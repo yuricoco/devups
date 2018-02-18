@@ -1,0 +1,9 @@
+{
+    "require": {
+        "doctrine/orm": "^1.1",
+        "philo/laravel-blade": "3.*"
+    },
+    "autoload": {
+        "psr-0": {"": "src/"}
+    }
+}

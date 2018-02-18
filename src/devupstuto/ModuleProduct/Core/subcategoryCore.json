@@ -1,0 +1,1 @@
+{"id":3,"name":"subcategory","module":{"id":2},"ref":null,"attribut":{"1":{"name":"name","visibility":"","datatype":"string","size":"22","nullable":"not","formtype":"text"}},"relation":[{"entity":"category","cardinality":"manyToOne","nullable":"default","ondelete":"cascade","onupdate":"cascade"}]}
