@@ -1,58 +1,49 @@
-<?php 
+<?php
+
+/**
+ * @Entity @Table(name="image")
+ * */
+class Image extends \Model implements JsonSerializable {
+
     /**
-     * @Entity @Table(name="image")
+     * @Id @GeneratedValue @Column(type="integer")
+     * @var int
      * */
-    class Image extends \Model implements JsonSerializable{
+    protected $id;
 
-        /**
-         * @Id @GeneratedValue @Column(type="integer")
-         * @var int
-         * */
-        protected $id;
-        /**
-         * @Column(name="image", type="string" , length=255 )
-         * @var string
-         **/
-        private $image; 
-        
+    /**
+     * @Column(name="image", type="string" , length=255 )
+     * @var string
+     * */
+    private $image;
 
-        
-        public function __construct($id = null){
-            
-                if( $id ) { $this->id = $id; }   
-                          
-}
+    public function __construct($id = null) {
 
-        public function getId() {
-            return $this->id;
+        if ($id) {
+            $this->id = $id;
         }
-					
-        public function showImage() {
-            return UploadFile::show($this->image, 'image');
-        }
-        
-        public function getImage() {
-            return $this->image;
-        }
+    }
 
-        public function uploadImage($image) {
-            
-            $path = 'image';
-            UploadFile::deleteFile($this->image, $path);
-            	
-            $result = UploadFile::image($path, $image);
-            if($result['success']){
-                $this->image = $result['file']['hashname'];
-            }
+    public function getId() {
+        return $this->id;
+    }
 
-            return $result;
-        }
-        
-        public function jsonSerialize() {
-                return [
-                        'id' => $this->id,
-                                'image' => $this->image,
-                ];
-        }
-        
+    public function showImage() {
+        return Dfile::show($this->image, 'image');
+    }
+
+    public function getImage() {
+        return $this->image;
+    }
+    function setImage($image) {
+        $this->image = $image;
+    }
+
+    public function jsonSerialize() {
+        return [
+            'id' => $this->id,
+            'image' => $this->image,
+        ];
+    }
+
 }

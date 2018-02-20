@@ -231,6 +231,13 @@ class QueryBuilder extends \DBAL {
         
     }
     
+    /**
+     * 
+     * @param type $arrayvalues
+     * @param type $seton
+     * @param type $case
+     * @return $this
+     */
     public function set($arrayvalues, $seton = null, $case = null) {
         $this->query .= " set ";
         
@@ -325,6 +332,11 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
+    /**
+     * 
+     * @param type $entity
+     * @return $this
+     */
     public function on($entity) {
         //" left join `".strtolower(get_class($entity)).
         $this->query .= " on " . $this->join . ".id = " . strtolower(get_class($entity)) . "." . $this->join . "_id";

@@ -185,40 +185,19 @@ class BackendGenerator {
 
                 if (in_array($attribut->formtype, ['document', 'image', 'music', 'video'])) {
                     $construt .= "
-					
+                        
         public function show" . ucfirst($attribut->name) . "() {
-            return UploadFile::show($" . "this->" . $attribut->name . ", '" . $name . "');
+            return Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
         }
         
         public function get" . ucfirst($attribut->name) . "() {
             return $" . "this->" . $attribut->name . ";
         }
 
-        public function upload" . ucfirst($attribut->name) . "($" . $attribut->name . ") {
-            
-            $" . "path = '" . $name . "';
-            UploadFile::deleteFile($" . "this->" . $attribut->name . ", $" . "path);
-            ";
-                    if ($attribut->formtype == 'document') {
-                        $construt .= "	
-            $" . "result = UploadFile::document($" . "path, $" . $attribut->name . ");";
-                    } elseif ($attribut->formtype == 'music') {
-                        $construt .= "	
-            $" . "result = UploadFile::music($" . "path, $" . $attribut->name . ");";
-                    } elseif ($attribut->formtype == 'video') {
-                        $construt .= "	
-            $" . "result = UploadFile::video($" . "path, $" . $attribut->name . ");";
-                    } elseif ($attribut->formtype == 'image') {
-                        $construt .= "	
-            $" . "result = UploadFile::image($" . "path, $" . $attribut->name . ");";
-                    }
-                    $construt .= "
-            if($" . "result['success']){
-                $" . "this->" . $attribut->name . " = $" . "result['file']['hashname'];
-            }
-
-            return $" . "result;
-        }";
+        public function set" . ucfirst($attribut->name) . "($" . $attribut->name . ") {
+            $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
+        }
+        ";
                 } elseif (in_array($attribut->formtype, ['date', 'datepicker'])) {
                     $construt .= "
 
@@ -392,8 +371,8 @@ class BackendGenerator {
             foreach ($entity->attribut as $attribut) {
 //			for($i = 1; $i < count($entity->attribut); $i++){
                 if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
-                    $contenu .= " 
-                        UploadFile::__FILE_SANITIZE($" . $name . ", '" . $attribut->name . "');
+                    $contenu .= "
+                        $".$name ."->savefile('" . $attribut->name . "');
                         ";
             }
         }
@@ -447,17 +426,17 @@ class BackendGenerator {
 //                            for($i = 1; $i < count($entity->attribut); $i++){
                 if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
                     $contenu .= " 
-                        UploadFile::__FILE_SANITIZE($" . $name . ", '" . $attribut->name . "');\n";
+                        $".$name ."->savefile('" . $attribut->name . "');\n";
             }
         endif;
         $contenu .= "
                     if ($" . $name . "->__update()) {
-                            return 	array(	'success' => true, // pour le restservice
+                            return 	array('success' => true, // pour le restservice
                                             '" . $name . "' => $" . $name . ",
                                             'redirect' => 'index', // pour le web service
                                             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
                     } else {
-                            return 	array(	'success' => false, // pour le restservice
+                            return 	array('success' => false, // pour le restservice
                                             '" . $name . "' => $" . $name . ",
                                             'action_form' => 'update&id='.$" . "id, // pour le web service
                                             'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
@@ -472,13 +451,13 @@ class BackendGenerator {
              */
             public function listAction($" . "next = 1, $" . "per_page = 10){
 
-                                                $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+                $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
 
-                                                return array('success' => true, // pour le restservice
-                                                    'lazyloading' => $" . "lazyloading, // pour le web service
-                                                    'detail' => '');
+                return array('success' => true, // pour le restservice
+                    'lazyloading' => $" . "lazyloading, // pour le web service
+                    'detail' => '');
 
-                                        }
+            }
 
             public function deleteAction($" . "id){
 

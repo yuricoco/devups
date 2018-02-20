@@ -14,6 +14,47 @@
 abstract class Model extends \stdClass {
 
     /**
+     * 
+     * @param type $param
+     * @return \Dfile
+     */
+    public static function upload($param) {
+        $dfile = new Dfile($param, $this);
+        return $dfile;
+    }
+
+    public function savefile($file) {
+
+        $uploadmethod = 'set' . ucfirst($file);
+        if (!method_exists($this, $uploadmethod)) {
+            var_dump(" You may create method " . $uploadmethod . " to set the file. ");
+            die;
+        }
+
+        $dfile = new Dfile($file, $this);
+        if ($this->id) {
+            $getcurrentfile = 'get' . ucfirst($file);
+            if (!method_exists($this, $getcurrentfile)) {
+                var_dump(" You may create method " . $getcurrentfile . " to update the file. ");
+                die;
+            }
+
+            $currentfile = call_user_func(array($this, $getcurrentfile));
+            if ($currentfile)
+                $dfile::deleteFile($currentfile, $dfile->uploaddir);
+            
+        }
+
+        $url = $dfile->hashname()->move();
+        call_user_func(array($this, $uploadmethod), $url["file"]["hashname"]);
+
+        if (!$url['success']) {
+            return false;
+        }
+        return true;
+    }
+
+    /**
      * return the row as design in the database
      * @example http://easyprod.spacekola.com description
      * @param type $id
@@ -48,9 +89,9 @@ abstract class Model extends \stdClass {
     }
 
     /**
-     * 
-     * @param string $att
-     * @param type $order
+     * return an array of entity sort by $att $order 
+     * @param string $att the attribut to sort by. id is the default value
+     * @param type $order the sort order ( asc, desc, rand() ) asc is the default value
      * @return type
      */
     public static function all($att = 'id', $order = "asc") {
@@ -98,7 +139,7 @@ abstract class Model extends \stdClass {
     /**
      * update a part or an entire entity
      * @example http://easyprod.spacekola.com description
-     * @param Mixed $arrayvalues 
+     * @param Mixed $arrayvalues an array [key => value]
      * @param Mixed $seton
      * @param Mixed $case id
      * @return boolean
@@ -122,7 +163,6 @@ abstract class Model extends \stdClass {
         return $dbal->createDbal($this);
     }
 
-    
     /**
      * update a part or an entire entity
      * @example http://easyprod.spacekola.com description
@@ -205,7 +245,6 @@ abstract class Model extends \stdClass {
 
         $dbal = new DBAL();
         return $dbal->belongto($this, $relation);
-        
     }
 
     public function getId() {

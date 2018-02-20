@@ -20,6 +20,7 @@ require __DIR__ . '/../class/devups/Bugmanager.php';
 require __DIR__ . '/../class/devups/Core.php';
 require __DIR__ . '/../class/devups/DBAL.php';
 require __DIR__ . '/../class/devups/QueryBuilder.php';
+require __DIR__ . '/../class/devups/Dfile.php';
 require __DIR__ . '/../class/devups/Model.php';
 require __DIR__ . '/../class/devups/EntityCollection.php';
 require __DIR__ . '/../class/devups/Controller.php';

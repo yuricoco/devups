@@ -4,7 +4,7 @@ Devups 3.5 Get started
 
 Prerequire : php, poo, uml
 
-Minimum config : php 7.^
+Minimum config : php 5.6, 7.^
 
 ## configuration
 Edit the config/constant.php file. Change
