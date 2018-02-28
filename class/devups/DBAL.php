@@ -963,8 +963,8 @@ class DBAL extends Database {
                     unset($this->objectValue[$i]);
                 } else {
 //                    $this->objectVar[] = substr($key, 2);
-                    $this->objectVar[] = $fieldname[$j];
-                    $j++;
+                        $this->objectVar[] = $fieldname[$j];
+                        $j++;
                 }
 
                 $i++;

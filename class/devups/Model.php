@@ -18,11 +18,14 @@ abstract class Model extends \stdClass {
      * @param type $param
      * @return \Dfile
      */
-    public static function upload($param) {
-        $dfile = new Dfile($param, $this);
+    public static function Dfile($fileparam) {
+        
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+        $dfile = new Dfile($fileparam, $entity);
         return $dfile;
     }
-
+    
     public function savefile($file) {
 
         $uploadmethod = 'set' . ucfirst($file);

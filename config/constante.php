@@ -38,6 +38,11 @@ define('VIEW', 1);
 define('ADMIN', 'admin_devups');
 define('ENTERPRISE', 'entreprise_devups');
 
+define('EXTENSION_IMAGE', array('jpg', 'jpeg', 'png', 'gif'));
+define('EXTENSION_AUDIO', array('mp3', 'aac', 'wma', 'ogg', 'flac', "wav"));
+define('EXTENSION_VIDEO', array('mp4', 'avi', 'mov', 'mkv', 'webm', 'ogg', 'crdownload'));
+define('EXTENSION_DOCUMENT', array('pdf', 'docx', 'doc', 'txt', 'ico', 'xls', 'xlsx', 'ppt', 'pptx'));
+define('EXTENSION_ARCHIVE', array('rar', 'zip'));
 
 function asset($src){
     return __env .'web/' . $src;
