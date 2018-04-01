@@ -22,9 +22,9 @@ class Dvups_adminController extends Controller {
             'dvups_admin' => $dvups_admin,
             'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&pwd=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-            //
+    //
     }
-    
+
     public function changepwAction(Dvups_admin $admin = null) {
 //        $adminDao = new AdminDAO();
         extract($_POST);
@@ -45,25 +45,24 @@ class Dvups_adminController extends Controller {
     }
 
     public function connexionAction($login, $password) {
-        $adminDao = new Dvups_adminDAO();
+//        $adminDao = new Dvups_adminDAO();
         //$connexionDao = new ConnexionDAO();
         //$mdp = sha1($password);
-        $admin = $adminDao->findByConnectic($login, $password);
+//        $admin = $adminDao->findByConnectic($login, $password);
+        $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
+
+        if (!$admin->getId())
+            return array('success' => false, "err" => 'Login ou mot de passe incorrect.');
+
         $admin->collectDvups_role();
 
-        if (!is_array($admin) and is_object($admin)) {
-            $_SESSION[ADMIN] = serialize($admin);
-            Dvups_roleController::getNavigationAction($admin);
+        Dvups_roleController::getNavigationAction($admin);
 
-            return array('success' => true,
-                'url' => 'index.php',
-                'detail' => 'detail de l\'action.');
-
-            //}
-        } else {
-            return array('success' => false, 'err' => 'login ou mot de passe incorrecte!');
-        }
-        //}
+        $_SESSION[ADMIN] = serialize($admin);
+        
+        return array('success' => true,
+            'url' => 'index.php',
+            'detail' => 'detail de l\'action.');
     }
 
     /**
@@ -107,7 +106,7 @@ class Dvups_adminController extends Controller {
         if ($dvups_admin->__insert()) {
             return array('success' => true, // pour le restservice
                 'dvups_admin' => $dvups_admin,
-                'redirect' => 'added&login=' . $dvups_admin->getLogin()."&password=" . $password, // pour le web service
+                'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
             return array('success' => false, // pour le restservice
@@ -127,7 +126,7 @@ class Dvups_adminController extends Controller {
         //$dvups_adminDao = new Dvups_adminDAO();
         $dvups_admin = (new DBAL())->findByIdDbal(new Dvups_admin($id));
         $dvups_admin->collectDvups_role();
-        
+
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
             'action_form' => 'update&id=' . $id, // pour le web service
@@ -170,7 +169,6 @@ class Dvups_adminController extends Controller {
             'lazyloading' => $pagination, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
     }
-    
 
     public function deleteAction($id) {
 

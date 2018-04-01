@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * @Entity @Table(name="dvups_admin")
  * */
@@ -11,19 +10,19 @@ class Dvups_admin extends Model implements JsonSerializable {
      * @var int
      * */
     private $id;
-    
+
     /**
      * @Column(name="name", type="string" , length=255 )
      * @var string
      * */
     private $name;
-    
+
     /**
      * @Column(name="login", type="string" , length=255 )
      * @var string
      * */
     private $login;
-    
+
     /**
      * @Column(name="password", type="string" , length=255 )
      * @var string
@@ -35,15 +34,13 @@ class Dvups_admin extends Model implements JsonSerializable {
      */
     private $dvups_role;
 
-    private function wd_remove_accents($str, $charset='utf-8')
-    {
+    private function wd_remove_accents($str, $charset = 'utf-8') {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);
 
         $str = preg_replace('#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
         $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str); // pour les ligatures e.g. '&oelig;'
         $str = preg_replace('#&[^;]+;#', '', $str); // supprime les autres caractères
         return str_replace(' ', '_', $str); // supprime les autres caractères
-
     }
 
     /**
@@ -79,7 +76,7 @@ class Dvups_admin extends Model implements JsonSerializable {
         }
         return $password;
     }
-    
+
     public function __construct($id = null) {
 
         if ($id) {
@@ -96,7 +93,7 @@ class Dvups_admin extends Model implements JsonSerializable {
     public function setId($id) {
         $this->id = $id;
     }
-    
+
     function getName() {
         return $this->name;
     }
@@ -128,7 +125,7 @@ class Dvups_admin extends Model implements JsonSerializable {
     function getDvups_role() {
         return $this->dvups_role;
     }
-    
+
     function collectDvups_role() {
         $this->dvups_role = $this->__hasmany('dvups_role');
         return $this->dvups_role;
@@ -140,6 +137,14 @@ class Dvups_admin extends Model implements JsonSerializable {
 
     function dropDvups_roleCollection() {
         $this->dvups_role = EntityCollection::entity_collection('dvups_role');
+    }
+
+    function availableentityright($action) {
+        if (isset($this->manageentity[$action])) {
+            $entity = $this->manageentity[$action];
+            return $entity->availableright();
+        }
+        return [];
     }
 
     public function jsonSerialize() {

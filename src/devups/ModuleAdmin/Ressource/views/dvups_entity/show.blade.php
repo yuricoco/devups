@@ -20,33 +20,25 @@
                     <div class="col-lg-12 col-md-12">
 			
             <div class="form-group">
-                            <h4>Image</h4>
-                <?php echo $product->getImage()->getId(); ?>
+                            <h4>Dvups_module</h4>
+                <?php echo $dvups_entity->getDvups_module()->getId(); ?>
         </div> 
             <div class="form-group">
-                            <h4>Category</h4>
-                <?php echo $product->getCategory()->getId(); ?>
-        </div> 
-            <div class="form-group">
-                            <h4>Subcategory</h4>
-                <?php echo $product->getSubcategory()->getId(); ?>
-        </div> 
-            <div class="form-group">
-                    <label>Storage product</label>
+                    <label>Dvups_right dvups_entity</label>
                   <?php 
-                  if($product->getStorage() and $product->getStorage()[0]->getId()) {
-                      foreach ($product->getStorage() as $storage){ 
+                  if($dvups_entity->getDvups_right() and $dvups_entity->getDvups_right()[0]->getId()) {
+                      foreach ($dvups_entity->getDvups_right() as $dvups_right){ 
                                     echo '
                 <label class="checkbox-inline">
-                                            '.$storage->getId().'
+                                            '.$dvups_right->getId().'
                 </label>'; 
                             }} ?>
             </div> 
 		
 			
 	<div class="form-group text-center">
-		<a href="index.php?path=product/edit&id=<?php echo $product->getId(); ?>" class="btn btn-default">Modifier</a>
-		<a href="index.php?path=product/delete&valid=oui&id=<?php echo $product->getId(); ?>" class="btn btn-default">Supprimer</a>
+		<a href="index.php?path=dvups_entity/edit&id=<?php echo $dvups_entity->getId(); ?>" class="btn btn-default">Modifier</a>
+		<a href="index.php?path=dvups_entity/delete&valid=oui&id=<?php echo $dvups_entity->getId(); ?>" class="btn btn-default">Supprimer</a>
 	</div>
 	
 	</div>

@@ -6,10 +6,22 @@
  * and open the template in the editor.
  */
 
+
 class Dfile {
 
+    public static $EXTENSION_IMAGE = array('jpg', 'jpeg', 'png', 'gif');
+    public static $EXTENSION_AUDIO = array('mp3', 'aac', 'wma', 'ogg', 'flac', "wav");
+    public static $EXTENSION_VIDEO = array('mp4', 'avi', 'mov', 'mkv', 'webm', 'ogg', 'crdownload');
+    public static $EXTENSION_DOCUMENT = array('pdf', 'docx', 'doc', 'txt', 'ico', 'xls', 'xlsx', 'ppt', 'pptx');
+    public static $EXTENSION_ARCHIVE = array('rar', 'zip', 'iso');
+    
     public $uploaddir;
     private $file;
+    private $compressionquality = 80;
+    
+    public function setcompressionquality($quality) {
+        $this->compressionquality = $quality;
+    }
 
     private function wd_remove_accents($str, $charset = 'utf-8') {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);
@@ -73,15 +85,15 @@ class Dfile {
         $this->imagesize = getimagesize($this->tmp_name);
 
         $this->extension = strtolower(pathinfo($this->name, PATHINFO_EXTENSION));
-        if (in_array($this->extension, EXTENSION_IMAGE)) {
+        if (in_array($this->extension, self::$EXTENSION_IMAGE)) {
             $this->type = "image";
-        } elseif (in_array($this->extension, EXTENSION_AUDIO)) {
+        } elseif (in_array($this->extension, self::$EXTENSION_AUDIO)) {
             $this->type = "audio";
-        } elseif (in_array($this->extension, EXTENSION_VIDEO)) {
+        } elseif (in_array($this->extension, self::$EXTENSION_VIDEO)) {
             $this->type = "video";
-        } elseif (in_array($this->extension, EXTENSION_DOCUMENT)) {
+        } elseif (in_array($this->extension, self::$EXTENSION_DOCUMENT)) {
             $this->type = "document";
-        } elseif (in_array($this->extension, EXTENSION_ARCHIVE)) {
+        } elseif (in_array($this->extension, self::$EXTENSION_ARCHIVE)) {
             $this->type = "archive";
         } else {
             $this->type = "text";
@@ -185,7 +197,8 @@ class Dfile {
             }
         }
 
-        $filename = $uploaddir . str_replace("." . $this->extension, "", $this->file_name) . $sufix . "." . $this->extension;
+        $filename = $uploaddir. $sufix . $this->file_name;
+//        $filename = $uploaddir . str_replace("." . $this->extension, "", $this->file_name) . $sufix . "." . $this->extension;
         $newimage = imagecreatetruecolor($largeur, $hauteur) or die("Erreur");
 
         if (in_array($this->extension, array('jpg', 'jpeg'))) {
@@ -300,6 +313,13 @@ class Dfile {
         return $image;
     }
 
+    public function addvariante($param) {
+        $this->variante[] = $param;
+        return $this;
+    }
+    public function delete($path) {
+        
+    }
     /**
      * delete the file named $image
      * 

@@ -19,7 +19,14 @@
                     "type" => FORMTYPE_SELECT, 
                     "value" => $dvups_entity->getDvups_module()->getId(),
                     "label" => 'Dvups_module',
-                    "options" => FormManager::Options_Helper('name', ( new DBAL( new Dvups_module()) )->findAllDbalEntireEntity()),
+                    "options" => FormManager::Options_Helper('name', Dvups_module::all()),
+                ];
+
+                $entitycore->field['dvups_right'] = [
+                    "type" => FORMTYPE_CHECKBOX, 
+                    "values" => FormManager::Options_Helper('name', $dvups_entity->getDvups_right()),
+                    "label" => 'Dvups_right',
+                    "options" => FormManager::Options_ToCollect_Helper('name', new Dvups_right(), $dvups_entity->getDvups_right()),
                 ];
 
 

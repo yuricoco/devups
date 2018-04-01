@@ -89,13 +89,15 @@ class Adminv2 {
 
         foreach ($entity->attribut as $attribut) {
             if ($attribut->formtype == 'image') {
-                $listview[] = "'src:" . $attribut->name . "'";
+//                $listview[] = "'src:" . $attribut->name . "'";
+                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => 'src:" . $attribut->name . "']";
 //                        }elseif($entity->attribut[$i]->formtype == 'document'){
 //                        }elseif($entity->attribut[$i]->formtype == 'document'){
 //                        }elseif($entity->attribut[$i]->formtype == 'document'){
-                $listview[] = "'" . $attribut->name . "'";
+                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
             } else {
-                $listview[] = "'" . $attribut->name . "'";
+                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
+//                $listview[] = "'" . $attribut->name . "'";
             }
         }
 
@@ -115,14 +117,14 @@ class Adminv2 {
                     $entitylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $listview[] = "'" . $entrel . "." . $entitylinkattrname . "'";
+                $listview[] = "\n['header' => '" . $entrel . "', 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
             }
         }
 
         $index = "
         <div class=\"col-lg-12 col-md-12\">
                 
-                    <?= Genesis::lazyloading($" . "lazyloading, [" . implode(', ', $listview) . "]); ?>
+                    <?= Genesis::lazyloadingUI($" . "lazyloading, [" . implode(', ', $listview) . "\n]); ?>
 
         </div>
 			";
@@ -258,38 +260,7 @@ class Adminv2 {
 
 @section('jsimport')
 
-                <script>
-    function findindatabase(){
-        $.get( \"index.php?path=abonne.rest/datatable&search=\" + $(\"#search\").val(), function (response) {
-                    console.log(response);
-        });
-    }
-    
-    function myFunction() {
-        var input, filter, table, tr, td, i;
-        input = document.getElementById(\"myInput\");
-        filter = input.value.toUpperCase();
-        table = document.getElementById(\"dv_table\");
-        console.log(table);
-        tr = table.getElementsByTagName(\"tr\");
-
-        for (i = 1; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName(\"td\")[1].innerHTML.toUpperCase();
-            td += \" \" + tr[i].getElementsByTagName(\"td\")[2].innerHTML.toUpperCase();
-//            td += \" \" + tr[i].getElementsByTagName(\"td\")[3].innerHTML.toUpperCase();
-//            td += \" \" + tr[i].getElementsByTagName(\"td\")[4].innerHTML.toUpperCase();
-            search(tr, td, filter, i);
-            
-        }
-    }
-    function search(tr, td, filter, i) {
-        if (td.indexOf(filter) > -1) {
-            tr[i].style.display = \"\";
-        } else {
-            tr[i].style.display = \"none\";
-        }
-    }
-    </script>
+                <script></script>
 @show";
 
         $view = fopen($_dir . 'index.blade.php', 'w');

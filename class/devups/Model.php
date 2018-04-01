@@ -15,17 +15,67 @@ abstract class Model extends \stdClass {
 
     /**
      * 
+     * @param type $lable
+     * @param type $content
+     * @param type $lang
+     * @return \Dvups_lang
+     */
+    public function __translate($lable, $content, $lang = "fr") {
+        if(!$this->id)
+            return; 
+        
+        $dvlang = new Dvups_lang();
+        $dvlang->setLabel($this->id . "_" . $lable);
+        $dvlang->setLang($lang);
+        $dvlang->setTable(strtolower(get_class($this)));
+        $dvlang->setRow_id($this->id);
+        $dvlang->setContent($content);
+        $dvlang->__save();
+    }
+
+    public function __updatetranslate($lable, $content, $lang = "fr") {
+        if(!$this->id)
+            return; 
+        
+        $dvlang = Dvups_lang::select()
+                ->where("label", $this->id . "_" . $lable)
+                ->andwhere("lang", $lang)
+                ->andwhere("`table`", strtolower(get_class($this)) )
+                ->__getOne();
+        
+        if (!$dvlang->getId()) {
+            $dvlang->setLabel($this->id . "_" . $lable);
+            $dvlang->setLang($lang);
+            $dvlang->setTable(strtolower(get_class($this)));
+            $dvlang->setRow_id($this->id);
+        }
+        $dvlang->setContent($content);
+        $dvlang->__save();
+    }
+
+    public function __gettranslate($lable, $lang = "fr") {
+        if(!$this->id)
+            return ""; 
+        
+        $dvlang = Dvups_lang::select()->where("label", $this->id . "_" . $lable)
+                ->andwhere("`table`", strtolower(get_class($this)) )
+                ->andwhere("lang", $lang)->__getOne();
+        return $dvlang->getContent();
+    }
+
+    /**
+     * 
      * @param type $param
      * @return \Dfile
      */
     public static function Dfile($fileparam) {
-        
+
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
         $dfile = new Dfile($fileparam, $entity);
         return $dfile;
     }
-    
+
     public function savefile($file) {
 
         $uploadmethod = 'set' . ucfirst($file);
@@ -45,7 +95,6 @@ abstract class Model extends \stdClass {
             $currentfile = call_user_func(array($this, $getcurrentfile));
             if ($currentfile)
                 $dfile::deleteFile($currentfile, $dfile->uploaddir);
-            
         }
 
         $url = $dfile->hashname()->move();
@@ -92,9 +141,9 @@ abstract class Model extends \stdClass {
     }
 
     /**
-     * return an array of entity sort by $att $order 
-     * @param string $att the attribut to sort by. id is the default value
-     * @param type $order the sort order ( asc, desc, rand() ) asc is the default value
+     * 
+     * @param string $att
+     * @param type $order
      * @return type
      */
     public static function all($att = 'id', $order = "asc") {
@@ -142,7 +191,7 @@ abstract class Model extends \stdClass {
     /**
      * update a part or an entire entity
      * @example http://easyprod.spacekola.com description
-     * @param Mixed $arrayvalues an array [key => value]
+     * @param Mixed $arrayvalues 
      * @param Mixed $seton
      * @param Mixed $case id
      * @return boolean
@@ -201,9 +250,15 @@ abstract class Model extends \stdClass {
         return $dbal->findByIdDbal($this, $recursif);
     }
 
-    public function __delete() {
-        $dbal = new DBAL();
-        return $dbal->deleteDbal($this);
+    public function __delete($exec = true) {
+        if ($exec) {
+            $dbal = new DBAL();
+            return $dbal->deleteDbal($this);
+        } else {
+            $qb = new QueryBuilder($this);
+            $qb->delete();
+            return $qb;
+        }
     }
 
     public function __getall($att = 'id', $order = "asc") {
@@ -222,14 +277,14 @@ abstract class Model extends \stdClass {
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }
 
-    public function __hasmany($collection) {
+    public function __hasmany($collection, $exec = true) {
         if (!is_object($collection)) {
             $reflection = new ReflectionClass($collection);
             $collection = $reflection->newInstance();
         }
         if ($this->getId()) {
             $dbal = new DBAL();
-            return $dbal->hasmany($this, $collection);
+            return $dbal->hasmany($this, $collection, $exec);
         } else {
             return [];
         }
@@ -248,6 +303,16 @@ abstract class Model extends \stdClass {
 
         $dbal = new DBAL();
         return $dbal->belongto($this, $relation);
+    }
+
+    public function __belongto2($relation) {
+        if (!is_object($relation)) :
+            $reflection = new ReflectionClass($relation);
+            $relation = $reflection->newInstance();
+        endif;
+
+        $qb = new QueryBuilder($relation);
+        return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOneRow();
     }
 
     public function getId() {

@@ -1,5 +1,7 @@
 <?php
 
+use Genesis as g;
+
 /**
  * class Controller 1.0
  *
@@ -17,9 +19,8 @@ abstract class Controller extends DBAL {
      * 
      * @param type $resultCtrl controller method
      */
-    public static function renderTemplate($resultCtrl) {
-        extract($resultCtrl);
-        include $template;
+    public static function renderTemplate($view, $data) {
+        g::render($view, $data);
     }
 
     /**
@@ -30,19 +31,84 @@ abstract class Controller extends DBAL {
      * @param type $next
      * @return type
      */
+    public function lazyloading2($listEntity) {
+
+        return array('success' => true, // pour le restservice
+            'listEntity' => $listEntity,
+            'nb_element' => count($listEntity),
+            'per_page' => 100,
+            'pagination' => 1,
+            'current_page' => 1,
+            'next' => 1,
+            'previous' => 0,
+            'remain' => 1,
+            'detail' => '');
+    }
+
+    private function filter(\stdClass $entity, \QueryBuilder $qb) {
+
+        $fieldarray = explode(",", $_GET['dfilters']);
+
+        foreach ($fieldarray as $fieldwithtype) {
+            $arrayfieldtype = explode(":", $fieldwithtype);
+
+            if ($_GET[$arrayfieldtype[0]]) {
+                if ($arrayfieldtype[1] == "attr") {
+                    $qb->andwhere($arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
+                }
+                elseif ($arrayfieldtype[1] == "join") {
+                    
+                    $join = explode("-", $arrayfieldtype[0]);
+                    $qb->andwhere($join[0]."_id")
+                            ->in(
+                                    $qb->addselect("id", new $join[0])
+                                    ->where($join[1])
+                                    ->like($_GET[$arrayfieldtype[0]])
+                                    ->close()
+                                    );
+                } 
+//                elseif ($_GET[$arrayfieldtype[1]] == "collect") {
+//                    
+//                    $join = explode("-", $arrayfieldtype[0]);
+//                    $qb->andwhere("id")->in($qb->addselect("id", new $join[0])->where($column)->like($value)->close());
+//                }
+            }
+        }
+
+        return $qb;
+    }
+
+    /**
+     * 
+     * @param \stdClass $entity
+     * @param type $next
+     * @param type $per_page
+     * @param \QueryBuilder $qbcustom
+     * @return type
+     */
     public function lazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null) {
         $remain = true;
+
         if (isset($_GET['next']) && isset($_GET['per_page']))
             extract($_GET);
 
         $qb = new QueryBuilder($entity);
 
         if ($qbcustom != null) {
+
+            if (isset($_GET["dfilters"]))
+                $qbcustom = $this->filter($entity, $qbcustom);
+
             $nb_element = $qbcustom->__countEl(false);
         } else {
-            $nb_element = $qb->selectcount()->__countEl(false);
-        }
 
+            if (isset($_GET["dfilters"])) {
+                $qbcustom = $this->filter($entity, $qb);
+                $nb_element = $qbcustom->__countEl(false);
+            } else {
+                $nb_element = $qb->selectcount()->__countEl(false);
+            }
+        }
 
         if ($per_page != "all") {
             if (!($nb_element % $per_page)) {
@@ -71,6 +137,9 @@ abstract class Controller extends DBAL {
                 $next = $page;
             }
         } else {
+            $pagination = 0;
+            $page = 1;
+            $remain = 0;
             if ($qbcustom != null) {
                 $listEntity = $qbcustom->__getAll();
             } else {
@@ -205,7 +274,7 @@ abstract class Controller extends DBAL {
                 $key_form = $association[$j];
                 $key_value[$key_form] = $key;
                 $j++;
-            } elseif (is_array($value)) {
+            } elseif (is_array($value) && $value) {
                 $key_form = strtolower(get_class($value[0]));
 
                 if (!isset($_ENTITY_FORM[$key_form]))
@@ -213,9 +282,11 @@ abstract class Controller extends DBAL {
 
                 $key_value[$key_form] = $key;
             } else {
-                $key_form = $fieldname[$i];
-                $key_value[$key_form] = $key;
-                $i++;
+                if (isset($fieldname[$i])) {
+                    $key_form = $fieldname[$i];
+                    $key_value[$key_form] = $key;
+                    $i++;
+                }
             }
         }
 
@@ -285,7 +356,7 @@ abstract class Controller extends DBAL {
                         $reflect = new ReflectionClass($key);
                         $value2 = $reflect->newInstance();
 
-                        if ($value['options']) {
+                        if ($value['options'] && $value_form) {
                             $value2->setId($value_form);
                             $object_array[$key_value[$key]] = $value2;
                         } else {

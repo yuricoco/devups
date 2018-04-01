@@ -12,6 +12,7 @@ class Dvups_roleController extends Controller {
         global $dvups_action;
         global $dvups_navigation;
 
+        $admin->manageentity = [];
         $dvups_navigation = [];
         foreach ($admin->getDvups_role() as $key => $role) {
 
@@ -24,13 +25,13 @@ class Dvups_roleController extends Controller {
                 foreach ($role->getDvups_entity() as $key => $entity) {
                     if ($entity->getDvups_module()->getId() == $module->getId()) {
                         $entities[] = $entity;
+                        $admin->manageentity[$entity->getName()] = $entity;
                         unset($role->getDvups_entity()[$key]);
                     }
                 }
                 $dvups_navigation[] = ['module' => $module, 'entities' => $entities];
             }
             foreach ($role->getDvups_right() as $value) {
-
                 $right[] = $value->getName();
             }
 

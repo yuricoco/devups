@@ -1,23 +1,23 @@
 <?php
-    
+
 require 'header.php';
-        
+
 use Genesis as g;
-		
-    //instanciation des controllers
-    		$storageCtrl = new StorageController();
-		$categoryCtrl = new CategoryController();
-		$subcategoryCtrl = new SubcategoryController();
-		$productCtrl = new ProductController();
-		$imageCtrl = new ImageController();
-                    
+
+//instanciation des controllers
+$storageCtrl = new StorageController();
+$categoryCtrl = new CategoryController();
+$subcategoryCtrl = new SubcategoryController();
+$productCtrl = new ProductController();
+$imageCtrl = new ImageController();
+
 
 (new Request('hello'));
 
 switch (Request::get('path')) {
-            case 'hello':
-                g::render( 'hello' );
-                break;
+    case 'hello':
+        g::render('hello');
+        break;
 
     //    case 'view1':
     //        g::render( 'view1', $Ctrl->Action() );
@@ -29,10 +29,10 @@ switch (Request::get('path')) {
     //        g::render( 'view2', [$Ctrl->Action(), $Ctrl2->Action(), ... , $Ctrln->Action()] );
     //        break;
 
-                        
-        default :
-                // inclusion du layout du site 
-                include 'web/404.html';
-                break;
-    }
+
+    default :
+        // inclusion du layout du site 
+        include 'web/404.html';
+        break;
+}
                         

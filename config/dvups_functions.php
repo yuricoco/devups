@@ -19,9 +19,46 @@ function url_format($str, $charset='utf-8')
 }
 
 
-//function redirection(Array $result) {
-//    if ($result['success'])
-//        header('location: ' . $result['url']);
-//    else
-//        return $result;
-//}
+global $__lang;
+if(!isset($_SESSION["__lang"] )){
+    $_SESSION["__lang"] = "fr";
+}
+
+/**
+ * @return \Dvups_admin Description
+ */
+function getadmin() {
+    return unserialize($_SESSION[ADMIN]);
+}
+
+function local() {
+    return $_SESSION["__lang"];
+}
+
+function setlang() {
+    if (Request::get('lang')) {
+        if (in_array(Request::get('lang'), ["en", "fr"]) && $_SESSION["__lang"] != Request::get('lang')) {
+            $_SESSION["__lang"] = Request::get('lang');
+        }
+    }
+}
+
+function url($path, $id = "", $title = "") {
+    global $__lang;
+
+    $path = $__lang . $path;
+    if ($id) {
+        $path .= "/" . $id;
+    }
+
+    if ($title) {
+        $path .= url_format($title);
+    }
+
+    $mode = "";
+    if (Request::get('mode')) {
+        $mode = "?mode=" . Request::get('mode');
+    }
+
+    return __env . $path . $mode;
+}

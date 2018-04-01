@@ -20,6 +20,7 @@ define('FORMTYPE_SELECT', 'select');
 define('FORMTYPE_CHECKBOX', 'checkbox');
 define('FORMTYPE_RADIO', 'radio');
 define('FORMTYPE_FILE', 'file');
+define('FORMTYPE_FILEMULTIPLE', 'filemultiple');
 define('FILETYPE_IMAGE', 'image');
 define('FILETYPE_DOCUMENT', 'document');
 define('FILETYPE_VIDEO', 'video');
@@ -28,6 +29,7 @@ define('FORMTYPE_EMAIL', 'email');
 define('FORMTYPE_NUMBER', 'number');
 define('FORMTYPE_PASSWORD', 'password');
 define('FORMTYPE_INJECTION', 'injection');
+define('FORMTYPE_INJECT_COLLECTIONFORM', 'injectioncollection');
 
 define('FH_TYPE', 'type');
 define('FH_FILETYPE', 'filetype');
@@ -45,7 +47,7 @@ abstract class FormManager {
     //put your code here
 //    abstract function __renderForm($entity = null) ;
     
-    static function Options_ToCollect_Helper($value, $entity, $currentcollection, $manageentity = false) {
+    static function Options_ToCollect_Helper($value, $entity, $currentcollection, $enablecollectionforminjection = false) {
         
         $qb = new QueryBuilder($entity);
         if($currentcollection && $currentcollection[0]->getId()){
@@ -63,11 +65,32 @@ abstract class FormManager {
             $entitylist = $qb->select()->__getAll(false);
             
         }
-        
-        if($manageentity)
-            return $entitylist;
 
-        return FormManager::Options_Helper($value, $entitylist);
+        return FormManager::Options_Helper($value, $entitylist, "id", $enablecollectionforminjection);
+            
+    }
+    
+    static function Options_ToCollectFormInjection_Helper($value,  $entity, $currentcollection, $entitybaseon) {
+        
+        $qb = new QueryBuilder($entitybaseon);
+        if($currentcollection && $currentcollection[0]->getId()){
+            foreach ($currentcollection as $collected) {
+                $ids[] = $collected->contentmodel->getId();
+            }
+            
+//            $qb = new QueryBuilder(new Contentmodel());
+            $entitylist = $qb->select()
+                    ->where("contentmodel.id")
+                    ->notin($ids)
+                    ->__getAll(false);
+            
+        }else{
+            
+            $entitylist = $qb->select()->__getAll(false);
+            
+        }
+        
+        return FormManager::Options_Helper($value, $entitylist,  "id", true);
             
     }
     
@@ -79,10 +102,44 @@ abstract class FormManager {
         
         if(isset($entitylist[0]) && is_object($entitylist[0]) && !$entitylist[0]->getId()) return [];
 //        if($__controller_traitment) return EntityCollection::entity_collection($value);
-        
+        $entitylist2 = [];
         foreach ($entitylist as $entity) {
-            $key_value[call_user_func(array( $entity, 'get' . ucfirst($key) ) )] = call_user_func(array( $entity, 'get' . ucfirst($value) ) ); 
-            $entitylist2[call_user_func(array( $entity, 'getId' ) )] = $entity; 
+            $join = explode(".", $value);
+                if (isset($join[1])) {
+
+//                    $collection = explode("::", $join[0]);
+//                    $src = explode(":", $join[0]);
+//
+//                    if (isset($src[1]) and $src[0] = 'src') {
+//
+//                        $entityjoin = call_user_func(array($entity, 'get' . ucfirst($src[1])));
+//                        $file = call_user_func(array($entityjoin, 'show' . ucfirst($join[1])));
+//
+//                        $tr[] = "<img class='dv-img' width='50' src='" . $file . "' />";
+//                        
+//                        $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[1])));
+//                        
+//                        $key_value[call_user_func(array($entity, 'get' . ucfirst($key)))] = call_user_func(array($entityjoin, 'get' . ucfirst($join[1])));
+//                    } 
+//                    elseif (isset($collection[1])) {
+//                        $td = [];
+//                        $entitycollection = call_user_func(array($entity, 'get' . ucfirst($collection[1])));
+//                        foreach ($entitycollection as $entity) {
+//                            $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
+//                            $td[] = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
+//                        }
+//                        $tr[] = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
+//                    } 
+//                    else {
+                        $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
+                        
+                        $key_value[call_user_func(array($entity, 'get' . ucfirst($key)))] = call_user_func(array($entityjoin, 'get' . ucfirst($join[1])));
+                    
+//                    }
+                } else {
+                    $key_value[call_user_func(array( $entity, 'get' . ucfirst($key)))] = call_user_func(array($entity, 'get' . ucfirst($value)));
+                }
+                $entitylist2[call_user_func(array($entity, 'getId' ) )] = $entity; 
         }
         
         if($enablecollectionforminjection)

@@ -3,15 +3,8 @@
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 /**
- * Description of DBAL 3.1.0
- * 
+ * Description of DBAL 3.1.0 * 
  * Abstraction database layer implement object \DateTime structire
  * nullable value for many to one relation 
  *
@@ -92,7 +85,8 @@ class DBAL extends Database {
         
         $global_navigation = Core::buildOriginCore();
         $enittyfoldes = [];
-
+        $enittyfoldes[] = ROOT . "class/extends";
+        
         foreach ($global_navigation as $key => $project) {
             if (is_object($project)) {
                 foreach ($project->listmodule as $key => $module) {
@@ -146,13 +140,6 @@ class DBAL extends Database {
      * 
      * @param integer $id l'id de l'entité proprietère de la relation
      * @return 
-     */
-    /*
-     * ok la il se pose un souci jusque la je n'ai pu persister que les entités deja formé dans le controller
-     * et juste ajouté dans l'instance. or il ya des situation ou c'est dans le dao qu'on doit former cette
-     * entité et la c'est vraiment la galere du moins pour le moment vu que je n'ai pas encore trouvé de
-     * solution. je pense pour une instanciation dynamique de l'entité en question mais massa je ne sais pas
-     * ou prendre l'autre la hummmmm!!!!
      */
     private function manyToManyAdd($id, $update = false, $change_collection = []) {
         /**
@@ -313,22 +300,6 @@ class DBAL extends Database {
         return $success;
     }
 
-    private function dynamicInstance($entity_name) {
-        /**
-         * on instantie la class $entityTable trop cool
-         */
-        $reflect = new ReflectionClass($entity_name);
-        $object = $reflect->newInstance();
-        $list_entity_link = [];
-        foreach ((array) $object as $value) {
-            if (is_object($value)) {
-                $list_entity_link[] = $value;
-            }
-        }
-
-        return ['object' => $object, "list_entity_link" => $list_entity_link];
-    }
-
     public function belongto($entity, $relation) {
 
         if (is_object($relation)) {
@@ -371,7 +342,7 @@ class DBAL extends Database {
         return $qb->select()->where("id", "=", $id)->__getOneRow();
     }
 
-    public function hasmany($entity, $collection) {
+    public function hasmany($entity, $collection, $exec = true) {
 
         $objectName = strtolower(get_class($entity));
         $collectionName = strtolower(get_class($collection));
@@ -388,22 +359,30 @@ class DBAL extends Database {
             $tableinstance = ucfirst($entityTable);
 
             $qb = new QueryBuilder($collection);
-            return $qb->select()
-                            ->where($entity)
-                            ->__getAll();
+            $qb->select()
+                 ->where($entity);
+                            
+            if($exec)
+                return $qb->__getAll();
+            else
+                return $qb;
         }
 
         $tableinstance = ucfirst($entityTable);
 
         $qb = new QueryBuilder($collection);
-        return $qb->select()
+        $qb->select()
                         ->where($collectionName . ".id")
                         ->in(
                                 $qb->addselect($collectionName . "_id", new $tableinstance)
                                 ->where($entity)
                                 ->close()
-                        )
-                        ->__getAll();
+                        );
+        
+        if($exec)
+            return $qb->__getAll();
+        else
+            return $qb;
     }
 
     /**
@@ -537,7 +516,7 @@ class DBAL extends Database {
             $parameterQuery .= ',?';
         }
 
-        $sql = "insert into `" . $this->table . "` (" . strtolower(implode(',', $this->objectVar)) . ") values (" . strtolower($parameterQuery) . ")";
+        $sql = "insert into `" . $this->table . "` (`" . strtolower(implode('` ,`', $this->objectVar)) . "`) values (" . strtolower($parameterQuery) . ")";
 
         foreach ($this->objectValue as $value) {
             $values[] = $value;
@@ -572,9 +551,9 @@ class DBAL extends Database {
         endif;
 
         $this->update = true;
-        $parameterQuery = $this->objectVar[1] . '=?';
+        $parameterQuery = '`' .$this->objectVar[1] . '`=?';
         for ($i = 2; $i < $this->nbVar; $i++) {
-            $parameterQuery .= ',' . $this->objectVar[$i] . '=?';
+            $parameterQuery .= ', `' . $this->objectVar[$i] . '`=?';
         }
         $values = $this->objectValue;
         array_splice($values, 0, 1);
@@ -715,9 +694,9 @@ class DBAL extends Database {
         if (empty($this->entity_link_list) and empty($this->objectCollection))
             $flowBD = $req->fetchObject($this->objectName);
         elseif ($arrayReturn)
-            $flowBD = $this->join($req->fetch(PDO::FETCH_NAMED), $this->object, true, $recursif);
+            $flowBD = $this->djoin($req->fetch(PDO::FETCH_NAMED), $this->object, true, $recursif);
         else
-            $flowBD = $this->join($req->fetch(PDO::FETCH_NAMED), $this->object, $collection, $recursif);
+            $flowBD = $this->djoin($req->fetch(PDO::FETCH_NAMED), $this->object, $collection, $recursif);
 
         if (!$flowBD)
             $flowBD = $this->object;
@@ -762,7 +741,7 @@ class DBAL extends Database {
             $retour = $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
         elseif ($arraybd = $query->fetchAll(PDO::FETCH_NAMED)) {
             foreach ($arraybd as $row)
-                $liste[] = $this->join($row, $this->object, $collection, $recursif);
+                $liste[] = $this->djoin($row, $this->object, $collection, $recursif);
             $retour = $liste;
         } else
             $retour = array();
@@ -785,8 +764,6 @@ class DBAL extends Database {
 
     /**
      * orm v_3.0
-     * utilisé pour les findById()
-     * 
      * methode recurcivi qui permet de recreer les entités imbriques dans l'entité courantes
      * prend en parametre un tableau qui est le résultat d'une requete avec jointure et retourne
      * l'entité souhaité.
@@ -802,16 +779,23 @@ class DBAL extends Database {
      * @return type
      */
     private function orm($flowBD, $object, $imbricateindex = 0, $recursif = true, $collection = false) {
-
+//        global $em;
         $object_array = (array) $object;
 
+//            $classmetadata = $em->getClassMetadata("\\" . get_class($object));
+//            $fieldname = array_keys($classmetadata->fieldNames);
+//            $association = array_keys($classmetadata->associationMappings);
+//            
+//             $i = 0;
+//            $j = 0;
+//            $k = 0;
         foreach ($object_array as $key => $value) {
 //                    $imbricateindex = 0;
 
             $k = str_replace(get_class($object), '', $key);
             $k = str_replace('*', '', $k);
             $k2 = substr($k, 2);
-
+            
             foreach ($flowBD as $key2 => $value2) {
 
                 if (is_object($value)) {
@@ -864,6 +848,7 @@ class DBAL extends Database {
                     }
                 }
             }
+            
         }
 
         return $object_array;
@@ -877,7 +862,7 @@ class DBAL extends Database {
      * @param Boolean $recursif weither or not the requeste should go deeper in finding entity relation.
      * @return type
      */
-    private function join($flowBD, $object, $collection = false, $recursif = true) {
+    private function djoin($flowBD, $object, $collection = false, $recursif = true) {
 
         if (!is_array($flowBD)) {
 
@@ -963,8 +948,8 @@ class DBAL extends Database {
                     unset($this->objectValue[$i]);
                 } else {
 //                    $this->objectVar[] = substr($key, 2);
-                        $this->objectVar[] = $fieldname[$j];
-                        $j++;
+                    $this->objectVar[] = $fieldname[$j];
+                    $j++;
                 }
 
                 $i++;

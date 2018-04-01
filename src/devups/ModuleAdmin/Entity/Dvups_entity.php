@@ -74,6 +74,23 @@ class Dvups_entity extends Model implements JsonSerializable {
         return $this->dvups_right;
     }
 
+    function collectDvups_right() {
+        $this->dvups_right = $this->__hasmany('dvups_right');
+        return $this->dvups_right;
+    }
+
+    function availableright() {
+        $this->dvups_right = $this->__hasmany('dvups_right');
+        if ($this->dvups_right) {
+            foreach ($this->dvups_right as $right) {
+                $rights[] = $right->getName();
+            }
+            return $rights;
+        }
+
+        return [];
+    }
+
     function addDvups_right(\Dvups_right $dvups_right) {
         $this->dvups_right[] = $dvups_right;
     }

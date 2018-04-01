@@ -23,13 +23,34 @@ class Genesis {
 //        }
     public static function actionListView($path, $id, $action) {
         $actionlien = "";
-        if (isset($_SESSION['action'])) {
+
+        if (!isset($_SESSION['action']))
+            return "<span class='alert alert-info' >not rigth contact the administrator</span>";
+
+        $rigths = getadmin()->availableentityright($path);
+        if ($rigths) {
+            if (in_array('update', $rigths)) {
+                if (in_array('update', $_SESSION['action'])) // next deep is the admin right. its role maybe have the right to do some thing but he maybe not have that right
+                    $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '"  class="btn btn-default" >edit</a>';
+            }
+            if (in_array('read', $rigths)) {
+                if (in_array('read', $_SESSION['action']))
+                    $actionlien .= '<a href="index.php?path=' . $path . '/show&id=' . $id . '" target="_self" class="btn btn-default" >show</a> .';
+            }
+            if (in_array('delete', $rigths)) {
+                if (in_array('delete', $_SESSION['action']))
+                    $actionlien .= '<a href="index.php?path=' . $path . '/delete&id=' . $id . '"'
+                            . ' onclick="if(!confirm(\'Voulez-vous Supprimer\')) return false;" '
+                            . ' class="btn btn-default" >delete</a>';
+            }
+        }
+        elseif (isset($_SESSION['action'])) {
             if (in_array('update', $_SESSION['action']) or
                     in_array('read', $_SESSION['action']) or
                     in_array('delete', $_SESSION['action'])) {
 
                 if (in_array('update', $_SESSION['action']))
-                    $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '"  class="btn btn-default" >modifier</a>';
+                    $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '"  class="btn btn-default" >edit</a>';
 
                 if (in_array('read', $_SESSION['action']))
                     $actionlien .= '<a href="index.php?path=' . $path . '/show&id=' . $id . '" target="_self" class="btn btn-default" >show</a> .';
@@ -55,7 +76,8 @@ class Genesis {
         $index_ajouter = "index.php?path=$action/_new";
         $index_modifier = "index.php?path=$action/index";
 
-//            if(isset($lien_menu)){
+        $rigths = getadmin()->availableentityright($action);
+
         $top_action = '<div class="row">
                             <div class="col-lg-3 col-md-6">
                                     <div class="panel panel-primary">
@@ -69,46 +91,24 @@ class Genesis {
                                     </div>
                             </div>
                             <div style="float: right; margin-right: 30px;"  class="panel">';
-        if (isset($_SESSION['action'])) {
-            if (in_array('create', $_SESSION['action']) or
-                    in_array('read', $_SESSION['action'])) {
-//
+
+        if ($rigths) {
+            if (in_array('create', $rigths)) {
                 if (in_array('create', $_SESSION['action']))
                     $top_action .= '<a href="' . $index_ajouter . '"  class="btn btn-default" >add</a>';
-//                                            else
-//                                                    echo "";
-//
-                if (in_array('read', $_SESSION['action']))
-                    $top_action .= '<a href="' . $index_modifier . '" target="_self" class="btn btn-default" >Listing</a> .';
-//                                            else
-//                                                    echo "<span class='alert alert-info' >not rigth for 'list' action </span>";
-//
-            }else {
+            }
+        }elseif (isset($_SESSION['action'])) {
+            if (in_array('create', $_SESSION['action']))
+                $top_action .= '<a href="' . $index_ajouter . '"  class="btn btn-default" >add</a>';
+            else {
                 $top_action .= "<span class='alert alert-info' >not rigth contact the administrator</span>";
             }
         }
+
+        $top_action .= '<a href="' . $index_modifier . '" target="_self" class="btn btn-default" >Listing</a> .';
         $top_action .= '</div>';
 
         return $top_action;
-//            }else{
-//                    if(isset($_SESSION['privilege_avance'][$action])){
-//                            if( in_array('create', $_SESSION['privilege_avance'][$action]) or 
-//                                    in_array('read', $_SESSION['privilege_avance'][$action]) ){
-//
-//                                    if(in_array('create', $_SESSION['privilege_avance'][$action]))
-//                                            echo '<a href="'.$index_ajouter.'"  class="btn btn-default" >add</a>';
-//                                    else
-//                                            echo "";
-//
-//                                    if(in_array('read', $_SESSION['privilege_avance'][$action]))
-//                                            echo '<a href="'.$index_modifier.'" target="_self" class="btn btn-default" >Listing</a> .';
-//                                    else
-//                                            echo "<span class='alert alert-info' >not rigth for 'list' action </span>";
-//
-//                            }else{
-//                                    echo "<span class='alert alert-info' >not rigth contact the administrator</span>";
-//                    }}
-//            }
     }
 
     public static function json_encode($value, $options = 0, $depth = 512) {
@@ -117,7 +117,7 @@ class Genesis {
             unset($_SESSION["dvups_form"]);
         }
 
-        return json_encode($value, $options, $depth);
+        echo json_encode($value, $options, $depth);
     }
 
     public static function renderBladeView($view, $data = [], $action = "list", $redirect = false) {
@@ -176,7 +176,7 @@ class Genesis {
         }
 
         $data["__navigation"] = Genesis::top_action($action, $path[ENTITY]);
-        
+
         $blade = new Blade([$views, admin_dir . 'views'], admin_dir . "cache");
         echo $blade->view()->make($view, $data)->render();
     }
@@ -187,7 +187,7 @@ class Genesis {
             return'<div class="text-center">la liste est vide</div>';
         }
 
-        $html = '<div class="row">
+        $html = '<div class="row"><form action="index.php" method="get" >
 
     <div class="col-lg-12 col-md-12"><div class="table-responsive">';
         $html .= self::tablefilter($lazyloading['current_page']);
@@ -197,43 +197,42 @@ class Genesis {
 
         $html .= Genesis::pagination($lazyloading);
 
-        $html .= "</div>";
+        $html .= "</form></div>";
         return $html;
     }
 
-    public static function lazyloadingUI($lazyloading, $header, $action = true, $defaultaction = true, 
-            $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
+    public static function lazyloadingUI($lazyloading, $header, $action = true, $defaultaction = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
 
         if (!$lazyloading['listEntity']) {
             return'<div class="text-center">la liste est vide</div>';
         }
 
-        $html = '<div class="row">
+        $html = '<div class="row"><form action="index.php" method="get" >
 
     <div class="col-lg-12 col-md-12"><div class="table-responsive">';
         $html .= self::tablefilter($lazyloading['current_page']);
-        
+
         $html .= Genesis::renderListViewUI($lazyloading['listEntity'], $header, $action, $defaultaction);
 
         $html .= ' </div>';
 
         $html .= Genesis::pagination($lazyloading);
 
-        $html .= "</div>";
+        $html .= "</form></div>";
         return $html;
     }
 
     public static function tablefilter($current_page) {
-        
+
         $uri = explode('&next=', $_SERVER['REQUEST_URI']);
 
         $url = $uri[0];
 
         $html = '<div class="row"><div class="col-lg-8 col-md-12">';
-        
+
         $html .= '<!--label class="" ><input type="checkbox" name="param[]" value="pseudo" /> pseudo</label-->
-        <input class="form-control" type="text" onkeyup="myFunction()" placeholder="Find in the table ..." id="myInput" name="search" />
-        <!--button class="clear">Find in database</button-->
+         <!--<input class="form-control" type="text" onkeyup="myFunction()" placeholder="Find in the table ..." id="myInput" name="search" />
+       button class="clear">Find in database</button-->
 
     
     </div>
@@ -241,21 +240,21 @@ class Genesis {
 
         <label class=" col-lg-7" >Nombre de ligne </label>';
 
-            $html .= '<select class="form-control" style="width:100px;" onchange="window.location.href = \''.$url.'\' + this.options[this.selectedIndex].value" >';
-            $html .= '<option value="&next='.$current_page.'&per_page=10" >10</option>';
-            $html .= '<option value="&next='.$current_page.'&per_page=20" >20</option>';
-            $html .= '<option value="&next='.$current_page.'&per_page=30" >30</option>';
-            $html .= '<option value="&next='.$current_page.'&per_page=40" >40</option>';
-            $html .= '<option value="&next='.$current_page.'&per_page=50" >50</option>';
-            $html .= '<option value="&next='.$current_page.'&per_page=100" >100</option>';
-            $html .= '<option value="&next=1&per_page=all" >All</option>';
-            
+        $html .= '<select class="form-control" style="width:100px;" onchange="window.location.href = \'' . $url . '\' + this.options[this.selectedIndex].value" >';
+        $html .= '<option value="&next=' . $current_page . '&per_page=10" >10</option>';
+        $html .= '<option value="&next=' . $current_page . '&per_page=20" >20</option>';
+        $html .= '<option value="&next=' . $current_page . '&per_page=30" >30</option>';
+        $html .= '<option value="&next=' . $current_page . '&per_page=40" >40</option>';
+        $html .= '<option value="&next=' . $current_page . '&per_page=50" >50</option>';
+        $html .= '<option value="&next=' . $current_page . '&per_page=100" >100</option>';
+        $html .= '<option value="&next=1&per_page=all" >All</option>';
+
         $html .= " </select>
     </div></div></div>";
 
         return $html;
     }
-    
+
     public static function pagination($lazyloading) {
         extract($lazyloading);
         if (!$lazyloading['listEntity']) {
@@ -267,7 +266,7 @@ class Genesis {
         $url = $uri[0];
 
         $html = '<div class="row">
-            <div class="col-lg-6 col-md-6">Showing ' . ( ($current_page - 1) *  $per_page + 1) . ' to ' . $per_page * $current_page . ' of ' . $nb_element . '</div>
+            <div class="col-lg-6 col-md-6">Showing ' . ( ($current_page - 1) * $per_page + 1) . ' to ' . $per_page * $current_page . ' of ' . $nb_element . '</div>
             <div class="col-lg-6 col-md-6">
                 <div class="dataTables_paginate paging_simple_numbers text-right">
                     <ul class="pagination">';
@@ -298,28 +297,29 @@ class Genesis {
         return $html;
     }
 
-    public static function renderListView($list, $header, $action = true, 
-            $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
-        
+    public static function renderListView($list, $header, $action = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
+
         if (!$list) {
             return'<div class="text-center">la liste est vide</div>';
         }
 
         $th = [];
+        $thf = [];
         $tb = [];
 
         foreach ($header as $value) {
             $th[] = '<th>' . $value . '</th>';
         }
-        if ($action) {
-            $th[] = '<th>Action</th>';
-        }
+
         $class = strtolower(get_class($list[0]));
         foreach ($list as $entity) {
             $tr = [];
             foreach ($header as $value) {
                 $join = explode(".", $value);
                 if (isset($join[1])) {
+
+                    $thf[] = '<th><input name="' . str_replace(".", "-", $value) . '" placeholder="' . $value . '" class="form-control" ></th>';
+                    $fields[] = str_replace(".", "-", $value) . ":join";
 
                     $collection = explode("::", $join[0]);
                     $src = explode(":", $join[0]);
@@ -343,6 +343,10 @@ class Genesis {
                         $tr[] = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
                     }
                 } else {
+
+                    $thf[] = '<th><input name="' . $value . '" placeholder="' . $value . '" class="form-control" ></th>';
+                    $fields[] = $value . ":attr";
+
                     $src = explode(":", $join[0]);
 
                     if (isset($src[1]) and $src[0] = 'src') {
@@ -361,14 +365,18 @@ class Genesis {
 
             if ($action) {
                 $tr[] = '<td>' . Genesis::actionListView($class, $entity->getId(), '') . '</td>';
-//                    $tr[] = '<td><a href="index.php?path='.$class.'/delete&valid=oui&id='.$entity->getId().'"'
-//                                                . ' onclick="if(!confirm(\'Voulez-vous Supprimer\')) return false;" '
-//                                                . ' class="btn btn-default" >delete</a></td>';
             }
 
             $tb[] = '<tr>' . implode(" ", $tr) . '</tr>';
         }
 
+        if ($action) {
+            $th[] = '<th>Action</th>';
+            $thf[] = '<th><input name="path" value="' . $_GET['path'] . '" hidden >'
+                    . '<input name="dfields" value="' . implode(",", $fields) . '" hidden >'
+                    . '<button class="btn btn-default">search</button></th>';
+        }
+        
         return '<table id="dv_table" class="table table-bordered table-hover table-striped" ><thead><tr>' . implode(" ", $th) . '</tr></thead><tbody>' . implode(" ", $tb) . '</tbody></table>';
     }
 
@@ -376,28 +384,58 @@ class Genesis {
         if (!$list) {
             return '<div class="text-center">la liste est vide</div>';
         }
-        $_SESSION['dv_datatable'] = ['header' => $header, 'action' => $header, 'defaultaction' => $defaultaction ];
-        
-        $th = [];
-//        $tb = [];
+        $_SESSION['dv_datatable'] = ['header' => $header, 'action' => $header, 'defaultaction' => $defaultaction];
 
-        foreach ($header as $value) {
-            $th[] = '<th>' . $value['header'] . '</th>';
-        }
-        if ($action) {
-            $th[] = '<th>Action</th>';
-        }
-        
+        $theader = self::buildheader($header, $action);
+
         $tb = self::getTableBody($list, $header, $action, $defaultaction);
 
-        return '<table id="dv_table"  class="table table-bordered table-hover table-striped" ><thead><tr>' . implode(" ", $th) . '</tr></thead><tbody>' . implode(" ", $tb) . '</tbody></table>';
+        return '<table id="dv_table"  class="table table-bordered table-hover table-striped" >'
+        . '<thead><tr>' . implode(" ", $theader['th']) . '</tr><tr>' . implode(" ", $theader['thf']) . '</tr></thead>'
+                . '<tbody>' . implode(" ", $tb) . '</tbody>'
+                . '</table>';
     }
 
     public static function getTableRest($controller) {
-            extract($_SESSION["dv_datatable"]);
-            return self::getTableBody($controller["lazyloading"], $header, $action, $defaultaction);
+        extract($_SESSION["dv_datatable"]);
+        return self::getTableBody($controller["lazyloading"], $header, $action, $defaultaction);
     }
-    
+
+    private static function buildheader($header, $action) {
+        $thf = [];
+        $th = [];
+        $fields = [];
+
+        foreach ($header as $valuetd) {
+            $th[] = '<th>' . $valuetd['header'] . '</th>';
+            $value = $valuetd["value"];
+            $join = explode(".", $value);
+            if (isset($join[1])) {
+
+//                $collection = explode("::", $join[0]);
+//                $src = explode(":", $join[0]);
+
+                $thf[] = '<th><input name="' . str_replace(".", "-", $value) . '" placeholder="' . $valuetd['header'] . '" class="form-control" ></th>';
+                $fields[] = str_replace(".", "-", $value) . ":join";
+            } else {
+
+                $thf[] = '<th><input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" ></th>';
+                $fields[] = $value . ":attr";
+            }
+        }
+
+        if ($action) {
+            $th[] = '<th>Action</th>';
+
+            $thf[] = '<th><input name="path" value="' . $_GET['path'] . '" hidden >'
+                    . '<input name="dfilters" value="' . implode(",", $fields) . '" hidden >'
+                    . '<button class="btn btn-default">search</button></th>';
+        }
+
+        return ["th" => $th, "thf" => $thf];
+        
+    }
+
     private static function getTableBody($list, $header, $action = false, $defaultaction = true) {
         $class = strtolower(get_class($list[0]));
         foreach ($list as $entity) {
@@ -429,6 +467,7 @@ class Genesis {
                         $tr[] = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
                     }
                 } else {
+
                     $src = explode(":", $join[0]);
 
                     if (isset($src[1]) and $src[0] = 'src') {
@@ -455,15 +494,15 @@ class Genesis {
             }
 
             if (!is_bool($action)) {
-                $act = $action($entity);                
+                $act = $action($entity);
             }
 
             $tr[] = '<td>' . $dact . $act . '</td>';
 
             $tb[] = '<tr id="' . $entity->getId() . '" >' . implode(" ", $tr) . '</tr>';
         }
-        
-        return $tb;
+
+        return$tb;
     }
 
 }

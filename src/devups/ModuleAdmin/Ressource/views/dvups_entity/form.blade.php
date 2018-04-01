@@ -19,7 +19,7 @@
                                     
                     <div class="col-lg-12" >
 
-                                    <?= ProductForm::__renderForm($product, $action_form, true); ?>
+                                    <?= Dvups_entityForm::__renderForm($dvups_entity, $action_form, true); ?>
 
                         </div>
                     <div>        

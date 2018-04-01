@@ -5,7 +5,7 @@ class Dvups_adminDAO extends DBAL {
     public function findByConnectic($login, $pwd) {
         
         $qb = new QueryBuilder(new Dvups_admin());
-        $row =  $qb->select()->where('login', "=", $login)->andwhere('password', "=",  sha1($pwd))->__getOne();
+        $row = Dvups_admin::select()->where('login', "=", $login)->andwhere('password', "=",  sha1($pwd))->__getOne();
 
         if (!$row->getId())
             return array('success' => false, "err" => 'Login ou mot de passe incorrect.');

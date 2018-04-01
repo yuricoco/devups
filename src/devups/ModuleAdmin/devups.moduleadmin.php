@@ -9,13 +9,13 @@
 	require 'Dao/Dvups_moduleDAO.php';
 	require 'Form/Dvups_moduleForm.php';
 	require 'Controller/Dvups_moduleController.php';
-//	require 'Genesis/Dvups_moduleGenesis.php';
+	require 'Genesis/Dvups_moduleGenesis.php';
 
 	require 'Entity/Dvups_entity.php';
 	require 'Dao/Dvups_entityDAO.php';
-//	require 'Form/Dvups_entityForm.php';
+	require 'Form/Dvups_entityForm.php';
 	require 'Controller/Dvups_entityController.php';
-//	require 'Genesis/Dvups_entityGenesis.php';
+	require 'Genesis/Dvups_entityGenesis.php';
 
 	require 'Entity/Dvups_role.php';
 	require 'Dao/Dvups_roleDAO.php';
@@ -25,9 +25,9 @@
 
 	require 'Entity/Dvups_right.php';
 	require 'Dao/Dvups_rightDAO.php';
-//	require 'Form/Dvups_rightForm.php';
+	require 'Form/Dvups_rightForm.php';
 	require 'Controller/Dvups_rightController.php';
-//	require 'Genesis/Dvups_rightGenesis.php';
+	require 'Genesis/Dvups_rightGenesis.php';
 
 	require 'Entity/Dvups_role_dvups_module.php';
 

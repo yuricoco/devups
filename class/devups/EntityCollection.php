@@ -18,7 +18,7 @@ class EntityCollection{
                  * on instantie la class $entityTable trop cool
                  */
             
-                $reflection = new ReflectionClass($classe_name); 
+                $reflection = new ReflectionClass(trim($classe_name)); 
 //                $entitycore = $reflect->scan_entity_core();
                 return [$reflection->newInstanceWithoutConstructor()];
                 
