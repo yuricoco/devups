@@ -669,7 +669,7 @@ class UploadFile extends stdClass {
         }
     }
 
-    public static function show($image, $path = '', $default = 'default/no_image.jpg') {
+    public static function show($image, $path = '', $default = 'no_image.jpg') {
 
         $up = new UploadFile();
 
@@ -680,7 +680,7 @@ class UploadFile extends stdClass {
 //            elseif($image && file_exists($path.$image))
 //                    $image = $path.$image;
         else
-            $image = SRC_FILE . $default;
+            $image = DEFAULT_FILE . $default;
 
         return $image;
     }

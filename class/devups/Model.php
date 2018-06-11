@@ -13,6 +13,14 @@
  */
 abstract class Model extends \stdClass {
 
+    public $dvfetched = false;
+
+    public static function classpath(){
+        $reflector = new ReflectionClass(get_called_class());
+        $fn = $reflector->getFileName();
+        return dirname($fn);
+    }
+
     /**
      * 
      * @param type $lable
@@ -21,7 +29,7 @@ abstract class Model extends \stdClass {
      * @return \Dvups_lang
      */
     public function __translate($lable, $content, $lang = "fr") {
-        if(!$this->id)
+        if(!$this->id || !$content)
             return; 
         
         $dvlang = new Dvups_lang();
@@ -34,7 +42,7 @@ abstract class Model extends \stdClass {
     }
 
     public function __updatetranslate($lable, $content, $lang = "fr") {
-        if(!$this->id)
+        if(!$this->id || !$content)
             return; 
         
         $dvlang = Dvups_lang::select()
@@ -106,6 +114,69 @@ abstract class Model extends \stdClass {
         return true;
     }
 
+
+
+    /**
+     * return the row as design in the database
+     * @example http://easyprod.spacekola.com description
+     * @param type $id
+     * @return $this
+     */
+    public static function count() {
+
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        return $qb->select()->__countEl();
+    }
+
+
+    /**
+     * return the row as design in the database
+     * @example http://easyprod.spacekola.com description
+     * @param type $id
+     * @return $this
+     */
+    public static function first() {
+
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        return $qb->select()->limit(1)->__getOne();
+    }
+
+    /**
+     * return the row as design in the database
+     * @example http://easyprod.spacekola.com description
+     * @param type $id
+     * @return $this
+     */
+    public static function last() {
+
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        return $qb->select()->orderby(strtolower(get_called_class()).".id desc")->limit(1)->__getOne();
+    }
+
+    /**
+     * return the row as design in the database
+     * @example http://easyprod.spacekola.com description
+     * @param type $id
+     * @return $this
+     */
+    public static function get($index = 1) {
+        $i = (int) $index;
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        return $qb->select()->limit($i - 1, $i)->__getOne();
+    }
+
     /**
      * return the row as design in the database
      * @example http://easyprod.spacekola.com description
@@ -141,20 +212,39 @@ abstract class Model extends \stdClass {
     }
 
     /**
+     * return the entity
+     * when recursif set to false, attribut as relation manyToOne has just their id hydrated
+     * when recursif set to true, the DBAL does recursif request to hydrate the association entity and those of it.
+     * @param type $id the id of the entity
+     * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
+     * @return type
+     */
+    public static function delete($id) {
+
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+        $entity->setId($id);
+
+        $dbal = new DBAL();
+        return $dbal->deleteDbal($entity);
+
+    }
+
+    /**
      * 
-     * @param string $att
+     * @param string $sort
      * @param type $order
      * @return type
      */
-    public static function all($att = 'id', $order = "asc") {
+    public static function all($sort = 'id', $order = "asc") {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if ($att == 'id')
-            $att = strtolower(get_class($entity)) . "." . $att;
+        if ($sort == 'id')
+            $sort = strtolower(get_class($entity)) . "." . $sort;
 
-        return $qb->select()->orderby($att . " " . $order)->__getAll();
+        return $qb->select()->orderby($sort . " " . $order)->__getAll();
     }
 
     /**
@@ -164,26 +254,27 @@ abstract class Model extends \stdClass {
      * @param String $order the ordering model ( ASC default, DESC, RAND() )
      * @return Array
      */
-    public static function allrows($att = 'id', $order = "") {
+    public static function allrows($sort = 'id', $order = "") {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if ($att == 'id')
-            $att = strtolower(get_class($entity)) . "." . $att;
+        if ($sort == 'id')
+            $sort = strtolower(get_class($entity)) . "." . $sort;
 
-        return $qb->select()->orderby($att . " " . $order)->__getAllRow();
+        return $qb->select()->orderby($sort . " " . $order)->__getAllRow();
     }
 
     /**
      * return instance of \QueryBuilder white the select request sequence.
+     * @example name, description, category if none has been set, all will be take.
      * @param string $columns
      * @return \QueryBuilder
      */
     public static function select($columns = '*') {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
-
+        
         $qb = new QueryBuilder($entity);
         return $qb->select($columns);
     }
@@ -194,7 +285,7 @@ abstract class Model extends \stdClass {
      * @param Mixed $arrayvalues 
      * @param Mixed $seton
      * @param Mixed $case id
-     * @return boolean
+     * @return \QueryBuilder
      */
     public static function update($arrayvalues = null, $seton = null, $case = null) {
         $reflection = new ReflectionClass(get_called_class());
@@ -292,6 +383,9 @@ abstract class Model extends \stdClass {
 
     public function __belongto($relation) {
 
+        if(is_object($relation) && $relation->dvfetched)
+            return $relation;
+
         if (!$this->getId()) {
             if (is_object($relation)) :
                 return $relation;
@@ -312,7 +406,7 @@ abstract class Model extends \stdClass {
         endif;
 
         $qb = new QueryBuilder($relation);
-        return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOneRow();
+        return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOne();
     }
 
     public function getId() {

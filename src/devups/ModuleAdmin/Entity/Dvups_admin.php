@@ -32,7 +32,7 @@ class Dvups_admin extends Model implements JsonSerializable {
     /**
      * @var \Dvups_role
      */
-    private $dvups_role;
+    public $dvups_role;
 
     private function wd_remove_accents($str, $charset = 'utf-8') {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);

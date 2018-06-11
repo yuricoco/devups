@@ -29,13 +29,17 @@ class Form extends FormFactory{
         
         return "<form ". implode(" ", $formdirective) ."  >";
     }
-    
+
+    public static function init($enitty) {
+        Form::$name = strtolower(get_class($enitty));
+    }
+
     public static function close() {
         
 //        $_SESSION[Form::$name ] = Form::$fields;
-        $_SESSION["dvups_form"][Form::$name] = Form::$fields;
-        
-        return "</form>";
+        //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
+        $dvups_form = "<textarea hidden name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
+        return $dvups_form."</form>";
     }
     
     public static function imbricate($enitty) {
@@ -45,10 +49,13 @@ class Form extends FormFactory{
     }
     
     public static function closeimbricate() {
-        $_SESSION["dvups_form"][Form::$name] = Form::$fields;
+        //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
+        $dvups_form = "<textarea hidden name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
         
-        Form::$name = Form::$savestate[0];
-        Form::$fields = Form::$savestate[1];
+        //Form::$name = Form::$savestate[0];
+        //Form::$fields = Form::$savestate[1];
+
+        return $dvups_form;
     }
     
     public static function submit($name = "submit", $directive = []) {

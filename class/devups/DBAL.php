@@ -17,6 +17,7 @@ class DBAL extends Database {
      * @var type 
      */
     protected $object;
+    protected $classmetadata;
 
     /**
      *
@@ -93,6 +94,8 @@ class DBAL extends Database {
                     if (is_object($module)) {
                         $enittyfoldes[] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name . "/Entity";
                         foreach ($module->listentity as $key => $entity) {
+                            if(is_object($entity))
+                                //die(var_dump($entity));
                                 $enittycollection[strtolower($entity->name)] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name;
                         }
                     }
@@ -181,22 +184,6 @@ class DBAL extends Database {
                  * on instantie la class $entityTable trop cool
                  */
                 $persistecollection = true;
-                $reflect = new ReflectionClass($entityTable);
-                $object = $reflect->newInstance();
-                $objectValue = array_values((array) $entity);
-                $objectValueEntity = array_values((array) $object);
-                $nbvar = count($objectValueEntity);
-                $parameterQuery = '?';
-                for ($i = 1; $i < $nbvar; $i++) {
-                    $parameterQuery .= ',?';
-                }
-                $values[] = '';
-                for ($j = 1; $j < $nbvar - 2; $j++) {
-                    if (is_object($objectValue[$j]))
-                        $values[] = $objectValue[$j]->getId();
-                    else
-                        $values[] = $objectValue[$j];
-                }
 
                 if ($direction == "lr") {
 
@@ -205,40 +192,19 @@ class DBAL extends Database {
 
                     $query = $this->link->prepare($sql);
                     $success = $query->execute() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $entityTable, $values));
-                } elseif ($direction == "ld") {
-                    $values[] = $id;
-                    if ($association) {
-                        $values[] = $entity->getId();
-                        if (!$entity->getId())
-                            $persistecollection = false;
-                    }else {
-                        $id_call = array_values((array) $entity);
-                        $values[] = $id_call[count($id_call) - 1]->getId();
-                    }
 
-                    $sql = "insert into `" . $entityTable . "` value (" . $parameterQuery . ")";
-
-                    $query = $this->link->prepare($sql);
-                    $success = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $entityTable, $values));
                 } else {
 
-                    if ($association) {
-                        $values[] = $entity->getId();
-                        if (!$entity->getId())
-                            $persistecollection = false;
-                    }else {
-                        $id_call = array_values((array) $entity);
-                        $values[] = $id_call[count($id_call) - 1]->getId();
-                        //on vérifie si le dernier attribut (exclave) est non null dans
-                        if (!$id_call[count($id_call) - 1]->getId())
-                            $persistecollection = false;
-                    }
-                    $values[] = $id;
+                    $reflect = new ReflectionClass($entityTable);
+                    $object = $reflect->newInstance();
+                    $obarr = (array) $object;
+                    $obarr[$this->objectName] = $this->object;
+                    $obarr[strtolower(get_class($entity))] = $entity;
 
-                    $sql = "insert into `" . $entityTable . "` value (" . $parameterQuery . ")";
+                    $entitycol = Bugmanager::cast((object) $obarr, $entityTable);
 
-                    $query = $this->link->prepare($sql);
-                    $success = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $entityTable, $values));
+                    $success = $entitycol->__save();
+
                 }
 
                 if ($persistecollection) {
@@ -323,8 +289,8 @@ class DBAL extends Database {
                 $id = $obarray[$relation]->getId();
             else {
                 foreach ($obarray as $obkey => $value) {
-                    $key = str_replace(get_class($entity), '', $obkey);
-                    $key = str_replace('*', '', $key);
+                    //$key = str_replace(get_class($entity), '', $obkey);
+                    //$key = str_replace('*', '', $key);
 
                     if (is_object($value) && strtolower(get_class($value)) == $relation) {
 
@@ -356,7 +322,7 @@ class DBAL extends Database {
         } elseif ($this->tableExists($collectionName)) {
 
             $entityTable = $collectionName;
-            $tableinstance = ucfirst($entityTable);
+            //$tableinstance = ucfirst($entityTable);
 
             $qb = new QueryBuilder($collection);
             $qb->select()
@@ -523,13 +489,12 @@ class DBAL extends Database {
         }
 
         $id = $this->executeDbal($sql, $values, 1);
+        $this->object->setId($id);
 
         if (isset($this->objectCollection) && is_array($this->objectCollection) && !empty($this->objectCollection)) {
 
             $this->manyToManyAdd($id, false, null);
         }
-
-        $this->object->setId($id);
 
         return $this->object->getId();
     }
@@ -654,6 +619,57 @@ class DBAL extends Database {
         return $query->fetchColumn();
     }
 
+    private function dbrow($flowBD){
+
+
+        $object_array = (array) $this->object;
+
+        foreach ($object_array as $key => $value) {
+
+            $k = str_replace(get_class($this->object), '', $key);
+            $k = str_replace('*', '', $k);
+            $k2 = substr($k, 2);
+
+            foreach ($flowBD as $key2 => $value2) {
+
+                if (is_object($value)) {
+                    $classname = strtolower(get_class($value));
+                    if ($classname . '_id' == $key2) {
+
+                        if (is_array($flowBD[$key2])) {
+                            $object_array[$key] = $classname;//null
+                            $object_array[$key."_id"] = $flowBD[$key2];
+                        }else {
+                            $object_array[$key] = $classname;//null
+                            $object_array[$key."_id"] = $flowBD[$key2];
+                        }
+                        break;
+                    }
+                }
+
+                elseif (is_array($value)) {
+                    $object_array[$key] = [];
+                    break;
+                } else {
+                    if ($k2 == $key2) {
+                        if (is_array($flowBD[$key2])) {
+                            $object_array[$key] = $flowBD[$key2][0];
+                        } else {
+                            $object_array[$key] = $flowBD[$key2];
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+
+        $flowBD = Bugmanager::cast((object) $object_array, get_class($this->object));
+        $flowBD->dvfetched = true;
+
+        return $flowBD;
+
+    }
+
     /**
      * Return the row of the database map with the object.
      * 
@@ -666,13 +682,18 @@ class DBAL extends Database {
         $req = $this->link->prepare($sql);
         $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $req->errorInfo()));
 
-        $flowBD = $req->fetchObject($this->objectName);
+        //$flowBD = $req->fetchObject($this->objectName);
+        $flowBD = $req->fetch(PDO::FETCH_NAMED);
+
         if (!$flowBD) {
             return new $this->objectName;
         }
-        $flowBD->dvfetched = true;
 
-        return $flowBD;
+        if (empty($this->entity_link_list) and empty($this->objectCollection))
+            return $req->fetchObject($this->objectName);
+
+        return $this->dbrow($flowBD);
+
     }
 
     /**
@@ -706,6 +727,7 @@ class DBAL extends Database {
         return $flowBD;
     }
 
+
     /**
      * Return array of base entity
      * 
@@ -714,13 +736,20 @@ class DBAL extends Database {
      * @return type
      */
     protected function __findAllRow($sql, $values = []) {
-
+        $result = [];
         $query = $this->link->prepare($sql);
         $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
 
-        $flowBD = $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
+//        $flowBD = $query->fetchAll(PDO::FETCH_CLASS);
+        if (empty($this->entity_link_list) and empty($this->objectCollection))
+            return $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
 
-        return $flowBD;
+        $rows = $query->fetchAll(PDO::FETCH_NAMED);
+        foreach ($rows as $row){
+            $result[] = $this->dbrow($row);
+        }
+
+        return $result;
     }
 
     /**
@@ -779,16 +808,9 @@ class DBAL extends Database {
      * @return type
      */
     private function orm($flowBD, $object, $imbricateindex = 0, $recursif = true, $collection = false) {
-//        global $em;
-        $object_array = (array) $object;
 
-//            $classmetadata = $em->getClassMetadata("\\" . get_class($object));
-//            $fieldname = array_keys($classmetadata->fieldNames);
-//            $association = array_keys($classmetadata->associationMappings);
-//            
-//             $i = 0;
-//            $j = 0;
-//            $k = 0;
+        $object_array = (array) $object;
+        
         foreach ($object_array as $key => $value) {
 //                    $imbricateindex = 0;
 
@@ -821,7 +843,6 @@ class DBAL extends Database {
                                 $object_array[$key] = $value;
                         }
 
-
                         $this->instanciateVariable($object);
                         break;
                     }
@@ -832,10 +853,7 @@ class DBAL extends Database {
                         $object_array[$key] = $object->__hasmany(strtolower(get_class($value[0])));
                     else
                         $object_array[$key] = $value;
-//                    $object_array[$key] = [];
                     
-//                                $object_array[$key] = $this->manyToManySelect($object->getId(), strtolower(get_class($object)), $value[0]);
-
                     break;
                 } else {
                     if ($k2 == $key2) {
@@ -844,6 +862,7 @@ class DBAL extends Database {
                         } else {
                             $object_array[$key] = $flowBD[$key2];
                         }
+                        
                         break;
                     }
                 }
@@ -891,7 +910,7 @@ class DBAL extends Database {
 
         if (is_object($object)) {
 
-            $classmetadata = $em->getClassMetadata("\\" . get_class($object));
+            $this->classmetadata = $em->getClassMetadata("\\" . get_class($object));
             $this->instanceid = $object->getId();
             $objecarray = (array) $object;
             if (isset($objecarray["dvfetched"])) {
@@ -908,15 +927,14 @@ class DBAL extends Database {
             $k = 0;
             $this->table = strtolower($this->objectName);
 
-            $fieldname = array_keys($classmetadata->fieldNames);
-            $association = array_keys($classmetadata->associationMappings);
-//                if(!$this->tableExists($this->table)){
-//                    
-//                    if($metadata = $this->getDoctrineMetadata($this->objectName)){
-//                        $this->table = $metadata->table['name'];
-//                    }
-//                    
-//                }
+            $fieldname = array_keys($this->classmetadata->fieldNames);
+            $association = array_keys($this->classmetadata->associationMappings);
+                if(!$this->tableExists($this->table)){
+                    if($metadata = $em->getClassMetadata("\\" . $this->objectName)){
+                        $this->table = $metadata->table['name'];
+                    }
+
+                }
 
             foreach ($objecarray as $obkey => $value) {
                 // gere les attributs hérités en visibilité protected
@@ -933,7 +951,7 @@ class DBAL extends Database {
                         $this->entity_link_list[] = $value;
                         $this->objectValue[$i] = $value->getId();
                         $k++;
-                    } elseif ($classname == 'DateTime') {
+                    } elseif ($classname == 'DateTime' && isset($fieldname[$j])) {
                         //$date = new DateTime();
                         $this->objectVar[] = $fieldname[$j];
 //                        $this->objectVar[] = substr($key, 2);
@@ -948,8 +966,10 @@ class DBAL extends Database {
                     unset($this->objectValue[$i]);
                 } else {
 //                    $this->objectVar[] = substr($key, 2);
-                    $this->objectVar[] = $fieldname[$j];
-                    $j++;
+                    if(isset($fieldname[$j])){
+                        $this->objectVar[] = $fieldname[$j];
+                        $j++;
+                    }
                 }
 
                 $i++;

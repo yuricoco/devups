@@ -11,7 +11,13 @@
  *
  * @author azankang
  */
-abstract class Core extends stdClass {
+class Core extends stdClass {
+    public function __construct($entity)
+    {
+        $this->name = strtolower(get_class($entity));
+        $this->addjs = [];
+        return $this;
+    }
 
     public static function __extract($entity, $asarray = false) {
 
@@ -178,7 +184,5 @@ abstract class Core extends stdClass {
         return $updated;
         
     }
-
-    abstract public function scan_entity_core();
     
 }

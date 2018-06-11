@@ -13,7 +13,11 @@
  */
 class EntityCore {
     //put your code here
-    
+    public function __construct($entity)
+    {
+        return get_class($entity);
+    }
+
     public static function __extract($__DIR__, $entity, $asarray = false){
         
         $path = $__DIR__ . '../Core/' . strtolower(get_class($entity)) . '.json';

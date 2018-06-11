@@ -84,7 +84,7 @@
          *	@return \Image
          */
         function getImage() {
-            $this->image = $this->__belongto("image");
+            //$this->image = $this->__belongto("image");
             return $this->image;
         }
         
@@ -98,7 +98,7 @@
          *	@return \Category
          */
         function getCategory() {
-            $this->category = $this->__belongto("category");
+            $this->category = $this->__belongto($this->category);
             return $this->category;
         }
         

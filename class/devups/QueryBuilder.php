@@ -186,6 +186,7 @@ class QueryBuilder extends \DBAL {
     /**
      * Set the columns to be selected.
      *
+     * @example name, description, category
      * @param  array|mixed  $columns
      * @return $this
      */
@@ -227,9 +228,11 @@ class QueryBuilder extends \DBAL {
      * @return $this
      */
     public function update($arrayvalues = null, $seton = null, $case = null) {
+        $this->join();
         $this->columns = null;
-        $this->query = "  update `" . $this->table . "` ";
-        if (!$arrayvalues)
+        $this->query = "  update `" . $this->table . "` " . $this->defaultjoin;
+
+        if ($arrayvalues)
             return $this->set($arrayvalues, $seton, $case);
 
         return $this;
@@ -256,9 +259,10 @@ class QueryBuilder extends \DBAL {
             $this->endquery = " WHERE `" . $arrayvalues . "`  IN('" . $whens . "'); ";
         }
         // update one column on one row
-        elseif (!is_array($arrayvalues) && $seton) {
+        elseif ($arrayvalues && $seton != null) {
+        //elseif (true) {
             $this->parameters[] = $seton;
-            $this->query .= " `$arrayvalues` = ? ";
+            $this->query .= " $arrayvalues = ? ";
             $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
         }
         // update multiple column on one row
@@ -314,28 +318,40 @@ class QueryBuilder extends \DBAL {
     }
 
     /**
-     * Set the columns to be selected.
-     *
-     * @param  array|mixed  $columns
+     * init innerjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current 
+     * class
+     * @param type $classname
+     * @param type $classnameon
      * @return $this
      */
-    public function innerjoin($entity) {
-        $this->join = strtolower(get_class($entity));
-        $this->query .= " inner join `" . $this->join . "` ";
+    public function innerjoin($classname, $classnameon = "") {
+        $this->join = strtolower(get_class($classname));
+        
+        if(!$classnameon)
+            $classnameon = $this->objectName;
+        
+        $this->query .= " inner join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
+//        $this->query .= " inner join `" . $this->join . "` ";
 
         return $this;
     }
 
     /**
-     * Set the columns to be selected.
-     *
-     * @param  array|mixed  $columns
+     * init leftjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current 
+     * class
+     * @param type $classname
+     * @param type $classnameon
      * @return $this
      */
-    public function leftjoin($entity) {
-        $this->join = strtolower(get_class($entity));
+    public function leftjoin($classname, $classnameon = "") {
+        $this->join = strtolower($classname);
+        
+        if(!$classnameon)
+            $classnameon = $this->objectName;
+        
         // on ".strtolower(get_class($entity)).".id = ".strtolower(get_class($entity_owner)).".".strtolower(get_class($entity))."_id
-        $this->query .= " left join `" . $this->join . "` ";
+        $this->query .= " left join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
+//        $this->query .= " left join `" . $this->join . "` ";
 
         return $this;
     }
@@ -357,7 +373,6 @@ class QueryBuilder extends \DBAL {
      */
     public function where($column, $operator = null, $value = null, $link = "where") {
         $this->endquery = "";
-        $this->initwhereclause = true;
 //        if(is_array($critere)){
 //            
 //        }
@@ -370,12 +385,26 @@ class QueryBuilder extends \DBAL {
             } else {
                 $this->query .= " " . $link . " " . strtolower(get_class($column)) . '_id';                
             }
-            
+
             if ($column->getId()) {
                     $this->query .= " = ? ";
                     $this->parameters[] = $column->getId();
             } else {
                     $this->query .= " is null ";
+            }
+        }elseif (is_array($column)) {
+            if(is_array($operator)){
+                for ($index = 0; $index < count($column); $index++){
+                    $this->andwhere($column[$index], "=", $operator[$index]);
+                }
+            }elseif (is_array($column[0])){
+                foreach ($column as $value){
+                    $this->andwhere($value[0], $value[1], $value[2]);
+                }
+            }else{
+                foreach ($column as $key => $value){
+                    $this->andwhere($key, "=", $value);
+                }
             }
         } else {
             $this->query .= " " . $link . " " . $column;
@@ -391,6 +420,8 @@ class QueryBuilder extends \DBAL {
                 }
             }
         }
+
+        $this->initwhereclause = true;
 
         return $this;
     }
@@ -410,6 +441,11 @@ class QueryBuilder extends \DBAL {
             return $this->where($column, $sign, $value, 'where');
     }
 
+    /**
+     * 
+     * @param String|Array $values
+     * @return $this
+     */
     public function in($values) {
         if (is_array($values))
             $this->query .= " in (" . implode(",", $values) . ")";

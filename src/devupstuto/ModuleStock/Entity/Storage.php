@@ -1,45 +1,46 @@
-<?php 
+<?php
+
+/**
+ * @Entity @Table(name="storage")
+ * */
+class Storage extends \Model implements JsonSerializable {
+
     /**
-     * @Entity @Table(name="storage")
+     * @Id @GeneratedValue @Column(type="integer")
+     * @var int
      * */
-    class Storage extends \Model implements JsonSerializable{
+    protected $id;
 
-        /**
-         * @Id @GeneratedValue @Column(type="integer")
-         * @var int
-         * */
-        protected $id;
-        /**
-         * @Column(name="town", type="string" , length=25 )
-         * @var string
-         **/
-        private $town; 
-        
+    /**
+     * @Column(name="town", type="string" , length=25 )
+     * @var string
+     * */
+    public $town;
 
-        
-        public function __construct($id = null){
-            
-                if( $id ) { $this->id = $id; }   
-                          
-}
+    public function __construct($id = null) {
 
-        public function getId() {
-            return $this->id;
+        if ($id) {
+            $this->id = $id;
         }
-        public function getTown() {
-            return $this->town;
-        }
+    }
 
-        public function setTown($town) {
-            $this->town = $town;
-        }
-        
-        
-        public function jsonSerialize() {
-                return [
-                        'id' => $this->id,
-                                'town' => $this->town,
-                ];
-        }
-        
+    public function getId() {
+        return $this->id;
+    }
+
+    public function getTown() {
+        return $this->town;
+    }
+
+    public function setTown($town) {
+        $this->town = $town;
+    }
+
+    public function jsonSerialize() {
+        return [
+            'id' => $this->id,
+            'town' => $this->town,
+        ];
+    }
+
 }

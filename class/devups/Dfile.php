@@ -18,7 +18,40 @@ class Dfile {
     public $uploaddir;
     private $file;
     private $compressionquality = 80;
-    
+    private $file_name = "";
+
+    public static function uploadchunk($uploaddir) {
+        $dfile = new Dfile(null);
+        $path = $dfile->chdirectory($dfile->filepath($uploaddir));
+        $hashname = $_GET['hashName'];
+        $filename = $_GET['fileName'];
+
+        $xmlstr = file_get_contents('php://input');
+
+        $is_ok = false;
+        while (!$is_ok) {
+            $file = fopen($path . $hashname, "ab");
+
+            if (flock($file, LOCK_EX)) {
+                fwrite($file, $xmlstr);
+                flock($file, LOCK_UN);
+                fclose($file);
+                $is_ok = true;
+            } else {
+                fclose($file);
+                sleep(3);
+            }
+        }
+
+        return ["filename" => $filename,
+            "hashname" => $hashname,
+            "show" => Dfile::show($hashname, $uploaddir),
+            "size" => $_GET['filesize'],
+            "extension" => $_GET['extension']
+        ];
+
+    }
+
     public function setcompressionquality($quality) {
         $this->compressionquality = $quality;
     }
@@ -34,6 +67,10 @@ class Dfile {
         return strtolower($str);
     }
 
+    function setUploaddir($uploaddir){
+        $this->uploaddir = $uploaddir;
+        return $this;
+    }
     /**
       @param $default Dans le cas ou le developpeur voudrait spécifier sa propre image par défaut
      */
@@ -54,6 +91,9 @@ class Dfile {
     }
 
     public function __construct($file, $entity = null) {
+        if(!$file)
+            return $this;
+
         if ($entity) {
             $this->uploaddir = strtolower(get_class($entity));
             $entityname = $this->uploaddir;
@@ -69,6 +109,12 @@ class Dfile {
 //            ];
             $this->file = $_FILES[$entityname . '_form'];
 //            $result = call_user_func(array($entity, $uploadmethod), $_files);
+        /*} elseif (is_string($file) && file_exists(UPLOAD_DIR . $file)) {
+            $this->name = $_FILES[$file]['name'];
+            $this->size = $_FILES[$file]['size'];
+            $this->tmp_name = $_FILES[$file]['tmp_name'];
+            $this->error = $_FILES[$file]['error'];
+            $this->file = $_FILES[$file];*/
         } elseif (is_string($file) && isset($_FILES[$file]) && $_FILES[$file]['error'] == 0) {
             $this->name = $_FILES[$file]['name'];
             $this->size = $_FILES[$file]['size'];
@@ -82,9 +128,21 @@ class Dfile {
         }
 
         $this->file_name = $this->name;
-        $this->imagesize = getimagesize($this->tmp_name);
+        $this->imagesize = $this->getsize($this->tmp_name);
+        $this->extension = $this->getextension($this->name);
+        $this->settype();
+    }
 
-        $this->extension = strtolower(pathinfo($this->name, PATHINFO_EXTENSION));
+
+    private function getsize($file){
+        return getimagesize($file);
+    }
+
+    private function getextension($name){
+        return strtolower(pathinfo($name, PATHINFO_EXTENSION));
+    }
+
+    private function settype(){
         if (in_array($this->extension, self::$EXTENSION_IMAGE)) {
             $this->type = "image";
         } elseif (in_array($this->extension, self::$EXTENSION_AUDIO)) {
@@ -131,10 +189,54 @@ class Dfile {
         return $this;
     }
 
-    public function addresize($resize = [], $sufix = "-r", $uploaddir = "", $crop = true, $quality = 80) {
+    /**
+     * @param array $resize []
+     * @param string $sufix r-
+     * @param string $uploaddir ""
+     * @param bool $crop true
+     * @param int $quality 80
+     * @return $this
+     */
+    public function addresize($resize = [], $sufix = "r-", $uploaddir = "", $crop = true, $quality = 80) {
         $this->imagetoresize[] = ["resize" => $resize, "sufix" => $sufix, "uploaddir" => $uploaddir, "crop" => $crop, "quality" => $quality];
 
         return $this;
+    }
+
+    function setfile_name($filename){
+        $this->file_name = $filename;
+        return $this;
+    }
+
+    public function resizethisimage($relative_url){
+        if(!$this->file_name){
+            $array = explode("/", $relative_url);
+            $this->file_name = end($array);
+        }
+
+        $source_url = UPLOAD_DIR . $relative_url;
+        if(!file_exists($source_url))
+            return false;
+
+        $this->imagesize = $this->getsize($source_url);
+        $this->extension = $this->getextension($relative_url);
+        $this->settype();
+
+        if (!empty($this->imagetoresize)) {
+
+            foreach ($this->imagetoresize as $imagetoresize) {
+                $this->resizeimage($source_url, $imagetoresize);
+            }
+
+            /*if ($this->validation())
+                return $this->error;*/
+        }
+
+        return array("success" => true,
+            "file" => [
+                //'error' => $this->error,
+            ],
+            'detail' => 'upload success');
     }
 
     private function resizeimage($source_url, $param) {
@@ -147,13 +249,24 @@ class Dfile {
         $uploaddir = $this->chdirectory($this->filepath($uploaddir));
 //        list($width, $height) = $this->imagesize;
         $imagesize = $this->imagesize;
-        $largeur = $resize[0];
-        if (isset($resize[1]))
-            $hauteur = $resize[1];
-        else
-            $hauteur = $imagesize[1];
+
+
 
         $ratio_orig = $imagesize[0] / $imagesize[1];
+
+        if($resize[0])
+            $largeur = $resize[0];
+        else{
+            $resize[0] = $imagesize[0];
+            $largeur = $imagesize[0];
+        }
+
+        if (isset($resize[1]) && $resize[1])
+            $hauteur = $resize[1];
+        else{
+            $resize[1] = $imagesize[1];
+            $hauteur = $imagesize[1];
+        }
 
         $mod = $imagesize[0] % $largeur;
         $mod += $imagesize[1] % $hauteur;
@@ -172,12 +285,14 @@ class Dfile {
                     $hauteur = $largeur / $ratio_orig;
                     $centery = $hauteur / 2 - $resize[1] / 2;
                 }
-            } elseif ($largeur > $hauteur) {
-                $largeur = $hauteur * $ratio_orig;
+            } elseif ($resize[0] > $resize[1]) {
+                //$largeur = $hauteur * $ratio_orig;
+                $hauteur = $largeur / $ratio_orig;
                 $centerx = $largeur / 2 - $resize[0] / 2;
             } else {
                 $largeur = $hauteur * $ratio_orig;
-                $hauteur = $largeur / $ratio_orig;
+
+                //$hauteur = $largeur / $ratio_orig;
                 $centerx = $largeur / 2 - $resize[0] / 2;
                 $centery = $hauteur / 2 - $resize[1] / 2;
             }
@@ -186,6 +301,11 @@ class Dfile {
 
             if ($centery < 0)
                 $centery = -($centery );
+
+            if(is_array($crop)){
+                $pos_x = $crop[0];
+                $pos_y = $crop[1];
+            }
 
 //            die(var_dump($resize, $hauteur, $imagesize[1], $resize[1], $centery));
         } else {
@@ -206,7 +326,7 @@ class Dfile {
             if (imagecopyresampled($newimage, $image, 0, 0, 0, 0, $largeur, $hauteur, $imagesize[0], $imagesize[1])) {
 
                 if ($tocrop) {
-                    $newimage = imagecrop($newimage, ["x" => $centerx, "y" => 0, "width" => $resize[0], "height" => $resize[1]]);
+                    $newimage = imagecrop($newimage, ["x" => 0, "y" => 0, "width" => $resize[0], "height" => $resize[1]]);
                 }
 
                 if (!imagejpeg($newimage, $filename, $quality)) {
@@ -224,7 +344,7 @@ class Dfile {
             imagecopyresampled($newimage, $source, 0, 0, 0, 0, $largeur, $hauteur, $imagesize[0], $imagesize[1]);
 
             if ($tocrop) {
-                $newimage = imagecrop($newimage, ["x" => $centerx, "y" => $centery, "width" => $resize[0], "height" => $resize[1]]);
+                $newimage = imagecrop($newimage, ["x" => 0, "y" => 0, "width" => $resize[0], "height" => $resize[1]]);
             }
 
             if (!imagepng($newimage, $filename, 8))
@@ -299,7 +419,7 @@ class Dfile {
         }
     }
 
-    public static function show($image, $path = '', $default = 'default/no_image.jpg') {
+    public static function show($image, $path = '', $default = 'no_image.jpg') {
 
         $up = new UploadFile();
 

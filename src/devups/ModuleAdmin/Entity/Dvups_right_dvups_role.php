@@ -15,13 +15,13 @@
          * @ManyToOne(targetEntity="\Dvups_role")
          * @var \Dvups_role
          */
-        private $dvups_role;
+        public $dvups_role;
 
         /**
          * @ManyToOne(targetEntity="\Dvups_right")
          * @var \Dvups_right
          */
-        private $dvups_right;
+        public $dvups_right;
 
 
         

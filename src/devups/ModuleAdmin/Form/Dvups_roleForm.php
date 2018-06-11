@@ -3,8 +3,9 @@
     class Dvups_roleForm extends FormManager{
 
         public static function formBuilder(\Dvups_role $dvups_role, $action = null, $button = false) {
-            $entitycore = $dvups_role->scan_entity_core();
-            
+            //$entitycore = $dvups_role->scan_entity_core();
+            $entitycore = new Core($dvups_role);
+
             $entitycore->formaction = $action;
             $entitycore->formbutton = $button;
                 

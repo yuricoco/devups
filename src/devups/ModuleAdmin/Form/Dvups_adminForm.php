@@ -3,8 +3,9 @@
     class Dvups_adminForm extends FormManager{
 
         public static function formBuilder(\Dvups_admin $dvups_admin, $action = null, $button = false) {
-            $entitycore = $dvups_admin->scan_entity_core();
-            
+            //$entitycore = $dvups_admin->scan_entity_core();
+            $entitycore = new Core($dvups_admin);
+
             $entitycore->formaction = $action;
             $entitycore->formbutton = $button;
                 
@@ -15,18 +16,12 @@
                 "value" => $dvups_admin->getName(), 
             ];
 
-//            $entitycore->field['password'] = [
-//                "label" => 'Password', 
-//			"type" => FORMTYPE_TEXT, 
-//                "value" => $dvups_admin->getPassword(), 
-//            ];
-
-                $entitycore->field['dvups_role'] = [
-                    "type" => FORMTYPE_CHECKBOX, 
-                    "values" => FormManager::Options_Helper('name', $dvups_admin->getDvups_role()),
-                    "label" => 'Dvups_role',
-                    "options" => FormManager::Options_ToCollect_Helper('name', new Dvups_role(), $dvups_admin->getDvups_role()),
-                ];
+            $entitycore->field['dvups_role'] = [
+                "type" => FORMTYPE_CHECKBOX,
+                "values" => FormManager::Options_Helper('name', $dvups_admin->getDvups_role()),
+                "label" => 'Dvups_role',
+                "options" => FormManager::Options_ToCollect_Helper('name', new Dvups_role(), $dvups_admin->getDvups_role()),
+            ];
 
 
             return $entitycore;

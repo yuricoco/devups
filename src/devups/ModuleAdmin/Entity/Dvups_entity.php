@@ -21,12 +21,12 @@ class Dvups_entity extends Model implements JsonSerializable {
      * @ManyToOne(targetEntity="\Dvups_module")
      * @var \Dvups_module
      */
-    private $dvups_module;
+    public $dvups_module;
 
     /**
      * @var \Dvups_right
      */
-    private $dvups_right;
+    public $dvups_right;
 
     public function __construct($id = null) {
 

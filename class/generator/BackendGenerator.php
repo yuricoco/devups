@@ -99,7 +99,7 @@ class BackendGenerator {
          *	@return " . $antislash . ucfirst($relation->entity) . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            $" . "this->". $relation->entity . " = $" . "this->__belongto(\"" . $relation->entity . "\");
+            //$" . "this->". $relation->entity . " = $" . "this->__belongto(\"" . $relation->entity . "\");
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -125,7 +125,7 @@ class BackendGenerator {
          *	@return " . $antislash . ucfirst($relation->entity) . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            $" . "this->". $relation->entity . " = $" . "this->__belongto(\"$" . "this->" . $relation->entity . "\");
+            //$" . "this->". $relation->entity . " = $" . "this->__belongto(\"" . $relation->entity . "\");
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -287,12 +287,17 @@ class BackendGenerator {
         $contenu = "<?php \n
     class " . ucfirst($name) . "Controller extends Controller{
 
-            /**
-             * retourne l'instance de l'entité ou un json pour les requete asynchrone (ajax)
-             *
-             * @param type $" . "id
-             * @return \Array
-             */
+
+            public function listAction($" . "next = 1, $" . "per_page = 10){
+
+                $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+
+                return array('success' => true, // pour le restservice
+                    'lazyloading' => $" . "lazyloading, // pour le web service
+                    'detail' => '');
+
+            }
+            
             public  function showAction($" . "id){
 
                     $" . $name . " = " . ucfirst($name) . "::find($" . "id);
@@ -303,11 +308,6 @@ class BackendGenerator {
 
             }
 
-            /**
-             * Data for creation form
-             * @Sequences: controller - genesis - ressource/view/form
-             * @return \Array
-            */
             public function __newAction(){
 
                     return 	array(	'success' => true, // pour le restservice
@@ -317,11 +317,6 @@ class BackendGenerator {
 
             }
 
-            /**
-             * Action on creation form
-             * @Sequences: controller - genesis - ressource/view/form
-             * @return \Array
-            */
             public function createAction(){
                     extract($" . "_POST);
                     $" . "this->err = array();
@@ -392,12 +387,6 @@ class BackendGenerator {
 
             }
 
-            /**
-             * Data for edit form
-             * @Sequences: controller - genesis - ressource/view/form
-             * @param type $" . "id
-             * @return \Array
-                                         */ 
             public function __editAction($" . "id){
 
                    $" . $name . " = " . ucfirst($name) . "::find($" . "id);
@@ -409,12 +398,6 @@ class BackendGenerator {
 
             }
 
-            /**
-             * Action on edit form
-             * @Sequences: controller - genesis - ressource/view/index
-             * @param type $" . "id
-             * @return \Array
-            */
             public function updateAction($" . "id){
                     extract($" . "_POST);
                         
@@ -441,22 +424,6 @@ class BackendGenerator {
                                             'action_form' => 'update&id='.$" . "id, // pour le web service
                                             'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
                     }
-            }
-
-            /**
-             * 
-             *
-             * @param type $" . "id
-             * @return \Array
-             */
-            public function listAction($" . "next = 1, $" . "per_page = 10){
-
-                $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
-
-                return array('success' => true, // pour le restservice
-                    'lazyloading' => $" . "lazyloading, // pour le web service
-                    'detail' => '');
-
             }
 
             public function deleteAction($" . "id){
@@ -586,8 +553,7 @@ class BackendGenerator {
             foreach ($entity->relation as $relation) {
 
                 $entitylink = $traitement->relation($listmodule, $relation->entity);
-                $entrel = ucfirst(strtolower($relation->entity));
-                $key = 0;
+
                 $enititylinkattrname = "id";
                 $entitylink->attribut = (array) $entitylink->attribut;
 
@@ -628,7 +594,7 @@ class BackendGenerator {
     class " . ucfirst($name) . "Form extends FormManager{
 
         public static function formBuilder(\\" . ucfirst($name) . " $" . $name . ", $" . "action = null, $" . "button = false) {
-            $" . "entitycore = $" . $name . "->scan_entity_core();
+            $" . "entitycore = new Core($" . $name . ");
             
             $" . "entitycore->formaction = $" . "action;
             $" . "entitycore->formbutton = $" . "button;

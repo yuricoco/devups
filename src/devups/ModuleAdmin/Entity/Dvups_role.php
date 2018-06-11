@@ -24,17 +24,17 @@ class Dvups_role extends Model implements JsonSerializable {
     /**
      * @var \Dvups_right
      */
-    private $dvups_right;
+    public $dvups_right;
 
     /**
      * @var \Dvups_module
      */
-    private $dvups_module;
+    public $dvups_module;
 
     /**
      * @var \Dvups_entity
      */
-    private $dvups_entity;
+    public $dvups_entity;
 
     public function array_rigth() {
         $array_rigth = [];

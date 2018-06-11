@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<input id="checkbox"  type="checkbox">
+<input id="price" name="price" value="34.5">
+<button onclick="updateprice()">update</button>
+<button id="result"></button>
+
+</body>
+<script>
+    function simulateClick() {
+        var event = new MouseEvent('click', {
+            'view': window,
+            'bubbles': true,
+            'cancelable': true
+        });
+        var cb = document.getElementById('checkbox');
+        var canceled = !cb.dispatchEvent(event);
+        if (canceled) {
+            //Un gestionnaire appelé preventDefault.
+            alert("canceled");
+        } else {
+            //Aucun gestionnaires appelé preventDefault.
+            alert("not canceled");
+        }
+    }
+
+    function updateprice() {
+
+        var diametre  = document.getElementById("price").value;
+        console.log(diametre);
+        var arrayprice = diametre.toString().split('.');
+        var price = arrayprice[1];
+
+        if(typeof price == "undefined")
+            document.getElementById("result").innerHTML = "Result: "+diametre;
+
+        var decimalsplited = price.toString().split('');
+
+        if(typeof decimalsplited[1] == "undefined"){
+            document.getElementById("result").innerHTML = "Result: "+diametre;
+            return ;
+        }
+
+        console.log(price, decimalsplited);
+
+        if(parseInt(decimalsplited[1]) <= 5 && parseInt(decimalsplited[1]) > 0) {
+            if(parseInt(decimalsplited[1])/2 > 1.5 )
+                price = arrayprice[0] + "." + decimalsplited[0] + "5";
+            else
+                price = arrayprice[0] + "." + decimalsplited[0] + "0";
+        }else if(parseInt(decimalsplited[1]) > 5){
+            var round = parseInt(decimalsplited[0]) + 1;
+            if(parseInt(decimalsplited[1])/2 > 3.5 )
+                price = arrayprice[0]+"."+round+"0";
+            else
+                price = arrayprice[0] + "." + decimalsplited[0] + "5";
+        }
+        document.getElementById("result").innerHTML = "Result: "+price;
+    }
+
+</script>
+</html>

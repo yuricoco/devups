@@ -46,7 +46,15 @@ define('FH_COLLECTIONFORMINJECTION', 'collectionforminjection');
 abstract class FormManager {
     //put your code here
 //    abstract function __renderForm($entity = null) ;
-    
+
+    public static function addjs($js){
+        $reflection = new ReflectionClass(get_called_class());
+        $filename = explode("\src", str_replace(get_called_class().".php", "", $reflection->getFilename()));
+        $filename = explode("\\", $filename[1]);
+
+        return __env . "src/" .$filename[1]."/". $filename[2] ."/Ressource/js/" . $js;
+    }
+
     static function Options_ToCollect_Helper($value, $entity, $currentcollection, $enablecollectionforminjection = false) {
         
         $qb = new QueryBuilder($entity);

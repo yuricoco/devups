@@ -32,7 +32,7 @@ class FormFactory {
         return $radio;
     }
 
-    public static function __checkboxinput($field, $directive = "", $callback = null) {
+    public static function __checkboxinput($field, $directive = "", $callback = null ) {
 
         $checkbox['checkecd'] = [];
         $checkbox['uncheckecd'] = [];
@@ -195,7 +195,7 @@ class FormFactory {
     public static function __renderForm($entitycore) {
 
         $form = "";
-        $_SESSION["dvups_form"][$entitycore->name] = $entitycore->field;
+        //$_SESSION["dvups_form"][$entitycore->name] = $entitycore->field;
 
         foreach ($entitycore->field as $key => $field) {
 
@@ -240,6 +240,7 @@ class FormFactory {
                 $formfield = FormFactory::__select($entitycore, $field, $field['directive']);
             } elseif ($field['type'] == FORMTYPE_INJECTION) {
                 $formfield = $field['imbricate'];
+                unset($entitycore->field[$key]['imbricate']);
             } elseif ($field['type'] == FORMTYPE_FILE) {
                 $formfield = FormFactory::__file($entitycore, $field, $field['directive']);
             } elseif ($field['type'] == FORMTYPE_FILEMULTIPLE) {
@@ -261,6 +262,8 @@ class FormFactory {
         }
 
         $formaction = "";
+        $dvups_form = "<textarea hidden name='dvups_form[".$entitycore->name."]' >".serialize($entitycore->field)."</textarea>";
+
         if ($entitycore->formaction) {
             $formaction = "<form action='index.php?path=" . $entitycore->name . "/" . $entitycore->formaction . "' enctype='multipart/form-data' method='post' >\n";
         }
@@ -270,7 +273,14 @@ class FormFactory {
             $formbutton = "<input class='btn btn-default' type='submit' value='save' /><input class='btn btn-default' type='reset' value='reset' >\n</form>";
         }
 
-        $form = $formaction . $form . $formbutton;
+        $formjs = "";
+        if (isset($entitycore->addjs) && $entitycore->addjs) {
+            foreach ($entitycore->addjs as $js){
+                $formjs .= "<script src='$js' ></script>";
+            }
+        }
+
+        $form = $formaction . $form . $dvups_form . $formbutton . $formjs ;
 
         return $form;
     }

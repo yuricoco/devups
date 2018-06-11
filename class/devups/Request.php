@@ -13,11 +13,12 @@
  */
 class Request {
 
-    private static $uri_param = [];
+    private static $uri_get_param = [];
+    private static $uri_post_param = [];
 
     function __construct($default_path = 'hello') {
 
-        Request::$uri_param["path"] = $default_path;
+        Request::$uri_get_param["path"] = $default_path;
 
         $uri = explode('?', $_SERVER['REQUEST_URI']);
 
@@ -26,27 +27,34 @@ class Request {
             foreach ($param as $el) {
                 $kv = explode("=", $el);
                 if (isset($kv[1])) {
-                    Request::$uri_param[$kv[0]] = $kv[1];
+                    Request::$uri_get_param[$kv[0]] = $kv[1];
                 }
             }
         }
 
         if (isset($_GET)) {
             foreach ($_GET as $key => $value) {
-                Request::$uri_param[$key] = $value;
+                Request::$uri_get_param[$key] = $value;
             }
         }
 
         if (isset($_POST)) {
             foreach ($_POST as $key => $value) {
-                Request::$uri_param[$key] = $value;
+                Request::$uri_post_param[$key] = $value;
             }
         }
     }
 
     public static function get($key) {
-        if (isset(Request::$uri_param[$key]))
-            return Request::$uri_param[$key];
+        if (isset(Request::$uri_get_param[$key]))
+            return Request::$uri_get_param[$key];
+        else
+            return false;
+    }
+
+    public static function post($key) {
+        if (isset(Request::$uri_post_param[$key]))
+            return Request::$uri_post_param[$key];
         else
             return false;
     }

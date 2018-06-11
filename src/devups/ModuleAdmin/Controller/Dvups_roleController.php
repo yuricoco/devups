@@ -43,6 +43,7 @@ class Dvups_roleController extends Controller {
         $_SESSION['action'] = $right;
 //                    $dvups_action = $right;
         $_SESSION["navigation"] = serialize($dvups_navigation);
+        // store in database
 //                    $navigation = $navigation;
     }
 

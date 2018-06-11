@@ -105,7 +105,7 @@ class Dvups_entityController extends Controller {
      */
     public function listAction($next = 1, $per_page = 10) {
 
-        $lazyloading = $this->lazyloadingfilter(new Dvups_entity(), $next, $per_page);
+        $lazyloading = $this->lazyloading(new Dvups_entity(), $next, $per_page);
 //        $lazyloading = $this->lazyloading(new Dvups_entity(), $next, $per_page);
 
         return array('success' => true, // pour le restservice

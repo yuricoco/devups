@@ -7,7 +7,7 @@ use Genesis as g;
  *
  * @author yuri coco
  */
-abstract class Controller extends DBAL {
+class Controller extends DBAL {
 
     private $change_collection_adress;
 
@@ -55,18 +55,17 @@ abstract class Controller extends DBAL {
             if ($_GET[$arrayfieldtype[0]]) {
                 if ($arrayfieldtype[1] == "attr") {
                     $qb->andwhere($arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
-                }
-                elseif ($arrayfieldtype[1] == "join") {
-                    
+                } elseif ($arrayfieldtype[1] == "join") {
+
                     $join = explode("-", $arrayfieldtype[0]);
-                    $qb->andwhere($join[0]."_id")
+                    $qb->andwhere($join[0] . "_id")
                             ->in(
                                     $qb->addselect("id", new $join[0])
                                     ->where($join[1])
                                     ->like($_GET[$arrayfieldtype[0]])
                                     ->close()
-                                    );
-                } 
+                    );
+                }
 //                elseif ($_GET[$arrayfieldtype[1]] == "collect") {
 //                    
 //                    $join = explode("-", $arrayfieldtype[0]);
@@ -78,6 +77,9 @@ abstract class Controller extends DBAL {
         return $qb;
     }
 
+    public static function initlazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = ""){
+        return (new Controller())->lazyloading($entity, $next, $per_page, $qbcustom, $order);
+    }
     /**
      * 
      * @param \stdClass $entity
@@ -86,8 +88,9 @@ abstract class Controller extends DBAL {
      * @param \QueryBuilder $qbcustom
      * @return type
      */
-    public function lazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null) {
+    public function lazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = "") {//
         $remain = true;
+//        $qbcustom = null;
 
         if (isset($_GET['next']) && isset($_GET['per_page']))
             extract($_GET);
@@ -125,9 +128,18 @@ abstract class Controller extends DBAL {
             }
 
             if ($qbcustom != null) {
-                $listEntity = $qbcustom->limit($next, $per_page)->__getAll();
+
+                if ($order) {
+                    $listEntity = $qbcustom->orderby($order)->limit($next, $per_page)->__getAll();
+                } else
+                    $listEntity = $qbcustom->limit($next, $per_page)->__getAll();
+                
             } else {
-                $listEntity = $qb->select()->limit($next, $per_page)->__getAll();
+                if ($order) 
+                    $listEntity = $qb->select()->orderby($order)->limit($next, $per_page)->__getAll();
+                else
+                    $listEntity = $qb->select()->limit($next, $per_page)->__getAll();
+                
             }
 
             if ($page == $pagination) {
@@ -140,8 +152,8 @@ abstract class Controller extends DBAL {
             $pagination = 0;
             $page = 1;
             $remain = 0;
-            if ($qbcustom != null) {
-                $listEntity = $qbcustom->__getAll();
+            if ($order) {
+                $listEntity = $qb->orderby($order)->__getAll();
             } else {
                 $listEntity = $qb->select()->__getAll();
             }
@@ -258,7 +270,8 @@ abstract class Controller extends DBAL {
             $entitycore = $entityform::formBuilder($object);
         else {
             $entitycore = new stdClass();
-            $entitycore->field = $_SESSION["dvups_form"][strtolower(get_class($object))];
+            $entitycore->field = unserialize($_POST["dvups_form"][strtolower(get_class($object))]);
+            //$entitycore->field = $_SESSION["dvups_form"][strtolower(get_class($object))];
 //            unset($_SESSION[strtolower(get_class($object))]);
         }
 
