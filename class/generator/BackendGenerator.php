@@ -626,7 +626,7 @@ class BackendGenerator {
 
         foreach ($entity->attribut as $attribut) {
 
-            $field .= "\n";
+            $field .= "<div class='form-group'>\n<label for='" . $attribut->name . "'>" . ucfirst($attribut->name) . "</label>\n";
 
             if ($attribut->nullable == 'default') {
                 $field .= "\tFH_REQUIRE => false,\n ";
@@ -675,7 +675,7 @@ class BackendGenerator {
                 $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
             }
 
-            $field .= " \n";
+            $field .= " </div>\n";
         }
 
         if (!empty($entity->relation)) {
@@ -691,6 +691,8 @@ class BackendGenerator {
                     $enititylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
+                $field .= "<div class='form-group'>\n<label for='" . $relation->entity . "'>" . ucfirst($relation->entity) . "</label>\n";
+
                 if ($relation->cardinality == 'manyToOne') {
                     $field .= "
                     <?= Form::select('" . $relation->entity . "', 
@@ -701,7 +703,7 @@ class BackendGenerator {
                 } elseif ($relation->cardinality == 'oneToOne' && $onetoone) {
                     $field .= "<?php $" . $relation->entity . " = $" . $name . "->get" . ucfirst($relation->entity) . "(); ?>";
                     $field .= "
-                    <?= Form::init($" . $relation->entity . ") ?>";
+                    <?= Form::imbricate($" . $relation->entity . ") ?>";
                     $field .= $this->formfield($entitylink, $listmodule, false);
                     $field .= "<?= Form::closeimbricate() ?>\n";
                 } elseif ($relation->cardinality == 'manyToMany') {
@@ -712,6 +714,8 @@ class BackendGenerator {
                     FormManager::Options_Helper('" . $enititylinkattrname . "', $" . $name . "->get" . ucfirst($relation->entity) . "()),
                     ['class' => 'form-control']); ?>\n";
                 }
+
+                $field .= " </div>\n";
             }
         }
 
