@@ -72,8 +72,8 @@ if (isset($argv[2])) {
             echo $argv[2] . ": Form generated with success";
             break;
 
-        case 'core:g:formfield':
-            __Generator::formfield($argv[2], $project); //,
+        case 'core:g:formwidget':
+            __Generator::formwidget($argv[2], $project); //,
             echo $argv[2] . ": Form Field generated with success";
             break;
 

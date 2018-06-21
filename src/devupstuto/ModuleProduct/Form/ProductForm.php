@@ -56,6 +56,10 @@
         public static function __renderForm(\Product $product, $action = null, $button = false) {
             return FormFactory::__renderForm(ProductForm::formBuilder($product, $action, $button));
         }
+
+        public static function __renderFormWidget(\Product $product, $action_form = null) {
+            include ROOT.Product::classpath()."Form/ProductFormWidget.php";
+        }
         
     }
     

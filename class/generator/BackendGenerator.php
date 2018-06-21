@@ -609,6 +609,10 @@ class BackendGenerator {
             return FormFactory::__renderForm(" . ucfirst($name) . "Form::formBuilder($" . $name . ", $" . "action, $" . "button));
         }
         
+        public static function __renderFormWidget(\\" . ucfirst($name) . " $" . $name . ", $" . "action_form = null) {
+            include ROOT." . ucfirst($name) . "::classpath().\"Form/" . ucfirst($name) . "FormWidget.php\";
+        }
+        
     }
     ";
         $entityform = fopen('Form/' . ucfirst($name) . 'Form.php', 'w');
@@ -619,7 +623,7 @@ class BackendGenerator {
 
     /* CREATION DU FORM FIELD */
 
-    private function formfield($entity, $listmodule, $onetoone = true){
+    private function formwidget($entity, $listmodule, $onetoone = true){
         $field = '';
         $traitement = new Traitement();
         $name = strtolower($entity->name);
@@ -724,14 +728,14 @@ class BackendGenerator {
     }
 
 
-    public function formFieldGenerator($entity, $listmodule) {
+    public function formWidgetGenerator($entity, $listmodule) {
 
         $name = strtolower($entity->name);
 
         /* if($name == 'utilisateur')
           return 0; */
         unset($entity->attribut[0]);
-        $field = $this->formfield($entity, $listmodule);
+        $field = $this->formwidget($entity, $listmodule);
 
         $contenu = "
     <?= Form::open($" . $name . ", [\"action\"=> \" $" . "action_form\", \"method\"=> \"post\"]) ?>
@@ -742,7 +746,7 @@ class BackendGenerator {
     
     <?= Form::close() ?>";
 
-        $entityform = fopen('Form/' . ucfirst($name) . 'FieldForm.php', 'w');
+        $entityform = fopen('Form/' . ucfirst($name) . 'FormWidget.php', 'w');
         fputs($entityform, $contenu);
 
         fclose($entityform);

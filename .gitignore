@@ -1,2 +1,4 @@
 /uploads/
 /admin/cache/
+/vendor/
+/.idea/

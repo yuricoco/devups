@@ -19,8 +19,8 @@
                                     
                     <div class="col-lg-12" >
 
-                        ProductForm::__renderForm($product, $action_form, true); ?>
-                        <?php include ROOT."src/devupstuto/ModuleProduct/Form/ProductFieldForm.php"; ?>
+                        <?php //ProductForm::__renderForm($product, $action_form, true); ?>
+                        <?php ProductForm::__renderFormWidget($product, $action_form); ?>
 
                         </div>
                     <div>        

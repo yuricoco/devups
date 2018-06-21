@@ -18,7 +18,9 @@ abstract class Model extends \stdClass {
     public static function classpath(){
         $reflector = new ReflectionClass(get_called_class());
         $fn = $reflector->getFileName();
-        return dirname($fn);
+        $dirname = explode("src", dirname($fn));
+        $dirname = str_replace("Entity", "", $dirname[1]);
+        return "src".$dirname;
     }
 
     /**

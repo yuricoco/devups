@@ -221,11 +221,11 @@ Usage:
      *
      * @param type $namespace
      */
-    public static function formfield($namespace, $project) {
+    public static function formwidget($namespace, $project) {
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => false, 'formfield' => true, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => false, 'formwidget' => true, 'genes' => false, 'views' => false]);
     }
 
     /**
@@ -288,8 +288,8 @@ Usage:
         if ($crud['form'])
             $backend->formGenerator($entity, $project->listmodule);
 
-        if (isset($crud['formfield']) && $crud['formfield'])
-            $backend->formFieldGenerator($entity, $project->listmodule);
+        if (isset($crud['formwidget']) && $crud['formwidget'])
+            $backend->formWidgetGenerator($entity, $project->listmodule);
 
         if ($crud['genes'])
             $rootgenerate->entityRooting($entity);
