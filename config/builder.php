@@ -3,12 +3,14 @@
 require __DIR__ . '/../config/dependanceInjection.php';
 
 require __DIR__ . '/../class/generator/BackendGenerator.php';
+require __DIR__ . '/../class/generator/android/BackendGeneratorJava.php';
 require __DIR__ . '/../class/generator/FrontendGenerator.php';
 require __DIR__ . '/../class/generator/rootGenerator.php';
 require __DIR__ . '/../class/generator/RequestGenerator.php';
 require __DIR__ . '/../class/generator/Traitement.php';
 require __DIR__ . '/../class/generator/template/Templatedependences.php';
 require __DIR__ . '/../class/generator/__Generator.php';
+require __DIR__ . '/../class/generator/android/__Generatorjava.php';
 
 require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_module.php';
 require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_role.php';
@@ -18,7 +20,7 @@ require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php
 require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';
 require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_right_dvups_entity.php';
 
-$backend = new BackendGenerator();
+$backend = new BackendGeneratorJava();
 $frontend = new FrontendGenerator();
 $rootgenerate = new RootGenerator();
 $database = new RequestGenerator();
@@ -70,9 +72,19 @@ if (isset($argv[2])) {
             echo $argv[2] . ": Form generated with success";
             break;
 
+        case 'core:g:formfield':
+            __Generator::formfield($argv[2], $project); //,
+            echo $argv[2] . ": Form Field generated with success";
+            break;
+
         case 'core:g:entity':
-            __Generator::entity($argv[2], $project); //, 
-            echo $argv[2] . ": Entity generated with success";
+            if(isset($argv[3])){
+                __Generatorjava::entity($argv[2], $project); //,
+                echo $argv[2] . ": Entity java generated with success";
+            }else{
+                __Generator::entity($argv[2], $project); //,
+                echo $argv[2] . ": Entity generated with success";
+            }
             break;
 
         case 'core:g:crud':

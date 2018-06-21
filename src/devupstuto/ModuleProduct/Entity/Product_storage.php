@@ -37,30 +37,26 @@
         public function getId() {
             return $this->id;
         }
-        
         /**
          *  manyToOne
          *	@return \Storage
          */
         function getStorage() {
-            $this->storage = $this->__belongto("storage");
+            //$this->storage = $this->__belongto("storage");
             return $this->storage;
         }
-        
         function setStorage(\Storage $storage) {
             $this->storage = $storage;
         }
                         
-        
         /**
          *  manyToOne
          *	@return \Product
          */
         function getProduct() {
-            $this->product = $this->__belongto("product");
+            //$this->product = $this->__belongto("product");
             return $this->product;
         }
-        
         function setProduct(\Product $product) {
             $this->product = $product;
         }

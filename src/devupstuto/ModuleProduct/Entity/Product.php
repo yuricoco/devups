@@ -19,13 +19,13 @@
          * @var text
          **/
         private $description; 
-         
+        
         /**
          * @OneToOne(targetEntity="\Image")
          * , inversedBy="reporter"
          * @var \Image
          */
-        private $image;
+        public $image;
 
         /**
          * @ManyToOne(targetEntity="\Category")
@@ -45,7 +45,7 @@
          * manyToMany
          * @var \Storage
          */
-        private $storage;
+        public $storage;
 
 
         
@@ -78,7 +78,6 @@
             $this->description = $description;
         }
         
-        
         /**
          *  oneToOne
          *	@return \Image
@@ -87,48 +86,45 @@
             //$this->image = $this->__belongto("image");
             return $this->image;
         }
-        
         function setImage(\Image $image = null) {
             $this->image = $image;
         }
                         
-        
         /**
          *  manyToOne
          *	@return \Category
          */
         function getCategory() {
-            $this->category = $this->__belongto($this->category);
+            //$this->category = $this->__belongto("category");
             return $this->category;
         }
-        
         function setCategory(\Category $category) {
             $this->category = $category;
         }
                         
-        
         /**
          *  manyToOne
          *	@return \Subcategory
          */
         function getSubcategory() {
-            $this->subcategory = $this->__belongto("subcategory");
+            //$this->subcategory = $this->__belongto("subcategory");
             return $this->subcategory;
         }
-        
         function setSubcategory(\Subcategory $subcategory) {
             $this->subcategory = $subcategory;
         }
                         
-         
         /**
          *  manyToMany
          *	@return \Storage
          */
-        function getStorage() {
-            return $this->__hasmany('storage');
+        function collectStorage() {
+            $this->storage = $this->__hasmany("storage");
+            return $this->storage;
         }
-        
+        function getStorage() {
+            return $this->storage;
+        }
         function addStorage(\Storage $storage){
             $this->storage[] = $storage;
         }

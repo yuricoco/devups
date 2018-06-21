@@ -553,7 +553,8 @@ class BackendGenerator {
             foreach ($entity->relation as $relation) {
 
                 $entitylink = $traitement->relation($listmodule, $relation->entity);
-
+                $entrel = ucfirst(strtolower($relation->entity));
+                $key = 0;
                 $enititylinkattrname = "id";
                 $entitylink->attribut = (array) $entitylink->attribut;
 
@@ -611,6 +612,133 @@ class BackendGenerator {
     }
     ";
         $entityform = fopen('Form/' . ucfirst($name) . 'Form.php', 'w');
+        fputs($entityform, $contenu);
+
+        fclose($entityform);
+    }
+
+    /* CREATION DU FORM FIELD */
+
+    private function formfield($entity, $listmodule, $onetoone = true){
+        $field = '';
+        $traitement = new Traitement();
+        $name = strtolower($entity->name);
+
+        foreach ($entity->attribut as $attribut) {
+
+            $field .= "\n";
+
+            if ($attribut->nullable == 'default') {
+                $field .= "\tFH_REQUIRE => false,\n ";
+            }
+
+            if ($attribut->formtype == 'text' or $attribut->formtype == 'float') {
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'input' or $attribut->formtype == 'number') {
+                $field .= "\t<?= Form::integer('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'textarea') {
+                $field .= "\t<?= Form::textarea('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'date') {
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'time') {
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'datetime') {
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'datepicker') {
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'radio') {
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'email') {
+                $field .= "\t<?= Form::email('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
+            } elseif ($attribut->formtype == 'document') {
+                $field .= "\t\"type\" => FORMTYPE_FILE,
+                FH_FILETYPE => FILETYPE_" . strtoupper($attribut->formtype) . ",  
+                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+            } elseif ($attribut->formtype == 'video') {
+                $field .= "\t\t\t\"type\" => FORMTYPE_FILE,
+                \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
+                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+            } elseif ($attribut->formtype == 'music') {
+                $field .= "\"type\" => FORMTYPE_FILE,
+                \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
+                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+            } elseif ($attribut->formtype == 'image') {
+                $field .= "\t<?= Form::file('" . $attribut->name . "', 
+                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                $" . $name . "->show" . ucfirst($attribut->name) . "(),
+                 ['class' => 'form-control'], 'image') ?>\n";
+
+            } else {
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
+            }
+
+            $field .= " \n";
+        }
+
+        if (!empty($entity->relation)) {
+            foreach ($entity->relation as $relation) {
+
+                $entitylink = $traitement->relation($listmodule, $relation->entity);
+
+                $enititylinkattrname = "id";
+                $entitylink->attribut = (array) $entitylink->attribut;
+
+                if (isset($entitylink->attribut[1])) {
+                    $key = 1;
+                    $enititylinkattrname = $entitylink->attribut[$key]->name;
+                }
+
+                if ($relation->cardinality == 'manyToOne') {
+                    $field .= "
+                    <?= Form::select('" . $relation->entity . "', 
+                    FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
+                    $" . $name . "->get" . ucfirst($relation->entity) . "()->getId(),
+                    ['class' => 'form-control']); ?>\n";
+
+                } elseif ($relation->cardinality == 'oneToOne' && $onetoone) {
+                    $field .= "<?php $" . $relation->entity . " = $" . $name . "->get" . ucfirst($relation->entity) . "(); ?>";
+                    $field .= "
+                    <?= Form::init($" . $relation->entity . ") ?>";
+                    $field .= $this->formfield($entitylink, $listmodule, false);
+                    $field .= "<?= Form::closeimbricate() ?>\n";
+                } elseif ($relation->cardinality == 'manyToMany') {
+                    //FormManager::Options_ToCollect_Helper('name', new Dvups_right(), $dvups_role->getDvups_right()
+                    $field .= "
+                    <?= Form::checkbox('" . $relation->entity . "', 
+                    FormManager::Options_ToCollect_Helper('" . $enititylinkattrname . "', new " . ucfirst($relation->entity) . "(), $" . $name . "->get" . ucfirst($relation->entity) . "()),
+                    FormManager::Options_Helper('" . $enititylinkattrname . "', $" . $name . "->get" . ucfirst($relation->entity) . "()),
+                    ['class' => 'form-control']); ?>\n";
+                }
+            }
+        }
+
+        return $field;
+
+    }
+
+
+    public function formFieldGenerator($entity, $listmodule) {
+
+        $name = strtolower($entity->name);
+
+        /* if($name == 'utilisateur')
+          return 0; */
+        unset($entity->attribut[0]);
+        $field = $this->formfield($entity, $listmodule);
+
+        $contenu = "
+    <?= Form::open($" . $name . ", [\"action\"=> \" $" . "action_form\", \"method\"=> \"post\"]) ?>
+
+     " . $field . "
+       
+    <?= Form::submit(\"save\", ['class' => 'btn btn-success']) ?>
+    
+    <?= Form::close() ?>";
+
+        $entityform = fopen('Form/' . ucfirst($name) . 'FieldForm.php', 'w');
         fputs($entityform, $contenu);
 
         fclose($entityform);

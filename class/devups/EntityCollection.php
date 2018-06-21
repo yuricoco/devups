@@ -30,28 +30,6 @@ class EntityCollection{
                  */
                 $classe_name = ucfirst($classe_name);
                 $reflect = new ReflectionClass($classe_name);
-                $i = 0;
-                
-//                $reflection = new ReflectionClass($classe_name); 
-//                $reflection = new ReflectionAnnotatedClass($classe_name); 
-//                if($reflection->getAnnotation('ClassInfos')){
-//                    $basicentity = $reflect->newInstanceWithoutConstructor();
-//                    if($reflection->getAnnotation('ClassInfos')->entitycollection){
-//                        $object_array = (array) $basicentity;
-//                        foreach ($object_array as $key => $value) {
-//                            $i++;
-//                            if($i > count($object_array) - $reflection->getAnnotation('ClassInfos')->nb){
-//                                $key2 = str_replace($classe_name, '', $key);
-//                                $key2 = str_replace('*', '', $key2);
-//                                $property = substr($key2, 2);
-//
-//                                $object_array[$key] = EntityCollection::entity_collection($property, false);
-//                            }
-//                        }
-//                        $entity = Bugmanager::cast((object) $object_array, $classe_name);
-//                    }else
-//                        $entity = $reflect->newInstanceWithoutConstructor();
-//                }else
                     
                 $entity = $reflect->newInstanceWithoutConstructor();
                 

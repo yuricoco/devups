@@ -20,8 +20,10 @@ class Form extends FormFactory{
         
         if(!isset($directives['method']))
             $directives['method'] = "post";
-        
+
         Form::$name = strtolower(get_class($enitty));
+        $directives["action"] = "index.php?path=".Form::$name."/".trim($directives["action"]);
+
         $formdirective = [];
         foreach ($directives as $key => $value) {
            $formdirective[] = $key ."='" . $value ."'";
@@ -44,7 +46,7 @@ class Form extends FormFactory{
     
     public static function imbricate($enitty) {
         Form::$savestate = [Form::$name, Form::$fields];
-        Form::$fields = [];
+        //Form::$fields = [];
         Form::$name = strtolower(get_class($enitty));
     }
     
@@ -52,7 +54,7 @@ class Form extends FormFactory{
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
         $dvups_form = "<textarea hidden name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
         
-        //Form::$name = Form::$savestate[0];
+        Form::$name = Form::$savestate[0];
         //Form::$fields = Form::$savestate[1];
 
         return $dvups_form;

@@ -22,7 +22,7 @@ abstract class Model extends \stdClass {
     }
 
     /**
-     * 
+     *
      * @param type $lable
      * @param type $content
      * @param type $lang
@@ -30,8 +30,8 @@ abstract class Model extends \stdClass {
      */
     public function __translate($lable, $content, $lang = "fr") {
         if(!$this->id || !$content)
-            return; 
-        
+            return;
+
         $dvlang = new Dvups_lang();
         $dvlang->setLabel($this->id . "_" . $lable);
         $dvlang->setLang($lang);
@@ -43,14 +43,14 @@ abstract class Model extends \stdClass {
 
     public function __updatetranslate($lable, $content, $lang = "fr") {
         if(!$this->id || !$content)
-            return; 
-        
+            return;
+
         $dvlang = Dvups_lang::select()
-                ->where("label", $this->id . "_" . $lable)
-                ->andwhere("lang", $lang)
-                ->andwhere("`table`", strtolower(get_class($this)) )
-                ->__getOne();
-        
+            ->where("label", $this->id . "_" . $lable)
+            ->andwhere("lang", $lang)
+            ->andwhere("`table`", strtolower(get_class($this)) )
+            ->__getOne();
+
         if (!$dvlang->getId()) {
             $dvlang->setLabel($this->id . "_" . $lable);
             $dvlang->setLang($lang);
@@ -63,16 +63,16 @@ abstract class Model extends \stdClass {
 
     public function __gettranslate($lable, $lang = "fr") {
         if(!$this->id)
-            return ""; 
-        
+            return "";
+
         $dvlang = Dvups_lang::select()->where("label", $this->id . "_" . $lable)
-                ->andwhere("`table`", strtolower(get_class($this)) )
-                ->andwhere("lang", $lang)->__getOne();
+            ->andwhere("`table`", strtolower(get_class($this)) )
+            ->andwhere("lang", $lang)->__getOne();
         return $dvlang->getContent();
     }
 
     /**
-     * 
+     *
      * @param type $param
      * @return \Dfile
      */
@@ -129,6 +129,7 @@ abstract class Model extends \stdClass {
 
         $qb = new QueryBuilder($entity);
         return $qb->select()->__countEl();
+
     }
 
 
@@ -159,7 +160,7 @@ abstract class Model extends \stdClass {
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->orderby(strtolower(get_called_class()).".id desc")->limit(1)->__getOne();
+        return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne();
     }
 
     /**
@@ -231,7 +232,7 @@ abstract class Model extends \stdClass {
     }
 
     /**
-     * 
+     *
      * @param string $sort
      * @param type $order
      * @return type
@@ -242,14 +243,14 @@ abstract class Model extends \stdClass {
 
         $qb = new QueryBuilder($entity);
         if ($sort == 'id')
-            $sort = strtolower(get_class($entity)) . "." . $sort;
+            $sort = $qb->getTable() . "." . $sort;
 
         return $qb->select()->orderby($sort . " " . $order)->__getAll();
     }
 
     /**
      * Return an array of rows as in database.
-     * @example http://easyprod.spacekola.com/doc/#allrow 
+     * @example http://easyprod.spacekola.com/doc/#allrow
      * @param String $att the attribut you want to order by
      * @param String $order the ordering model ( ASC default, DESC, RAND() )
      * @return Array
@@ -260,7 +261,7 @@ abstract class Model extends \stdClass {
 
         $qb = new QueryBuilder($entity);
         if ($sort == 'id')
-            $sort = strtolower(get_class($entity)) . "." . $sort;
+            $sort = $qb->getTable() . "." . $sort;
 
         return $qb->select()->orderby($sort . " " . $order)->__getAllRow();
     }
@@ -274,7 +275,7 @@ abstract class Model extends \stdClass {
     public static function select($columns = '*') {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
-        
+
         $qb = new QueryBuilder($entity);
         return $qb->select($columns);
     }
@@ -282,7 +283,7 @@ abstract class Model extends \stdClass {
     /**
      * update a part or an entire entity
      * @example http://easyprod.spacekola.com description
-     * @param Mixed $arrayvalues 
+     * @param Mixed $arrayvalues
      * @param Mixed $seton
      * @param Mixed $case id
      * @return \QueryBuilder
@@ -309,7 +310,7 @@ abstract class Model extends \stdClass {
     /**
      * update a part or an entire entity
      * @example http://easyprod.spacekola.com description
-     * @param Mixed $arrayvalues 
+     * @param Mixed $arrayvalues
      * @param Mixed $seton
      * @param Mixed $case
      * @return boolean
@@ -355,7 +356,7 @@ abstract class Model extends \stdClass {
     public function __getall($att = 'id', $order = "asc") {
         $qb = new QueryBuilder($this);
         if ($att == 'id')
-            $att = strtolower(get_class($this)) . "." . $att;
+            $att = $qb->getTable() . "." . $att;
 
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }
@@ -363,7 +364,7 @@ abstract class Model extends \stdClass {
     public function __all($att = 'id', $order = "") {
         $qb = new QueryBuilder($this);
         if ($att == 'id')
-            $att = strtolower(get_class($this)) . "." . $att;
+            $att = $qb->getTable() . "." . $att;
 
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }

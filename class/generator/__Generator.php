@@ -24,16 +24,16 @@ class __Generator {
 Usage:
   command [options] [arguments]\n\nAvailable commands:\n";
         
-        $commend[] = "core:g:component <component>                           // generate an entity crud from core eg: component\module\entity";
-        $commend[] = "core:g:module <component\module>                    // generate an entity crud from core eg: component\module\entity";
-        $commend[] = "core:g:crud <component\module\entity>               // generate an entity crud from core";
-        $commend[] = "core:g:entity <component\module\entity>             // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:component <component>                      // generate an entity crud from core eg: component\module\entity";
+        $commend[] = "core:g:module <component\module>                  // generate an entity crud from core eg: component\module\entity";
+        $commend[] = "core:g:crud <component\module\entity>             // generate an entity crud from core";
+        $commend[] = "core:g:entity <component\module\entity>           // generate an entity from core eg: component\module\entity";
         $commend[] = "core:g:controller <component\module\entity>       // generate a controller from core eg: component\module\entity";
-        $commend[] = "core:g:form <component\module\entity>               // generate an entity from core eg: component\module\entity";
-        $commend[] = "core:g:views <component\module\entity>              // generate an entity from core eg: component\module\entity";
-        $commend[] = "core:g:genesis <component\module\entity>           // generate an entity from core eg: component\module\entity\n ";
+        $commend[] = "core:g:form <component\module\entity>             // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:views <component\module\entity>            // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:genesis <component\module\entity>          // generate an entity from core eg: component\module\entity\n ";
 
-        $commend[] = "install                       // create database, create database schema and create master admin ";
+        $commend[] = "install                 // create database, create database schema and create master admin ";
         $commend[] = "dvups_:update           // update right of master admin on new modules and entities ";
 
         echo implode("\n\t -> ", $commend);
@@ -218,6 +218,17 @@ Usage:
     }
 
     /**
+     *
+     * @param type $namespace
+     */
+    public static function formfield($namespace, $project) {
+
+        $ns = explode("\\", $namespace);
+        $entity = __Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => false, 'formfield' => true, 'genes' => false, 'views' => false]);
+    }
+
+    /**
      * 
      * @param type $namespace
      */
@@ -276,6 +287,9 @@ Usage:
 
         if ($crud['form'])
             $backend->formGenerator($entity, $project->listmodule);
+
+        if (isset($crud['formfield']) && $crud['formfield'])
+            $backend->formFieldGenerator($entity, $project->listmodule);
 
         if ($crud['genes'])
             $rootgenerate->entityRooting($entity);

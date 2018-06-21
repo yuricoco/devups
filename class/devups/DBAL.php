@@ -25,6 +25,14 @@ class DBAL extends Database {
      */
     protected $objectName;
     protected $table;
+
+    /**
+     * @return mixed
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
     protected $instanceid;
 
     /**
@@ -95,7 +103,7 @@ class DBAL extends Database {
                         $enittyfoldes[] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name . "/Entity";
                         foreach ($module->listentity as $key => $entity) {
                             if(is_object($entity))
-                                //die(var_dump($entity));
+                                //var_dump($entity);
                                 $enittycollection[strtolower($entity->name)] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name;
                         }
                     }
