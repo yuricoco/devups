@@ -17,15 +17,15 @@ class RootGenerator{
 					break;
 					
 				case '_new':
-                                                                                                            Genesis::renderView( '".$name.".form',  $".$name."Ctrl->__newAction(), 'new');
+                    Genesis::renderView( '".$name.".form',  $".$name."Ctrl->__newAction(), 'new');
 					break;
 					
 				case 'create':
-                                                                                                            Genesis::renderView( '".$name.".form', $".$name."Ctrl->createAction(), 'error creation', true);
+                    Genesis::renderView( '".$name.".form', $".$name."Ctrl->createAction(), 'error creation', true);
 					break;
 					
 				case '_edit':
-                                                                                                            Genesis::renderView( '".$name.".form',  $".$name."Ctrl->__editAction($"."_GET['id']), 'edite');
+                    Genesis::renderView( '".$name.".form',  $".$name."Ctrl->__editAction($"."_GET['id']), 'edite');
 					break;
 					
 				case 'update':
@@ -33,11 +33,11 @@ class RootGenerator{
 					break;
 					
 				case 'show':
-                                                                                                                Genesis::renderView( '".$name.".show', $".$name."Ctrl->showAction($"."_GET['id']), 'Show');
+                    Genesis::renderView( '".$name.".show', $".$name."Ctrl->showAction($"."_GET['id']), 'Show');
 					break;
 					
 				case 'delete':
-                                                                                                                Genesis::renderView( '".$name.".show', $".$name."Ctrl->deleteAction($"."_GET['id']), 'delete', true);
+                    Genesis::renderView( '".$name.".show', $".$name."Ctrl->deleteAction($"."_GET['id']), 'delete', true);
 					break;
                                         
 				default:

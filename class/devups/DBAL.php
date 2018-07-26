@@ -536,7 +536,7 @@ class DBAL extends Database {
 
         $query = $this->link->prepare($sql);
 
-        $result = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+        $result = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
         $this->manyToManyDelete($this->objectValue[0], $_ENTITY_COLLECTION);
 
@@ -673,6 +673,7 @@ class DBAL extends Database {
 
         $flowBD = Bugmanager::cast((object) $object_array, get_class($this->object));
         $flowBD->dvfetched = true;
+        $flowBD->dvinrelation = true;
 
         return $flowBD;
 
@@ -878,6 +879,8 @@ class DBAL extends Database {
             
         }
 
+        $object_array["dvinrelation"] = true;
+
         return $object_array;
     }
 
@@ -923,6 +926,9 @@ class DBAL extends Database {
             $objecarray = (array) $object;
             if (isset($objecarray["dvfetched"])) {
                 unset($objecarray["dvfetched"]);
+            }
+            if (isset($objecarray["dvinrelation"])) {
+                unset($objecarray["dvinrelation"]);
             }
 
             $this->object = $object;

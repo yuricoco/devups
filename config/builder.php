@@ -74,13 +74,21 @@ if (isset($argv[2])) {
 
         case 'core:g:formwidget':
             __Generator::formwidget($argv[2], $project); //,
-            echo $argv[2] . ": Form Field generated with success";
+            echo $argv[2] . ": Form widget generated with success";
+            break;
+
+        case 'core:g:viewswidget':
+            __Generator::detailwidget($argv[2], $project); //,
+            echo $argv[2] . ": Detail widget generated with success";
             break;
 
         case 'core:g:entity':
             if(isset($argv[3])){
-                __Generatorjava::entity($argv[2], $project); //,
-                echo $argv[2] . ": Entity java generated with success";
+                if(isset($argv[4])){
+                    __Generatorjava::entity($argv[2], $project, $argv[4]); //,$argv[4] for package
+                    echo $argv[2] . ": Entity java generated with success";
+                }else
+                    echo "warning: package missing!";
             }else{
                 __Generator::entity($argv[2], $project); //,
                 echo $argv[2] . ": Entity generated with success";
@@ -88,8 +96,16 @@ if (isset($argv[2])) {
             break;
 
         case 'core:g:crud':
-            __Generator::crud($argv[2], $project); //, 
-            echo $argv[2] . ": CRUD generated with success";
+            if(isset($argv[3])){
+                if(isset($argv[4])){
+                    __Generatorjava::crud($argv[2], $project, $argv[4]); //,$argv[4] for package
+                    echo $argv[2] . ": Entity java generated with success";
+                }else
+                    echo "warning: package missing!";
+            }else {
+                __Generator::crud($argv[2], $project); //,
+                echo $argv[2] . ": CRUD generated with success";
+            }
             break;
 
         case 'core:g:module':
@@ -100,6 +116,11 @@ if (isset($argv[2])) {
         case 'core:g:moduleendless':
             __Generator::__moduleendless($project, $argv[2]); //, 
             echo $argv[2] . ": Moduleendless generated with success";
+            break;
+
+        case 'core:g:moduleservices':
+            __Generator::__services($project, $argv[2]); //,
+            echo $argv[2] . ": Services generated with success";
             break;
 
         case 'core:g:component':

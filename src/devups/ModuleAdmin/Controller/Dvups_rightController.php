@@ -1,124 +1,134 @@
 <?php 
 
-	class Dvups_rightController extends Controller{
-		
-		private $err;
-		
-		function __construct() {
-			$this->err = array();
-		}
-		
-		/**
-		 * retourne l'instance de l'entité ou un json pour les requete asynchrone (ajax)
-		 *
-		 * @param type $id
-		 * @return \Array
-		 */
-		public  function showAction($id){
-			//$dvups_rightDao = new Dvups_rightDAO();
-			$dvups_right = (new DBAL())->findByIdDbal(new Dvups_right($id));
-			
-			return 	array(	'success' => true, 
-                                        //'url' => 'index.php?path=dvups_right/show&id='.$id,
-                                        'dvups_right' => $dvups_right,
-                                        'detail' => 'detail de l\'action.');
-                
-		}
-			
-		public function createAction(){
-			extract($_POST);
-			$this->err = array();
-			//$dvups_rightDao = new Dvups_rightDAO();
+    class Dvups_rightController extends Controller{
 
-			$dvups_right = $this->form_generat(new Dvups_right(), $dvups_right_form);
+            /**
+             * retourne l'instance de l'entité ou un json pour les requete asynchrone (ajax)
+             *
+             * @param type $id
+             * @return \Array
+             */
+            public  function showAction($id){
+
+                    $dvups_right = Dvups_right::find($id);
+
+                    return array( 'success' => true, 
+                                    'dvups_right' => $dvups_right,
+                                    'detail' => 'detail de l\'action.');
+
+            }
+
+            /**
+             * Data for creation form
+             * @Sequences: controller - genesis - ressource/view/form
+             * @return \Array
+            */
+            public function __newAction(){
+
+                    return 	array(	'success' => true, // pour le restservice
+                                    'dvups_right' => new Dvups_right(),
+                                    'action_form' => 'create', // pour le web service
+                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+            }
+
+            /**
+             * Action on creation form
+             * @Sequences: controller - genesis - ressource/view/form
+             * @return \Array
+            */
+            public function createAction(){
+                    extract($_POST);
+                    $this->err = array();
+
+                    $dvups_right = $this->form_generat(new Dvups_right(), $dvups_right_form);
  
 
-			if (!array_key_exists('err', $this->err) and $id = (new DBAL())->createDbal($dvups_right)) {
-				return 	array(	'success' => true, // pour le restservice
-						'dvups_right' => $dvups_right,
-						'url' => 'index', // pour le web service
-						'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-			} else {
-				return 	array(	'success' => false, // pour le restservice
-						'dvups_right' => $dvups_right,
-						'view' => 'form', // pour le web service
-						'detail' => $this->err['err']); //Detail de l'action ou message d'erreur ou de succes
-			}
-			
-		}
+                    if ( $id = $dvups_right->__insert()) {
+                            return 	array(	'success' => true, // pour le restservice
+                                            'dvups_right' => $dvups_right,
+                                            'redirect' => 'index', // pour le web service
+                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+                    } else {
+                            return 	array(	'success' => false, // pour le restservice
+                                            'dvups_right' => $dvups_right,
+                                            'action_form' => 'create', // pour le web service
+                                            'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
+                    }
 
-		public function editAction($id){
-			extract($_POST);
-			$this->err = array();
-			//$dvups_rightDao = new Dvups_rightDAO();
-                            
-			$dvups_right = $this->form_generat(new Dvups_right($id), $dvups_right_form);
-			
-			
-			if (!array_key_exists('err', $this->err) and (new DBAL())->updateDbal($dvups_right)) {
-				return 	array(	'success' => true, // pour le restservice
-						'dvups_right' => $dvups_right,
-						'url' => 'index', // pour le web service
-						'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-			} else {
-				return 	array(	'success' => false, // pour le restservice
-						'dvups_right' => $dvups_right,
-						'view' => 'form', // pour le web service
-						'detail' => $this->err['err']); //Detail de l'action ou message d'erreur ou de succes
-			}
-		}
-		
-		/**
-		 * retourne un tableau d'instance de l'entité ou un json pour les requetes asynchrone (ajax)
-		 *
-		 * @param type $id
-		 * @return \Array
-		 */
-		public function listAction(){
+            }
 
-			$dvups_rightDao = new Dvups_rightDAO();
-			$listDvups_right = $dvups_rightDao->findAll();
-			
-			return 	array(	'success' => true, // pour le restservice
-					'listDvups_right' => $listDvups_right,
-					'url' => '#', // pour le web service
-					'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-			
-		}
-			 
-		public function searchOneAction($x, $value = null){
-			$dvups_rightDao = new Dvups_rightDAO();
-			$dvups_right = $dvups_rightDao->findOneElementWhereXisY($x, $value);
-			
-			return 	array(	'success' => true, // pour le restservice
-					'dvups_right' => $dvups_right,
-					'url' => '#', // pour le web service
-					'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-			
-		}
-			 
-		public function searchAction($x, $value = null){
-			$dvups_rightDao = new Dvups_rightDAO();
-			$listDvups_right = $dvups_rightDao->findElementWhereXisY($x, $value);
-			
-			return 	array(	'success' => true, // pour le restservice
-					'listDvups_right' => $listDvups_right,
-					'url' => '#', // pour le web service
-					'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-			
-		}
-		
-		public function deleteAction($id){
+            /**
+             * Data for edit form
+             * @Sequences: controller - genesis - ressource/view/form
+             * @param type $id
+             * @return \Array
+                                         */ 
+            public function __editAction($id){
+
+                   $dvups_right = Dvups_right::find($id);
+
+                    return array('success' => true, // pour le restservice
+                                    'dvups_right' => $dvups_right,
+                                    'action_form' => 'update&id='.$id, // pour le web service
+                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+            }
+
+            /**
+             * Action on edit form
+             * @Sequences: controller - genesis - ressource/view/index
+             * @param type $id
+             * @return \Array
+            */
+            public function updateAction($id){
+                    extract($_POST);
+                        
+                    $dvups_right = $this->form_generat(new Dvups_right($id), $dvups_right_form);
+
                     
+                    if ($dvups_right->__update()) {
+                            return 	array('success' => true, // pour le restservice
+                                            'dvups_right' => $dvups_right,
+                                            'redirect' => 'index', // pour le web service
+                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+                    } else {
+                            return 	array('success' => false, // pour le restservice
+                                            'dvups_right' => $dvups_right,
+                                            'action_form' => 'update&id='.$id, // pour le web service
+                                            'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
+                    }
+            }
+
+            /**
+             * 
+             *
+             * @param type $id
+             * @return \Array
+             */
+            public function listAction($next = 1, $per_page = 10){
+
+                $lazyloading = $this->lazyloading(new Dvups_right(), $next, $per_page);
+
+                return array('success' => true, // pour le restservice
+                    'lazyloading' => $lazyloading, // pour le web service
+                    'detail' => '');
+
+            }
+
+            public function deleteAction($id){
+
+                    $dvups_right = Dvups_right::find($id);
+
 			
-			if( (new DBAL())->deleteDbal(new Dvups_right($id)) )
-				return 	array(	'success' => true, // pour le restservice
-						'url' => 'index', // pour le web service
-						'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-			else
-				return 	array(	'success' => false, // pour le restservice
-						'url' => '#', // pour le web service
-						'detail' => 'Des problèmes sont survenus lors de la suppression de l\'élément.'); //Detail de l'action ou message d'erreur ou de succes
-		}
-	
+                    if( $dvups_right->__delete() )
+                            return 	array(	'success' => true, // pour le restservice
+                                            'redirect' => 'index', // pour le web service
+                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+                    else
+                            return 	array(	'success' => false, // pour le restservice
+                                                                                                                        'dvups_right' => $dvups_right,
+                                            'detail' => 'Des problèmes sont survenus lors de la suppression de l\'élément.'); //Detail de l'action ou message d'erreur ou de succes
+            }
+
 	}

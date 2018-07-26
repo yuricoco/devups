@@ -8,9 +8,9 @@ class Dvups_adminController extends Controller {
         $this->err = array();
     }
 
-    public function resetcredential($id) {
+    public function resetcredential() {
 
-        $dvups_admin = Dvups_admin::find($id);
+        $dvups_admin = Dvups_admin::find(getadmin()->getId());
         $password = $dvups_admin->generatePassword();
         $dvups_admin->setPassword(sha1($password));
 //        $dvups_admin->setLogin();
@@ -20,20 +20,23 @@ class Dvups_adminController extends Controller {
 
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
-            'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&pwd=" . $password, // pour le web service
+            'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
     //
     }
 
-    public function changepwAction(Dvups_admin $admin = null) {
+    public function changepwAction() {
 //        $adminDao = new AdminDAO();
+        $dvups_admin = Dvups_admin::find(getadmin()->getId());
         extract($_POST);
-        if (sha1($oldpwd) == $admin->getPassword()) {
-            $admin->setPassword(sha1($newpwd));
-            return $admin->__save($admin);
+        if (sha1($oldpwd) == $dvups_admin->getPassword()) {
+            $dvups_admin->__update("password", sha1($newpwd))->exec();
+            return array('success' => true, // pour le restservice
+                'redirect' => 'profile&detail=password updated successfully', // pour le web service
+                'detail' => '');
         } else {
-            //return false;
-            echo 'rien';
+            return array('success' => false, // pour le restservice
+                'detail' => 'mot de passe incorrect');
         }
     }
 

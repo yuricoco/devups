@@ -5,6 +5,8 @@
  * */
 class Dvups_role extends Model implements JsonSerializable {
 
+    static $SELLER = "seller";
+
     /**
      * @Id @GeneratedValue @Column(type="integer")
      * @var int

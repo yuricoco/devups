@@ -131,91 +131,11 @@ class Adminv2 {
 
         $show = "
                     <div class=\"col-lg-12 col-md-12\">
-			";
-        if (!empty($entity->relation)) {
-            foreach ($entity->relation as $relation) {
-                $entitylink = $traitement->relation($listemodule, $relation->entity);
-                $entrel = ucfirst(strtolower($relation->entity));
-                $key = 0;
-                $entitylinkattrname = "id";
-                $entitylink->attribut = (array) $entitylink->attribut;
-                if (isset($entitylink->attribut[1])) {
-                    $key = 1;
-                    $entitylinkattrname = $entitylink->attribut[$key]->name;
-                }
-                if ($relation->cardinality == 'manyToMany') {
-                    $show .= "
-            <div class=\"form-group\">
-                    <label>" . $entrel . " " . $name . "</label>
-                  <?php 
-                  if($" . $name . "->get" . $entrel . "() and $" . $name . "->get" . $entrel . "()[0]->getId()) {
-                      foreach ($" . $name . "->get" . $entrel . "() as $" . $relation->entity . "){ 
-                                    echo '
-                <label class=\"checkbox-inline\">
-                                            '.$" . $relation->entity . "->get" . ucfirst($entitylinkattrname) . "().'
-                </label>'; 
-                            }} ?>
-            </div> 
-		";
-                } elseif (in_array($relation->cardinality, ['oneToOne', 'manyToOne'])) {
-
-                    $show .= "
-            <div class=\"form-group\">
-                            <h4>" . $entrel . "</h4>
-                <?php echo $" . $name . "->get" . $entrel . "()->get" . ucfirst($entitylinkattrname) . "(); ?>
-        </div> ";
-                }
-            }
-        }
-        if ($key) {
-            for ($i = 1; $i < count($entity->attribut); $i++) {
-                if (in_array($entity->attribut[$i]->datatype, ['date', 'datetime', 'time'])) {
-
-                    $show .= "<div class=\"form-group\">
-		<label>" . ucfirst($entity->attribut[$i]->name) . "</label>
-		<?php echo $" . $name . "->get" . ucfirst($entity->attribut[$i]->name) . "()->format('d M Y'); ?>
-	</div>";
-                } elseif (!in_array($entity->attribut[$i]->formtype, ['document', 'image', 'music', 'video'])) {
-
-                    $show .= "<div class=\"form-group\">
-		<label>" . ucfirst($entity->attribut[$i]->name) . "</label>
-		<?php echo $" . $name . "->get" . ucfirst($entity->attribut[$i]->name) . "(); ?>
-	</div>";
-                } else {
-                    if ($entity->attribut[$i]->formtype == 'document') {
-                        $show .= "
-	<div class=\"form-group\">
-			<label>" . ucfirst($entity->attribut[$i]->name) . "</label>
-		  <a target='_blank' href='<?php echo $" . $name . "->show" . ucfirst($entity->attribut[$i]->name) . "(); ?>' >download the document</a>
-	</div>
-	";
-                    } elseif ($entity->attribut[$i]->formtype == 'video') {
-                        $show .= "
-	<div class=\"form-group\">
-			<label>" . ucfirst($entity->attribut[$i]->name) . "</label>
-		  <video src='<?php echo $" . $name . "->show" . ucfirst($entity->attribut[$i]->name) . "(); ?>' ></video>
-	</div>";
-                    } elseif ($entity->attribut[$i]->formtype == 'music') {
-                        $show .= "
-	<div class=\"form-group\">
-			<label>" . ucfirst($entity->attribut[$i]->name) . "</label>
-		  <audio src='<?php echo $" . $name . "->show" . ucfirst($entity->attribut[$i]->name) . "(); ?>' ></audio>
-	</div>";
-                    } elseif ($entity->attribut[$i]->formtype == 'image') {
-                        $show .= "
-	<div class=\"form-group\">
-			<label>" . ucfirst($entity->attribut[$i]->name) . "</label>
-		  <img width='120' src='<?php echo $" . $name . "->show" . ucfirst($entity->attribut[$i]->name) . "(); ?>' />
-	</div>";
-                    }
-                }
-            }
-        }
-        $show .= "
+                    
+			<?php " . ucfirst($name) . "Form::__renderDetailWidget($" . $name . "); ?>
 			
 	<div class=\"form-group text-center\">
-		<a href=\"index.php?path=" . $name . "/edit&id=<?php echo $" . $name . "->getId(); ?>\" class=\"btn btn-default\">Modifier</a>
-		<a href=\"index.php?path=" . $name . "/delete&valid=oui&id=<?php echo $" . $name . "->getId(); ?>\" class=\"btn btn-default\">Supprimer</a>
+		<?php echo Genesis::actionListView(\"" . $name . "\", $" . $name . "->getId()); ?>
 	</div>
 	
 	</div>
@@ -256,10 +176,31 @@ class Adminv2 {
                 " . $index . "
         </div>
         
+        <div class=\"modal fade\" id=\"" . $name . "modal\" tabindex=\"-1\" role=\"dialog\"
+             aria-labelledby=\"modallabel\">
+            <div  class=\"modal-dialog\" role=\"document\">
+                <div class=\"modal-content\">
+        
+                    <div class=\"modal-header\">
+                        <button type=\"button\" class=\"close\" data-dismiss=\"modal\"
+                                aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
+                        <h3 class=\"title\" id=\"modallabel\">Modal Label</h3>
+                    </div>
+                    <div class=\"modal-body panel generalinformation\"> </div>
+                    <div class=\"modal-footer\">
+                        <button data-dismiss=\"modal\" aria-label=\"Close\" type=\"button\" class=\"btn btn-danger\" >Close</button>
+                    </div>
+        
+                </div>
+        
+            </div>
+        </div>
+        
 @endsection
 
 @section('jsimport')
-
+        <script src=\"<?= CLASSJS ?>model.js\"></script>
+        <script src=\"<?= CLASSJS ?>ddatatable.js\"></script>
                 <script></script>
 @show";
 

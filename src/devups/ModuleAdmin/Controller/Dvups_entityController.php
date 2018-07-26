@@ -8,6 +8,23 @@ class Dvups_entityController extends Controller {
      * @param type $id
      * @return \Array
      */
+    public static function updatelabel($id, $label) {
+
+
+        $dvups_entity = new Dvups_entity($id);
+        $dvups_entity->__update("dvups_entity.label", $label)->exec();
+
+        return array( 'success' => true,
+            'dvups_entity' => $dvups_entity,
+            'detail' => 'detail de l\'action.');
+    }
+
+    /**
+     * retourne l'instance de l'entité ou un json pour les requete asynchrone (ajax)
+     *
+     * @param type $id
+     * @return \Array
+     */
     public function showAction($id) {
 
         $dvups_entity = Dvups_entity::find($id);

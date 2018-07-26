@@ -62,3 +62,9 @@ function url($path, $id = "", $title = "") {
 
     return __env . $path . $mode;
 }
+
+function dv_dump($data){
+    echo "<pre>";
+    var_dump($data);
+    die();
+}

@@ -7,8 +7,13 @@
  */
 require '../header.php';
 
-$reflector = new ReflectionClass("Product");
-$fn = $reflector->getFileName();
-$path = dirname($fn);
+$acte = "";
+$nbcaract = 6;
+$emptycarat = "0";
+$value = 2;
 
-var_dump($path);
+$remaincarat = $nbcaract - strlen($value);
+for($i = 0; $i < $remaincarat; $i++)
+    $acte .= $emptycarat;
+
+var_dump($acte.$value);

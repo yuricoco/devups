@@ -28,6 +28,7 @@
         <?=
         Genesis::lazyloadingUI($lazyloading, [
             ['header' => 'Name', 'value' => 'name'],
+            ['header' => 'Label', 'value' => 'labelform'],
             ['header' => 'Module', 'value' => 'Dvups_module.name']
         ]);
         ?>
@@ -40,36 +41,33 @@
 
 @section('jsimport')
 
-<script>
-    function findindatabase() {
-        $.get("index.php?path=abonne.rest/datatable&search=" + $("#search").val(), function (response) {
-            console.log(response);
-        });
-    }
+    <script>
+        var dom = null;
+        function updatelabel(id) {
+            var label = $("#input-"+id).val();
+            dom.find("span").html(label);
+            console.log(id, label);
 
-    function myFunction() {
-        var input, filter, table, tr, td, i;
-        input = document.getElementById("myInput");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("dv_table");
-        console.log(table);
-        tr = table.getElementsByTagName("tr");
+            $.get("services.php?path=dvups_entity.updatelabel&id="+id, {
+                label : label
+            }, function (response) {
+                console.log(response);
 
-        for (i = 1; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[1].innerHTML.toUpperCase();
-            td += " " + tr[i].getElementsByTagName("td")[2].innerHTML.toUpperCase();
-//            td += " " + tr[i].getElementsByTagName("td")[3].innerHTML.toUpperCase();
-//            td += " " + tr[i].getElementsByTagName("td")[4].innerHTML.toUpperCase();
-            search(tr, td, filter, i);
-
+                dom.next().hide();
+                dom.show();
+            });
         }
-    }
-    function search(tr, td, filter, i) {
-        if (td.indexOf(filter) > -1) {
-            tr[i].style.display = "";
-        } else {
-            tr[i].style.display = "none";
+
+        function cancelupdate() {
+            dom.next().show();
+            dom.hide();
         }
-    }
-</script>
+
+        function editlabel($this) {
+            dom = $($this).parent();
+            dom.next().show();
+            dom.hide();
+        }
+
+    </script>
 @show

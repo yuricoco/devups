@@ -1,0 +1,59 @@
+{
+  "id": 1,
+  "name": "ModuleTranslate",
+  "project": "cashdesk",
+  "nbent": 10,
+  "listentity": [
+    {
+      "id": 5,
+      "name": "dvups_lang",
+      "module": {
+        "id": 2
+      },
+      "ref": null,
+      "attribut": {
+        "1": {
+          "name": "lable",
+          "visibility": "",
+          "datatype": "string",
+          "size": "150",
+          "nullable": "not",
+          "formtype": "text"
+        },
+        "5": {
+          "name": "_table",
+          "visibility": "",
+          "datatype": "string",
+          "size": "55",
+          "nullable": "not",
+          "formtype": "textarea"
+        },
+        "6": {
+          "name": "_row",
+          "visibility": "",
+          "datatype": "integer",
+          "size": "",
+          "nullable": "not",
+          "formtype": "textarea"
+        },
+        "2": {
+          "name": "lang",
+          "visibility": "",
+          "datatype": "string",
+          "size": "2",
+          "nullable": "not",
+          "formtype": "textarea"
+        },
+        "3": {
+          "name": "content",
+          "visibility": "",
+          "datatype": "text",
+          "size": "",
+          "nullable": "not",
+          "formtype": "textarea"
+        }
+      },
+      "relation": []
+    }
+  ]
+}

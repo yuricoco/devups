@@ -60,9 +60,12 @@ class Form extends FormFactory{
         return $dvups_form;
     }
     
+    public static function addjs($js, $path = "Ressource/js"){
+        return "<script src='".$path."/".$js.".js' ></script>";
+    }
+
     public static function submit($name = "submit", $directive = []) {
         return "<input ".Form::serialysedirective($directive)." type='submit' value='".$name."' />";
-       
     }
     
     public static function reset($name = "reset", $directive = []) {

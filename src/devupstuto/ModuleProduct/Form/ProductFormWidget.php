@@ -46,7 +46,8 @@
                     ['class' => 'form-control']); ?>
  </div>
 
-       
+
     <?= Form::submit("save", ['class' => 'btn btn-success']) ?>
-    
+
     <?= Form::close() ?>
+    <?= Form::addjs("productForm") ?>

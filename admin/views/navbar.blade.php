@@ -24,14 +24,14 @@
                         <?php foreach ($dvups_navigation as $key => $module) {
 //                                if(is_object($module)){?>
                             <li>
-                                <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> <?= $module["module"]->getName() ?> <span class="fa arrow"></span></a>
+                                <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> <?= $module["module"]->getLabel() ?> <span class="fa arrow"></span></a>
                                 <ul class="nav nav-second-level">
                                     <li>
                                         <a href='<?= path( 'src/'. strtolower($module["module"]->getProject()) .'/'. $module["module"]->getName() . '/index.php') ?>' > Overview<span class="fa arrow"></span></a>
                                     </li>
                                     <?php foreach ($module["entities"] as $entity) { ?>
                                     <li>
-                                        <a href='#' > <?= $entity->getName() ?><span class="fa arrow"></span></a>
+                                        <a href='#' > <?= $entity->getLabel() ?><span class="fa arrow"></span></a>
                                         <ul class="nav nav-third-level">
                                             <li>
                                                 <a href="<?= path( 'src/'. strtolower($module["module"]->getProject()) .'/'. $module["module"]->getName() . '/index.php?path=' . strtolower($entity->getName()) .'/index') ?>">index</a>

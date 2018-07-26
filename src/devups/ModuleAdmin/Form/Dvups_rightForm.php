@@ -3,7 +3,7 @@
     class Dvups_rightForm extends FormManager{
 
         public static function formBuilder(\Dvups_right $dvups_right, $action = null, $button = false) {
-            $entitycore = $dvups_right->scan_entity_core();
+            $entitycore = new Core($dvups_right);
             
             $entitycore->formaction = $action;
             $entitycore->formbutton = $button;

@@ -1,0 +1,51 @@
+{
+  "id": 5,
+  "name": "penaltytype",
+  "module": {
+    "id": 2
+  },
+  "ref": null,
+  "attribut": {
+    "1": {
+      "name": "assoc_id",
+      "visibility": "",
+      "datatype": "string",
+      "size": "255",
+      "nullable": "not",
+      "formtype": "image"
+    },
+    "2": {
+      "name": "penalty_type",
+      "visibility": "",
+      "datatype": "string",
+      "size": "255",
+      "nullable": "not",
+      "formtype": "image"
+    },
+    "3": {
+      "name": "created_by",
+      "visibility": "",
+      "datatype": "string",
+      "size": "255",
+      "nullable": "not",
+      "formtype": "image"
+    },
+    "4": {
+      "name": "created_id",
+      "visibility": "",
+      "datatype": "string",
+      "size": "255",
+      "nullable": "not",
+      "formtype": "image"
+    },
+    "5": {
+      "name": "updated_at",
+      "visibility": "",
+      "datatype": "string",
+      "size": "255",
+      "nullable": "not",
+      "formtype": "image"
+    }
+  },
+  "relation": []
+}

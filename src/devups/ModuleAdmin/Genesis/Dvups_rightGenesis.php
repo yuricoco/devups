@@ -7,31 +7,31 @@
 			
 			switch($view){
 				case 'index':
-					Genesis::renderView( $dvups_rightCtrl->listAction(), 'index', 'liste');
+					Genesis::renderView('dvups_right.index',  $dvups_rightCtrl->listAction(), 'list');
 					break;
 					
 				case '_new':
-                                        Genesis::renderView( ['dvups_right' => new Dvups_right() ], 'form', 'nouveau', false, 'create');
-					break;
-					
-				case '_edit':
-                                        Genesis::renderView( $dvups_rightCtrl->showAction($_GET['id']), 'form', 'editer', false, 'edit&id='.$_GET['id']);
+                                                                                                            Genesis::renderView( 'dvups_right.form',  $dvups_rightCtrl->__newAction(), 'new');
 					break;
 					
 				case 'create':
-                                        Genesis::renderView( $dvups_rightCtrl->createAction(), 'index', 'modifier', true);
+                                                                                                            Genesis::renderView( 'dvups_right.form', $dvups_rightCtrl->createAction(), 'error creation', true);
 					break;
 					
-				case 'edit':
-					Genesis::renderView( $dvups_rightCtrl->editAction($_GET['id']), 'index', 'modifier', true);
+				case '_edit':
+                                                                                                            Genesis::renderView( 'dvups_right.form',  $dvups_rightCtrl->__editAction($_GET['id']), 'edite');
+					break;
+					
+				case 'update':
+					Genesis::renderView( 'dvups_right.form',  $dvups_rightCtrl->updateAction($_GET['id']),'error updating', true);
 					break;
 					
 				case 'show':
-                                        Genesis::renderView( $dvups_rightCtrl->showAction($_GET['id']), 'show', '');
+                                                                                                                Genesis::renderView( 'dvups_right.show', $dvups_rightCtrl->showAction($_GET['id']), 'Show');
 					break;
 					
 				case 'delete':
-                                        Genesis::renderView( $dvups_rightCtrl->deleteAction($_GET['id']), 'index', 'modifier', true);
+                                                                                                                Genesis::renderView( 'dvups_right.show', $dvups_rightCtrl->deleteAction($_GET['id']), 'delete', true);
 					break;
                                         
 				default:
@@ -44,7 +44,6 @@
 			extract($controllers);
 			
 			switch($view){
-				
 				case 'index':
 					echo json_encode($dvups_rightCtrl->listAction());
 					break;

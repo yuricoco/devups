@@ -2,15 +2,15 @@
 
 class BackendGeneratorJava {
 
-    public function entityGenerator($entity) {
+    public function modelGenerator($entity, $package) {
 
         $name = strtolower($entity->name);
 
         unset($entity->attribut[0]);
 
-        $fichier = fopen('Ressource/java/' . ucfirst($name) . '.java', 'w');
+        $fichier = fopen('Ressource/java/' . $name."/models/" .ucfirst($name) . '.java', 'w');
 
-        fputs($fichier, "
+        fputs($fichier, "package $package;
     
     public class " . ucfirst($name) . " {\n");
         $method = "";
@@ -30,7 +30,7 @@ class BackendGeneratorJava {
         public List<" . ucfirst($relation->entity) . "> " . $relation->entity . ";\n";
 
                 $method .= "
-        function List<" . ucfirst($relation->entity) . "> get" . ucfirst($relation->entity) . "() {
+        public List<" . ucfirst($relation->entity) . "> get" . ucfirst($relation->entity) . "() {
             return this." . $relation->entity . ";
         }";
 
@@ -40,11 +40,11 @@ class BackendGeneratorJava {
         private " . ucfirst($relation->entity) . " " . $relation->entity . ";\n";
 
                 $method .= "
-        function " . ucfirst($relation->entity) . " get" . ucfirst($relation->entity) . "() {
+        public " . ucfirst($relation->entity) . " get" . ucfirst($relation->entity) . "() {
             return this." . $relation->entity . ";
         }";
                     $method .= "
-        function void set" . ucfirst($relation->entity) . "(" . ucfirst($relation->entity) . " " . $relation->entity . ") {
+        public void set" . ucfirst($relation->entity) . "(" . ucfirst($relation->entity) . " " . $relation->entity . ") {
             this." . $relation->entity . " = " . $relation->entity . ";
         }
                         ";
@@ -54,11 +54,11 @@ class BackendGeneratorJava {
         private " . ucfirst($relation->entity) . " " . $relation->entity . ";\n";
 
                 $method .= "
-        function " . ucfirst($relation->entity) . " get" . ucfirst($relation->entity) . "() {
+        public " . ucfirst($relation->entity) . " get" . ucfirst($relation->entity) . "() {
             return this." . $relation->entity . ";
         }";
                     $method .= "
-        function void set" . ucfirst($relation->entity) . "(" . ucfirst($relation->entity) . " " . $relation->entity . ") {
+        public void set" . ucfirst($relation->entity) . "(" . ucfirst($relation->entity) . " " . $relation->entity . ") {
             this." . $relation->entity . " = " . $relation->entity . ";
         }
                         ";
@@ -152,13 +152,19 @@ class BackendGeneratorJava {
 
     /* 	CREATION DU CONTROLLER 	 */
 
-    public function activityGenerator($entity) {
+    public function activityGenerator($entity, $package) {
         $name = strtolower($entity->name);
 
-        $classController = fopen('Activities/' . ucfirst($name) . 'DetailActivity.java', 'w');
+        $classController = fopen('Ressource/java/' . $name.'/activities/' . ucfirst($name) . 'DetailActivity.java', 'w');
 
-        $contenu = "
-    public class " . ucfirst($name) . "DetailActivity extends BaseActivity{
+        $contenu = "package $package;
+        
+import android.os.Bundle;
+
+import $package.R;
+import $package.core.activities.BaseActivity;
+
+public class " . ucfirst($name) . "DetailActivity extends BaseActivity{
 
         private " . ucfirst($name) . " " . $name . ";
     
@@ -173,38 +179,50 @@ class BackendGeneratorJava {
         fputs($classController, $contenu);
         fclose($classController);
 
-        $classController = fopen('Activities/' . ucfirst($name) . 'ListActivity.java', 'w');
+        $classController = fopen('Ressource/java/' . $name.'/activities/' . ucfirst($name) . 'ListActivity.java', 'w');
 
-        $contenu = "
-    public class " . ucfirst($name) . "ListActivity extends BaseActivity{
-
-        private " . ucfirst($name) . " " . $name . ";
-    
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_" . $name . "_list);
+        $contenu = "package $package;
         
-        }
+import android.os.Bundle;
+
+import $package.R;
+import $package.core.activities.BaseActivity;
+
+public class " . ucfirst($name) . "ListActivity extends BaseActivity{
+
+    private " . ucfirst($name) . " " . $name . ";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_" . $name . "_list);
+    
     }
+}
     ";
         fputs($classController, $contenu);
         fclose($classController);
 
-        $classController = fopen('Activities/' . ucfirst($name) . 'FormActivity.java', 'w');
+        $classController = fopen('Ressource/java/' . $name.'/activities/' . ucfirst($name) . 'FormActivity.java', 'w');
 
-        $contenu = "
-    public class " . ucfirst($name) . "FormActivity extends BaseActivity{
-
-        private " . ucfirst($name) . " " . $name . ";
-    
-        @Override
-        protected void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            setContentView(R.layout.activity_" . $name . "_form);
+        $contenu = "package $package;
         
-        }
+import android.os.Bundle;
+
+import $package.R;
+import $package.core.activities.BaseActivity;
+
+public class " . ucfirst($name) . "FormActivity extends BaseActivity{
+
+    private " . ucfirst($name) . " " . $name . ";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_" . $name . "_form);
+    
     }
+}
     ";
         fputs($classController, $contenu);
         fclose($classController);
@@ -357,18 +375,99 @@ class BackendGeneratorJava {
 
     /* CREATION DU DAO */
 
-    public function servicesGenerator($entity) {
+    public function adapterGenerator($entity, $package)
+    {
         $name = strtolower($entity->name);
 
         /* if($name == 'utilisateur')
           return 0; */
 
-        $classDao = fopen('services/' . ucfirst($name) . 'WebServiceClient.java', 'w');
-        $contenu = "
+        $classAdapter = fopen('Ressource/java/' . $name.'/adapters/' . ucfirst($name) . 'Adapter.java', 'w');
+
+        $contenu = "package $package;
+        
+import android.content.Intent;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.CardView;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
+
+import java.util.List;
+        
+import $package.R;
+        
+public class " . ucfirst($name) . "Adapter extends RecyclerView.Adapter<" . ucfirst($name) . "Adapter.MyRecyclerView> {
+    private AppCompatActivity activity;
+    private List<" . ucfirst($name) . "> " . $name . "s;
+
+    public " . ucfirst($name) . "Adapter(AppCompatActivity activity) {
+        this.activity = activity;
+    }
+
+    @Override
+    public MyRecyclerView onCreateViewHolder(ViewGroup parent, int viewType) {
+        return new MyRecyclerView(activity.getLayoutInflater().inflate(R.layout.list_item_" . $name . ", parent, false));
+    }
+    @Override
+    public void onBindViewHolder(" . ucfirst($name) . "Adapter.MyRecyclerView holder, int position) {
+        final " . ucfirst($name) . " " . $name . " = " . $name . "s.get(position);
+
+        //holder.nkap_" . $name . "_title.setText(" . $name . ".getTitle());
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+                Intent intent = new Intent(activity, " . ucfirst($name) . "DetailActivity.class);
+                intent.putExtra(Intent.EXTRA_TEXT, Integer.parseInt(" . $name . ".getId()));
+                activity.startActivity(intent);
+
+            }
+        });
+
+    }
+
+    public void set" . ucfirst($name) . "s(List<" . ucfirst($name) . "> " . $name . "s) {
+        this." . $name . "s = " . $name . "s;
+    }
+    @Override
+    public int getItemCount() {
+        return " . $name . "s.size();
+    }
+
+    class MyRecyclerView extends RecyclerView.ViewHolder {
+        //TextView nkap_" . $name . "_title;
+
+        MyRecyclerView(View itemView) {
+            super(itemView);
+            //nkap_" . $name . "_title = itemView.findViewById(R.id.label_" . $name . ");
+        }
+    }
+
+}";
+
+        fputs($classAdapter, $contenu);
+        fclose($classAdapter);
+
+    }
+    /* CREATION DU DAO */
+
+    public function servicesGenerator($entity, $package) {
+        $name = strtolower($entity->name);
+
+        /* if($name == 'utilisateur')
+          return 0; */
+
+        $classDao = fopen('Ressource/java/' . $name.'/services/' . ucfirst($name) . 'WebServiceClient.java', 'w');
+        $contenu = "package $package;
+        
     import java.util.List;
     import retrofit2.Call;
 	
-	public class " . ucfirst($name) . "" . ucfirst($name) . "WebServiceClient extends WebServiceClient{
+	public class " . ucfirst($name) . "WebServiceClient extends WebServiceClient{
 			private final static String TAG = " . ucfirst($name) . "WebServiceClient.class.getName();
 
     private static " . ucfirst($name) . "WebServiceClient instance;
@@ -421,40 +520,40 @@ class BackendGeneratorJava {
         fputs($classDao, $contenu);
         fclose($classDao);
 
-        $classDao = fopen('services/' . ucfirst($name) . 'WebServiceClientInterface.java', 'w');
-        $contenu = "
-        //package
-    import retrofit2.Call;
-    import retrofit2.http.Body;
-    import retrofit2.http.GET;
-    import retrofit2.http.HTTP;
-    import retrofit2.http.HeaderMap;
-    import retrofit2.http.POST;
-    import retrofit2.http.Path;
+        $classDao = fopen('Ressource/java/' . $name.'/services/' . ucfirst($name) . 'WebServiceClientInterface.java', 'w');
+        $contenu = "package $package;
 
-	public interface " . ucfirst($name) . "" . ucfirst($name) . "WebServiceClientInterface extends DBAL{
-			
-		
-        @POST(\"/Api/" . ucfirst($name) . "\")
-        Call<WebServiceDataResponse<List<" . ucfirst($name) . ">>> get" . ucfirst($name) . "s(@HeaderMap Map<String, String> headers, @Body WebServiceDataRequest<" . ucfirst($name) . "DataRequest> dataRequest);
+import java.util.List;
+import java.util.Map;
 
-        @GET(\"/Api/" . ucfirst($name) . "/{id}\")
-        Call<WebServiceDataResponse<List<" . ucfirst($name) . ">>> get" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Path(\"id\") long id);
+import retrofit2.Call;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
+import retrofit2.http.HTTP;
+import retrofit2.http.HeaderMap;
+import retrofit2.http.POST;
+import retrofit2.http.Path;
 
-        @POST(\"/Api/" . ucfirst($name) . "\")
-        Call<WebServiceDataResponse<List<" . ucfirst($name) . ">>> create" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Body WebServiceDataRequest dataRequest);
+public interface " . ucfirst($name) . "WebServiceClientInterface{
+        
+    
+    @POST(\"/Api/" . ucfirst($name) . "s\")
+    Call<WebServiceDataResponse<List<" . ucfirst($name) . ">>> get" . ucfirst($name) . "s(@HeaderMap Map<String, String> headers, @Body WebServiceDataRequest<" . ucfirst($name) . "DataRequest> dataRequest);
 
-        @POST(\"/Api/" . ucfirst($name) . "/{id}\")
-        Call<WebServiceDataResponse<List<" . ucfirst($name) . ">>> update" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Path(\"id\") long id, @Body WebServiceDataRequest dataRequest);
+    @GET(\"/Api/" . ucfirst($name) . "/{id}\")
+    Call<WebServiceDataResponse<" . ucfirst($name) . ">> get" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Path(\"id\") long id);
 
-        @POST(\"/Api/" . ucfirst($name) . "/{id}/Statut\")
-        Call<WebServiceDataResponse<List<" . ucfirst($name) . ">>> update" . ucfirst($name) . "Status(@HeaderMap Map<String, String> headers, @Path(\"id\") long id, @Body WebServiceDataRequest<UpdateStatusDataRequest> dataRequest);
+    @POST(\"/Api/" . ucfirst($name) . "\")
+    Call<WebServiceDataResponse<" . ucfirst($name) . ">> create" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Body WebServiceDataRequest dataRequest);
 
-        @HTTP(method = \"DELETE\", path = \"/Api/" . ucfirst($name) . "\", hasBody = true)
-        Call<WebServiceDataResponse<DeleteResponse>> delete" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Body WebServiceDataRequest<Delete" . ucfirst($name) . "DataRequest> dataRequest);
-		
-		
-	}";
+    @POST(\"/Api/" . ucfirst($name) . "/{id}\")
+    Call<WebServiceDataResponse<" . ucfirst($name) . ">> update" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Path(\"id\") long id, @Body WebServiceDataRequest dataRequest);
+
+    @HTTP(method = \"DELETE\", path = \"/Api/" . ucfirst($name) . "\", hasBody = true)
+    Call<WebServiceDataResponse<DeleteResponse>> delete" . ucfirst($name) . "(@HeaderMap Map<String, String> headers, @Body WebServiceDataRequest<Delete" . ucfirst($name) . "DataRequest> dataRequest);
+    
+    
+}";
 
         fputs($classDao, $contenu);
         fclose($classDao);

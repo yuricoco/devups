@@ -288,6 +288,37 @@ class BackendGenerator {
     class " . ucfirst($name) . "Controller extends Controller{
 
 
+    public static function renderFormWidget($" . "id = null) {
+        if($" . "id)
+            " . ucfirst($name) . "Form::__renderFormWidget(" . ucfirst($name) . "::find($" . "id), 'update');
+        else
+            " . ucfirst($name) . "Form::__renderFormWidget(new " . ucfirst($name) . "(), 'create');
+    }
+
+    public static function renderDetail($" . "id) {
+        " . ucfirst($name) . "Form::__renderDetailWidget(" . ucfirst($name) . "::find($" . "id));
+    }
+
+    public static function renderForm($" . "id = null, $" . "action = \"create\") {
+        $" . $name . " = new " . ucfirst($name) . "();
+        if($" . "id){
+            $" . "action = \"update&id=\".$" . "id;
+            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+            //$" . $name . "->collectStorage();
+        }
+
+        return ['success' => true,
+            'form' => " . ucfirst($name) . "Form::__renderForm($" . $name . ", $" . "action, true),
+        ];
+    }
+
+    public function datatable($" . "next, $" . "per_page) {
+        $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+        return ['success' => true,
+            'tablebody' => Genesis::getTableRest($" . "lazyloading)
+        ];
+    }
+
             public function listAction($" . "next = 1, $" . "per_page = 10){
 
                 $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
@@ -305,15 +336,6 @@ class BackendGenerator {
                     return array( 'success' => true, 
                                     '" . $name . "' => $" . $name . ",
                                     'detail' => 'detail de l\'action.');
-
-            }
-
-            public function __newAction(){
-
-                    return 	array(	'success' => true, // pour le restservice
-                                    '" . $name . "' => new " . ucfirst($name) . "(),
-                                    'action_form' => 'create', // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
             }
 
@@ -387,17 +409,6 @@ class BackendGenerator {
 
             }
 
-            public function __editAction($" . "id){
-
-                   $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-
-                    return array('success' => true, // pour le restservice
-                                    '" . $name . "' => $" . $name . ",
-                                    'action_form' => 'update&id='.$" . "id, // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-
-            }
-
             public function updateAction($" . "id){
                     extract($" . "_POST);
                         
@@ -425,28 +436,58 @@ class BackendGenerator {
                                             'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
                     }
             }
-
+            
             public function deleteAction($" . "id){
-
-                    $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-
 			";
         if ($otherattrib):
+            // add and attribut to alert about media attib in entity
             foreach ($entity->attribut as $attribut) {
                 if (in_array($attribut->formtype, ['document', 'image', 'musique', 'video']))
                     $contenu .= " 
-                   $" . $name . "->deleteFile($" . $name . "->get" . ucfirst($attribut->name) . "(), '" . $name . "');";
+                $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+                $" . $name . "->deleteFile($" . $name . "->get" . ucfirst($attribut->name) . "(), '" . $name . "');
+                $" . $name . "->__delete()";
             }
+        else:
+            $contenu .= "  
+            " . ucfirst($name) . "::delete($" . "id);";
         endif;
         $contenu .= "
-                    if( $" . $name . "->__delete() )
-                            return 	array(	'success' => true, // pour le restservice
-                                            'redirect' => 'index', // pour le web service
-                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-                    else
-                            return 	array(	'success' => false, // pour le restservice
-                                                                                                                        '" . $name . "' => $" . $name . ",
-                                            'detail' => 'Des problèmes sont survenus lors de la suppression de l\'élément.'); //Detail de l'action ou message d'erreur ou de succes
+                return 	array(	'success' => true, // pour le restservice
+                                'redirect' => 'index', // pour le web service
+                                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+            }
+            
+
+            public function deletegroupAction($" . "ids)
+            {
+        
+                " . ucfirst($name) . "::delete()->where(\"id\")->in($" . "ids)->exec();
+        
+                return array('success' => true, // pour le restservice
+                        'redirect' => 'index', // pour le web service
+                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        
+            }
+
+            public function __newAction(){
+
+                    return 	array(	'success' => true, // pour le restservice
+                                    '" . $name . "' => new " . ucfirst($name) . "(),
+                                    'action_form' => 'create', // pour le web service
+                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+            }
+
+            public function __editAction($" . "id){
+
+                   $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+
+                    return array('success' => true, // pour le restservice
+                                    '" . $name . "' => $" . $name . ",
+                                    'action_form' => 'update&id='.$" . "id, // pour le web service
+                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
             }
 
 	}\n";
@@ -612,7 +653,10 @@ class BackendGenerator {
         public static function __renderFormWidget(\\" . ucfirst($name) . " $" . $name . ", $" . "action_form = null) {
             include ROOT." . ucfirst($name) . "::classpath().\"Form/" . ucfirst($name) . "FormWidget.php\";
         }
-        
+
+        public static function __renderDetailWidget(\\" . ucfirst($name) . " $" . $name . "){
+            include ROOT . " . ucfirst($name) . "::classpath() . \"Form/" . ucfirst($name) . "DetailWidget.php\";
+        }
     }
     ";
         $entityform = fopen('Form/' . ucfirst($name) . 'Form.php', 'w');
@@ -708,7 +752,7 @@ class BackendGenerator {
                     $field .= "<?php $" . $relation->entity . " = $" . $name . "->get" . ucfirst($relation->entity) . "(); ?>";
                     $field .= "
                     <?= Form::imbricate($" . $relation->entity . ") ?>";
-                    $field .= $this->formfield($entitylink, $listmodule, false);
+                    $field .= $this->formwidget($entitylink, $listmodule, false);
                     $field .= "<?= Form::closeimbricate() ?>\n";
                 } elseif ($relation->cardinality == 'manyToMany') {
                     //FormManager::Options_ToCollect_Helper('name', new Dvups_right(), $dvups_role->getDvups_right()
@@ -727,6 +771,101 @@ class BackendGenerator {
 
     }
 
+
+    /* CREATION DU FORM FIELD */
+
+    private function detailwidget($entity, $listmodule, $onetoone = true, $mother = false){
+        $field = '';
+        $traitement = new Traitement();
+        $name = strtolower($entity->name);
+
+        if ($mother) {
+            $field .= "<?php $".$name." = $".$mother."->get".ucfirst($entity->name)."(); ?>";
+        }
+
+        foreach ($entity->attribut as $attribut) {
+
+            $field .= "<div class='form-group'>\n<label for='" . $attribut->name . "'>" . ucfirst($attribut->name) . "</label>\n";
+
+            if ($attribut->nullable == 'default') {
+                $field .= "\tFH_REQUIRE => false,\n ";
+            }
+
+            if (in_array($attribut->formtype, ['text', 'float', 'input', 'number', 'date', 'datetime', 'time',
+                'datepicker', 'radio', 'email'])) {
+                    $field .= "\t<b><?= $" . $name . "->get" . ucfirst($attribut->name) . "(); ?></b>\n";
+            } elseif ($attribut->formtype == 'textarea') {
+                $field .= "\t<p><?= $" . $name . "->get" . ucfirst($attribut->name) . "(); ?></p>\n";
+            } elseif ($attribut->formtype == 'document') {
+                $field .= "\t<?= '<img src=\"$" . $name . "->show" . ucfirst($attribut->name) . "()\" />'; ?>\n";
+            } elseif ($attribut->formtype == 'video') {
+                $field .= "\t<?= '<img src=\"$" . $name . "->show" . ucfirst($attribut->name) . "()\" />'; ?>\n";
+            } elseif ($attribut->formtype == 'music') {
+                $field .= "\"type\" => FORMTYPE_FILE,
+                \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
+                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+            } elseif ($attribut->formtype == 'image') {
+                $field .= "\t<img width='100' src=\"<?= $" . $name . "->show" . ucfirst($attribut->name) . "(); ?>\" />\n";
+            } else {
+                $field .= "\t<b><?= $" . $name . "->get" . ucfirst($attribut->name) . "(); ?></b>\n";
+            }
+
+            $field .= " </div>\n";
+        }
+
+        if (!empty($entity->relation)) {
+            foreach ($entity->relation as $relation) {
+
+                $entitylink = $traitement->relation($listmodule, $relation->entity);
+
+                $enititylinkattrname = "id";
+                $entitylink->attribut = (array) $entitylink->attribut;
+
+                if (isset($entitylink->attribut[1])) {
+                    $key = 1;
+                    $enititylinkattrname = $entitylink->attribut[$key]->name;
+                }
+
+                $field .= "<div class='form-group'>\n<label for='" . $relation->entity . "'>" . ucfirst($relation->entity) . "</label>\n";
+
+                if ($relation->cardinality == 'manyToOne') {
+                    $field .= "\t<?= '<b>'.$" . $name . "->get" . ucfirst($relation->entity) . "()->getId().'</b>'; ?>\n";
+
+                } elseif ($relation->cardinality == 'oneToOne' && $onetoone) {
+                    $field .= "<div>";
+                    $field .= $this->detailwidget($entitylink, $listmodule, false, $name."");
+                    $field .= "</div>\n";
+                } elseif ($relation->cardinality == 'manyToMany') {
+                    //FormManager::Options_ToCollect_Helper('name', new Dvups_right(), $dvups_role->getDvups_right()
+                    $field .= "<ul>
+                    <?php foreach ($" . $name . "->get" . ucfirst($relation->entity) . "() as $" . $relation->entity . "){ 
+                        echo '<li>'.$" . $relation->entity . "->getId().'</li>';
+                    } ?></ul>\n";
+                }
+
+                $field .= " </div>\n";
+            }
+        }
+
+        return $field;
+
+    }
+
+    public function detailWidgetGenerator($entity, $listmodule) {
+
+        $name = strtolower($entity->name);
+
+        /* if($name == 'utilisateur')
+          return 0; */
+        unset($entity->attribut[0]);
+        $contenu = $this->detailwidget($entity, $listmodule);
+
+        $entityform = fopen('Form/' . ucfirst($name) . 'DetailWidget.php', 'w');
+        fputs($entityform, $contenu);
+
+        fclose($entityform);
+    }
 
     public function formWidgetGenerator($entity, $listmodule) {
 

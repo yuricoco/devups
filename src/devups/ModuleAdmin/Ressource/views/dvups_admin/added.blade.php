@@ -34,7 +34,7 @@
                 </div>
 
                 <div class="form-group text-center">
-                    <a href="index.php?path=layout" class="btn btn-default">Retour au menu</a>
+                    <a href="<?= __env.'admin/'; ?>" class="btn btn-default">Return to dashboard</a>
                 </div>
 
             </div>

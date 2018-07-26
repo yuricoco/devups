@@ -47,7 +47,11 @@
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="{{ __env }}" target="__blank">Devups Admin v{{ __v }} | go to {{ PROJECT_NAME }}</a>
+                    <span  class="navbar-brand" >
+                        Devups Admin v{{ __v }} | Bonjour <b>{{ getadmin()->getName() }}</b>
+                        <a href="{{ __env }}" target="__blank"></a>
+                    </span>
+
                 </div>
                 <!-- /.navbar-header -->
 
@@ -139,11 +143,10 @@
                             <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
                         </a>
                         <ul class="dropdown-menu dropdown-user">
-
-                            <!--                        <li>
-                                                        <a href="<?= __DIR__ ?>/../../src/devups/ModuleAdmin/index.php?path=admin/changerpwd"><i class="fa fa-fw fa-user"></i> mot de passe</a>
-                                                    </li>
-                                                    <li>
+                            <li>
+                                <a href="<?= __env.Dvups_admin::classpath().'index.php?path=dvups_admin/_editpassword' ?>"><i class="fa fa-fw fa-user"></i> update password</a>
+                            </li>
+                             <!--                         <li>
                                                         <a href="<?= __DIR__ ?>/../../src/devups/ModuleAdmin/index.php?path=admin/changerphoto"><i class="fa fa-gear fa-fw"></i> Photo</a>
                                                     </li>-->
                             <li class="divider"></li>

@@ -15,6 +15,12 @@
                 "value" => $dvups_module->getName(), 
             ];
 
+            $entitycore->field['label'] = [
+                "label" => 'Label',
+                "type" => FORMTYPE_TEXT,
+                "value" => $dvups_module->getLabel(),
+            ];
+
 
             return $entitycore;
         }

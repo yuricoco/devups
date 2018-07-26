@@ -12,11 +12,16 @@
  * @author azankang
  */
 class Core extends stdClass {
+
     public function __construct($entity)
     {
         $this->name = strtolower(get_class($entity));
         $this->addjs = [];
         return $this;
+    }
+
+    public function addjs($js, $path = "Ressource/js"){
+        $this->addjs[] = $path."/".$js.".js";
     }
 
     public static function __extract($entity, $asarray = false) {

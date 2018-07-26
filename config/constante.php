@@ -29,6 +29,7 @@ define('RESSOURCE2', __env. 'admin/Ressource/');
 define('VENDOR', __env. 'admin/vendor/');
 define('UPLOAD_DIR_SRC', __env. 'admin/Ressource/js/');
 define('JS', __env. 'admin/Ressource/js/');
+define('CLASSJS', __env. 'class/devupsjs/');
 define('IMG', __env. 'admin/Ressource/img/');
 define('CSS', __env. 'admin/Ressource/css/');
 define('IHM', __env. 'admin/Ressource/ihm/');

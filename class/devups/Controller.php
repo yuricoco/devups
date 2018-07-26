@@ -52,15 +52,16 @@ class Controller extends DBAL {
         foreach ($fieldarray as $fieldwithtype) {
             $arrayfieldtype = explode(":", $fieldwithtype);
 
-            if ($_GET[$arrayfieldtype[0]]) {
+            if (isset($_GET[$arrayfieldtype[0]])) {
                 if ($arrayfieldtype[1] == "attr") {
                     $qb->andwhere($arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
                 } elseif ($arrayfieldtype[1] == "join") {
 
                     $join = explode("-", $arrayfieldtype[0]);
+
                     $qb->andwhere($join[0] . "_id")
                             ->in(
-                                    $qb->addselect("id", new $join[0])
+                                    $qb->addselect("id", new $join[0], false)
                                     ->where($join[1])
                                     ->like($_GET[$arrayfieldtype[0]])
                                     ->close()
@@ -90,12 +91,18 @@ class Controller extends DBAL {
      */
     public function lazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = "") {//
         $remain = true;
-//        $qbcustom = null;
+        $qb = new QueryBuilder($entity);
 
         if (isset($_GET['next']) && isset($_GET['per_page']))
             extract($_GET);
 
-        $qb = new QueryBuilder($entity);
+        if(isset($_GET['order'])){
+            $order = $_GET['order'];
+            if($entity->inrelation())
+                $order = strtolower(get_class($entity)).".".$_GET['order'];
+        }elseif(isset($_GET['orderjoin']))
+            $order = strtolower($_GET['orderjoin']);
+
 
         if ($qbcustom != null) {
 

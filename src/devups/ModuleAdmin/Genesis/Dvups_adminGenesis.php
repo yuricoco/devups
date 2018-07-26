@@ -6,6 +6,26 @@ class Dvups_adminGenesis {
         extract($controllers);
 
         switch ($view) {
+            case 'profile':
+                Genesis::renderView('dvups_admin.profile', ["admin" => Dvups_admin::find(getadmin()->getId())], "profile");
+                break;
+
+            case 'changepassword':
+                Genesis::renderView('dvups_admin.changepwd', $dvups_adminCtrl->changepwAction(), 'list', true);
+                break;
+
+            case '_editpassword':
+                Genesis::renderView('dvups_admin.changepwd', ["detail" => ""], 'list');
+                break;
+
+            case 'resetcredential':
+                Genesis::renderView('dvups_admin.index', $dvups_adminCtrl->resetcredential($_GET["id"]), 'list', true);
+                break;
+
+            case 'added':
+                Genesis::renderView('dvups_admin.added');
+                break;
+            
             case 'index':
                 Genesis::renderView('dvups_admin.index', $dvups_adminCtrl->listAction(), 'list');
                 break;
@@ -16,10 +36,6 @@ class Dvups_adminGenesis {
 
             case 'create':
                 Genesis::renderView('dvups_admin.form', $dvups_adminCtrl->createAction(), 'error creation', true);
-                break;
-
-            case 'added':
-                Genesis::renderView('dvups_admin.added');
                 break;
 
             case '_edit':

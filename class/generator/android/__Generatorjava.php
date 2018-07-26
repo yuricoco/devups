@@ -221,29 +221,30 @@ Usage:
      * 
      * @param type $namespace
      */
-    public static function entity($namespace, $project) {
+    public static function entity($namespace, $project, $package) {
 
         $ns = explode("\\", $namespace);
         $entity = __Generatorjava::findentity($project, $ns[1], $ns[2]);
-        __Generatorjava::__entity($entity, $project, false, ['entity' => true, 'dao' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
+        __Generatorjava::__entity($entity, $project, $package, false, ['model' => true, 'activity' => false, 'service' => false, 'adapter' => false, 'views' => false]);
     }
 
     /**
      * 
      * @param type $namespace
      */
-    public static function crud($namespace, $project) {
+    public static function crud($namespace, $project, $package) {
 
         $ns = explode("\\", $namespace);
         $entity = __Generatorjava::findentity($project, $ns[1], $ns[2]);
-        __Generatorjava::__entity($entity, $project);
+        __Generatorjava::__entity($entity, $project, $package);
     }
 
     /**
      * 
      * @param type $namespace
      */
-    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'dao' => true, 'ctrl' => true, 'form' => true, 'genes' => true, 'views' => true]) {
+    private static function __entity($entity, $project, $package, $setdependance = false,
+                                     $crud = ['model' => true, 'activity' => true, 'service' => true, 'adapter' => true, 'views' => true]) {
 
         $backend = new BackendGeneratorJava();
         $frontend = new FrontendGenerator();
@@ -254,7 +255,7 @@ Usage:
         $repertoire = ucfirst(__Generatorjava::$modulecore->name);
 
 //        if (!file_exists($repertoire)) {            
-        __Generatorjava::__module(__Generatorjava::$modulecore, $setdependance);
+        //__Generatorjava::__module(__Generatorjava::$modulecore, $setdependance);
 //        }
 
         chdir($repertoire);
@@ -263,44 +264,56 @@ Usage:
 //            __Generatorjava::moduleendless(__Generatorjava::$projectcore, __Generatorjava::$modulecore, [$entity]);
 
         $entity->attribut = (array) $entity->attribut;
-
-
-        if ($crud['model'])
-            $backend->entityGenerator($entity);
-
-        if ($crud['activity'])
-            $backend->daoGenerator($entity);
-
-        if ($crud['service'])
-            $backend->controllerGenerator($entity);
-
-        if ($crud['adapter'])
-            $backend->formGenerator($entity, $project->listmodule);
-
-        if ($crud['views']) {
-            if (!file_exists('Ressource'))
-                mkdir('Ressource', 0777);
-
-            if (!file_exists('Ressource/views'))
-                mkdir('Ressource/views', 0777);
-
-            if (!file_exists('Ressource/views/' . strtolower($entity->name)))
-                mkdir('Ressource/views/' . strtolower($entity->name), 0777);
-
-            if (!file_exists('Ressource/js'))
-                mkdir("Ressource/js", 0777);
-
-            $vue = "Ressource/views/" . strtolower($entity->name);
-            $frontend->viewsGenerator(__Generatorjava::$projectcore->listmodule, $entity, __Generatorjava::$projectcore->template, $vue);
-        }
-
         $name = strtolower($entity->name);
 
-        $entitycore = fopen('Core/' . ucfirst($name) . 'Core.json', 'w');
-        $contenu = json_encode($entity);
-        fputs($entitycore, $contenu);
+        if (!file_exists('Ressource/java/' .$name))
+            mkdir('Ressource/java/' .$name, 0777);
 
-        fclose($entitycore);
+        if (!file_exists('Ressource/java/' .$name."/models"))
+            mkdir('Ressource/java/' .$name."/models", 0777);
+        if (!file_exists('Ressource/java/' .$name."/activities"))
+            mkdir('Ressource/java/' .$name."/activities", 0777);
+        if (!file_exists('Ressource/java/' .$name."/services"))
+            mkdir('Ressource/java/' .$name."/services", 0777);
+        if (!file_exists('Ressource/java/' .$name."/adapters"))
+            mkdir('Ressource/java/' .$name."/adapters", 0777);
+
+        if ($crud['model'])
+            $backend->modelGenerator($entity, $package);
+
+        if ($crud['activity'])
+            $backend->activityGenerator($entity, $package);
+
+        if ($crud['service'])
+            $backend->servicesGenerator($entity, $package);
+
+        if ($crud['adapter'])
+            $backend->adapterGenerator($entity, $package);
+
+//        if ($crud['views']) {
+//            if (!file_exists('Ressource'))
+//                mkdir('Ressource', 0777);
+//
+//            if (!file_exists('Ressource/views'))
+//                mkdir('Ressource/views', 0777);
+//
+//            if (!file_exists('Ressource/views/' . strtolower($entity->name)))
+//                mkdir('Ressource/views/' . strtolower($entity->name), 0777);
+//
+//            if (!file_exists('Ressource/js'))
+//                mkdir("Ressource/js", 0777);
+//
+//            $vue = "Ressource/views/" . strtolower($entity->name);
+//            $frontend->viewsGenerator(__Generatorjava::$projectcore->listmodule, $entity, __Generatorjava::$projectcore->template, $vue);
+//        }
+
+//        $name = strtolower($entity->name);
+//
+//        $entitycore = fopen('Core/' . ucfirst($name) . 'Core.json', 'w');
+//        $contenu = json_encode($entity);
+//        fputs($entitycore, $contenu);
+//
+//        fclose($entitycore);
 
         chdir('../');
     }

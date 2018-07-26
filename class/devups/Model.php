@@ -14,6 +14,29 @@
 abstract class Model extends \stdClass {
 
     public $dvfetched = false;
+    public $dvinrelation = false;
+
+    public function inrelation(){
+
+        global $em;
+        $this->classmetadata = $em->getClassMetadata("\\" . get_class($this));
+
+        $objecarray = (array) $this;
+        $association = array_keys($this->classmetadata->associationMappings);
+        if(count($association))
+            return true;
+
+        return false;
+//        foreach ($objecarray as $obkey => $value) {
+//            // gere les attributs hérités en visibilité protected
+//            if (is_object($value)) {
+//                $classname = get_class($value);
+//                if ($classname != 'DateTime' && $association[0] != $classname) {
+//                    return true;
+//                }
+//            }
+//        }
+    }
 
     public static function classpath(){
         $reflector = new ReflectionClass(get_called_class());
@@ -222,14 +245,20 @@ abstract class Model extends \stdClass {
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
      * @return type
      */
-    public static function delete($id) {
+    public static function delete($id = null) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
-        $entity->setId($id);
 
-        $dbal = new DBAL();
-        return $dbal->deleteDbal($entity);
+        if($id){
+            $entity->setId($id);
+
+            $dbal = new DBAL();
+            return $dbal->deleteDbal($entity);
+        }else{
+            $qb = new QueryBuilder($entity);
+            return $qb->delete();
+        }
 
     }
 

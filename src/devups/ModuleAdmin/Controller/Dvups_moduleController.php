@@ -2,6 +2,17 @@
 
 class Dvups_moduleController extends Controller {
 
+    public static function updatelabel($id, $label) {
+
+
+        $dvups_module = new Dvups_module($id);
+        $dvups_module->__update("dvups_module.label", $label)->exec();
+
+        return array( 'success' => true,
+            'dvups_module' => $dvups_module,
+            'detail' => 'detail de l\'action.');
+    }
+
     /**
      * retourne l'instance de l'entité ou un json pour les requete asynchrone (ajax)
      *
