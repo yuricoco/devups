@@ -11,15 +11,15 @@
 					break;
 					
 				case '_new':
-                                                                                                            Genesis::renderView( 'storage.form',  $storageCtrl->__newAction(), 'new');
+                    Genesis::renderView( 'storage.form',  $storageCtrl->__newAction(), 'new');
 					break;
 					
 				case 'create':
-                                                                                                            Genesis::renderView( 'storage.form', $storageCtrl->createAction(), 'error creation', true);
+                    Genesis::renderView( 'storage.form', $storageCtrl->createAction(), 'error creation', true);
 					break;
 					
 				case '_edit':
-                                                                                                            Genesis::renderView( 'storage.form',  $storageCtrl->__editAction($_GET['id']), 'edite');
+                    Genesis::renderView( 'storage.form',  $storageCtrl->__editAction($_GET['id']), 'edite');
 					break;
 					
 				case 'update':
@@ -27,11 +27,11 @@
 					break;
 					
 				case 'show':
-                                                                                                                Genesis::renderView( 'storage.show', $storageCtrl->showAction($_GET['id']), 'Show');
+                    Genesis::renderView( 'storage.show', $storageCtrl->showAction($_GET['id']), 'Show');
 					break;
 					
 				case 'delete':
-                                                                                                                Genesis::renderView( 'storage.show', $storageCtrl->deleteAction($_GET['id']), 'delete', true);
+                    Genesis::renderView( 'storage.show', $storageCtrl->deleteAction($_GET['id']), 'delete', true);
 					break;
                                         
 				default:
@@ -44,7 +44,6 @@
 			extract($controllers);
 			
 			switch($view){
-				
 				case 'index':
 					echo json_encode($storageCtrl->listAction());
 					break;

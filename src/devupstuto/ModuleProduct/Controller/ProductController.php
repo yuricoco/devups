@@ -30,7 +30,8 @@ class ProductController extends Controller
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Product(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Genesis::getTableRest($lazyloading)
+            'tablebody' => Genesis::getTableRest($lazyloading),
+            'tablepagination' => Genesis::pagination($lazyloading)
         ];
     }
 

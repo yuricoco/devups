@@ -12,11 +12,11 @@
                     </ol>
             </div>
     </div>
-    <div class="row">
+	<div class="row">
                   
-                        <?php //if($moi->is_anable('storage')){ ?> 
+                            <?php //if($moi->is_anable('storage')){ ?> 
             <div class="col-lg-3 col-md-6">
-                            <div class="panel panel-green">
+                            <div class="panel panel-primary">
                                     <div class="panel-heading">
                                             <div class="row">
                                                     <div class="col-xs-3">
@@ -40,9 +40,9 @@
                                     </a>
                             </div>
                     </div>  
-                            <?php //} ?> 			
-                             
-        </div>
+                <?php //} ?> 			
+				 
+            </div>
             
         @endsection
-    
+	

@@ -512,6 +512,19 @@ class QueryBuilder extends \DBAL {
         return $this->executeDbal($this->query . $this->endquery, $this->parameters, $action);
     }
 
+    public function __getFirst($recursif = true) {
+        return $this->limit(1)->__getOne($recursif);
+    }
+
+    public function __getLast($recursif = true) {
+        return $this->orderby($this->table.".id desc")->limit(1)->__getOne($recursif);
+    }
+
+    public function __getIndex($index, $recursif = true) {
+        $i = (int) $index;
+        return $this->limit($i - 1, $i)->__getOne($recursif);
+    }
+
     public function __getAllRow() {
         return $this->__findAllRow($this->initquery($this->columns) . $this->query, $this->parameters);
     }

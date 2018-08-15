@@ -7,13 +7,35 @@
  */
 require '../header.php';
 
-$acte = "";
-$nbcaract = 6;
-$emptycarat = "0";
-$value = 2;
+global $em;
+$classmetadata = (array) $em->getClassMetadata("\\testentity");
 
-$remaincarat = $nbcaract - strlen($value);
-for($i = 0; $i < $remaincarat; $i++)
-    $acte .= $emptycarat;
+dv_dump(Product::classpath());
+$classdevupsmetadata = [];
 
-var_dump($acte.$value);
+$classdevupsmetadata["name"] = $classmetadata["name"];
+foreach ($classmetadata["fieldMappings"] as $field){
+    $dvfield = [
+        "name" => $field["fieldName"],
+        "visibility" => $field["fieldName"],
+        "datatype" => $field["type"],
+        "size" => $field["fieldName"],
+        "nullable" => $field["fieldName"],
+        "formtype" => $field["fieldName"],
+    ];
+    $classdevupsmetadata["attribut"][] = $dvfield;
+}
+
+foreach ($classmetadata["associationMappings"] as $field){
+    $dvfield = [
+        "entity" => $field["fieldName"],
+        "cardinality" => "manyToOne",
+        "nullable" => "true",
+        "ondelete" => "cascade",
+        "onupdate" => "cascade"
+    ];
+    $classdevupsmetadata["relation"][] = $dvfield;
+}
+
+//dd();
+dv_dump($classmetadata);

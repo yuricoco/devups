@@ -499,14 +499,49 @@ class BackendGenerator {
 
     /* CREATION OF CORE */
 
-    public function coreGenerator($entity) {
-        $name = strtolower($entity->name);
+    public function coreGenerator($entityname) {
+        require ROOT . 'requires.php';
+        global $em;
 
-        /* if($name == 'utilisateur')
-          return 0; */
+        $classmetadata = (array) $em->getClassMetadata("\\". $entityname);
+
+        $classdevupsmetadata = [];
+        $name = strtolower($entityname);
+
+        $classdevupsmetadata["name"] = $name;
+        foreach ($classmetadata["fieldMappings"] as $field){
+            $length = "";
+            if($field["length"])
+                $length = $field["length"];
+
+            $nullable = "not";
+            if($field["nullable"])
+                $nullable = "default";
+
+            $dvfield = [
+                "name" => $field["fieldName"],
+                "visibility" => $field["fieldName"],
+                "datatype" => $field["type"],
+                "size" => $length,
+                "nullable" => $nullable,
+                "formtype" => $field["fieldName"],
+            ];
+            $classdevupsmetadata["attribut"][] = $dvfield;
+        }
+
+        foreach ($classmetadata["associationMappings"] as $field){
+            $dvfield = [
+                "entity" => $field["fieldName"],
+                "cardinality" => "manyToOne",
+                "nullable" => "not",
+                "ondelete" => "cascade",
+                "onupdate" => "cascade"
+            ];
+            $classdevupsmetadata["relation"][] = $dvfield;
+        }
 
         $entitycore = fopen('Core/' . $name . 'Core.json', 'w');
-        $contenu = json_encode($entity);
+        $contenu = json_encode($classdevupsmetadata);
         fputs($entitycore, $contenu);
 
         fclose($entitycore);

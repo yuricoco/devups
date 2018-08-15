@@ -12,11 +12,11 @@
 @section('content')
 
 <?php
-            $callbackbtn = function($entity){
+            function callbackbtn($entity){
                 return "<a class='btn btn-default' href='index.php?path=dvups_admin/resetcredential&id=".$entity->getId()."'>reset password</a>";
             };
-            
-    ?>
+
+?>
         <div class="row">
                 <div class="col-lg-12">
                         <ol class="breadcrumb">
@@ -32,11 +32,10 @@
         <div class="col-lg-12 col-md-12">
                 <div class="table-responsive">
 
-                 <?=
-                Genesis::lazyloadingUI($lazyloading, [
+                 <?= \DClass\devups\Datatable::renderdata($lazyloading, [
                     ['header' => 'nom', 'value' => 'name'],
                     ['header' => 'login', 'value' => 'login'],
-                        ], $callbackbtn);
+                        ]);
                 ?>
 
 
@@ -49,5 +48,7 @@
 
 @section('jsimport')
 
+    <script src="<?= CLASSJS ?>model.js"></script>
+    <script src="<?= CLASSJS ?>ddatatable.js"></script>
                 <script></script>
 @show

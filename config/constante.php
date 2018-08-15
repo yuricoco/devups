@@ -16,6 +16,8 @@ define('__v', '4.3');
 
 define('__env', '/devupstuto/');
 define('__prod', false);
+define('__default_lang', "fr");
+define('__project_id', 'devupstuto');
 
 
 define('ROOT', __DIR__  . '/../');
@@ -36,14 +38,12 @@ define('IHM', __env. 'admin/Ressource/ihm/');
 
 define('ENTITY', 0);
 define('VIEW', 1);
-define('ADMIN', 'admin_devups');
-define('ENTERPRISE', 'entreprise_devups');
+define('ADMIN', __project_id.'_devups');
 
-function asset($src){
-    return __env .'web/' . $src;
-}
+/**
+ * NOTIFIACTION DEFINE
+ */
+define('LANG', "lang");
+define('JSON_ENCODE_DEPTH', 512);
 
-function path($src){
-    return __env . $src;
-}
 

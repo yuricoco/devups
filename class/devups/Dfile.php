@@ -20,6 +20,12 @@ class Dfile {
     private $compressionquality = 80;
     private $file_name = "";
 
+    public static function getimageatbase64($path){
+        $type = pathinfo($path, PATHINFO_EXTENSION);
+        $data = file_get_contents($path);
+        return 'data:image/' . $type . ';base64,' . base64_encode($data);
+    }
+
     public static function uploadchunk($uploaddir) {
         $dfile = new Dfile(null);
         $path = $dfile->chdirectory($dfile->filepath($uploaddir));

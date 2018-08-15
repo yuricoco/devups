@@ -25,7 +25,7 @@
                 
         <div class="col-lg-12 col-md-12">
                 
-                    <?= Genesis::lazyloadingUI($lazyloading, [
+                    <?= \DClass\devups\Datatable::renderdata($lazyloading, [
 ['header' => 'Name', 'value' => 'name'], 
 ['header' => 'Description', 'value' => 'description']
 ]); ?>

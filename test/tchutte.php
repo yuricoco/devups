@@ -32,8 +32,13 @@ require '../header.php';
 //->__getOneRow();
 
 //Product::select();
+
+// this formula will automatically take product as entity owner of category
 //Product::select()->leftjoin("category");
+
+// this formula takes subcategory as owner of category
 //Product::select()->leftjoin("subcategory", "category");
+
 //Product::select("name, description")->where("name", "tew");
 //Product::select()->where("name", "=", "tew"); 
 //Product::select()->where("name", "=", "tew")->orderby("name desc"); 

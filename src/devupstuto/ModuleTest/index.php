@@ -26,7 +26,10 @@
                         
 				case 'testentity/index':
 					Genesis::renderView('testentity.index',  $testentityCtrl->listAction(), 'list');
-					break;					
+					break;
+                case 'testentity/_new':
+                    Genesis::renderView( 'testentity.form',  $testentityCtrl->__newAction(), 'new');
+                    break;
 				case 'testentity/create':
                     Genesis::renderView( 'testentity.form', $testentityCtrl->createAction(), 'error creation', true);
 					break;					
@@ -37,7 +40,7 @@
 
 		
                 default:
-                    echo 'la route n\'existe pas!';
+                    echo 'la route "'.$_GET['path'].'" n\'existe pas!';
                     break;
             }
     

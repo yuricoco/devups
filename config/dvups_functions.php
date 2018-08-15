@@ -6,6 +6,14 @@
  * and open the template in the editor.
  */
 
+function asset($src){
+    return __env .'web/' . $src;
+}
+
+function path($src){
+    return __env . $src;
+}
+
 function url_format($str, $charset='utf-8')
 {
     $str = htmlentities($str, ENT_NOQUOTES, $charset);
@@ -63,8 +71,12 @@ function url($path, $id = "", $title = "") {
     return __env . $path . $mode;
 }
 
-function dv_dump($data){
+function dv_dump(){
     echo "<pre>";
-    var_dump($data);
-    die();
+    //var_dump($argv[0]);
+    array_map(function ($x) {
+        var_dump($x);
+    }, func_get_args());
+
+    die(1);
 }

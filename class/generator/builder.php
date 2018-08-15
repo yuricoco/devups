@@ -1,24 +1,24 @@
 <?php
 
-require __DIR__ . '/../config/dependanceInjection.php';
+require __DIR__ . '/../../config/dependanceInjection.php';
 
-require __DIR__ . '/../class/generator/BackendGenerator.php';
-require __DIR__ . '/../class/generator/android/BackendGeneratorJava.php';
-require __DIR__ . '/../class/generator/FrontendGenerator.php';
-require __DIR__ . '/../class/generator/rootGenerator.php';
-require __DIR__ . '/../class/generator/RequestGenerator.php';
-require __DIR__ . '/../class/generator/Traitement.php';
-require __DIR__ . '/../class/generator/template/Templatedependences.php';
-require __DIR__ . '/../class/generator/__Generator.php';
-require __DIR__ . '/../class/generator/android/__Generatorjava.php';
+require __DIR__ . '/BackendGenerator.php';
+require __DIR__ . '/android/BackendGeneratorJava.php';
+require __DIR__ . '/FrontendGenerator.php';
+require __DIR__ . '/rootGenerator.php';
+require __DIR__ . '/RequestGenerator.php';
+require __DIR__ . '/Traitement.php';
+require __DIR__ . '/template/Templatedependences.php';
+require __DIR__ . '/__Generator.php';
+require __DIR__ . '/android/__Generatorjava.php';
 
-require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_module.php';
-require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_role.php';
-require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_right.php';
-require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_entity.php';
-require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php';
-require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';
-require __DIR__ . '/../src/devups/ModuleAdmin/Entity/Dvups_right_dvups_entity.php';
+require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_module.php';
+require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role.php';
+require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right.php';
+require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_entity.php';
+require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php';
+require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';
+require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right_dvups_entity.php';
 
 $backend = new BackendGeneratorJava();
 $frontend = new FrontendGenerator();
@@ -52,8 +52,13 @@ if (isset($argv[2])) {
 
     switch ($argv[1]) {
 
+        case 'entity:g:core':
+            __Generator::core($argv[2], $project); //,
+            echo $argv[2] . ": Core generated with success";
+            break;
+
         case 'core:g:views':
-            __Generator::views($argv[2], $project); //, 
+            __Generator::views($argv[2], $project); //,
             echo $argv[2] . ": Views generated with success";
             break;
 
@@ -147,7 +152,7 @@ if (isset($argv[2])) {
             echo "\n > Update database schema (DOCTRINE ORM).\n\n" . implode("\n", $result);
             
             $rqg = new DBAL();
-            $path = __DIR__ . '/../class/generator/dvupsadmin.sql';
+            $path = __DIR__ . '/dvupsadmin.sql';
             $dvupsadminsql = file_get_contents($path);
             $rqg->executeDbal($dvupsadminsql);
             
@@ -164,7 +169,7 @@ if (isset($argv[2])) {
 
         case 'dvups_:admin':
             $rqg = new DBAL();
-            $path = __DIR__ . '/../class/generator/dvupsadmin.sql';
+            $path = __DIR__ . '/dvupsadmin.sql';
             $dvupsadminsql = file_get_contents($path);
             $rqg->executeDbal($dvupsadminsql);
             echo "Data admin initialized with success";

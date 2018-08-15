@@ -25,6 +25,7 @@ require __DIR__ . '/../class/devups/Model.php';
 require __DIR__ . '/../class/devups/EntityCollection.php';
 require __DIR__ . '/../class/devups/Controller.php';
 require __DIR__ . '/../class/devups/Genesis.php';
+require __DIR__ . '/../class/devups/Datatable.php';
 require __DIR__ . '/../class/devups/System_prod.php';
 require __DIR__ . '/../class/devups/UploadFile.php';
 require __DIR__ . '/../class/devups/EntityCore.php';

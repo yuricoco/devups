@@ -16,19 +16,22 @@ class Form extends FormFactory{
     public static $fields = [];
     public static $savestate = [];
 
-    public static function open($enitty,  $directives = ["action"=> "#", "method"=> "post"]) {
-        
+    public static function open($enitty,  $directives = ["action"=> "#", "method"=> "post"], $overideaction = false) {
+
         if(!isset($directives['method']))
             $directives['method'] = "post";
 
         Form::$name = strtolower(get_class($enitty));
-        $directives["action"] = "index.php?path=".Form::$name."/".trim($directives["action"]);
+        $action = $directives["action"];
+        $directives["action"] = "index.php?path=".Form::$name."/".trim($action);
+        if($overideaction)
+            $directives["action"] = trim($action);
 
         $formdirective = [];
         foreach ($directives as $key => $value) {
-           $formdirective[] = $key ."='" . $value ."'";
+            $formdirective[] = $key ."='" . $value ."'";
         }
-        
+
         return "<form ". implode(" ", $formdirective) ."  >";
     }
 
@@ -40,7 +43,7 @@ class Form extends FormFactory{
         
 //        $_SESSION[Form::$name ] = Form::$fields;
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
-        $dvups_form = "<textarea hidden name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
+        $dvups_form = "<textarea style='display=none;' name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
         return $dvups_form."</form>";
     }
     
@@ -52,7 +55,7 @@ class Form extends FormFactory{
     
     public static function closeimbricate() {
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
-        $dvups_form = "<textarea hidden name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
+        $dvups_form = "<textarea style='display: none' name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
         
         Form::$name = Form::$savestate[0];
         //Form::$fields = Form::$savestate[1];

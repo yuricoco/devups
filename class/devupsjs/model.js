@@ -9,7 +9,10 @@ var databinding = {
     },
     checkrenderform: function(response){
         //console.log(response);
-        this.bindmodal(response.form);
+        if(response.form)
+            this.bindmodal(response.form);
+        else
+            this.bindmodal(response);
     }
 }
 var model = {
@@ -17,16 +20,15 @@ var model = {
     _new: function (callback) {
 
         $.get("services.php?path="+this.entity+"._new", function (response) {
+            console.log(response);
             databinding.checkrenderform(response);
         }, 'json');//, 'json'
 
     },
     _edit: function (id, callback) {
-
         $.get("services.php?path="+this.entity+"._edit&id="+id, function (response) {
             databinding.checkrenderform(response);
         }, 'json');//, 'json'
-
     },
     _delete: function ($this, id, callback) {
 
@@ -54,3 +56,8 @@ var model = {
 };
 
 model.entity = $("#dv_table").data('entity');
+$("#model_new").attr("href", "#");
+$("#model_new").click(function (e) {
+    e.preventDefault();
+    model._new()
+});

@@ -30,7 +30,9 @@ Usage:
         $commend[] = "core:g:entity <component\module\entity>           // generate an entity from core eg: component\module\entity";
         $commend[] = "core:g:controller <component\module\entity>       // generate a controller from core eg: component\module\entity";
         $commend[] = "core:g:form <component\module\entity>             // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:formwidget <component\module\entity>            // generate an entity from core eg: component\module\entity";
         $commend[] = "core:g:views <component\module\entity>            // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:viewswidget <component\module\entity>          // generate an entity from core eg: component\module\entity\n ";
         $commend[] = "core:g:genesis <component\module\entity>          // generate an entity from core eg: component\module\entity\n ";
 
         $commend[] = "install                 // create database, create database schema and create master admin ";
@@ -202,6 +204,17 @@ Usage:
      * 
      * @param type $namespace
      */
+    public static function core($namespace, $project) {
+
+        $ns = explode("\\", $namespace);
+        __Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::__core($ns[2]);
+
+    }
+    /**
+     *
+     * @param type $namespace
+     */
     public static function genesis($namespace, $project) {
 
         $ns = explode("\\", $namespace);
@@ -273,6 +286,17 @@ Usage:
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
         __Generator::__entity($entity, $project);
+    }
+
+    private static function __core($entity){
+
+        $backend = new BackendGenerator();
+        $repertoire = ucfirst(__Generator::$modulecore->name);
+        chdir($repertoire);
+
+        $backend->coreGenerator($entity);
+
+        chdir('../');
     }
 
     /**
