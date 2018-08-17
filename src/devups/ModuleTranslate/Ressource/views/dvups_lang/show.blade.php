@@ -18,11 +18,11 @@
                     <div class="row">
                                             
                     <div class="col-lg-12 col-md-12">
-			
+                    
+			<?php Dvups_langForm::__renderDetailWidget($dvups_lang); ?>
 			
 	<div class="form-group text-center">
-		<a href="index.php?path=dvups_lang/edit&id=<?php echo $dvups_lang->getId(); ?>" class="btn btn-default">Modifier</a>
-		<a href="index.php?path=dvups_lang/delete&valid=oui&id=<?php echo $dvups_lang->getId(); ?>" class="btn btn-default">Supprimer</a>
+		<?php echo Genesis::actionListView("dvups_lang", $dvups_lang->getId()); ?>
 	</div>
 	
 	</div>

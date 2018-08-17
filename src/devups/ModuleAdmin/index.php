@@ -56,40 +56,20 @@ $views = __DIR__ . '/Ressource/views';
                 Dvups_adminGenesis::genesis($path[VIEW], $controllers);
                 break;
 
-            case 'dvups_admin.rest':
-                Dvups_adminGenesis::restGenesis($path[VIEW], $controllers);
-                break;
-
             case 'dvups_module':
                 Dvups_moduleGenesis::genesis($path[VIEW], $controllers);
-                break;
-
-            case 'dvups_module.rest':
-                Dvups_moduleGenesis::restGenesis($path[VIEW], $controllers);
                 break;
 
             case 'dvups_entity':
                 Dvups_entityGenesis::genesis($path[VIEW], $controllers);
                 break;
 
-            case 'dvups_entity.rest':
-                Dvups_entityGenesis::restGenesis($path[VIEW], $controllers);
-                break;
-
             case 'dvups_role':
                 Dvups_roleGenesis::genesis($path[VIEW], $controllers);
                 break;
 
-            case 'dvups_role.rest':
-                Dvups_roleGenesis::restGenesis($path[VIEW], $controllers);
-                break;
-
             case 'dvups_right':
                 Dvups_rightGenesis::genesis($path[VIEW], $controllers);
-                break;
-
-            case 'dvups_right.rest':
-                Dvups_rightGenesis::restGenesis($path[VIEW], $controllers);
                 break;
 
 

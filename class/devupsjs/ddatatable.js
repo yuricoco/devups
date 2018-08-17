@@ -82,23 +82,19 @@ var ddatatable = {
         callback(ids, $trs);
     },
     search: function (form) {
-        var $input = form.find('input');
+        var $input = form.find("thead").find('input');
         this.currentpage = 1;
-        this.searchparam = '';
+        var searchparam = '';
         $.each($input, function (i, input) {
-            //console.log(input);
-            if ($(input).val())
-                this.searchparam += "&" + $(input).attr('name') + "=" + $(input).val();
+            if ($(input).val()){
+                searchparam += "&" + $(input).attr('name') + "=" + $(input).val();
+            }
         });
 
-        if(this.searchparam)
+        if(searchparam){
+            this.searchparam = searchparam;
             this.page(1);
-
-        // $.get("services.php?path="+model.entity+".datatable&next=1&per_page="+this.per_page+""+this.searchparam, function (response) {
-        //     //console.log(response);
-        //     $("#dv_table").find("tbody").html(response.tablebody);
-        //     $("#dv_table").find("input[type=reset]").removeClass("hidden");
-        // }, 'json');//
+        }
     },
     cancelsearch : function ($this) {
         this.searchparam = '';
@@ -152,7 +148,6 @@ var ddatatable = {
         this.setloader();
         $.get("services.php?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam, function (response) {
             //console.log(response);
-            $("#dv_table").find(".loader").remove();
             $("#dv_table").find("tbody").html(response.tablebody);
             $("#dv_pagination").replaceWith(response.tablepagination);
             removeloader();
@@ -162,7 +157,7 @@ var ddatatable = {
 };
 
 function removeloader(){
-    $("#dv_pagination").replaceWith(response.tablepagination);
+    $("#dv_table").find(".loader").remove();
 }
 
 $("#datatable-form").submit(function (e) {

@@ -48,10 +48,6 @@ class Dvups_adminController extends Controller {
     }
 
     public function connexionAction($login, $password) {
-//        $adminDao = new Dvups_adminDAO();
-        //$connexionDao = new ConnexionDAO();
-        //$mdp = sha1($password);
-//        $admin = $adminDao->findByConnectic($login, $password);
         $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
 
         if (!$admin->getId())
@@ -155,36 +151,42 @@ class Dvups_adminController extends Controller {
         }
     }
 
-    /**
-     * retourne un tableau d'instance de l'entité ou un json pour les requetes asynchrone (ajax)
-     *
-     * @param type $id
-     * @return \Array
-     */
-    public function listAction() {
-
-        $qb = new QueryBuilder(new Dvups_admin());
-        $qb->select()->orderby("dvups_admin.id desc");
-
-        $pagination = $this->lazyloading(new Dvups_admin(), 1, 10, $qb);
-
-        return array('success' => true, // pour le restservice
-            'lazyloading' => $pagination, // pour le web service
-            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+    public static function renderDetail($id)
+    {
+        Dvups_adminForm::__renderDetailWidget(Dvups_admin::find($id));
     }
 
-    public function deleteAction($id) {
+    public static function renderForm($id = null, $action = "create")
+    {
+        $dvups_admin = new Dvups_admin();
+        if ($id) {
+            $action = "update&id=" . $id;
+            $dvups_admin = Dvups_admin::find($id);
+            $dvups_admin->collectDvups_role();
+        }
 
-        $dvups_admin = Dvups_admin::find($id);
+        return ['success' => true,
+            'form' => Dvups_adminForm::__renderForm($dvups_admin, $action, true),
+        ];
+    }
 
-        if ($dvups_admin->__delete())
-            return array('success' => true, // pour le restservice
-                'redirect' => 'index', // pour le web service
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        else
-            return array('success' => false, // pour le restservice
-                'dvups_admin' => $dvups_admin,
-                'detail' => 'Des problèmes sont survenus lors de la suppression de l\'élément.'); //Detail de l'action ou message d'erreur ou de succes
+    public function datatable($next, $per_page)
+    {
+        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page);
+        return ['success' => true,
+            'tablebody' => Genesis::getTableRest($lazyloading)
+        ];
+    }
+
+    public function listAction($next = 1, $per_page = 10)
+    {
+
+        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, null, "dvups_admin.id desc");
+
+        return array('success' => true, // pour le restservice
+            'lazyloading' => $lazyloading, // pour le web service
+            'detail' => '');
+
     }
 
 }

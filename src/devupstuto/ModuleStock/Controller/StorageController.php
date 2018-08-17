@@ -1,6 +1,8 @@
 <?php 
 
-    class StorageController extends Controller{
+use DClass\devups\Datatable as Datatable;
+
+class StorageController extends Controller{
 
 
     public static function renderFormWidget($id = null) {
@@ -30,7 +32,8 @@
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Storage(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Genesis::getTableRest($lazyloading)
+            'tablebody' => Datatable::getTableRest($lazyloading),
+            'tablepagination' => Datatable::pagination($lazyloading)
         ];
     }
 

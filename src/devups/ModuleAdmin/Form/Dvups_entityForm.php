@@ -42,6 +42,10 @@
         public static function __renderForm(\Dvups_entity $dvups_entity, $action = null, $button = false) {
             return FormFactory::__renderForm(Dvups_entityForm::formBuilder($dvups_entity, $action, $button));
         }
+
+        public static function __renderDetailWidget(\Dvups_entity $dvups_entity){
+            include ROOT . Dvups_entity::classpath() . "Form/Dvups_entityDetailWidget.php";
+        }
         
     }
     

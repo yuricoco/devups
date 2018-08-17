@@ -53,47 +53,51 @@ abstract class Model extends \stdClass {
      * @param type $lang
      * @return \Dvups_lang
      */
-    public function __translate($lable, $content, $lang = "fr") {
+    public function __inittranslate($column, $content, $lang = "fr") {
         if(!$this->id || !$content)
             return;
 
-        $dvlang = new Dvups_lang();
-        $dvlang->setLabel($this->id . "_" . $lable);
-        $dvlang->setLang($lang);
-        $dvlang->setTable(strtolower(get_class($this)));
-        $dvlang->setRow_id($this->id);
-        $dvlang->setContent($content);
-        $dvlang->__save();
-    }
+        $table = strtolower(get_class($this));
+        $ref = $this->id . $table . "_" . $column;
 
-    public function __updatetranslate($lable, $content, $lang = "fr") {
-        if(!$this->id || !$content)
-            return;
+        $dvlang = Dvups_lang::select()->where("ref", $ref)->__getOne();
+        $dvcontentlang = new Dvups_contentlang();
 
-        $dvlang = Dvups_lang::select()
-            ->where("label", $this->id . "_" . $lable)
-            ->andwhere("lang", $lang)
-            ->andwhere("`table`", strtolower(get_class($this)) )
-            ->__getOne();
+        if(!$dvlang->getId()){
+            $dvlang = new Dvups_lang();
+            $dvlang->setRef($ref);
+            $dvlang->set_table($table);
+            $dvlang->setRow($this->id);
+            $dvlang->set_column($column);
+            $dvlang->__save();
 
-        if (!$dvlang->getId()) {
-            $dvlang->setLabel($this->id . "_" . $lable);
-            $dvlang->setLang($lang);
-            $dvlang->setTable(strtolower(get_class($this)));
-            $dvlang->setRow_id($this->id);
+            $dvcontentlang->setDvups_lang($dvlang);
+            $dvcontentlang->setLang($lang);
+        }else{
+            $dvcontentlang = Dvups_contentlang::select()
+                ->where("dvups_lang.ref", $dvlang->getRef())
+                ->andwhere("lang", $lang)
+                ->__getOne();
         }
-        $dvlang->setContent($content);
-        $dvlang->__save();
+        $dvcontentlang->setContent($content);
+        $dvcontentlang->__save();
+
     }
 
-    public function __gettranslate($lable, $lang = "fr") {
+    public function __gettranslate($column, $lang = "fr") {
         if(!$this->id)
             return "";
 
-        $dvlang = Dvups_lang::select()->where("label", $this->id . "_" . $lable)
-            ->andwhere("`table`", strtolower(get_class($this)) )
+        $table = strtolower(get_class($this));
+        $ref = $this->id . $table . "_" . $column;
+
+        $dvcontentlang = Dvups_contentlang::select()
+            ->where("dvups_lang.ref", $ref)
             ->andwhere("lang", $lang)->__getOne();
-        return $dvlang->getContent();
+        if($dvcontentlang->getId())
+            return $dvcontentlang->getContent();
+
+        return $this->$column;
     }
 
     /**

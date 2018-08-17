@@ -28,6 +28,10 @@
         public static function __renderForm(\Dvups_module $dvups_module, $action = null, $button = false) {
             return FormFactory::__renderForm(Dvups_moduleForm::formBuilder($dvups_module, $action, $button));
         }
+
+        public static function __renderDetailWidget(\Dvups_module $dvups_module){
+            include ROOT . Dvups_module::classpath() . "Form/Dvups_moduleDetailWidget.php";
+        }
         
     }
     

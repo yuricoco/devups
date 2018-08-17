@@ -50,6 +50,9 @@
         public static function __renderForm(\Dvups_role $dvups_role, $action = null, $button = false) {
             return FormFactory::__renderForm(Dvups_roleForm::formBuilder($dvups_role, $action, $button));
         }
-        
+
+        public static function __renderDetailWidget(\Testentity $testentity){
+            include ROOT . Testentity::classpath() . "Form/TestentityDetailWidget.php";
+        }
     }
     

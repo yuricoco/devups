@@ -1,0 +1,1 @@
+{"name":"dvups_contentlang","attribut":{"1":{"name":"content","visibility":"content","datatype":"text","size":"","nullable":"not","formtype":"content"},"2":{"name":"lang","visibility":"lang","datatype":"string","size":2,"nullable":"not","formtype":"lang"}},"relation":[{"entity":"dvups_lang","cardinality":"manyToOne","nullable":"not","ondelete":"cascade","onupdate":"cascade"}]}

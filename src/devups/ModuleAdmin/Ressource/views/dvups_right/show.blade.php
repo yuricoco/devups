@@ -18,11 +18,11 @@
                     <div class="row">
                                             
                     <div class="col-lg-12 col-md-12">
-			
+                    
+			<?php Dvups_rightForm::__renderDetailWidget($dvups_right); ?>
 			
 	<div class="form-group text-center">
-		<a href="index.php?path=dvups_right/edit&id=<?php echo $dvups_right->getId(); ?>" class="btn btn-default">Modifier</a>
-		<a href="index.php?path=dvups_right/delete&valid=oui&id=<?php echo $dvups_right->getId(); ?>" class="btn btn-default">Supprimer</a>
+		<?php echo Genesis::actionListView("dvups_right", $dvups_right->getId()); ?>
 	</div>
 	
 	</div>

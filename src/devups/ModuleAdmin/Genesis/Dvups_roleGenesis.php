@@ -11,15 +11,15 @@
 					break;
 					
 				case '_new':
-                                                                                                            Genesis::renderView( 'dvups_role.form',  $dvups_roleCtrl->__newAction(), 'new');
+                    Genesis::renderView( 'dvups_role.form',  $dvups_roleCtrl->__newAction(), 'new');
 					break;
 					
 				case 'create':
-                                                                                                            Genesis::renderView( 'dvups_role.form', $dvups_roleCtrl->createAction(), 'error creation', true);
+                    Genesis::renderView( 'dvups_role.form', $dvups_roleCtrl->createAction(), 'error creation', true);
 					break;
 					
 				case '_edit':
-                                                                                                            Genesis::renderView( 'dvups_role.form',  $dvups_roleCtrl->__editAction($_GET['id']), 'edite');
+                    Genesis::renderView( 'dvups_role.form',  $dvups_roleCtrl->__editAction($_GET['id']), 'edite');
 					break;
 					
 				case 'update':
@@ -27,11 +27,11 @@
 					break;
 					
 				case 'show':
-                                                                                                                Genesis::renderView( 'dvups_role.show', $dvups_roleCtrl->showAction($_GET['id']), 'Show');
+                    Genesis::renderView( 'dvups_role.show', $dvups_roleCtrl->showAction($_GET['id']), 'Show');
 					break;
 					
 				case 'delete':
-                                                                                                                Genesis::renderView( 'dvups_role.show', $dvups_roleCtrl->deleteAction($_GET['id']), 'delete', true);
+                    Genesis::renderView( 'dvups_role.show', $dvups_roleCtrl->deleteAction($_GET['id']), 'delete', true);
 					break;
                                         
 				default:

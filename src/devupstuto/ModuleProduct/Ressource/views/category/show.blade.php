@@ -17,16 +17,16 @@
                     </div>
                     <div class="row">
                                             
-                <div class="col-lg-12 col-md-12">
-                
+                    <div class="col-lg-12 col-md-12">
+                    
+			<?php CategoryForm::__renderDetailWidget($category); ?>
 			
 	<div class="form-group text-center">
-		<a href="index.php?path=category/edit&id=<?php echo $category->getId(); ?>" class="btn btn-default">Modifier</a>
-		<a href="index.php?path=category/delete&valid=oui&id=<?php echo $category->getId(); ?>" class="btn btn-default">Supprimer</a>
+		<?php echo Genesis::actionListView("category", $category->getId()); ?>
 	</div>
 	
 	</div>
 					
-                    </div>      
-                    
+                    </div>        
+         
 @endsection

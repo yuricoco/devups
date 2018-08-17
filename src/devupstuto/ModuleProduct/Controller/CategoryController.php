@@ -1,134 +1,151 @@
-<?php 
+<?php
 
-    class CategoryController extends Controller{
 
-            /**
-             * retourne l'instance de l'entité ou un json pour les requete asynchrone (ajax)
-             *
-             * @param type $id
-             * @return \Array
-             */
-            public  function showAction($id){
-                
-                     $category = Category::find($id);
+use DClass\devups\Datatable as Datatable;
 
-                    return array( 'success' => true, 
-                                    'category' => $category,
-                                    'detail' => 'detail de l\'action.');
+class CategoryController extends Controller
+{
 
-            }
 
-                                        /**
-                                         * Data for creation form
-                                         * @Sequences: controller - genesis - ressource/view/form
-             * @return \Array
-                                         */
-            public function __newAction(){
+    public static function renderFormWidget($id = null)
+    {
+        if ($id)
+            CategoryForm::__renderFormWidget(Category::find($id), 'update');
+        else
+            CategoryForm::__renderFormWidget(new Category(), 'create');
+    }
 
-                    return 	array(	'success' => true, // pour le restservice
-                                    'category' => new Category(),
-                                    'action_form' => 'create', // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+    public static function renderDetail($id)
+    {
+        CategoryForm::__renderDetailWidget(Category::find($id));
+    }
 
-            }
+    public static function renderForm($id = null, $action = "create")
+    {
+        $category = new Category();
+        if ($id) {
+            $action = "update&id=" . $id;
+            $category = Category::find($id);
+            //$category->collectStorage();
+        }
 
-                                        /**
-                                         * Action on creation form
-                                         * @Sequences: controller - genesis - ressource/view/form
-             * @return \Array
-                                         */
-            public function createAction(){
-                    extract($_POST);
-                    $this->err = array();
+        return ['success' => true,
+            'form' => CategoryForm::__renderForm($category, $action, true),
+        ];
+    }
 
-                    $category = $this->form_generat(new Category(), $category_form);
- 
+    public function datatable($next, $per_page)
+    {
+        $lazyloading = $this->lazyloading(new Category(), $next, $per_page);
+        return ['success' => true,
+            'tablebody' => Datatable::getTableRest($lazyloading),
+            'tablepagination' => Datatable::pagination($lazyloading)
+        ];
+    }
 
-                    if ( $id = $category->__insert()) {
-                            return 	array(	'success' => true, // pour le restservice
-                                            'category' => $category,
-                                            'redirect' => 'index', // pour le web service
-                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-                    } else {
-                            return 	array(	'success' => false, // pour le restservice
-                                            'category' => $category,
-                                            'action_form' => 'create', // pour le web service
-                                            'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
-                    }
+    public function listAction($next = 1, $per_page = 10)
+    {
 
-            }
+        $lazyloading = $this->lazyloading(new Category(), $next, $per_page);
 
-            /**
-             * Data for edit form
-             * @Sequences: controller - genesis - ressource/view/form
-             * @param type $id
-             * @return \Array
-            */ 
-            public function __editAction($id){
-                
-                     $category = Category::find($id);
-
-                    return array('success' => true, // pour le restservice
-                                    'category' => $category,
-                                    'action_form' => 'update&id='.$id, // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-
-            }
-
-            /**
-             * Action on edit form
-             * @Sequences: controller - genesis - ressource/view/index
-             * @param type $id
-             * @return \Array
-            */
-            public function updateAction($id){
-                    extract($_POST);
-                    $this->err = array();
-
-                    $category = $this->form_generat(new Category($id), $category_form);
-
-                    
-                    if ($category->__update()) {
-                            return 	array(	'success' => true,
-                                            'category' => $category,
-                                            'redirect' => 'index', 
-                                            'detail' => ''); 
-                    } else {
-                            return 	array(	'success' => false,
-                                            'category' => $category,
-                                            'action_form' => 'update&id='.$id, 
-                                            'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
-                    }
-            }
-
-            /**
-             * 
-             *
-             * @param type $id
-             * @return \Array
-             */
-            public function listAction($next = 1, $per_page = 10){
-                
-                    $lazyloading = $this->lazyloading(new Category(), $next, $per_page);
-        
-                    return array('success' => true, // pour le restservice
-                        'lazyloading' => $lazyloading, // pour le web service
-                        'detail' => '');
-
-            }
-
-            public function deleteAction($id){
-
-                     $category = Category::find($id);                                       
-                    
-                    if( $category->__delete() )
-                            return 	array(	'success' => true, // pour le restservice
-                                            'redirect' => 'index', // pour le web service
-                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-                    else
-                            return 	array(	'success' => false, // pour le restservice
-                                                                                                                        'category' => $category,
-                                            'detail' => 'Des problèmes sont survenus lors de la suppression de l\'élément.'); //Detail de l'action ou message d'erreur ou de succes
-            }
+        return array('success' => true, // pour le restservice
+            'lazyloading' => $lazyloading, // pour le web service
+            'detail' => '');
 
     }
+
+    public function showAction($id)
+    {
+
+        $category = Category::find($id);
+
+        return array('success' => true,
+            'category' => $category,
+            'detail' => 'detail de l\'action.');
+
+    }
+
+    public function createAction()
+    {
+        extract($_POST);
+        $this->err = array();
+
+        $category = $this->form_generat(new Category(), $category_form);
+
+        if ($id = $category->__insert()) {
+            return array('success' => true, // pour le restservice
+                'category' => $category,
+                'redirect' => 'index', // pour le web service
+                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        } else {
+            return array('success' => false, // pour le restservice
+                'category' => $category,
+                'action_form' => 'create', // pour le web service
+                'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
+        }
+
+    }
+
+    public function updateAction($id)
+    {
+        extract($_POST);
+
+        $category = $this->form_generat(new Category($id), $category_form);
+
+        if ($category->__update()) {
+            return array('success' => true, // pour le restservice
+                'category' => $category,
+                'redirect' => 'index', // pour le web service
+                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        } else {
+            return array('success' => false, // pour le restservice
+                'category' => $category,
+                'action_form' => 'update&id=' . $id, // pour le web service
+                'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
+        }
+    }
+
+    public function deleteAction($id)
+    {
+
+        Category::delete($id);
+        return array('success' => true, // pour le restservice
+            'redirect' => 'index', // pour le web service
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+    }
+
+
+    public function deletegroupAction($ids)
+    {
+
+        Category::delete()->where("id")->in($ids)->exec();
+
+        return array('success' => true, // pour le restservice
+            'redirect' => 'index', // pour le web service
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+    }
+
+    public function __newAction()
+    {
+
+        return array('success' => true, // pour le restservice
+            'category' => new Category(),
+            'action_form' => 'create', // pour le web service
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+    }
+
+    public function __editAction($id)
+    {
+
+        $category = Category::find($id);
+
+        return array('success' => true, // pour le restservice
+            'category' => $category,
+            'action_form' => 'update&id=' . $id, // pour le web service
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+    }
+
+}

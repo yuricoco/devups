@@ -1,6 +1,6 @@
 <?php
             //ModuleTranslate
-		
+        
         require '../../../admin/header.php';
         
         global $views;
@@ -8,40 +8,51 @@
                 
 
 
-
+    
     define('CHEMINMODULE', ' <a href="index.php" target="_self" class="titre_module">Administration du system global</a> &gt; <a href="index.php?path=layout" target="_self" class="titre_module">Module ModuleTranslate</a> ');
 
+    
+        		$dvups_langCtrl = new Dvups_langController();		$dvups_contentlangCtrl = new Dvups_contentlangController();		
+
+        if(isset($_GET['path'])){
+
+            $path = explode('/', $_GET['path']);
+
+            switch ($_GET['path']) {
+
+                case 'layout':
+                    Genesis::renderBladeView("layout");
+                    break;
+                        
+				case 'dvups_lang/index':
+					Genesis::renderView('dvups_lang.index',  $dvups_langCtrl->listAction(), 'list');
+					break;					
+				case 'dvups_lang/create':
+                    Genesis::renderView( 'dvups_lang.form', $dvups_langCtrl->createAction(), 'error creation', true);
+					break;					
+				case 'dvups_lang/update':
+					Genesis::renderView( 'dvups_lang.form',  $dvups_langCtrl->updateAction($_GET['id']),'error updating', true);
+					break;
 
 
-    $controllers = [
-			'dvups_langCtrl' => new Dvups_langController(),
-		];
+				case 'dvups_contentlang/index':
+					Genesis::renderView('dvups_contentlang.index',  $dvups_contentlangCtrl->listAction(), 'list');
+					break;					
+				case 'dvups_contentlang/create':
+                    Genesis::renderView( 'dvups_contentlang.form', $dvups_contentlangCtrl->createAction(), 'error creation', true);
+					break;					
+				case 'dvups_contentlang/update':
+					Genesis::renderView( 'dvups_contentlang.form',  $dvups_contentlangCtrl->updateAction($_GET['id']),'error updating', true);
+					break;
 
-            if(isset($_GET['path'])){
-
-                    $path = explode('/', $_GET['path']);
-
-                    switch ($path[ENTITY]) {
-
-                            case 'layout':
-                                    Genesis::renderBladeView("layout");
-                                    break;
-                                            
-                            case 'dvups_lang':
-                                    Dvups_langGenesis::genesis($path[VIEW], $controllers);
-                                    break;
-
-                            case 'dvups_lang.rest':
-                                    Dvups_langGenesis::restGenesis($path[VIEW], $controllers);
-                                    break;
 
 		
-                            default:
-                                    echo 'la route n\'existe pas!';
-                                    break;
-                    }
-
-            }else{
-                    Genesis::renderBladeView("layout");
-            }		
+                default:
+                    echo 'la route n\'existe pas!';
+                    break;
+            }
+    
+        }else{
+            Genesis::renderBladeView("layout");
+        }		
         

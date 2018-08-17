@@ -9,7 +9,7 @@
                             <div class="col-lg-12">
                                     <ol class="breadcrumb">
                                             <li class="active">
-                                                    <i class="fa fa-dashboard"></i> <?= CHEMINMODULE; ?>  > Ajout 
+                                                    <i class="fa fa-dashboard"></i> <?php echo CHEMINMODULE; ?>  > Ajout 
                                             </li>
                                     </ol>
                             </div>
@@ -17,11 +17,11 @@
                     </div>
                     <div class="row">
                                     
-			<div class="col-lg-12" >
+                    <div class="col-lg-12" >
 
                                     <?= CategoryForm::__renderForm($category, $action_form, true); ?>
 
                         </div>
                     <div>        
-                    
-        @endsection
+         
+@endsection

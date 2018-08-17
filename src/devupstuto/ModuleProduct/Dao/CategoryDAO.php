@@ -1,9 +1,9 @@
 <?php 
 
-    class CategoryDAO extends DBAL{
-
-            public function __construct() {
-                    parent::__construct(new Category());
-            }
-
-    }
+	class CategoryDAO extends DBAL{
+			
+		public function __construct() {
+			parent::__construct(new Category());
+		}			
+		
+	}

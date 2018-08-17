@@ -18,8 +18,16 @@
      (new Request('hello'));
 
      switch (Request::get('path')) {
-                
-        case 'dvups_admin._new':
+
+         case 'dvups_entity.updatelabel':
+             g::json_encode(Dvups_entityController::updatelabel($_GET['id'], $_GET['label']));
+             break;
+
+         case 'dvups_module.updatelabel':
+             g::json_encode(Dvups_moduleController::updatelabel($_GET['id'], $_GET['label']));
+             break;
+
+         case 'dvups_admin._new':
                 g::json_encode(Dvups_adminController::renderForm());
                 break;
         case 'dvups_admin._edit':
@@ -116,7 +124,7 @@
 
 	
         default:
-            echo json_encode("404 : page note found");
+            echo json_encode("404 : page  '".Request::get('path')."' note found");
             break;
      }
 

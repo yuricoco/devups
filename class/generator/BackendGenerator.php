@@ -285,7 +285,10 @@ class BackendGenerator {
         $classController = fopen('Controller/' . ucfirst($name) . 'Controller.php', 'w');
 
         $contenu = "<?php \n
-    class " . ucfirst($name) . "Controller extends Controller{
+
+use DClass\devups\Datatable as Datatable;
+
+class " . ucfirst($name) . "Controller extends Controller{
 
 
     public static function renderFormWidget($" . "id = null) {
@@ -315,7 +318,8 @@ class BackendGenerator {
     public function datatable($" . "next, $" . "per_page) {
         $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
         return ['success' => true,
-            'tablebody' => Genesis::getTableRest($" . "lazyloading)
+            'tablebody' => Datatable::getTableRest($" . "lazyloading),
+            'tablepagination' => Datatable::pagination($" . "lazyloading)
         ];
     }
 
@@ -500,7 +504,7 @@ class BackendGenerator {
     /* CREATION OF CORE */
 
     public function coreGenerator($entityname) {
-        require ROOT . 'requires.php';
+        require ROOT . 'src/requires.php';
         global $em;
 
         $classmetadata = (array) $em->getClassMetadata("\\". $entityname);

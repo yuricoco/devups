@@ -26,6 +26,22 @@ function url_format($str, $charset='utf-8')
     return '/' .strtolower($str);
 }
 
+function remove_accents($str, $charset='utf-8')
+{
+    $str = htmlentities($str, ENT_NOQUOTES, $charset);
+
+    $str = preg_replace('#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
+    $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str); // pour les ligatures e.g. '&oelig;'
+    $str = preg_replace('#&[^;]+;#', '', $str); // supprime les autres caractères
+//    $str = str_replace('\'', '.', $str); // supprime les autres caractères
+//    $str = str_replace('"', '.', $str); // supprime les autres caractères
+
+    return strtolower($str);
+}
+
+function clean($string) {
+    return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
+}
 
 global $__lang;
 if(!isset($_SESSION["__lang"] )){

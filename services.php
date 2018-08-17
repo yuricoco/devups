@@ -13,8 +13,6 @@ $subcategoryCtrl = new SubcategoryController();
 $productCtrl = new ProductController();
 $imageCtrl = new ImageController();
 
-
-
 (new Request('hello'));
 
 switch (Request::get('path')) {

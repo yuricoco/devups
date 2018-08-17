@@ -43,7 +43,7 @@ class Form extends FormFactory{
         
 //        $_SESSION[Form::$name ] = Form::$fields;
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
-        $dvups_form = "<textarea style='display=none;' name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
+        $dvups_form = "<textarea style='display:none;' name='dvups_form[".Form::$name."]' >".serialize(Form::$fields)."</textarea>";
         return $dvups_form."</form>";
     }
     

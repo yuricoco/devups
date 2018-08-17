@@ -498,12 +498,16 @@ class DBAL extends Database {
 
         $id = $this->executeDbal($sql, $values, 1);
         $this->object->setId($id);
-
-        if (isset($this->objectCollection) && is_array($this->objectCollection) && !empty($this->objectCollection)) {
-
-            $this->manyToManyAdd($id, false, null);
+        
+        // implement translation if anabled in class
+        if(method_exists($this->object, 'dvupsTranslate')){
+            $this->object->dvupsTranslate();
         }
 
+        if (isset($this->objectCollection) && is_array($this->objectCollection) && !empty($this->objectCollection)) {
+            $this->manyToManyAdd($id, false, null);
+        }
+        
         return $this->object->getId();
     }
 
@@ -538,6 +542,11 @@ class DBAL extends Database {
 
         $result = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
+        // implement translation if anabled in class
+        if(method_exists($this->object, 'dvupsTranslate')){
+            $this->object->dvupsTranslate();
+        }
+        
         $this->manyToManyDelete($this->objectValue[0], $_ENTITY_COLLECTION);
 
         if (isset($this->objectCollection) && is_array($this->objectCollection) && !empty($this->objectCollection)) {
@@ -563,30 +572,30 @@ class DBAL extends Database {
         return $flowBD;
     }
 
-    public function findAllDbalBaseEntity($critere = "") {
-        $sql = 'select * from `' . $this->table . '`' . $critere;
-        $query = $this->link->prepare($sql);
-        $query->execute();
-        $flowBD = $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
-
-        return $flowBD;
-    }
-
-    public function findAllDbalEntireEntity($list = false, $object = null) {
-
-        if ($object):
-            $this->instanciateVariable($object);
-        endif;
-
-        $sql = 'select * from `' . $this->table . '`';
-        if (!empty($this->entity_link_list)) {
-            foreach ($this->entity_link_list as $entity_link) {
-                $sql .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
-            }
-        }
-
-        return $this->__findAll($sql, [], false, true);
-    }
+//    public function findAllDbalBaseEntity($critere = "") {
+//        $sql = 'select * from `' . $this->table . '`' . $critere;
+//        $query = $this->link->prepare($sql);
+//        $query->execute();
+//        $flowBD = $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
+//
+//        return $flowBD;
+//    }
+//
+//    public function findAllDbalEntireEntity($list = false, $object = null) {
+//
+//        if ($object):
+//            $this->instanciateVariable($object);
+//        endif;
+//
+//        $sql = 'select * from `' . $this->table . '`';
+//        if (!empty($this->entity_link_list)) {
+//            foreach ($this->entity_link_list as $entity_link) {
+//                $sql .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
+//            }
+//        }
+//
+//        return $this->__findAll($sql, [], false, true);
+//    }
 
     public function findByIdDbal($object = null, $recursif = true, $collection = false) {
 

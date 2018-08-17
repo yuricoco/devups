@@ -11,15 +11,15 @@
 					break;
 					
 				case '_new':
-                                                                                                            Genesis::renderView( 'category.form',  $categoryCtrl->__newAction(), 'new');
+                    Genesis::renderView( 'category.form',  $categoryCtrl->__newAction(), 'new');
 					break;
 					
 				case 'create':
-                                                                                                            Genesis::renderView( 'category.form', $categoryCtrl->createAction(), 'error creation', true);
+                    Genesis::renderView( 'category.form', $categoryCtrl->createAction(), 'error creation', true);
 					break;
 					
 				case '_edit':
-                                                                                                            Genesis::renderView( 'category.form',  $categoryCtrl->__editAction($_GET['id']), 'edite');
+                    Genesis::renderView( 'category.form',  $categoryCtrl->__editAction($_GET['id']), 'edite');
 					break;
 					
 				case 'update':
@@ -27,11 +27,11 @@
 					break;
 					
 				case 'show':
-                                                                                                                Genesis::renderView( 'category.show', $categoryCtrl->showAction($_GET['id']), 'Show');
+                    Genesis::renderView( 'category.show', $categoryCtrl->showAction($_GET['id']), 'Show');
 					break;
 					
 				case 'delete':
-                                                                                                                Genesis::renderView( 'category.show', $categoryCtrl->deleteAction($_GET['id']), 'delete', true);
+                    Genesis::renderView( 'category.show', $categoryCtrl->deleteAction($_GET['id']), 'delete', true);
 					break;
                                         
 				default:
@@ -44,7 +44,6 @@
 			extract($controllers);
 			
 			switch($view){
-				
 				case 'index':
 					echo json_encode($categoryCtrl->listAction());
 					break;

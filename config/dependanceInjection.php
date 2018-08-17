@@ -22,6 +22,7 @@ require __DIR__ . '/../class/devups/DBAL.php';
 require __DIR__ . '/../class/devups/QueryBuilder.php';
 require __DIR__ . '/../class/devups/Dfile.php';
 require __DIR__ . '/../class/devups/Model.php';
+require __DIR__ . '/../class/devups/DvupsTranslation.php';
 require __DIR__ . '/../class/devups/EntityCollection.php';
 require __DIR__ . '/../class/devups/Controller.php';
 require __DIR__ . '/../class/devups/Genesis.php';

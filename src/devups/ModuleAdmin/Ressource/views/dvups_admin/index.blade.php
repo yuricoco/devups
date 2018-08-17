@@ -12,9 +12,7 @@
 @section('content')
 
 <?php
-            function callbackbtn($entity){
-                return "<a class='btn btn-default' href='index.php?path=dvups_admin/resetcredential&id=".$entity->getId()."'>reset password</a>";
-            };
+
 
 ?>
         <div class="row">
@@ -33,9 +31,9 @@
                 <div class="table-responsive">
 
                  <?= \DClass\devups\Datatable::renderdata($lazyloading, [
-                    ['header' => 'nom', 'value' => 'name'],
-                    ['header' => 'login', 'value' => 'login'],
-                        ]);
+                        ['header' => 'nom', 'value' => 'name'],
+                        ['header' => 'login', 'value' => 'login'],
+                    ], "callbackbtn");
                 ?>
 
 
@@ -43,7 +41,26 @@
         </div>
 			
         </div>
-        
+
+<div class="modal fade" id="dvups_adminmodal" tabindex="-1" role="dialog"
+     aria-labelledby="modallabel">
+    <div  class="modal-dialog" role="document">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"
+                        aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h3 class="title" id="modallabel">Modal Label</h3>
+            </div>
+            <div class="modal-body panel generalinformation"> </div>
+            <div class="modal-footer">
+                <button data-dismiss="modal" aria-label="Close" type="button" class="btn btn-danger" >Close</button>
+            </div>
+
+        </div>
+
+    </div>
+</div>
 @endsection
 
 @section('jsimport')

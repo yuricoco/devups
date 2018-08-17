@@ -11,15 +11,15 @@
 					break;
 					
 				case '_new':
-                                                                                                            Genesis::renderView( 'dvups_right.form',  $dvups_rightCtrl->__newAction(), 'new');
+                    Genesis::renderView( 'dvups_right.form',  $dvups_rightCtrl->__newAction(), 'new');
 					break;
 					
 				case 'create':
-                                                                                                            Genesis::renderView( 'dvups_right.form', $dvups_rightCtrl->createAction(), 'error creation', true);
+                    Genesis::renderView( 'dvups_right.form', $dvups_rightCtrl->createAction(), 'error creation', true);
 					break;
 					
 				case '_edit':
-                                                                                                            Genesis::renderView( 'dvups_right.form',  $dvups_rightCtrl->__editAction($_GET['id']), 'edite');
+                    Genesis::renderView( 'dvups_right.form',  $dvups_rightCtrl->__editAction($_GET['id']), 'edite');
 					break;
 					
 				case 'update':
@@ -27,11 +27,11 @@
 					break;
 					
 				case 'show':
-                                                                                                                Genesis::renderView( 'dvups_right.show', $dvups_rightCtrl->showAction($_GET['id']), 'Show');
+                    Genesis::renderView( 'dvups_right.show', $dvups_rightCtrl->showAction($_GET['id']), 'Show');
 					break;
 					
 				case 'delete':
-                                                                                                                Genesis::renderView( 'dvups_right.show', $dvups_rightCtrl->deleteAction($_GET['id']), 'delete', true);
+                    Genesis::renderView( 'dvups_right.show', $dvups_rightCtrl->deleteAction($_GET['id']), 'delete', true);
 					break;
                                         
 				default:

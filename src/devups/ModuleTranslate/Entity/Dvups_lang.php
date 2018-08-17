@@ -10,30 +10,26 @@
          * */
         protected $id;
         /**
-         * @Column(name="lable", type="string" , length=150 )
+         * @Column(name="ref", type="string" , length=150 )
          * @var string
          **/
-        private $lable;
+        private $ref;
         /**
          * @Column(name="_table", type="string" , length=55 )
          * @var string
          **/
         private $_table;
         /**
-         * @Column(name="_row", type="integer"  )
-         * @var integer
-         **/
-        private $_row;
-        /**
-         * @Column(name="lang", type="string" , length=2 )
+         * @Column(name="_row", type="integer" )
          * @var string
          **/
-        private $lang;
+        private $_row;
+
         /**
-         * @Column(name="content", type="text"  )
-         * @var text
+         * @Column(name="_column", type="string" , length=55 )
+         * @var string
          **/
-        private $content; 
+        private $_column;
         
 
         
@@ -46,12 +42,12 @@
         public function getId() {
             return $this->id;
         }
-        public function getLable() {
-            return $this->lable;
+        public function getRef() {
+            return $this->ref;
         }
 
-        public function setLable($lable) {
-            $this->lable = $lable;
+        public function setRef($ref) {
+            $this->ref = $ref;
         }
         
         public function get_table() {
@@ -62,39 +58,39 @@
             $this->_table = $_table;
         }
         
-        public function get_row() {
+        public function get_column() {
+            return $this->_column;
+        }
+
+        public function set_column($_column) {
+            $this->_column = $_column;
+        }
+
+        /**
+         * @return string
+         */
+        public function getRow()
+        {
             return $this->_row;
         }
 
-        public function set_row($_row) {
-            $this->_row = $_row;
-        }
-        
-        public function getLang() {
-            return $this->lang;
-        }
-
-        public function setLang($lang) {
-            $this->lang = $lang;
-        }
-        
-        public function getContent() {
-            return $this->content;
-        }
-
-        public function setContent($content) {
-            $this->content = $content;
+        /**
+         * @param string $row
+         */
+        public function setRow($row)
+        {
+            $this->_row = $row;
         }
         
         
         public function jsonSerialize() {
                 return [
                         'id' => $this->id,
-                                'lable' => $this->lable,
-                                '_table' => $this->_table,
-                                '_row' => $this->_row,
-                                'lang' => $this->lang,
+                                'ref' => $this->ref,
                                 'content' => $this->content,
+                                '_table' => $this->_table,
+                                '_column' => $this->_column,
+                                'lang' => $this->lang,
                 ];
         }
         

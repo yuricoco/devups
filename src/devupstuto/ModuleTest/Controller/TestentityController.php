@@ -50,17 +50,6 @@ class TestentityController extends Controller
 
     }
 
-    public function showAction($id)
-    {
-
-        $testentity = Testentity::find($id);
-
-        return array('success' => true,
-            'testentity' => $testentity,
-            'detail' => 'detail de l\'action.');
-
-    }
-
     public function createAction()
     {
         extract($_POST);

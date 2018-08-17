@@ -92,14 +92,14 @@ class Controller extends DBAL {
     public function lazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = "") {//
         $remain = true;
         $qb = new QueryBuilder($entity);
-
+        $classname = strtolower(get_class($entity));
         if (isset($_GET['next']) && isset($_GET['per_page']))
             extract($_GET);
 
         if(isset($_GET['order'])){
             $order = $_GET['order'];
             if($entity->inrelation())
-                $order = strtolower(get_class($entity)).".".$_GET['order'];
+                $order = $classname.".".$_GET['order'];
         }elseif(isset($_GET['orderjoin']))
             $order = strtolower($_GET['orderjoin']);
 
@@ -167,6 +167,7 @@ class Controller extends DBAL {
         }
 
         return array('success' => true, // pour le restservice
+            'classname' => $classname,
             'listEntity' => $listEntity,
             'nb_element' => $nb_element,
             'per_page' => $per_page,

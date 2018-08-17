@@ -14,6 +14,7 @@ namespace DClass\devups;
  */
 class Datatable {
     private $entity = null;
+    private static $class;
     
     static function init(\stdClass $entity, $next = 0, $per_page = 10) {
         $dt = new Datatable();
@@ -77,31 +78,31 @@ class Datatable {
     }
 
     public static function renderdata($lazyloading, $header, $action = true, $defaultaction = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
-
-        $path = explode('/', $_GET['path']);
+        self::$class = $lazyloading['classname'];
         if (!$lazyloading['listEntity']) {
-            return '<div id="dv_table" data-entity="'.$path[0].'" class="text-center">la liste est vide</div>';
+            return '<div id="dv_table" data-entity="'.$lazyloading['classname'].'" class="text-center">la liste est vide</div>';
         }
 
-        $html = '<div class="row">
-<style>
-th{position: relative;}
-.torder{z-index: 3; position: absolute; top:0; right: 0; padding: 15px 12px}
-.loader{
-position: absolute;
-    top: 0;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 3;
-    padding: 25% 0;
-    text-align: center;
-    color: white;
-    font-size: 50px;
-    background: rgba(51,122,183,0.3);
-}
-</style>
-<form id="datatable-form" action="index.php" method="get" >
+        $html = '
+<form id="datatable-form" action="#" method="get" >
+    <div class="row">
+    <style>
+        th{position: relative;}
+        .torder{z-index: 3; position: absolute; top:0; right: 0; padding: 15px 12px}
+        .loader{
+        position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            padding: 25% 0;
+            text-align: center;
+            color: white;
+            font-size: 50px;
+            background: rgba(51,122,183,0.3);
+        }
+    </style>
 
     <div class="col-lg-12 col-md-12"><div class="table-responsive">';
         $html .= self::tablefilter($lazyloading['current_page']);
@@ -113,6 +114,7 @@ position: absolute;
         $html .= self::pagination($lazyloading);
 
         $html .= "</form></div>";
+
         return $html;
     }
 
@@ -148,10 +150,6 @@ position: absolute;
         if (!$lazyloading['listEntity']) {
             return' no page';
         }
-
-        $uri = explode('&next=', $_SERVER['REQUEST_URI']);
-
-        $url = $uri[0];
 
         $html = '<div id="dv_pagination" class="row">
             <div id="pagination-notice" data-notice="' . $pagination . '" class="col-lg-6 col-md-6">Showing ' . ( ($current_page - 1) * $per_page + 1) . ' to ' . $per_page * $current_page . ' of ' . $nb_element . '</div>
@@ -268,14 +266,11 @@ position: absolute;
         return '<table id="dv_table" data-entity="" class="table table-bordered table-hover table-striped" ><thead><tr>' . implode(" ", $th) . '</tr></thead><tbody>' . implode(" ", $tb) . '</tbody></table>';
     }
 
-    private static $class;
     public static function renderListViewUI($list, $header, $action = false, $defaultaction = true) {
-        $path = explode('/', $_GET['path']);
-        if (!$list) {
-            return '<div id="dv_table" data-entity="'.$path[0].'" class="text-center">la liste est vide</div>';
-        }
 
-        self::$class = strtolower(get_class($list[0]));
+        if (!$list) {
+            return '<div id="dv_table" data-entity="'.self::$class.'" class="text-center">la liste est vide</div>';
+        }
 
         $_SESSION['dv_datatable'] = ['header' => $header, 'action' => $action, 'defaultaction' => $defaultaction];
 
@@ -291,10 +286,10 @@ position: absolute;
 
     public static function getTableRest($lazyloading) {
         extract($_SESSION["dv_datatable"]);
-        $path = explode('/', $_GET['path']);
+        self::$class = $lazyloading["classname"];
 
         if (!$lazyloading["listEntity"]) {
-            return '<div id="dv_table" data-entity="'.$path[0].'" class="text-center">la liste est vide</div>';
+            return '<div id="dv_table" data-entity="'.self::$class.'" class="text-center">la liste est vide</div>';
         }
         return self::getTableBody($lazyloading["listEntity"], $header, $action, $defaultaction);
     }
@@ -336,8 +331,6 @@ position: absolute;
     }
 
     private static function getTableBody($list, $header, $action = false, $defaultaction = true) {
-        $path = explode('/', $_GET['path']);
-        $class = $path[0];
 
         foreach ($list as $entity) {
             $tr = [];
@@ -398,15 +391,15 @@ position: absolute;
             $dact = "";
             $act = "";
             if ($defaultaction) {
-                $dact = self::actionListView($class, $entity->getId(), '');
+                $dact = self::actionListView(self::$class, $entity->getId(), '');
             }
 
             // the user may write the method in the entity for better code practice
-//            if (!is_bool($action)) {
-//                $act = $action($entity);
-//            }
+            if (!is_bool($action)) {
+                $act = call_user_func(array($entity, $action.'Action'));
+            }
 
-            $tr[] = '<td>' . $dact . $act . '</td>';
+            $tr[] = '<td>' .  $act . $dact . '</td>';
 
             $tb[] = '<tr id="' . $entity->getId() . '" >' . implode(" ", $tr) . '</tr>';
         }
