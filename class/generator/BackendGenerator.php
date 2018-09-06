@@ -323,31 +323,31 @@ class " . ucfirst($name) . "Controller extends Controller{
         ];
     }
 
-            public function listAction($" . "next = 1, $" . "per_page = 10){
+    public function listAction($" . "next = 1, $" . "per_page = 10){
 
-                $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+        $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
 
-                return array('success' => true, // pour le restservice
-                    'lazyloading' => $" . "lazyloading, // pour le web service
-                    'detail' => '');
+        return array('success' => true, // pour le restservice
+            'lazyloading' => $" . "lazyloading, // pour le web service
+            'detail' => '');
 
-            }
-            
-            public  function showAction($" . "id){
+    }
+    
+    public  function showAction($" . "id){
 
-                    $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
 
-                    return array( 'success' => true, 
-                                    '" . $name . "' => $" . $name . ",
-                                    'detail' => 'detail de l\'action.');
+            return array( 'success' => true, 
+                            '" . $name . "' => $" . $name . ",
+                            'detail' => 'detail de l\'action.');
 
-            }
+    }
 
-            public function createAction(){
-                    extract($" . "_POST);
-                    $" . "this->err = array();
+    public function createAction(){
+        extract($" . "_POST);
+        $" . "this->err = array();
 
-                    $" . $name . " = $" . "this->form_generat(new " . ucfirst($name) . "(), $" . $name . "_form);\n ";
+        $" . $name . " = $" . "this->form_generat(new " . ucfirst($name) . "(), $" . $name . "_form);\n ";
         // gestion des relations many to many dans le controller
         $mtm = [];
         $mtmedit = [];
@@ -358,29 +358,29 @@ class " . ucfirst($name) . "Controller extends Controller{
 
                 if ($relation->cardinality == "oneToOne") {
                     $contenu .= "
-                        $" . $relation->entity . "Ctrl = new " . ucfirst($relation->entity) . "Controller();
-                        extract($" . $relation->entity . "Ctrl->createAction());
-                        $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . "); ";
+        $" . $relation->entity . "Ctrl = new " . ucfirst($relation->entity) . "Controller();
+        extract($" . $relation->entity . "Ctrl->createAction());
+        $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . "); ";
                 } elseif (false) {//$relation->cardinality == "manyToMany" &&
                     $mtm[] = "
-                        if (!empty($" . "id_" . $relation->entity . ")){
-                                foreach($" . "id_" . $relation->entity . " as $" . "id){
-                                        $" . $relation->entity . "Dao = new " . ucfirst($relation->entity) . "DAO();
-                                        $" . $name . "->add" . ucfirst($relation->entity) . "($" . $relation->entity . "Dao->findById($" . "id));
-                                }
-                        }";
+        if (!empty($" . "id_" . $relation->entity . ")){
+                foreach($" . "id_" . $relation->entity . " as $" . "id){
+                        $" . $relation->entity . "Dao = new " . ucfirst($relation->entity) . "DAO();
+                        $" . $name . "->add" . ucfirst($relation->entity) . "($" . $relation->entity . "Dao->findById($" . "id));
+                }
+        }";
 
                     $mtmedit[] = "
-                        if (!empty($" . "id_" . $relation->entity . ") && 
-                                        $" . "update_collection = $" . "this->updateEntityCollection($" . "_GET['collection'], $" . "id_" . $relation->entity . ")){
-                                $" . $name . "->remove" . ucfirst($relation->entity) . "();
-                                foreach($" . "id_" . $relation->entity . " as $" . "id){
-                                        $" . $relation->entity . "Dao = new " . ucfirst($relation->entity) . "DAO();
-                                        $" . $name . "->add" . ucfirst($relation->entity) . "($" . $relation->entity . "Dao->findById($" . "id));
-                                }
-                        }else
-                                $" . $name . "->drop" . ucfirst($relation->entity) . "Collection();
-                                $" . "update_collection = true;\n";
+        if (!empty($" . "id_" . $relation->entity . ") && 
+                        $" . "update_collection = $" . "this->updateEntityCollection($" . "_GET['collection'], $" . "id_" . $relation->entity . ")){
+                $" . $name . "->remove" . ucfirst($relation->entity) . "();
+                foreach($" . "id_" . $relation->entity . " as $" . "id){
+                        $" . $relation->entity . "Dao = new " . ucfirst($relation->entity) . "DAO();
+                        $" . $name . "->add" . ucfirst($relation->entity) . "($" . $relation->entity . "Dao->findById($" . "id));
+                }
+        }else
+                $" . $name . "->drop" . ucfirst($relation->entity) . "Collection();
+                $" . "update_collection = true;\n";
                     $iter++;
                 }
             }
@@ -393,32 +393,33 @@ class " . ucfirst($name) . "Controller extends Controller{
 //			for($i = 1; $i < count($entity->attribut); $i++){
                 if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
                     $contenu .= "
-                        $".$name ."->savefile('" . $attribut->name . "');
-                        ";
+            $".$name ."->savefile('" . $attribut->name . "');
+            ";
             }
         }
 
         $contenu .= "
-                    if ( $" . "id = $" . $name . "->__insert()) {
-                            return 	array(	'success' => true, // pour le restservice
-                                            '" . $name . "' => $" . $name . ",
-                                            'redirect' => 'index', // pour le web service
-                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-                    } else {
-                            return 	array(	'success' => false, // pour le restservice
-                                            '" . $name . "' => $" . $name . ",
-                                            'action_form' => 'create', // pour le web service
-                                            'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
-                    }
+        if ( $" . "id = $" . $name . "->__insert()) {
+            return 	array(	'success' => true, // pour le restservice
+                            '" . $name . "' => $" . $name . ",
+                            'tablerow' => Datatable::getSingleRowRest($" . $name . "),
+                            'redirect' => 'index', // pour le web service
+                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        } else {
+            return 	array(	'success' => false, // pour le restservice
+                            '" . $name . "' => $" . $name . ",
+                            'action_form' => 'create', // pour le web service
+                            'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
+        }
 
-            }
+    }
 
-            public function updateAction($" . "id){
-                    extract($" . "_POST);
-                        
-                    $" . $name . " = $" . "this->form_generat(new " . ucfirst($name) . "($" . "id), $" . $name . "_form);
+    public function updateAction($" . "id){
+        extract($" . "_POST);
+            
+        $" . $name . " = $" . "this->form_generat(new " . ucfirst($name) . "($" . "id), $" . $name . "_form);
 
-                    "; //.implode($mtmedit, "\n")
+            "; //.implode($mtmedit, "\n")
         if ($otherattrib):
             foreach ($entity->attribut as $attribut) {
 //                            for($i = 1; $i < count($entity->attribut); $i++){
@@ -428,73 +429,76 @@ class " . ucfirst($name) . "Controller extends Controller{
             }
         endif;
         $contenu .= "
-                    if ($" . $name . "->__update()) {
-                            return 	array('success' => true, // pour le restservice
-                                            '" . $name . "' => $" . $name . ",
-                                            'redirect' => 'index', // pour le web service
-                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-                    } else {
-                            return 	array('success' => false, // pour le restservice
-                                            '" . $name . "' => $" . $name . ",
-                                            'action_form' => 'update&id='.$" . "id, // pour le web service
-                                            'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
-                    }
-            }
-            
-            public function deleteAction($" . "id){
-			";
-        if ($otherattrib):
+        if ($" . $name . "->__update()) {
+            return 	array('success' => true, // pour le restservice
+                            '" . $name . "' => $" . $name . ",
+                            'id' => $" . "id,
+                            'tablerow' => Datatable::getSingleRowRest($" . $name . "),
+                            'redirect' => 'index', // pour le web service
+                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        } else {
+            return 	array('success' => false, // pour le restservice
+                            '" . $name . "' => $" . $name . ",
+                            'action_form' => 'update&id='.$" . "id, // pour le web service
+                            'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
+        }
+    }
+    
+    public function deleteAction($" . "id){
+    ";
+        //if ($otherattrib):
+        if (false):
             // add and attribut to alert about media attib in entity
             foreach ($entity->attribut as $attribut) {
                 if (in_array($attribut->formtype, ['document', 'image', 'musique', 'video']))
                     $contenu .= " 
-                $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-                $" . $name . "->deleteFile($" . $name . "->get" . ucfirst($attribut->name) . "(), '" . $name . "');
-                $" . $name . "->__delete()";
+        $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+        $" . $name . "->deleteFile($" . $name . "->get" . ucfirst($attribut->name) . "(), '" . $name . "');
+        $" . $name . "->__delete()";
             }
         else:
             $contenu .= "  
             " . ucfirst($name) . "::delete($" . "id);";
         endif;
         $contenu .= "
-                return 	array(	'success' => true, // pour le restservice
-                                'redirect' => 'index', // pour le web service
-                                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-            }
-            
-
-            public function deletegroupAction($" . "ids)
-            {
-        
-                " . ucfirst($name) . "::delete()->where(\"id\")->in($" . "ids)->exec();
-        
-                return array('success' => true, // pour le restservice
+        return 	array(	'success' => true, // pour le restservice
                         'redirect' => 'index', // pour le web service
                         'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        
-            }
+    }
+    
 
-            public function __newAction(){
+    public function deletegroupAction($" . "ids)
+    {
 
-                    return 	array(	'success' => true, // pour le restservice
-                                    '" . $name . "' => new " . ucfirst($name) . "(),
-                                    'action_form' => 'create', // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        " . ucfirst($name) . "::delete()->where(\"id\")->in($" . "ids)->exec();
 
-            }
+        return array('success' => true, // pour le restservice
+                'redirect' => 'index', // pour le web service
+                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
-            public function __editAction($" . "id){
+    }
 
-                   $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+    public function __newAction(){
 
-                    return array('success' => true, // pour le restservice
-                                    '" . $name . "' => $" . $name . ",
-                                    'action_form' => 'update&id='.$" . "id, // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return 	array(	'success' => true, // pour le restservice
+                        '" . $name . "' => new " . ucfirst($name) . "(),
+                        'action_form' => 'create', // pour le web service
+                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
-            }
+    }
 
-	}\n";
+    public function __editAction($" . "id){
+
+       $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+
+        return array('success' => true, // pour le restservice
+                        '" . $name . "' => $" . $name . ",
+                        'action_form' => 'update&id='.$" . "id, // pour le web service
+                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+    }
+
+}\n";
         fputs($classController, $contenu);
         //fputs($classController, "\n}\n");
 
@@ -681,7 +685,9 @@ class " . ucfirst($name) . "Controller extends Controller{
             $" . "entitycore->formbutton = $" . "button;
                 
             " . $field . "
-
+            
+            $" . "entitycore->addDformjs();
+            
             return $" . "entitycore;
         }
         
@@ -715,9 +721,9 @@ class " . ucfirst($name) . "Controller extends Controller{
 
             $field .= "<div class='form-group'>\n<label for='" . $attribut->name . "'>" . ucfirst($attribut->name) . "</label>\n";
 
-            if ($attribut->nullable == 'default') {
-                $field .= "\tFH_REQUIRE => false,\n ";
-            }
+//            if ($attribut->nullable == 'default') {
+//                $field .= "\tFH_REQUIRE => false,\n ";
+//            }
 
             if ($attribut->formtype == 'text' or $attribut->formtype == 'float') {
                 $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
@@ -916,11 +922,13 @@ class " . ucfirst($name) . "Controller extends Controller{
         $field = $this->formwidget($entity, $listmodule);
 
         $contenu = "
-    <?= Form::open($" . $name . ", [\"action\"=> \" $" . "action_form\", \"method\"=> \"post\"]) ?>
+    <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action_form\", \"method\"=> \"post\"]) ?>
 
      " . $field . "
        
     <?= Form::submit(\"save\", ['class' => 'btn btn-success']) ?>
+    
+    <?= Form::addDformjs() ?>
     
     <?= Form::close() ?>";
 

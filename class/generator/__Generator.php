@@ -207,8 +207,8 @@ Usage:
     public static function core($namespace, $project) {
 
         $ns = explode("\\", $namespace);
-        __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__core($ns[2]);
+        //__Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::__core($ns[2], $ns[1]);
 
     }
     /**
@@ -288,10 +288,11 @@ Usage:
         __Generator::__entity($entity, $project);
     }
 
-    private static function __core($entity){
+    private static function __core($entity, $module){
 
         $backend = new BackendGenerator();
-        $repertoire = ucfirst(__Generator::$modulecore->name);
+        $repertoire = ucfirst($module);
+        //$repertoire = ucfirst(__Generator::$modulecore->name);
         chdir($repertoire);
 
         $backend->coreGenerator($entity);
@@ -328,8 +329,8 @@ Usage:
         if ($crud['entity'])
             $backend->entityGenerator($entity);
 
-        if ($crud['dao'])
-            $backend->daoGenerator($entity);
+//        if ($crud['dao'])
+//            $backend->daoGenerator($entity);
 
         if ($crud['ctrl'])
             $backend->controllerGenerator($entity);
@@ -343,8 +344,8 @@ Usage:
         if (isset($crud['detailwidget']) && $crud['detailwidget'])
             $backend->detailWidgetGenerator($entity, $project->listmodule);
 
-        if ($crud['genes'])
-            $rootgenerate->entityRooting($entity);
+//        if ($crud['genes'])
+//            $rootgenerate->entityRooting($entity);
 
         if ($crud['views']) {
             if (!file_exists('Ressource'))
@@ -402,14 +403,14 @@ Usage:
         }
         /* ENTITYDAO */
 
-        if (!file_exists("Dao")) {
-            mkdir('Dao', 0777);
-        }
+//        if (!file_exists("Dao")) {
+//            mkdir('Dao', 0777);
+//        }
         /* ENTITYDAO */
 
-        if (!file_exists("Genesis")) {
-            mkdir('Genesis', 0777);
-        }
+//        if (!file_exists("Genesis")) {
+//            mkdir('Genesis', 0777);
+//        }
         /* CONTROLLER */
 
         if (!file_exists("Controller")) {
@@ -477,10 +478,10 @@ Usage:
 
             $package .= "
     require 'Entity/" . $name . ".php';
-    require 'Dao/" . $name . "DAO.php';
+    //require 'Dao/" . $name . "DAO.php';
     require 'Form/" . $name . "Form.php';
     require 'Controller/" . $name . "Controller.php';
-    require 'Genesis/" . $name . "Genesis.php';\n";
+    //require 'Genesis/" . $name . "Genesis.php';\n";
         }
 
         //$filename = strtolower(str_replace('/', '.', $module->name));
@@ -502,41 +503,36 @@ Usage:
 
         $contenu .= "\t\t
 
-        if(isset($" . "_GET['path'])){
+(new Request('layout'));
 
-            $" . "path = explode('/', $" . "_GET['path']);
+switch (Request::get('path')) {
 
-            switch ($" . "_GET['path']) {
-
-                case 'layout':
-                    Genesis::renderBladeView(\"layout\");
-                    break;
-                        ";
+    case 'layout':
+        Genesis::renderBladeView(\"layout\");
+        break;
+        ";
 
         foreach ($modulelistentity as $entity) {
             $name = strtolower($entity->name);
             $contenu .= "
-				case '" . $name . "/index':
-					Genesis::renderView('".$name.".index',  $".$name."Ctrl->listAction(), 'list');
-					break;					
-				case '" . $name . "/create':
-                    Genesis::renderView( '".$name.".form', $".$name."Ctrl->createAction(), 'error creation', true);
-					break;					
-				case '" . $name . "/update':
-					Genesis::renderView( '".$name.".form',  $".$name."Ctrl->updateAction($"."_GET['id']),'error updating', true);
-					break;\n\n";
+    case '" . $name . "/index':
+        Genesis::renderView('".$name.".index',  $".$name."Ctrl->listAction());
+        break;					
+    case '" . $name . "/create':
+        Genesis::renderView( '".$name.".form', $".$name."Ctrl->createAction(), true);
+        break;					
+    case '" . $name . "/update':
+        Genesis::renderView( '".$name.".form',  $".$name."Ctrl->updateAction($"."_GET['id']), true);
+        break;\n\n";
         }
 
         $contenu .= "\n\t\t
-                default:
-                    echo 'la route n\'existe pas!';
-                    break;
-            }
+    default:
+        Genesis::renderView('404', ['page' => Request::get('path')]);
+        break;
+}
     
-        }else{
-            Genesis::renderBladeView(\"layout\");
-        }		
-        ";
+    ";
 
         fputs($root, $contenu);
         fclose($root);
@@ -579,7 +575,7 @@ Usage:
         $contenu .= "\t\t
      (new Request('hello'));
 
-     switch (Request::get('path')) {
+     switch (R::get('path')) {
                 ";
 
         foreach ($modulelistentity as $entity) {
@@ -587,19 +583,25 @@ Usage:
             $contenu .= "
         case '" . $name . "._new':
                 g::json_encode(" . ucfirst($name) . "Controller::renderForm());
-                break;\n
+                break;
+        case '" . $name . ".create':
+                g::json_encode($" . $name . "Ctrl->createAction());
+                break;
         case '" . $name . "._edit':
                 g::json_encode(" . ucfirst($name) . "Controller::renderForm(R::get(\"id\")));
-                break;\n
+                break;
+        case '" . $name . ".update':
+                g::json_encode($" . $name . "Ctrl->updateAction(R::get(\"id\")));
+                break;
         case '" . $name . "._show':
                 g::json_encode(" . ucfirst($name) . "Controller::renderDetail(R::get(\"id\")));
-                break;\n
+                break;
         case '" . $name . "._delete':
                 g::json_encode($" . $name . "Ctrl->deleteAction(R::get(\"id\")));
-                break;\n
+                break;
         case '" . $name . "._deletegroup':
                 g::json_encode($" . $name . "Ctrl->deletegroupAction(R::get(\"ids\")));
-                break;\n
+                break;
         case '" . $name . ".datatable':
                 g::json_encode($" . $name . "Ctrl->datatable(R::get('next'), R::get('per_page')));
                 break;\n";
@@ -607,7 +609,7 @@ Usage:
 
         $contenu .= "\n\t
         default:
-            echo json_encode(\"404 : page note found\");
+            echo json_encode(['error' => \"404 : page note found\", 'route' => R::get('path')]);
             break;
      }
 

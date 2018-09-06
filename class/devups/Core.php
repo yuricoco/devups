@@ -15,13 +15,22 @@ class Core extends stdClass {
 
     public function __construct($entity)
     {
+        $this->entity = $entity;
+        $this->classname = get_class($entity);
         $this->name = strtolower(get_class($entity));
         $this->addjs = [];
         return $this;
     }
 
-    public function addjs($js, $path = "Ressource/js"){
-        $this->addjs[] = $path."/".$js.".js";
+    public function addDformjs(){
+        $this->addjs[] = CLASSJS."dform.js";
+    }
+
+    public function addjs($js, $path = ""){
+        if(!$path)
+            $this->addjs[] = __env . $this->classname ::classpath()."/Ressource/js/".$js.".js";
+        else
+            $this->addjs[] = $path."/".$js.".js";
     }
 
     public static function __extract($entity, $asarray = false) {

@@ -69,7 +69,11 @@ var ddatatable = {
                     tr.remove();
                 })
                 thisclass.uncheckall();
-            }, 'json');
+            }, 'json').error (function(resultat, statut, erreur){
+                console.log(statut, erreur);
+                $("#"+model.entity+"modal").modal("show");
+                databinding.bindmodal(resultat.responseText);
+            });//, 'json'
         });
     },
     groupaction : function (callback) {
@@ -116,19 +120,29 @@ var ddatatable = {
     },
     orderasc:function (param) {
         console.log(param);
+        this.setloader();
         $.get("services.php?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param, function (response) {
             console.log(response);
             $("#dv_table").find("tbody").html(response.tablebody);
             removeloader();
-        }, 'json');//, 'json'
+        }, 'json').error (function(resultat, statut, erreur){
+            console.log(statut, erreur);
+            $("#"+model.entity+"modal").modal("show");
+            databinding.bindmodal(resultat.responseText);
+        });//, 'json'
     },
     orderdesc:function (param) {
         console.log(param);
+        this.setloader();
         $.get("services.php?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param+" desc", function (response) {
             //console.log(response);
             $("#dv_table").find("tbody").html(response.tablebody);
             removeloader();
-        }, 'json');
+        }, 'json').error (function(resultat, statut, erreur){
+            console.log(statut, erreur);
+            $("#"+model.entity+"modal").modal("show");
+            databinding.bindmodal(resultat.responseText);
+        });//, 'json'
     },
     previous: function () {
         this.currentpage -= 1;
@@ -151,7 +165,11 @@ var ddatatable = {
             $("#dv_table").find("tbody").html(response.tablebody);
             $("#dv_pagination").replaceWith(response.tablepagination);
             removeloader();
-        }, 'json');
+        }, 'json').error (function(resultat, statut, erreur){
+            console.log(statut, erreur);
+            $("#"+model.entity+"modal").show();
+            databinding.bindmodal(resultat.responseText);
+        });//, 'json'
 
     }
 };

@@ -21,7 +21,9 @@
                 "value" => $testentity->getDescription(), 
             ];
 
-
+            
+            $entitycore->addDformjs();
+            
             return $entitycore;
         }
         

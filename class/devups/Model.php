@@ -45,6 +45,17 @@ abstract class Model extends \stdClass {
         $dirname = str_replace("Entity", "", $dirname[1]);
         return "src".$dirname;
     }
+    public static function classroot(){
+        $reflector = new ReflectionClass(get_called_class());
+        $fn = $reflector->getFileName();
+        $dirname = explode("src", dirname($fn));
+        $dirname = str_replace("Entity", "", $dirname[1]);
+        return __env."src".$dirname."/index.php?path=".strtolower(get_called_class())."/";
+    }
+
+    public static function classdir(){
+        return ROOT.self::classpath();
+    }
 
     /**
      *
@@ -53,12 +64,12 @@ abstract class Model extends \stdClass {
      * @param type $lang
      * @return \Dvups_lang
      */
-    public function __inittranslate($column, $content, $lang = "fr") {
+    public function __inittranslate($column, $content, $lang = __lang) {
         if(!$this->id || !$content)
             return;
 
         $table = strtolower(get_class($this));
-        $ref = $this->id . $table . "_" . $column;
+        $ref = $table . "_".$this->id . "_" . $column;
 
         $dvlang = Dvups_lang::select()->where("ref", $ref)->__getOne();
         $dvcontentlang = new Dvups_contentlang();
@@ -67,7 +78,7 @@ abstract class Model extends \stdClass {
             $dvlang = new Dvups_lang();
             $dvlang->setRef($ref);
             $dvlang->set_table($table);
-            $dvlang->setRow($this->id);
+            $dvlang->set_row($this->id);
             $dvlang->set_column($column);
             $dvlang->__save();
 
@@ -84,12 +95,15 @@ abstract class Model extends \stdClass {
 
     }
 
-    public function __gettranslate($column, $lang = "fr") {
+    public function __gettranslate($column, $lang = null) {
         if(!$this->id)
             return "";
 
+        if(!$lang)
+            $lang = local();
+
         $table = strtolower(get_class($this));
-        $ref = $this->id . $table . "_" . $column;
+        $ref = $table . "_".$this->id . "_" . $column;
 
         $dvcontentlang = Dvups_contentlang::select()
             ->where("dvups_lang.ref", $ref)
@@ -113,7 +127,7 @@ abstract class Model extends \stdClass {
         return $dfile;
     }
 
-    public function savefile($file) {
+    public function uploadfile($file) {
 
         $uploadmethod = 'set' . ucfirst($file);
         if (!method_exists($this, $uploadmethod)) {
@@ -134,7 +148,7 @@ abstract class Model extends \stdClass {
                 $dfile::deleteFile($currentfile, $dfile->uploaddir);
         }
 
-        $url = $dfile->hashname()->move();
+        $url = $dfile->hashname()->upload();
         call_user_func(array($this, $uploadmethod), $url["file"]["hashname"]);
 
         if (!$url['success']) {
@@ -370,9 +384,10 @@ abstract class Model extends \stdClass {
     }
 
     public function __show($recursif = false) {
-        if (isset($this->dvfetched)) {
+        if ($this->dvfetched) {
             return $this;
         }
+
         $dbal = new DBAL();
         return $dbal->findByIdDbal($this, $recursif);
     }
@@ -404,14 +419,14 @@ abstract class Model extends \stdClass {
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }
 
-    public function __hasmany($collection, $exec = true) {
+    public function __hasmany($collection, $exec = true, $recursif = true) {
         if (!is_object($collection)) {
             $reflection = new ReflectionClass($collection);
             $collection = $reflection->newInstance();
         }
         if ($this->getId()) {
             $dbal = new DBAL();
-            return $dbal->hasmany($this, $collection, $exec);
+            return $dbal->hasmany($this, $collection, $exec, $recursif);
         } else {
             return [];
         }

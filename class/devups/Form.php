@@ -21,7 +21,8 @@ class Form extends FormFactory{
         if(!isset($directives['method']))
             $directives['method'] = "post";
 
-        Form::$name = strtolower(get_class($enitty));
+        Form::$classname = get_class($enitty);
+        Form::$name = strtolower(Form::$classname);
         $action = $directives["action"];
         $directives["action"] = "index.php?path=".Form::$name."/".trim($action);
         if($overideaction)
@@ -32,7 +33,8 @@ class Form extends FormFactory{
             $formdirective[] = $key ."='" . $value ."'";
         }
 
-        return "<form ". implode(" ", $formdirective) ."  >";
+        return "<form id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
+
     }
 
     public static function init($enitty) {
@@ -62,9 +64,16 @@ class Form extends FormFactory{
 
         return $dvups_form;
     }
-    
-    public static function addjs($js, $path = "Ressource/js"){
-        return "<script src='".$path."/".$js.".js' ></script>";
+
+    public static function addDformjs(){
+        return "<script src='".CLASSJS."dform.js' ></script>";
+    }
+
+    public static function addjs($js, $path = ""){
+        if(!$path)
+            return "<script src='".__env . self::$classname ::classpath()."/Ressource/js/".$js.".js' ></script>";
+        else
+            return "<script src='".$path."/".$js.".js' ></script>";
     }
 
     public static function submit($name = "submit", $directive = []) {
@@ -148,7 +157,20 @@ class Form extends FormFactory{
         return Form::__file("", $field, Form::serialysedirective($directive));
         
     }
-    
+
+    public static function inputarray($name, $key, $value, $directive = []) {
+
+        FormFactory::$fieldname = Form::$name."_form[".$name.']['.$key.']';
+        FormFactory::$fieldid = Form::$name."-".$name.'';
+        $field["value"] = $value;
+        $field["type"] = FORMTYPE_TEXT;
+
+        Form::inputfield($name, $value);
+
+        return Form::__input("", $field, Form::serialysedirective($directive));
+
+    }
+
     public static function input($name, $value, $directive = [], $type = FORMTYPE_TEXT) {
                  
         FormFactory::$fieldname = Form::$name."_form[".$name.']';

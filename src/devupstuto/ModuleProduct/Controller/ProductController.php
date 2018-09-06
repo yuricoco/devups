@@ -1,5 +1,7 @@
 <?php
 
+use DClass\devups\Datatable;
+
 class ProductController extends Controller
 {
 
@@ -63,11 +65,13 @@ class ProductController extends Controller
         $this->err = array();
 
         $product = $this->form_generat(new Product(), $product_form);
-        Product::Dfile("image");
+//        $result = ImageController::i()->createAction();
+//        $product->setImage($result["image"]);
 
         if ($id = $product->__insert()) {
             return array('success' => true, // pour le restservice
                 'product' => $product,
+                'newrow' => Datatable::getSingleRowRest($product),
                 'redirect' => 'index', // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
@@ -95,6 +99,7 @@ class ProductController extends Controller
         if ($product->__update()) {
             return array('success' => true,
                 'product' => $product,
+                'updaterow' => Datatable::getSingleRowRest($product),
                 'redirect' => 'index',
                 'detail' => '');
         } else {

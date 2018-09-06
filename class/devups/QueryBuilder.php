@@ -483,6 +483,16 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
+    public function groupby($critere) {
+        $this->query .= " group by " . $critere;
+        return $this;
+    }
+
+    public function between($value1, $value2) {
+        $this->query .= " BETWEEN " . $value1 . " AND ". $value2;
+        return $this;
+    }
+
     public function orderby($critere) {
         $this->query .= " order by " . $critere;
         return $this;
@@ -501,6 +511,20 @@ class QueryBuilder extends \DBAL {
         return " select " . $columns . " from `" . $this->table . "` ";
     }
 
+    /**
+     * @param $column
+     * @return $this
+     */
+    public static function sum($column, $as = "") {
+        if($as)
+            $as = "as ".$as;
+
+        return " SUM(" . $column . ") $as ";
+    }
+    public static function distinct($column) {
+        return " DISTINCT " . $column . " ";
+    }
+
     public function getSqlQuery() {
         if ($this->columns)
             return $this->initquery($this->columns) . $this->defaultjoin . $this->query . $this->endquery;
@@ -509,6 +533,9 @@ class QueryBuilder extends \DBAL {
     }
 
     public function exec($action = 0) {
+        if(in_array($action, [DBAL::$FETCH, DBAL::$FETCHALL]))
+            return $this->executeDbal($this->initquery($this->columns) . $this->defaultjoin . $this->query, $this->parameters, $action);
+
         return $this->executeDbal($this->query . $this->endquery, $this->parameters, $action);
     }
 

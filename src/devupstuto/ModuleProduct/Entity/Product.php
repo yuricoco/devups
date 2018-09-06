@@ -109,7 +109,7 @@ class Product extends \Model implements JsonSerializable
      */
     function getCategory()
     {
-        //$this->category = $this->__belongto("category");
+        $this->category = $this->category->__show(false);
         return $this->category;
     }
 
@@ -124,7 +124,7 @@ class Product extends \Model implements JsonSerializable
      */
     function getSubcategory()
     {
-        //$this->subcategory = $this->__belongto("subcategory");
+        $this->subcategory = $this->subcategory->__show(false);
         return $this->subcategory;
     }
 

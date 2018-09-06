@@ -39,8 +39,9 @@ class ImageController extends Controller {
         extract($_POST);
         $this->err = array();
 
-        $image = $this->form_generat(new Image(), $image_form);
-        $image->savefile('image');
+        //$image = $this->form_generat(new Image(), $image_form);
+        $image = new Image();
+        $image->uploadfile('image');
 
         if ($image->__insert()) {
             return array('success' => true, // pour le restservice

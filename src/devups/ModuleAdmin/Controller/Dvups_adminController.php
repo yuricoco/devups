@@ -1,5 +1,7 @@
 <?php
 
+use DClass\devups\Datatable as Datatable;
+
 class Dvups_adminController extends Controller {
 
     private $err;
@@ -10,7 +12,7 @@ class Dvups_adminController extends Controller {
 
     public function resetcredential() {
 
-        $dvups_admin = Dvups_admin::find(getadmin()->getId());
+        $dvups_admin = Dvups_admin::find($_GET["id"]);
         $password = $dvups_admin->generatePassword();
         $dvups_admin->setPassword(sha1($password));
 //        $dvups_admin->setLogin();
@@ -48,8 +50,9 @@ class Dvups_adminController extends Controller {
     }
 
     public function connexionAction($login, $password) {
-        $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
 
+        $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
+        //dv_dump($login, $password, $admin);
         if (!$admin->getId())
             return array('success' => false, "err" => 'Login ou mot de passe incorrect.');
 
@@ -174,7 +177,8 @@ class Dvups_adminController extends Controller {
     {
         $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Genesis::getTableRest($lazyloading)
+            'tablebody' => Datatable::getTableRest($lazyloading),
+            'tablepagination' => Datatable::pagination($lazyloading)
         ];
     }
 

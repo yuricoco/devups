@@ -12,13 +12,6 @@ require __DIR__ . '/template/Templatedependences.php';
 require __DIR__ . '/__Generator.php';
 require __DIR__ . '/android/__Generatorjava.php';
 
-require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_module.php';
-require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role.php';
-require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right.php';
-require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_entity.php';
-require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php';
-require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';
-require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right_dvups_entity.php';
 
 $backend = new BackendGeneratorJava();
 $frontend = new FrontendGenerator();
@@ -140,6 +133,14 @@ if (isset($argv[2])) {
 
     chdir('../../');
 } else {
+
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_module.php';
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role.php';
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right.php';
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_entity.php';
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php';
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right_dvups_entity.php';
 
     switch ($argv[1]) {
 

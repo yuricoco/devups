@@ -77,12 +77,11 @@ class Datatable {
         return $actionlien;
     }
 
-    public static function renderdata($lazyloading, $header, $action = true, $defaultaction = true,
-                                      $groupedaction = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
+    public static function renderdata($lazyloading, $header, $action = true, $defaultaction = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
         self::$class = $lazyloading['classname'];
-//        if (!$lazyloading['listEntity']) {
-//            return '<div id="dv_table" data-entity="'.$lazyloading['classname'].'" class="text-center">la liste est vide</div>';
-//        }
+        if (!$lazyloading['listEntity']) {
+            return '<div id="dv_table" data-entity="'.$lazyloading['classname'].'" class="text-center">la liste est vide</div>';
+        }
 
         $html = '
 <form id="datatable-form" action="#" method="get" >
@@ -106,7 +105,7 @@ class Datatable {
     </style>
 
     <div class="col-lg-12 col-md-12"><div class="table-responsive">';
-        $html .= self::tablefilter($lazyloading['current_page'], $groupedaction);
+        $html .= self::tablefilter($lazyloading['current_page']);
 
         $html .= self::renderListViewUI($lazyloading['listEntity'], $header, $action, $defaultaction);
 
@@ -119,26 +118,13 @@ class Datatable {
         return $html;
     }
 
-    public static function tablefilter($current_page, $groupedaction) {
+    public static function tablefilter($current_page) {
 
-        $html = '<div class="row">';
+        $html = '<div class="row"><div class="col-lg-8 col-md-12">';
 
-        if($groupedaction){
-            $customaction = [];
-            if(is_array($groupedaction)){
-                foreach ($groupedaction as $action){
-                    $customaction[] = "<span class=\"btn btn-info\" onclick=\"".$action["action"]."\" >".$action["label"]."</span>";
-                }
-            }
-            $html .= '
-<div class="col-lg-8 col-md-12">
-<label class="" >Action groupe:</label> '.implode("", $customaction).'
-<span id="deletegroup" class="btn btn-danger">delete</span>
-                    </div>';
-
-        }
-
-        $html .= '                    
+        $html .= '<label class="" >Action groupe:</label> <span id="deletegroup" class="btn btn-danger">delete</span>
+                    </div>
+                    
             <div class="col-lg-4 col-md-12">
 
         <label class=" col-lg-7" >Nombre de ligne </label>';
@@ -282,24 +268,20 @@ class Datatable {
 
     public static function renderListViewUI($list, $header, $action = false, $defaultaction = true) {
 
+        if (!$list) {
+            return '<div id="dv_table" data-entity="'.self::$class.'" class="text-center">la liste est vide</div>';
+        }
 
         $_SESSION['dv_datatable'] = ['header' => $header, 'action' => $action, 'defaultaction' => $defaultaction];
 
         $theader = self::buildheader($header, $action);
 
-        if (!$list) {
-            $tb = 'la liste est vide';
-        }else
-            $tb = self::getTableBody($list, $header, $action, $defaultaction);
+        $tb = self::getTableBody($list, $header, $action, $defaultaction);
 
         return '<table id="dv_table" data-entity="'.self::$class.'"  class="table table-bordered table-hover table-striped" >'
             . '<thead><tr>' . implode(" ", $theader['th']) . '</tr><tr>' . implode(" ", $theader['thf']) . '</tr></thead>'
             . '<tbody>' . implode(" ", $tb) . '</tbody>'
             . '</table>';
-    }
-
-    public static function getSingleRowRest($entity) {
-        return self::getTableRest(\Controller::lastpersistance($entity))[0];
     }
 
     public static function getTableRest($lazyloading) {

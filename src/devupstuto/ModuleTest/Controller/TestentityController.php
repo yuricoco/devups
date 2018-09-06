@@ -1,5 +1,8 @@
 <?php
 
+
+use DClass\devups\Datatable as Datatable;
+
 class TestentityController extends Controller
 {
 
@@ -35,7 +38,8 @@ class TestentityController extends Controller
     {
         $lazyloading = $this->lazyloading(new Testentity(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Genesis::getTableRest($lazyloading)
+            'tablebody' => Datatable::getTableRest($lazyloading),
+            'tablepagination' => Datatable::pagination($lazyloading)
         ];
     }
 
@@ -50,6 +54,17 @@ class TestentityController extends Controller
 
     }
 
+    public function showAction($id)
+    {
+
+        $testentity = Testentity::find($id);
+
+        return array('success' => true,
+            'testentity' => $testentity,
+            'detail' => 'detail de l\'action.');
+
+    }
+
     public function createAction()
     {
         extract($_POST);
@@ -61,6 +76,7 @@ class TestentityController extends Controller
         if ($id = $testentity->__insert()) {
             return array('success' => true, // pour le restservice
                 'testentity' => $testentity,
+                'tablerow' => Datatable::getSingleRowRest($testentity),
                 'redirect' => 'index', // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
@@ -82,6 +98,8 @@ class TestentityController extends Controller
         if ($testentity->__update()) {
             return array('success' => true, // pour le restservice
                 'testentity' => $testentity,
+                'id' => $id,
+                'tablerow' => Datatable::getSingleRowRest($testentity),
                 'redirect' => 'index', // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {

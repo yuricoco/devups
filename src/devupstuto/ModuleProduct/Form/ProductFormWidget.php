@@ -49,5 +49,7 @@
 
     <?= Form::submit("save", ['class' => 'btn btn-success']) ?>
 
-    <?= Form::close() ?>
+    <?= Form::addDformjs() ?>
     <?= Form::addjs("productForm") ?>
+
+    <?= Form::close() ?>

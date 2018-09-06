@@ -14,10 +14,12 @@ define ('dbhost',  'localhost');
 // in production, replace by "/"
 define('__v', '4.3');
 
-define('__env', '/devupstuto/');
+define('__server', 'http://127.0.0.1');
+define('__env', __server.'/devupstuto/');
 define('__prod', false);
 define('__default_lang', "fr");
 define('__project_id', 'devupstuto');
+define('__lang', 'en');
 
 
 define('ROOT', __DIR__  . '/../');
@@ -44,6 +46,8 @@ define('ADMIN', __project_id.'_devups');
  * NOTIFIACTION DEFINE
  */
 define('LANG', "lang");
+define('PREVIOUSPAGE', "previous_page");
 define('JSON_ENCODE_DEPTH', 512);
+
 
 

@@ -15,11 +15,6 @@
          **/
         private $name;
         /**
-         * @Column(name="additionalfield", type="string" , length=25 )
-         * @var string
-         **/
-        private $additionalfield;
-        /**
          * @Column(name="description", type="text"  )
          * @var text
          **/
@@ -44,14 +39,6 @@
             $this->name = $name;
         }
         
-        public function getAdditionalfield() {
-            return $this->additionalfield;
-        }
-
-        public function setAdditionalfield($additionalfield) {
-            $this->additionalfield = $additionalfield;
-        }
-        
         public function getDescription() {
             return $this->description;
         }
@@ -65,7 +52,6 @@
                 return [
                         'id' => $this->id,
                                 'name' => $this->name,
-                                'additionalfield' => $this->additionalfield,
                                 'description' => $this->description,
                 ];
         }

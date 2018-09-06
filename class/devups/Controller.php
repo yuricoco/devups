@@ -7,12 +7,13 @@ use Genesis as g;
  *
  * @author yuri coco
  */
-class Controller extends DBAL {
+class Controller {
 
     private $change_collection_adress;
 
-    public function editImageAction($id) {
-        
+    public static  function i() {
+        $reflection = new ReflectionClass(get_called_class());
+        return $reflection->newInstance();
     }
 
     /**
@@ -31,6 +32,15 @@ class Controller extends DBAL {
      * @param type $next
      * @return type
      */
+    public static function lastpersistance($entity) {
+        $classname = strtolower(get_class($entity));
+
+        return array('success' => true, // pour le restservice
+            'classname' => $classname,
+            'listEntity' => [$entity],
+            'detail' => '');
+    }
+
     public function lazyloading2($listEntity) {
 
         return array('success' => true, // pour le restservice
@@ -54,7 +64,10 @@ class Controller extends DBAL {
 
             if (isset($_GET[$arrayfieldtype[0]])) {
                 if ($arrayfieldtype[1] == "attr") {
-                    $qb->andwhere($arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
+                    if($qb->hasrelation)
+                        $qb->andwhere(get_class($entity) .".".$arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
+                    else
+                        $qb->andwhere($arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
                 } elseif ($arrayfieldtype[1] == "join") {
 
                     $join = explode("-", $arrayfieldtype[0]);
@@ -243,8 +256,7 @@ class Controller extends DBAL {
         $_ENTITY_FORM = $data;
 
         if ($object->getId()) {
-            $dbal = new DBAL();
-            $object = $dbal->findByIdDbal($object, false, true);
+            $object = $object->__show(false);
         }
 
 //            if($jsondata){
@@ -379,7 +391,7 @@ class Controller extends DBAL {
 
                         if ($value['options'] && $value_form) {
                             $value2->setId($value_form);
-                            $object_array[$key_value[$key]] = $value2;
+                            $object_array[$key_value[$key]] = $value2->__show(false);
                         } else {
                             $object_array[$key_value[$key]] = $value2;
                         }

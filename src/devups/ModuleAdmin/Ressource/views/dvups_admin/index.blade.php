@@ -11,10 +11,6 @@
 
 @section('content')
 
-<?php
-
-
-?>
         <div class="row">
                 <div class="col-lg-12">
                         <ol class="breadcrumb">

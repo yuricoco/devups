@@ -69,7 +69,7 @@
         /**
          * @return string
          */
-        public function getRow()
+        public function get_row()
         {
             return $this->_row;
         }
@@ -77,7 +77,7 @@
         /**
          * @param string $row
          */
-        public function setRow($row)
+        public function set_row($row)
         {
             $this->_row = $row;
         }

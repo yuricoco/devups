@@ -15,33 +15,14 @@ use Philo\Blade\Blade;
  */
 class Genesis {
 
-    //put your code here
-    private $entityinstance;
-
-//        public function __construct($entity) {
-//            $this->entityinstance = $entity;
-//        }
-
-    public static function top_action($lien_menu, $action) {
-
+    public static function top_action($action) {
+        $action = strtolower($action);
         $index_ajouter = "index.php?path=$action/_new";
         $index_modifier = "index.php?path=$action/index";
 
         $rigths = getadmin()->availableentityright($action);
 
-        $top_action = '<div class="row">
-                            <div class="col-lg-3 col-md-6">
-                                    <div class="panel panel-primary">
-                                            <div class="panel-heading">
-                                                    <div class="row">
-                                                            <div class="col-xs-12 ">
-                                                                    <h5>' . $lien_menu . ' ' . $action . '</h5>
-                                                            </div>
-                                                    </div>
-                                            </div>
-                                    </div>
-                            </div>
-                            <div style="float: right; margin-right: 30px;"  class="panel">';
+        $top_action = '';
 
         if ($rigths) {
             if (in_array('create', $rigths)) {
@@ -58,17 +39,11 @@ class Genesis {
         }
 
         $top_action .= '<a href="' . $index_modifier . '" target="_self" class="btn btn-default" ><i class="fa fa-list"></i> Listing</a> .';
-        $top_action .= '</div>';
 
         return $top_action;
     }
 
     public static function json_encode($value, $options = 0, $depth = 512) {
-
-        if (isset($_SESSION["dvups_form"])) {
-            unset($_SESSION["dvups_form"]);
-        }
-
         echo json_encode($value, $options, $depth);
     }
 
@@ -78,16 +53,11 @@ class Genesis {
         global $views;
 
         if ($redirect && $data['success']) {
-
-            if (isset($_SESSION["dvups_form"])) {
-                unset($_SESSION["dvups_form"]);
-            }
-
             header('location: index.php?path=' . $path[ENTITY] . '/' . $data['redirect']);
         }
 
         if ($data) {
-            $data["__navigation"] = Genesis::top_action($action, $path[ENTITY]);
+            $data["__navigation"] = "";//Genesis::top_action($action, $path[ENTITY]);
         }
 
         $blade = new Blade([$views, admin_dir . 'views'], admin_dir . "cache");
@@ -113,21 +83,16 @@ class Genesis {
         echo $blade->view()->make($view, $compilate)->render();
     }
 
-    public static function renderView($view, $data = [], $action = "list", $redirect = false) {
+    public static function renderView($view, $data = [], $redirect = false) {
 
-        global $path;
         global $views;
 
-        if ($redirect && $data['success']) {
-
-            if (isset($_SESSION["dvups_form"])) {
-                unset($_SESSION["dvups_form"]);
-            }
-
-            header('location: index.php?path=' . $path[ENTITY] . '/' . $data['redirect']);
+        if ($redirect && isset($data['redirect'])) {
+            $classroot = Request::classroot("path");
+            header('location: index.php?path=' . $classroot . '/' . $data['redirect']);
         }
 
-        $data["__navigation"] = Genesis::top_action($action, $path[ENTITY]);
+        $data["__navigation"] = "";//Genesis::top_action($action, $classroot);
 
         $blade = new Blade([$views, admin_dir . 'views'], admin_dir . "cache");
         echo $blade->view()->make($view, $data)->render();

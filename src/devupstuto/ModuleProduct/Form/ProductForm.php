@@ -51,7 +51,8 @@ class ProductForm extends FormManager
             "options" => FormManager::Options_ToCollect_Helper('town', new Storage(), $product->getStorage()),
         ];
 
-        $entitycore->addjs("productForm");
+        $entitycore->addDformjs();
+        //$entitycore->addjs("productForm");
 
         return $entitycore;
     }

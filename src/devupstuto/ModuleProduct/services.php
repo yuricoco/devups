@@ -90,6 +90,12 @@
                 g::json_encode($penaltytypeCtrl->datatable(R::get('next'), R::get('per_page')));
                 break;
 
+         case 'product.create':
+             g::json_encode($productCtrl->createAction());
+             break;
+         case 'product.update':
+             g::json_encode($productCtrl->updateAction($_GET['id']));
+             break;
         case 'product._new':
                 g::json_encode(ProductController::renderForm());
                 break;

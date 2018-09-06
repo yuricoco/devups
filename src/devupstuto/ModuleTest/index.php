@@ -14,37 +14,29 @@
     
         		$testentityCtrl = new TestentityController();		
 
-        if(isset($_GET['path'])){
+(new Request('layout'));
 
-            $path = explode('/', $_GET['path']);
+switch (Request::get('path')) {
 
-            switch ($_GET['path']) {
-
-                case 'layout':
-                    Genesis::renderBladeView("layout");
-                    break;
-                        
-				case 'testentity/index':
-					Genesis::renderView('testentity.index',  $testentityCtrl->listAction(), 'list');
-					break;
-                case 'testentity/_new':
-                    Genesis::renderView( 'testentity.form',  $testentityCtrl->__newAction(), 'new');
-                    break;
-				case 'testentity/create':
-                    Genesis::renderView( 'testentity.form', $testentityCtrl->createAction(), 'error creation', true);
-					break;					
-				case 'testentity/update':
-					Genesis::renderView( 'testentity.form',  $testentityCtrl->updateAction($_GET['id']),'error updating', true);
-					break;
+    case 'layout':
+        Genesis::renderBladeView("layout");
+        break;
+        
+    case 'testentity/index':
+        Genesis::renderView('testentity.index',  $testentityCtrl->listAction());
+        break;					
+    case 'testentity/create':
+        Genesis::renderView( 'testentity.form', $testentityCtrl->createAction(), true);
+        break;					
+    case 'testentity/update':
+        Genesis::renderView( 'testentity.form',  $testentityCtrl->updateAction($_GET['id']), true);
+        break;
 
 
 		
-                default:
-                    echo 'la route "'.$_GET['path'].'" n\'existe pas!';
-                    break;
-            }
+    default:
+        Genesis::renderView('404', ['page' => Request::get('path')]);
+        break;
+}
     
-        }else{
-            Genesis::renderBladeView("layout");
-        }		
-        
+    

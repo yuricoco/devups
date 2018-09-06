@@ -45,6 +45,13 @@ class Request {
         }
     }
 
+    public static function classroot($key) {
+        if (isset(Request::$uri_get_param[$key]))
+            return explode("/", Request::$uri_get_param[$key])[ENTITY];
+        else
+            return false;
+    }
+
     public static function get($key) {
         if (isset(Request::$uri_get_param[$key]))
             return Request::$uri_get_param[$key];

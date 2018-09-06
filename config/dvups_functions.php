@@ -6,6 +6,34 @@
  * and open the template in the editor.
  */
 
+global $__lang;
+if(!isset($_SESSION[LANG]))
+    $_SESSION[LANG] = __lang;
+
+//if(!isset($_SESSION[PREVIOUSPAGE]))
+//    $_SESSION[PREVIOUSPAGE] = $_SERVER["url"];
+//elseif ($_SESSION[PREVIOUSPAGE] != $_SERVER["url"])
+//    $_SESSION[PREVIOUSPAGE] = $_SERVER["url"];
+
+function local() {
+    global $__lang;
+    $__lang = $_SESSION[LANG];
+    return $_SESSION[LANG];
+}
+
+function setlang($lang) {
+    $_SESSION[LANG] = $lang;
+}
+
+function redirect($url = ""){
+    header('location: '. __env . $url );
+}
+
+if(!isset($_SESSION["__lang"] )){
+    $_SESSION["__lang"] = "fr";
+}
+
+
 function asset($src){
     return __env .'web/' . $src;
 }
@@ -42,29 +70,11 @@ function remove_accents($str, $charset='utf-8')
 function clean($string) {
     return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
 }
-
-global $__lang;
-if(!isset($_SESSION["__lang"] )){
-    $_SESSION["__lang"] = "fr";
-}
-
 /**
  * @return \Dvups_admin Description
  */
 function getadmin() {
     return unserialize($_SESSION[ADMIN]);
-}
-
-function local() {
-    return $_SESSION["__lang"];
-}
-
-function setlang() {
-    if (Request::get('lang')) {
-        if (in_array(Request::get('lang'), ["en", "fr"]) && $_SESSION["__lang"] != Request::get('lang')) {
-            $_SESSION["__lang"] = Request::get('lang');
-        }
-    }
 }
 
 function url($path, $id = "", $title = "") {

@@ -28,6 +28,7 @@
                     <?= \DClass\devups\Datatable::renderdata($lazyloading, [
 ['header' => 'Ref', 'value' => 'ref'],
 ['header' => '_table', 'value' => '_table'], 
+['header' => '_row', 'value' => '_row'],
 ['header' => '_column', 'value' => '_column']
 ]); ?>
 

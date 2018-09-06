@@ -316,7 +316,7 @@ class DBAL extends Database {
         return $qb->select()->where("id", "=", $id)->__getOneRow();
     }
 
-    public function hasmany($entity, $collection, $exec = true) {
+    public function hasmany($entity, $collection, $exec = true, $recursif = false) {
 
         $objectName = strtolower(get_class($entity));
         $collectionName = strtolower(get_class($collection));
@@ -337,7 +337,7 @@ class DBAL extends Database {
                  ->where($entity);
                             
             if($exec)
-                return $qb->__getAll();
+                return $qb->__getAll($recursif);
             else
                 return $qb;
         }
@@ -354,7 +354,7 @@ class DBAL extends Database {
                         );
         
         if($exec)
-            return $qb->__getAll();
+            return $qb->__getAll($recursif);
         else
             return $qb;
     }
@@ -444,10 +444,15 @@ class DBAL extends Database {
         return $sql;
     }
 
+    public static $NOTHING = 0;
+    public static $INSERT = 1;
+    public static $FETCHALL = 2;
+    public static $FETCHOBJECT = 3;
+    public static $FETCH = 4;
     /**
      * createDbal
      * persiste les entités en base de données.
-     * 
+     *
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
@@ -456,16 +461,19 @@ class DBAL extends Database {
         $query = $this->link->prepare($sql);
         $return = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
-        if ($action == 0) {
+        if ($action ==  self::$NOTHING) {
             // nothing
-        } elseif ($action == 1) {
+        } elseif ($action == self::$FETCH) {
+            $return = $query->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+            //$return = 33;
+        } elseif ($action == self::$INSERT) {
             $req = $this->link->prepare("select @@IDENTITY as id");
             $req->execute();
             $id = $req->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
             $return = $id['id'];
-        } elseif ($action == 2) {
+        } elseif ($action ==  self::$FETCHALL) {
             $return = $query->fetchAll() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
-        } elseif ($action == 3) {
+        } elseif ($action ==  self::$FETCHOBJECT) {
             $return = $query->fetchObject($this->objectName) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
         }
 
@@ -913,6 +921,8 @@ class DBAL extends Database {
         return Bugmanager::cast((object) $object_array, get_class($object));
     }
 
+    public $hasrelation = false;
+
     /**
      * methode qui initialise les variables d'instance. elle est notament utilisé pour permetre de persister
      * des entités en utilisant directement les methodes du dbal sans passé par le dao comme ça se faisait
@@ -967,7 +977,8 @@ class DBAL extends Database {
                 if (is_object($value)) {
                     $classname = get_class($value);
                     if (isset($association[$k]) && $classname != 'DateTime' && $association[$k] != $classname) {
-                        
+
+                        $this->hasrelation = true;
                         $this->objectVar[] = get_class($value) . '_id';
                         $heritage = true;
 //                        $class = get_class($value);

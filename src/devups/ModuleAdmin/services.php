@@ -104,10 +104,10 @@
                 break;
 
         case 'dvups_role._new':
-                g::json_encode(Dvups_roleController::renderForm());
+                g::json_encode(Dvups_roleController::renderFormWidget());
                 break;
         case 'dvups_role._edit':
-                g::json_encode(Dvups_roleController::renderForm(R::get("id")));
+                g::json_encode(Dvups_roleController::renderFormWidget(R::get("id")));
                 break;
         case 'dvups_role._show':
                 g::json_encode(Dvups_roleController::renderDetail(R::get("id")));

@@ -265,7 +265,7 @@ class FormFactory {
         $dvups_form = "<textarea style='display:none' name='dvups_form[".$entitycore->name."]' >".serialize($entitycore->field)."</textarea>";
 
         if ($entitycore->formaction) {
-            $formaction = "<form id='" . $entitycore->name . "-form' action='index.php?path=" . $entitycore->name . "/" . $entitycore->formaction . "' enctype='multipart/form-data' method='post' >\n";
+            $formaction = "<form id='" . $entitycore->name . "-form' action='index.php?path=" . $entitycore->name . "/" . $entitycore->formaction . "'  data-id='".$entitycore->entity->getId()."' enctype='multipart/form-data' method='post' >\n";
         }
 
         $formbutton = "";

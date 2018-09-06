@@ -16,14 +16,3 @@ var routingGenerate = function (route, parameter) {
     else
         return this.api + "api.php?path=" + route + getAttr;
 }
-
-var formdata = function (form) {
-    var $input = form.find('input');
-
-    var formdata = new FormData();
-    $.each($input, function (i, input) {
-        console.log(input);
-        formdata.append($(input).attr('name'), $(input).val());
-    });
-    return formdata;
-}

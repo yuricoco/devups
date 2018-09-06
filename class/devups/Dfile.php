@@ -20,10 +20,21 @@ class Dfile {
     private $compressionquality = 80;
     private $file_name = "";
 
-    public static function getimageatbase64($path){
+    public static function getimageatbase64($path, $default = 'no_image.jpg'){
+        if(file_exists($path)){
+            $type = pathinfo($path, PATHINFO_EXTENSION);
+            $data = file_get_contents($path);
+            return 'data:image/' . $type . ';base64,' . base64_encode($data);
+        }
+
+        $data = file_get_contents(ROOT."web/asset/default/".$default);
+        return 'data:image/jpg;base64,' . base64_encode($data);
+    }
+
+    public static function getaudioatbase64($path){
         $type = pathinfo($path, PATHINFO_EXTENSION);
         $data = file_get_contents($path);
-        return 'data:image/' . $type . ';base64,' . base64_encode($data);
+        return 'data:audio/' . $type . ';base64,' . base64_encode($data);
     }
 
     public static function uploadchunk($uploaddir) {
@@ -372,7 +383,7 @@ class Dfile {
         return $this;
     }
 
-    public function move() {
+    public function upload() {
         return $this->moveto($this->uploaddir);
     }
 

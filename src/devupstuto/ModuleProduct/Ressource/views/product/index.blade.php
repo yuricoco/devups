@@ -19,11 +19,27 @@
             </li>
         </ol>
     </div>
-    <div class="col-lg-12"> <?= $__navigation ?>
-        <div class="input-group custom-search-form">
-            <button onclick="model._new()" class="btn btn-default" data-toggle="modal" data-target="#productmodal" type="button">
-                <i class="fa fa-plus"></i>
-            </button>
+    <div class="col-lg-12">
+        <div class="row">
+            <div class="col-lg-3 col-md-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <div class="row">
+                            <div class="col-xs-12 ">
+                                <h5>Manage Product</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="float: right; margin-right: 30px;"  class="panel">
+                <div class="input-group custom-search-form">
+                    <button onclick="model._new()" class="btn btn-default" data-toggle="modal" data-target="#productmodal" type="button">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+                <?= Genesis::top_action(Product::class); ?>
+            </div>
         </div>
     </div>
 </div>
@@ -67,8 +83,12 @@
 
 @endsection
 
+<?php function script(){ ?>
+
+<script src="<?= CLASSJS ?>model.js"></script>
+<script src="<?= CLASSJS ?>ddatatable.js"></script>
+<!--script src="Ressource/js/product.js"></script-->
+
+<?php } ?>
 @section('jsimport')
-        <script src="<?= CLASSJS ?>model.js"></script>
-        <script src="<?= CLASSJS ?>ddatatable.js"></script>
-        <!--script src="Ressource/js/product.js"></script-->
 @show
