@@ -22,8 +22,8 @@ class Core extends stdClass {
         return $this;
     }
 
-    public function addDformjs(){
-        $this->addjs[] = CLASSJS."dform.js";
+    public function addDformjs($action = true){
+        if($action)  $this->addjs[] = CLASSJS."dform.js";
     }
 
     public function addjs($js, $path = ""){

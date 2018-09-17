@@ -18,7 +18,7 @@ var databinding = {
 var model = {
     _showmodal: function(){
         //set content loader
-        model.modalbody.html('<div style="height: 150px; text-align: center; padding-top: 45%">Loading ...</div>');
+        model.modalbody.html('<div style="height: 150px; text-align: center; padding: 5%">Loading ...</div>');
         model.modal.modal("show");
     },
     _dismissmodal: function(){
@@ -27,13 +27,14 @@ var model = {
     },
     entity : null,
     _new: function (callback) {
+        this._showmodal();
 
         $.get("services.php?path="+this.entity+"._new", function (response) {
             databinding.checkrenderform(response);
         }, 'json').error (function(resultat, statut, erreur){
             console.log(statut, erreur);
             databinding.bindmodal(resultat.responseText);
-        });//, 'json'
+        });
 
     },
     _edit: function (id, callback) {
@@ -106,6 +107,8 @@ var model = {
     },
     _post : function (action, form, callback) {
         var formdata = this._formdata(form);
+        model.modalbody.append('<div style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
+
         $.ajax({
             url: "services.php?path="+this.entity+"."+action,
             data: formdata,
@@ -117,7 +120,7 @@ var model = {
             success: callback,
             error: function (e) {
                 console.log(e);//responseText
-                model.modalbody(e.responseText);
+                model.modalbody.html(e.responseText);
             }
         });
     }
@@ -127,8 +130,8 @@ model.entity = $("#dv_table").data('entity');
 model.modal = $("#"+model.entity+"modal");
 model.modalbody = $("#"+model.entity+"modal").find(".modal-body");
 
-$("#model_new").attr("href", "#");
-$("#model_new").click(function (e) {
-    e.preventDefault();
-    model._new()
-});
+// $("#model_new").attr("href", "#");
+// $("#model_new").click(function (e) {
+//     e.preventDefault();
+//     model._new()
+// });

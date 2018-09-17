@@ -9,14 +9,33 @@
 require '../header.php';
 
 // basique request
-
+/**
+ * insertion
+ */
 //$storage = new Storage();
 //$storage->town = "edea";
-//$storage->__insert();// __save()
+//$storage->__insert();
+/**
+ * update
+ */
+//$storage->__update();
 
+// for both, you can also use the save method,
+// this method check if the id has a good value the update or insert if not
+// __save()
+
+/**
+ * get all element of a table
+ */
 //$storages = Storage::all();
+
+/**
+ * get all element of a table
+ */
 //$storages = Storage::all("name");
 //$storages = Storage::all("name", "desc");
+
+// method ::all takes 2 parameter for sort the data, the first is the attribut to sort and the seconde the way either asc desc or rand() ...
 
 //$storagerows = Storage::allrows();
 //$storagerows = Storage::allrows("town");
@@ -27,17 +46,20 @@ require '../header.php';
 //      Product::select("product.name, product.description")->where("product.name", "tew")->__getAll(); 
 //->__getAllRow(); this method doesn't allow default join so need to manually enable it.
 //
-//->__getOne(); you need to specifie entity.attr
+//->__getOne(); you need to specify entity.attr
 //      Product::select("product.name, product.description")->where("product.name", "tew")->__getOne(); 
-//->__getOneRow();
+//->__getOneRow(); just specify attr
 
 //Product::select();
 
 // this formula will automatically take product as entity owner of category
 //Product::select()->leftjoin("category");
+// left join category on category.id = product.category_id
 
 // this formula takes subcategory as owner of category
-//Product::select()->leftjoin("subcategory", "category");
+//Product::select()->leftjoin("category", "subcategory");
+// left join category on category.id = subcategory.category_id
+
 
 //Product::select("name, description")->where("name", "tew");
 //Product::select()->where("name", "=", "tew"); 
@@ -51,10 +73,10 @@ require '../header.php';
 //Product::select()->where(Category::find(1));
 //Product::select()->where("id")->in([1, 2, 3]);
 //Product::select()->where("id")->in("1, 2, 3");
-//Product::select()->where("id")->in(
+//$sql = Product::select()->where("id")->in(
 ////        (new QueryBuilder(new Product_storage()))
 //        Product_storage::select("product_id")->where("storage_id", 1)->getSqlQuery()
-//        );
+//        )->getSqlQuery();
 
 //$products = Storage::find(1)->__hasmany('product');
 //$storages = Product::find(1)->__hasmany('storage');
@@ -63,11 +85,13 @@ require '../header.php';
 //$products = Category::find(1)->__hasmany('product');
 
 //$storage = Storage::find(1);
-$storage = Storage::findrow(1);
+//$storage = Storage::findrow(1);
 
-
+// requeste the first element
 //$storage = Storage::first();
+// requeste the last element
 //$storage = Storage::last();
+// requeste element at any position. of course if you just have 3 entry you can't requeste the fourth
 //$storage = Storage::get(3);
 
 
@@ -90,6 +114,6 @@ $storage = Storage::findrow(1);
 //$storage = Storage::get(3);
 
 $produits = Product::allrows();
-
+$category = $produits[0]->__belongto(Category::class);
 echo "<pre>";
-dd($produits);
+dd($category, $produits[0]);

@@ -27,11 +27,12 @@ class Genesis {
         if ($rigths) {
             if (in_array('create', $rigths)) {
                 if (in_array('create', $_SESSION['action']))
-                    $top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                    $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                    //$top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
             }
         }elseif (isset($_SESSION['action'])) {
             if (in_array('create', $_SESSION['action']))
-                $top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
 
         else {
                 $top_action .= "<span class='alert alert-info' >not rigth contact the administrator</span>";

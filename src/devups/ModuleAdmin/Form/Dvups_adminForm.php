@@ -23,6 +23,7 @@
                 "options" => FormManager::Options_ToCollect_Helper('name', new Dvups_role(), $dvups_admin->getDvups_role()),
             ];
 
+            $entitycore->addDformjs();
 
             return $entitycore;
         }

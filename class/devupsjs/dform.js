@@ -2,6 +2,7 @@
  * Created by Aurelien Atemkeng on 9/6/2018.
  */
 
+var entityid = 0;
 var dform = {
     callbackcreate : function (response){
         console.log(response);
@@ -10,7 +11,7 @@ var dform = {
     },
     callbackupdate : function (response){
         console.log(response);
-        $("#dv_table").find("#"+response.id).replaceWith(response.tablerow);
+        $("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
         model._dismissmodal();
     }
 };
@@ -21,7 +22,7 @@ $("#"+model.entity+"-form").submit(function (e) {
     // console.log(formserialize);
     var action = "create";
     var callback = function (response) { console.log(response); };
-    var entityid = $(this).data("id");
+    entityid = $(this).data("id");
 
     if(entityid){
         action = "update&id="+entityid;

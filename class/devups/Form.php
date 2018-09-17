@@ -13,6 +13,7 @@
  */
 class Form extends FormFactory{
     public static $name;
+    public static $classname;
     public static $fields = [];
     public static $savestate = [];
 

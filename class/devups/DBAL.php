@@ -281,7 +281,8 @@ class DBAL extends Database {
                 return $relation->__show();
             else {
                 $obarray = (array) $entity;
-                $relationname = get_class($relation);
+                $relationname = strtolower(get_class($relation));
+                //dv_dump($relationname);
                 if (isset($obarray[$relationname . "_id"]))
                     $id = $obarray[$relationname . "_id"];
                 else {
@@ -316,43 +317,56 @@ class DBAL extends Database {
         return $qb->select()->where("id", "=", $id)->__getOneRow();
     }
 
-    public function hasmany($entity, $collection, $exec = true, $recursif = false) {
+    public function hasmany($entity, $collection, $exec = true, $incollectionof = null, $recursif = false) {
 
-        $objectName = strtolower(get_class($entity));
         $collectionName = strtolower(get_class($collection));
-
-        if ($this->tableExists($collectionName . '_' . $objectName)) {
-
-            $entityTable = $collectionName . '_' . $objectName;
-        } elseif ($this->tableExists($objectName . "_" . $collectionName)) {
-
-            $entityTable = $objectName . "_" . $collectionName;
-        } elseif ($this->tableExists($collectionName)) {
-
-            $entityTable = $collectionName;
-            //$tableinstance = ucfirst($entityTable);
+        if($incollectionof != null){
 
             $qb = new QueryBuilder($collection);
             $qb->select()
-                 ->where($entity);
-                            
+                ->where( "this.id")//$collectionName .
+                ->in(
+                    $qb->addselect($collectionName . "_id", new $incollectionof, false)
+                        ->where($entity)
+                        ->close()
+                );
+
             if($exec)
                 return $qb->__getAll($recursif);
             else
                 return $qb;
+
+        }else{
+            $objectName = strtolower(get_class($entity));
+
+            if ($this->tableExists($collectionName . '_' . $objectName)) {
+                $entityTable = $collectionName . '_' . $objectName;
+            } elseif ($this->tableExists($objectName . "_" . $collectionName)) {
+                $entityTable = $objectName . "_" . $collectionName;
+            } elseif ($this->tableExists($collectionName)) {
+
+                $qb = new QueryBuilder($collection);
+                $qb->select()
+                    ->where($entity);
+
+                if($exec)
+                    return $qb->__getAll($recursif);
+                else
+                    return $qb;
+            }
         }
 
         $tableinstance = ucfirst($entityTable);
 
         $qb = new QueryBuilder($collection);
         $qb->select()
-                        ->where($collectionName . ".id")
-                        ->in(
-                                $qb->addselect($collectionName . "_id", new $tableinstance)
-                                ->where($entity)
-                                ->close()
-                        );
-        
+            ->where($collectionName . ".id")
+            ->in(
+                $qb->addselect($collectionName . "_id", new $tableinstance)
+                    ->where($entity)
+                    ->close()
+            );
+
         if($exec)
             return $qb->__getAll($recursif);
         else
@@ -662,10 +676,10 @@ class DBAL extends Database {
                     if ($classname . '_id' == $key2) {
 
                         if (is_array($flowBD[$key2])) {
-                            $object_array[$key] = $classname;//null
+                            $object_array[$key] = null;//$classname;
                             $object_array[$key."_id"] = $flowBD[$key2];
                         }else {
-                            $object_array[$key] = $classname;//null
+                            $object_array[$key] = null;// $classname;
                             $object_array[$key."_id"] = $flowBD[$key2];
                         }
                         break;
@@ -708,15 +722,14 @@ class DBAL extends Database {
         $req = $this->link->prepare($sql);
         $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $req->errorInfo()));
 
-        //$flowBD = $req->fetchObject($this->objectName);
+        if (empty($this->entity_link_list) and empty($this->objectCollection))
+            return $req->fetchObject($this->objectName);
+
         $flowBD = $req->fetch(PDO::FETCH_NAMED);
 
         if (!$flowBD) {
             return new $this->objectName;
         }
-
-        if (empty($this->entity_link_list) and empty($this->objectCollection))
-            return $req->fetchObject($this->objectName);
 
         return $this->dbrow($flowBD);
 

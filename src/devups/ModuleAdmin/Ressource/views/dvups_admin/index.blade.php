@@ -19,7 +19,24 @@
                                 </li>
                         </ol>
                 </div>
-                <div class="col-lg-12"> <?= $__navigation  ?></div>
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-12 ">
+                                        <h5>Manage Dvups_admin</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="float: right; margin-right: 30px;"  class="panel">
+                        <?= Genesis::top_action(Dvups_admin::class); ?>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row">
                 
@@ -31,7 +48,6 @@
                         ['header' => 'login', 'value' => 'login'],
                     ], "callbackbtn");
                 ?>
-
 
                 </div>
         </div>
@@ -59,9 +75,12 @@
 </div>
 @endsection
 
-@section('jsimport')
+<?php function script(){ ?>
 
-    <script src="<?= CLASSJS ?>model.js"></script>
-    <script src="<?= CLASSJS ?>ddatatable.js"></script>
-                <script></script>
+<script src="<?= CLASSJS ?>model.js"></script>
+<script src="<?= CLASSJS ?>ddatatable.js"></script>
+<script src=""></script>
+
+<?php } ?>
+@section('jsimport')
 @show

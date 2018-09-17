@@ -132,6 +132,7 @@ class QueryBuilder extends \DBAL {
             $this->instanciateVariable($object);
         endif;
 
+        $this->defaultjoinsetted = $defaultjoin;
         $this->query = " select $columns from `" . $this->table . "` ";
 
         if ($defaultjoin) {
@@ -387,10 +388,14 @@ class QueryBuilder extends \DBAL {
             }
 
             if ($column->getId()) {
+                if($operator == "not"){
+                    $this->query .= " != ? ";
+                }else{
                     $this->query .= " = ? ";
-                    $this->parameters[] = $column->getId();
+                }
+                $this->parameters[] = $column->getId();
             } else {
-                    $this->query .= " is null ";
+                $this->query .= " is null ";
             }
         }elseif (is_array($column)) {
             if(is_array($operator)){
@@ -511,6 +516,10 @@ class QueryBuilder extends \DBAL {
         return " select " . $columns . " from `" . $this->table . "` ";
     }
 
+    protected function querysanitize($sql) {
+        return str_replace("this.", $this->table.".", $sql);
+    }
+
     /**
      * @param $column
      * @return $this
@@ -527,16 +536,16 @@ class QueryBuilder extends \DBAL {
 
     public function getSqlQuery() {
         if ($this->columns)
-            return $this->initquery($this->columns) . $this->defaultjoin . $this->query . $this->endquery;
+            return $this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query . $this->endquery);
         else
-            return $this->query . $this->endquery;
+            return $this->querysanitize($this->query . $this->endquery);
     }
 
     public function exec($action = 0) {
         if(in_array($action, [DBAL::$FETCH, DBAL::$FETCHALL]))
-            return $this->executeDbal($this->initquery($this->columns) . $this->defaultjoin . $this->query, $this->parameters, $action);
+            return $this->executeDbal($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, $action);
 
-        return $this->executeDbal($this->query . $this->endquery, $this->parameters, $action);
+        return $this->executeDbal($this->querysanitize($this->query . $this->endquery), $this->parameters, $action);
     }
 
     public function __getFirst($recursif = true) {
@@ -553,23 +562,23 @@ class QueryBuilder extends \DBAL {
     }
 
     public function __getAllRow() {
-        return $this->__findAllRow($this->initquery($this->columns) . $this->query, $this->parameters);
+        return $this->__findAllRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
     }
 
     public function __getAll($recursif = true) {
-        return $this->__findAll($this->initquery($this->columns) . $this->defaultjoin . $this->query, $this->parameters, false, $recursif);
+        return $this->__findAll($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
     public function __getOneRow() {
-        return $this->__findOneRow($this->initquery($this->columns) . $this->query, $this->parameters);
+        return $this->__findOneRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
     }
 
     public function __getOne($recursif = true) {
-        return $this->__findOne($this->initquery($this->columns) . $this->defaultjoin . $this->query, $this->parameters, false, $recursif);
+        return $this->__findOne($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
     public function __countEl($recursif = true) {
-        return $this->__count($this->initquery($this->columnscount) . $this->defaultjoin . $this->query, $this->parameters, false, $recursif);
+        return $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
 }

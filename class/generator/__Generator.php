@@ -470,14 +470,21 @@ Usage:
                 \n\n";
 
         $dependance = array();
-        $requiremanytomany = [];
 
         $package = "<?php ";
         foreach ($modulelistentity as $entity) {
             $name = ucfirst(strtolower($entity->name));
+            $requiremanytomany = "";
+
+            foreach ($entity->relation as $relation) {
+                if ($relation->cardinality == 'manyToMany') {
+                    $requiremanytomany .= "require 'Entity/" . $name."_".$relation->entity. ".php';";
+                }
+            }
 
             $package .= "
     require 'Entity/" . $name . ".php';
+    $requiremanytomany
     //require 'Dao/" . $name . "DAO.php';
     require 'Form/" . $name . "Form.php';
     require 'Controller/" . $name . "Controller.php';

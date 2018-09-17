@@ -249,8 +249,15 @@ class Controller {
      * @throws InvalidArgumentException
      */
     public static function form_generat($object, $data = null, $entityform = null) {
+        return self::form_fillingentity($object, $data, $entityform);
+    }
+
+    public static function form_fillingentity($object, $data = null, $entityform = null) {
         if (!is_object($object))
             throw new InvalidArgumentException('$object must be an object.');
+
+        if(!$data)
+            return $object;
 
         global $_ENTITY_FORM;
         $_ENTITY_FORM = $data;

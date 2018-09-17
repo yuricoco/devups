@@ -75,6 +75,11 @@ class BackendGenerator {
         function add" . ucfirst($relation->entity) . "(" . $antislash . ucfirst($relation->entity) . " $" . $relation->entity . "){
             $" . "this->" . $relation->entity . "[] = $" . $relation->entity . ";
         }
+        
+        function collect" . ucfirst($relation->entity) . "(){
+            $" . "this->" . $relation->entity . " = $" . "this->__hasmany('" . $relation->entity . "');
+            return $" . "this->" . $relation->entity . ";
+        }
 
         function drop" . ucfirst($relation->entity) . "Collection() {
                 $" . "this->" . $relation->entity . " = EntityCollection::entity_collection('" . $relation->entity . "');
@@ -343,11 +348,11 @@ class " . ucfirst($name) . "Controller extends Controller{
 
     }
 
-    public function createAction(){
+    public function createAction($" . $name . "_form = null){
         extract($" . "_POST);
         $" . "this->err = array();
 
-        $" . $name . " = $" . "this->form_generat(new " . ucfirst($name) . "(), $" . $name . "_form);\n ";
+        $" . $name . " = $" . "this->form_fillingentity(new " . ucfirst($name) . "(), $" . $name . "_form);\n ";
         // gestion des relations many to many dans le controller
         $mtm = [];
         $mtmedit = [];
@@ -358,8 +363,8 @@ class " . ucfirst($name) . "Controller extends Controller{
 
                 if ($relation->cardinality == "oneToOne") {
                     $contenu .= "
-        $" . $relation->entity . "Ctrl = new " . ucfirst($relation->entity) . "Controller();
-        extract($" . $relation->entity . "Ctrl->createAction());
+        //$" . $relation->entity . "Ctrl = new " . ucfirst($relation->entity) . "Controller();
+        extract(" . ucfirst($relation->entity) . "Controller::i()->createAction());
         $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . "); ";
                 } elseif (false) {//$relation->cardinality == "manyToMany" &&
                     $mtm[] = "
@@ -393,7 +398,7 @@ class " . ucfirst($name) . "Controller extends Controller{
 //			for($i = 1; $i < count($entity->attribut); $i++){
                 if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
                     $contenu .= "
-            $".$name ."->savefile('" . $attribut->name . "');
+            $".$name ."->uploadfile('" . $attribut->name . "');
             ";
             }
         }
@@ -414,10 +419,10 @@ class " . ucfirst($name) . "Controller extends Controller{
 
     }
 
-    public function updateAction($" . "id){
+    public function updateAction($" . "id, $" . $name . "_form = null){
         extract($" . "_POST);
             
-        $" . $name . " = $" . "this->form_generat(new " . ucfirst($name) . "($" . "id), $" . $name . "_form);
+        $" . $name . " = $" . "this->form_fillingentity(new " . ucfirst($name) . "($" . "id), $" . $name . "_form);
 
             "; //.implode($mtmedit, "\n")
         if ($otherattrib):
@@ -432,7 +437,6 @@ class " . ucfirst($name) . "Controller extends Controller{
         if ($" . $name . "->__update()) {
             return 	array('success' => true, // pour le restservice
                             '" . $name . "' => $" . $name . ",
-                            'id' => $" . "id,
                             'tablerow' => Datatable::getSingleRowRest($" . $name . "),
                             'redirect' => 'index', // pour le web service
                             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
@@ -686,7 +690,7 @@ class " . ucfirst($name) . "Controller extends Controller{
                 
             " . $field . "
             
-            $" . "entitycore->addDformjs();
+            $" . "entitycore->addDformjs($" . "action);
             
             return $" . "entitycore;
         }

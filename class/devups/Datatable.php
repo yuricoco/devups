@@ -32,20 +32,20 @@ class Datatable {
         if ($rigths) {
             if (in_array('update', $rigths)) {
                 if (in_array('update', $_SESSION['action'])) // next deep is the admin right. its role maybe have the right to do some thing but he maybe not have that right
-                    //$actionlien .= '<span onclick="edit(' . $id . ')" class="btn btn-default" >edit</span>';
-                    $actionlien .= '<a data-id="' . $id . '" href="index.php?path=' . $path . '/_edit&id=' . $id . '"  class="btn btn-default model_edit" data-toggle="modal" data-target="#' . $path . 'modal" >edit</a>';
+                    $actionlien .= '<span onclick="model._edit(' . $id . ')" class="btn btn-default" >edit</span>';
+                    //$actionlien .= '<a data-id="' . $id . '" href="#" onclick="model._edit(' . $id . ')"  class="btn btn-default model_edit" >edit</a>';
             }
             if (in_array('read', $rigths)) {
                 if (in_array('read', $_SESSION['action']))
-                    $actionlien .= '<a href="index.php?path=' . $path . '/show&id=' . $id . '" target="_self" class="btn btn-default" >show</a> .';
+                    $actionlien .= '<a href="#" onclick="model._show(' . $id . ')" target="_self" class="btn btn-default" >show</a> .';
             }
             if (in_array('delete', $rigths)) {
                 if (in_array('delete', $_SESSION['action']))
-                    $actionlien .= '<a href="index.php?path=' . $path . '/delete&id=' . $id . '"'
-                        . ' onclick="if(!confirm(\'Voulez-vous Supprimer\')) return false;" '
-                        . ' class="btn btn-default" >delete</a>';
+                    $actionlien .= '<span onclick="model._delete(this, ' . $id . ')"'
+                        . ' class="btn btn-default" >delete</span>';
             }
         }
+
         elseif (isset($_SESSION['action'])) {
             if (in_array('update', $_SESSION['action']) or
                 in_array('read', $_SESSION['action']) or
@@ -135,6 +135,12 @@ class Datatable {
 <label class="" >Action groupe:</label> '.implode("", $customaction).'
 <span id="deletegroup" class="btn btn-danger">delete</span>
                     </div>';
+
+        }else{
+
+            $html .= '
+<div class="col-lg-8 col-md-12">
+<label class="" >Action groupe:</label> Non disponible </div>';
 
         }
 
@@ -283,12 +289,12 @@ class Datatable {
     public static function renderListViewUI($list, $header, $action = false, $defaultaction = true) {
 
 
-        $_SESSION['dv_datatable'] = ['header' => $header, 'action' => $action, 'defaultaction' => $defaultaction];
+        $_SESSION['dv_datatable'] = ['class' => self::$class, 'header' => $header, 'action' => $action, 'defaultaction' => $defaultaction];
 
         $theader = self::buildheader($header, $action);
 
         if (!$list) {
-            $tb = 'la liste est vide';
+            $tb = [];
         }else
             $tb = self::getTableBody($list, $header, $action, $defaultaction);
 
@@ -299,7 +305,10 @@ class Datatable {
     }
 
     public static function getSingleRowRest($entity) {
-        return self::getTableRest(\Controller::lastpersistance($entity))[0];
+        if($_SESSION["dv_datatable"]["class"] == strtolower(get_class($entity)))
+            return self::getTableRest(\Controller::lastpersistance($entity))[0];
+
+        return "";
     }
 
     public static function getTableRest($lazyloading) {

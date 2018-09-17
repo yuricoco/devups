@@ -38,6 +38,10 @@ abstract class Model extends \stdClass {
 //        }
     }
 
+    /**
+     * static method gives the path of the module where the entity is/
+     * @return string the path of the module where the class is.
+     */
     public static function classpath(){
         $reflector = new ReflectionClass(get_called_class());
         $fn = $reflector->getFileName();
@@ -45,6 +49,7 @@ abstract class Model extends \stdClass {
         $dirname = str_replace("Entity", "", $dirname[1]);
         return "src".$dirname;
     }
+
     public static function classroot(){
         $reflector = new ReflectionClass(get_called_class());
         $fn = $reflector->getFileName();
@@ -53,6 +58,10 @@ abstract class Model extends \stdClass {
         return __env."src".$dirname."/index.php?path=".strtolower(get_called_class())."/";
     }
 
+    /**
+     * static method gives the directory of the module where the entity is/
+     * @return classroot the directory of the module where the class is.
+     */
     public static function classdir(){
         return ROOT.self::classpath();
     }
@@ -127,6 +136,10 @@ abstract class Model extends \stdClass {
         return $dfile;
     }
 
+    /**
+     * @param $file
+     * @return bool
+     */
     public function uploadfile($file) {
 
         $uploadmethod = 'set' . ucfirst($file);
@@ -177,18 +190,18 @@ abstract class Model extends \stdClass {
 
 
     /**
-     * return the row as design in the database
+     * return the firt
      * @example http://easyprod.spacekola.com description
      * @param type $id
      * @return $this
      */
-    public static function first() {
+    public static function first($recursif = true) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->limit(1)->__getOne();
+        return $qb->select()->limit(1)->__getOne($recursif);
     }
 
     /**
@@ -197,13 +210,13 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function last() {
+    public static function last($recursif = true) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne();
+        return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne($recursif);
     }
 
     /**
@@ -212,13 +225,13 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function get($index = 1) {
+    public static function get($index = 1, $recursif = true) {
         $i = (int) $index;
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->limit($i - 1, $i)->__getOne();
+        return $qb->select()->limit($i - 1, $i)->__getOne($recursif);
     }
 
     /**
@@ -419,14 +432,14 @@ abstract class Model extends \stdClass {
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }
 
-    public function __hasmany($collection, $exec = true, $recursif = true) {
+    public function __hasmany($collection, $exec = true, $incollectionof = null, $recursif = false) {
         if (!is_object($collection)) {
             $reflection = new ReflectionClass($collection);
             $collection = $reflection->newInstance();
         }
         if ($this->getId()) {
             $dbal = new DBAL();
-            return $dbal->hasmany($this, $collection, $exec, $recursif);
+            return $dbal->hasmany($this, $collection, $exec, $incollectionof, $recursif);
         } else {
             return [];
         }
@@ -434,7 +447,7 @@ abstract class Model extends \stdClass {
 
     public function __belongto($relation) {
 
-        if(is_object($relation) && $relation->dvfetched)
+        if(is_object($relation) && ($relation->dvfetched || !$relation->dvinrelation))
             return $relation;
 
         if (!$this->getId()) {
@@ -444,20 +457,23 @@ abstract class Model extends \stdClass {
                 $reflection = new ReflectionClass($relation);
                 return $reflection->newInstance();
             endif;
+        }else{
+            $reflection = new ReflectionClass($relation);
+            $relation = $reflection->newInstance();
         }
 
         $dbal = new DBAL();
         return $dbal->belongto($this, $relation);
     }
 
-    public function __belongto2($relation) {
+    public function __belongto2($relation, $recursif = false) {
         if (!is_object($relation)) :
             $reflection = new ReflectionClass($relation);
             $relation = $reflection->newInstance();
         endif;
 
         $qb = new QueryBuilder($relation);
-        return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOne();
+        return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
     }
 
     public function getId() {
