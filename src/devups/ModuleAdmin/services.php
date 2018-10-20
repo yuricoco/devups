@@ -30,8 +30,14 @@
          case 'dvups_admin._new':
                 g::json_encode(Dvups_adminController::renderForm());
                 break;
+         case 'dvups_admin.create':
+                g::json_encode($dvups_adminCtrl->createAction());
+                break;
         case 'dvups_admin._edit':
                 g::json_encode(Dvups_adminController::renderForm(R::get("id")));
+                break;
+        case 'dvups_admin.update':
+                g::json_encode($dvups_adminCtrl->updateAction(R::get("id")));
                 break;
         case 'dvups_admin._show':
                 g::json_encode(Dvups_adminController::renderDetail(R::get("id")));
@@ -104,10 +110,10 @@
                 break;
 
         case 'dvups_role._new':
-                g::json_encode(Dvups_roleController::renderFormWidget());
+                g::json_encode(Dvups_roleController::renderForm());
                 break;
         case 'dvups_role._edit':
-                g::json_encode(Dvups_roleController::renderFormWidget(R::get("id")));
+                g::json_encode(Dvups_roleController::renderForm(R::get("id")));
                 break;
         case 'dvups_role._show':
                 g::json_encode(Dvups_roleController::renderDetail(R::get("id")));

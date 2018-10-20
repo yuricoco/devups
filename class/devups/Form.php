@@ -71,9 +71,9 @@ class Form extends FormFactory{
     }
 
     public static function addjs($js, $path = ""){
-        if(!$path)
-            return "<script src='".__env . self::$classname ::classpath()."/Ressource/js/".$js.".js' ></script>";
-        else
+//        if(!$path)
+//            return "<script src='".__env . self::$classname ::classpath()."/Ressource/js/".$js.".js' ></script>";
+//        else
             return "<script src='".$path."/".$js.".js' ></script>";
     }
 

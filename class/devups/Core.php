@@ -27,9 +27,9 @@ class Core extends stdClass {
     }
 
     public function addjs($js, $path = ""){
-        if(!$path)
-            $this->addjs[] = __env . $this->classname ::classpath()."/Ressource/js/".$js.".js";
-        else
+//        if(!$path)
+//            $this->addjs[] = __env . $this->classname ::classpath()."/Ressource/js/".$js.".js";
+//        else
             $this->addjs[] = $path."/".$js.".js";
     }
 

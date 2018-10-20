@@ -83,7 +83,18 @@ abstract class Model extends \stdClass {
         $dvlang = Dvups_lang::select()->where("ref", $ref)->__getOne();
         $dvcontentlang = new Dvups_contentlang();
 
-        if(!$dvlang->getId()){
+        if($dvlang->getId()){
+            $dvcontentlang = Dvups_contentlang::select()
+                ->where("dvups_lang.ref", $dvlang->getRef())
+                ->andwhere("lang", $lang)
+                ->__getOne();
+            if(!$dvcontentlang->getId()){
+                $dvcontentlang = new Dvups_contentlang();
+
+                $dvcontentlang->setDvups_lang($dvlang);
+                $dvcontentlang->setLang($lang);
+            }
+        }else{
             $dvlang = new Dvups_lang();
             $dvlang->setRef($ref);
             $dvlang->set_table($table);
@@ -93,11 +104,6 @@ abstract class Model extends \stdClass {
 
             $dvcontentlang->setDvups_lang($dvlang);
             $dvcontentlang->setLang($lang);
-        }else{
-            $dvcontentlang = Dvups_contentlang::select()
-                ->where("dvups_lang.ref", $dvlang->getRef())
-                ->andwhere("lang", $lang)
-                ->__getOne();
         }
         $dvcontentlang->setContent($content);
         $dvcontentlang->__save();
@@ -110,7 +116,7 @@ abstract class Model extends \stdClass {
 
         if(!$lang)
             $lang = local();
-
+        //$lang = __lang;
         $table = strtolower(get_class($this));
         $ref = $table . "_".$this->id . "_" . $column;
 
@@ -217,6 +223,14 @@ abstract class Model extends \stdClass {
 
         $qb = new QueryBuilder($entity);
         return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne($recursif);
+    }
+    public static function lastrow() {
+
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        return $qb->select()->orderby("id desc")->limit(1)->__getOneRow();
     }
 
     /**
@@ -403,6 +417,10 @@ abstract class Model extends \stdClass {
 
         $dbal = new DBAL();
         return $dbal->findByIdDbal($this, $recursif);
+    }
+    public function __findrow() {
+        $qb = new QueryBuilder($this);
+        return $qb->select()->where("id", "=", $this->id)->__getOneRow();
     }
 
     public function __delete($exec = true) {

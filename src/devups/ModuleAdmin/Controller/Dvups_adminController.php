@@ -10,6 +10,13 @@ class Dvups_adminController extends Controller {
         $this->err = array();
     }
 
+    public static function renderFormWidget($id = null) {
+        if($id)
+            Dvups_adminForm::__renderFormWidget(Dvups_admin::find($id), "update&id=".$id);
+        else
+            Dvups_adminForm::__renderFormWidget(new Dvups_admin(), 'create');
+    }
+
     public function resetcredential() {
 
         $dvups_admin = Dvups_admin::find($_GET["id"]);
@@ -108,6 +115,7 @@ class Dvups_adminController extends Controller {
         if ($dvups_admin->__insert()) {
             return array('success' => true, // pour le restservice
                 'dvups_admin' => $dvups_admin,
+                'tablerow' => Datatable::getSingleRowRest($dvups_admin),
                 'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
@@ -144,6 +152,7 @@ class Dvups_adminController extends Controller {
         if ($dvups_admin->__save()) {
             return array('success' => true, // pour le restservice
                 'dvups_admin' => $dvups_admin,
+                'tablerow' => Datatable::getSingleRowRest($dvups_admin),
                 'redirect' => 'index', // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {

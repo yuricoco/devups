@@ -594,31 +594,6 @@ class DBAL extends Database {
         return $flowBD;
     }
 
-//    public function findAllDbalBaseEntity($critere = "") {
-//        $sql = 'select * from `' . $this->table . '`' . $critere;
-//        $query = $this->link->prepare($sql);
-//        $query->execute();
-//        $flowBD = $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
-//
-//        return $flowBD;
-//    }
-//
-//    public function findAllDbalEntireEntity($list = false, $object = null) {
-//
-//        if ($object):
-//            $this->instanciateVariable($object);
-//        endif;
-//
-//        $sql = 'select * from `' . $this->table . '`';
-//        if (!empty($this->entity_link_list)) {
-//            foreach ($this->entity_link_list as $entity_link) {
-//                $sql .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
-//            }
-//        }
-//
-//        return $this->__findAll($sql, [], false, true);
-//    }
-
     public function findByIdDbal($object = null, $recursif = true, $collection = false) {
 
         if ($object):
@@ -677,7 +652,7 @@ class DBAL extends Database {
 
                         if (is_array($flowBD[$key2])) {
                             $object_array[$key] = null;//$classname;
-                            $object_array[$key."_id"] = $flowBD[$key2];
+                            $object_array[$key."_id"] = $flowBD[$key2][0];
                         }else {
                             $object_array[$key] = null;// $classname;
                             $object_array[$key."_id"] = $flowBD[$key2];

@@ -44,6 +44,7 @@
                 ];
 
 
+
             return $entitycore;
         }
         
@@ -51,11 +52,8 @@
             return FormFactory::__renderForm(Dvups_roleForm::formBuilder($dvups_role, $action, $button));
         }
 
-        public static function __renderDetailWidget(\Dvups_role $testentity){
+        public static function __renderDetailWidget(\Testentity $testentity){
             include ROOT . Testentity::classpath() . "Form/TestentityDetailWidget.php";
-        }
-        public static function __renderFormWidget(\Dvups_role $dvups_role, $action_form){
-            include ROOT . Dvups_role::classpath() . "Form/Dvups_roleFormWidget.php";
         }
     }
     

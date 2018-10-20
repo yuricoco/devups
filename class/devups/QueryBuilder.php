@@ -561,7 +561,10 @@ class QueryBuilder extends \DBAL {
         return $this->limit($i - 1, $i)->__getOne($recursif);
     }
 
-    public function __getAllRow() {
+    public function __getAllRow($setdefaultjoin = false) {
+        if($setdefaultjoin)
+            return $this->__findAllRow($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters);
+
         return $this->__findAllRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
     }
 

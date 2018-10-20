@@ -4,7 +4,7 @@ define('PROJECT_NAME', 'devupstuto');
 
 define ('dbname', 'devupstuto_bd');
 define ('dbuser', 'root');
-define ('dbpassword',  '');
+define ('dbpassword',  '');//BD20Devupstuto18
 define ('dbhost',  'localhost');
         
 // base url

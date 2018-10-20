@@ -40,6 +40,8 @@ $views = __DIR__ . '/Ressource/views';
         'dvups_rightCtrl' => new Dvups_rightController()
     ];
 
+(new Request('hello'));
+
 
     //extract($_GET['path']);
     if (isset($_GET['path'])) {

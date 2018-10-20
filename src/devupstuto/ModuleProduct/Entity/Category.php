@@ -34,7 +34,7 @@ class Category extends \Model implements JsonSerializable, DvupsTranslation
 
     public function getName()
     {
-        return $this->__gettranslate("name", "en");
+        return $this->__gettranslate("name", "fr");
     }
 
     public function setName($name)

@@ -41,13 +41,8 @@ class Dvups_roleController extends Controller{
     }
 
     public static function renderFormWidget($id = null) {
-        if($id){
-            $dvups_role = Dvups_role::find($id);
-            $dvups_role->collectDvups_entity();
-            $dvups_role->collectDvups_module();
-            $dvups_role->collectDvups_right();
-            Dvups_roleForm::__renderFormWidget($dvups_role, "update&id=".$id);
-        }
+        if($id)
+            Dvups_roleForm::__renderFormWidget(Dvups_role::find($id), 'update');
         else
             Dvups_roleForm::__renderFormWidget(new Dvups_role(), 'create');
     }

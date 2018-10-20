@@ -10,12 +10,10 @@ class Dvups_moduleController extends Controller{
 
         $dvups_module = new Dvups_module($id);
         $dvups_module->__update("dvups_module.label", $label)->exec();
-        $dvups_module->__inittranslate("label", $label);
 
         return array( 'success' => true,
             'dvups_module' => $dvups_module,
             'detail' => 'detail de l\'action.');
-
     }
 
 

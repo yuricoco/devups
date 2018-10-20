@@ -65,7 +65,10 @@
         function setDvups_lang(\Dvups_lang $dvups_lang) {
             $this->dvups_lang = $dvups_lang;
         }
-                        
+
+        function addNewTranslationAction(){
+            return '<a id="model_new" onclick="model._newtranslation('.$this->id.')" class="btn btn-default"><i class="fa fa-plus"></i> add</a>';
+        }
         
         public function jsonSerialize() {
                 return [

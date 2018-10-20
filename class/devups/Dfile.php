@@ -17,6 +17,7 @@ class Dfile {
     
     public $uploaddir;
     private $file;
+    private $original = true;
     private $compressionquality = 80;
     private $file_name = "";
 
@@ -195,6 +196,12 @@ class Dfile {
 
     public function sanitize() {
         $this->file_name = $this->wd_remove_accents($this->name);
+        return $this;
+    }
+
+
+    public function saveoriginal($param){
+        $this->original = $param;
         return $this;
     }
 
@@ -383,6 +390,19 @@ class Dfile {
         return $this;
     }
 
+    public static function d_rename($oldname, $newname, $oldpath = "", $newpath = ""){
+        $path = UPLOAD_DIR;
+        if($oldpath){
+            $path = UPLOAD_DIR.$oldpath;
+        }
+        if($newpath)
+            $newpath = UPLOAD_DIR.$newpath;
+        else
+            $newpath = $path;
+
+        rename($path."/".$oldname, $newpath."/".$newname);
+    }
+
     public function upload() {
         return $this->moveto($this->uploaddir);
     }
@@ -410,15 +430,33 @@ class Dfile {
         if (!$absolut)
             $path = $this->chdirectory($this->filepath($path));
 
-        if (move_uploaded_file($this->tmp_name, $path . $this->file_name)) {
+        if (move_uploaded_file($this->tmp_name, $path . "tmp_".$this->file_name)) {
 
             if (!empty($this->imagetoresize)) {
 
                 foreach ($this->imagetoresize as $imagetoresize) {
-                    $this->resizeimage($path . $this->file_name, $imagetoresize);
+                    $this->resizeimage($path . "tmp_".$this->file_name, $imagetoresize);
                 }
+
+                if($this->original):
+                    // rename the file
+                    self::d_rename("tmp_".$this->file_name, $this->file_name, $this->uploaddir);
+                else:
+                    $this->unlink($path . "tmp_".$this->file_name);
+                endif;
+
                 if ($this->validation())
                     return $this->error;
+            }elseif($this->type === "image"){
+                // rename the file
+                self::d_rename("tmp_".$this->file_name, $this->file_name, $this->uploaddir);
+                $this->resizeimage($path . $this->file_name,
+                    ["resize" => [$this->imagesize[0], $this->imagesize[1]], "sufix" => "", "uploaddir" => $this->uploaddir, "crop" => false, "quality" => $this->compressionquality]);
+
+            }else{
+                // rename the file
+                self::d_rename("tmp_".$this->file_name, $this->file_name, $this->uploaddir);
+
             }
 
             return array("success" => true,
@@ -427,6 +465,8 @@ class Dfile {
                     'size' => $this->size,
                     'type' => $this->type,
                     'path' => $path,
+                    'uploaddir' => $this->uploaddir,
+                    'imagesize' => $this->imagesize,
                     'hashname' => $this->file_name,
                     'extension' => $this->extension,
                 ],
