@@ -15,15 +15,23 @@ namespace DClass\devups;
 class Datatable {
     private $entity = null;
     private static $class;
-    
+
     static function init(\stdClass $entity, $next = 0, $per_page = 10) {
         $dt = new Datatable();
         $dt->entity = $entity;
         return $dt;
     }
 
-    public static function actionListView($path, $id, $action = "") {
+    public static function actionListView($path, $id, $userside = false) {
         $actionlien = "";
+
+        if($userside){
+
+            $actionlien .= '<a href="#"  class="btn btn-default" >edit</a>';
+            $actionlien .= '<a href="#" target="_self" class="btn btn-default" >show</a> .';
+
+            return $actionlien;
+        }
 
         if (!isset($_SESSION['action']))
             return "<span class='alert alert-info' >not rigth contact the administrator</span>";
@@ -33,7 +41,7 @@ class Datatable {
             if (in_array('update', $rigths)) {
                 if (in_array('update', $_SESSION['action'])) // next deep is the admin right. its role maybe have the right to do some thing but he maybe not have that right
                     $actionlien .= '<span onclick="model._edit(' . $id . ')" class="btn btn-default" >edit</span>';
-                    //$actionlien .= '<a data-id="' . $id . '" href="#" onclick="model._edit(' . $id . ')"  class="btn btn-default model_edit" >edit</a>';
+                //$actionlien .= '<a data-id="' . $id . '" href="#" onclick="model._edit(' . $id . ')"  class="btn btn-default model_edit" >edit</a>';
             }
             if (in_array('read', $rigths)) {
                 if (in_array('read', $_SESSION['action']))
@@ -78,7 +86,7 @@ class Datatable {
     }
 
     public static function renderdata($lazyloading, $header, $action = true, $defaultaction = true,
-                                      $groupedaction = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
+                                      $groupedaction = true, $searchaction = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]) {
         self::$class = $lazyloading['classname'];
 //        if (!$lazyloading['listEntity']) {
 //            return '<div id="dv_table" data-entity="'.$lazyloading['classname'].'" class="text-center">la liste est vide</div>';
@@ -108,7 +116,7 @@ class Datatable {
     <div class="col-lg-12 col-md-12"><div class="table-responsive">';
         $html .= self::tablefilter($lazyloading['current_page'], $groupedaction);
 
-        $html .= self::renderListViewUI($lazyloading['listEntity'], $header, $action, $defaultaction);
+        $html .= self::renderListViewUI($lazyloading['listEntity'], $header, $action, $defaultaction, $searchaction);
 
         $html .= ' </div></div>';
 
@@ -286,12 +294,12 @@ class Datatable {
         return '<table id="dv_table" data-entity="" class="table table-bordered table-hover table-striped" ><thead><tr>' . implode(" ", $th) . '</tr></thead><tbody>' . implode(" ", $tb) . '</tbody></table>';
     }
 
-    public static function renderListViewUI($list, $header, $action = false, $defaultaction = true) {
+    public static function renderListViewUI($list, $header, $action = false, $defaultaction = true, $searchaction = true) {
 
 
         $_SESSION['dv_datatable'] = ['class' => self::$class, 'header' => $header, 'action' => $action, 'defaultaction' => $defaultaction];
 
-        $theader = self::buildheader($header, $action);
+        $theader = self::buildheader($header, $searchaction);
 
         if (!$list) {
             $tb = [];
@@ -321,7 +329,7 @@ class Datatable {
         return self::getTableBody($lazyloading["listEntity"], $header, $action, $defaultaction);
     }
 
-    private static function buildheader($header, $action) {
+    private static function buildheader($header, $searchaction) {
         $thf = [];
         $th = [];
         $fields = [];
@@ -358,7 +366,7 @@ class Datatable {
             }
         }
 
-        if ($action) {
+        if ($searchaction) {
             $th[] = '<th>Action</th>';
 
             $thf[] = '<th>'//<input name="path" value="' . $_GET['path'] . '" hidden >
@@ -370,7 +378,7 @@ class Datatable {
 
     }
 
-    private static function getTableBody($list, $header, $action = false, $defaultaction = true) {
+    private static function getTableBody($list, $header, $action = false, $defaultaction = true, $userbaseurl = "") {
 
         foreach ($list as $entity) {
             $tr = [];
@@ -436,7 +444,17 @@ class Datatable {
 
             // the user may write the method in the entity for better code practice
             if (!is_bool($action)) {
-                $act = call_user_func(array($entity, $action.'Action'));
+                if($action == "crud"){
+                    $act = '<a href="'.__env.self::$class.'-update?id='.$entity->getId().'"  class="btn btn-default" >edit</a>';
+                    $act .= '<a href="'.__env.self::$class.'-detail?id='.$entity->getId().'" target="_self" class="btn btn-default" >show</a> .';
+                }
+                else
+                    $act = call_user_func(array($entity, $action.'Action'));
+
+//                if (is_array($action)){
+//                    $act = '<a href="#"  class="btn btn-default" >edit</a>';
+//                    $act .= '<a href="#" target="_self" class="btn btn-default" >show</a> .';
+//                }
             }
 
             $tr[] = '<td>' .  $act . $dact . '</td>';

@@ -39,7 +39,18 @@ class Category extends \Model implements JsonSerializable, DvupsTranslation
 
     public function setName($name)
     {
-        $this->name = $name;
+        if($name)
+            $this->name = $name;
+        else
+            return "field empty";
+    }
+
+    public function setNamesetter($name)
+    {
+        if($name)
+            $this->name = $name;
+        else
+            return "field empty setter";
     }
 
 

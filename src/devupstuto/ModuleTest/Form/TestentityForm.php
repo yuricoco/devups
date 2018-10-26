@@ -7,6 +7,8 @@
             
             $entitycore->formaction = $action;
             $entitycore->formbutton = $button;
+            
+            //$entitycore->addcss('csspath');
                 
             
             $entitycore->field['name'] = [
@@ -22,7 +24,8 @@
             ];
 
             
-            $entitycore->addDformjs();
+            $entitycore->addDformjs($action);
+            $entitycore->addjs('Ressource/js/testentityForm.js');
             
             return $entitycore;
         }

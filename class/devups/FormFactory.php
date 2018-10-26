@@ -53,7 +53,7 @@ class FormFactory {
             }
         }
 
-        $callback($checkbox);
+        call_user_func($callback, $checkbox);
     }
 
     public static function __checkbox($entitycore, $field, $directive = "") {
@@ -156,11 +156,20 @@ class FormFactory {
 
         $input = FormFactory::__input($entitycore, $field, $require);
         $file = "";
+
+        if(isset($field['src']))
+            $file = self::__filepreview($field);
+
+        return $file . $input;
+    }
+
+    public static function __filepreview($field){
+        $file = "";
         if ($field['value']) {
             switch ($field[FH_FILETYPE]) {
 
                 case FILETYPE_DOCUMENT:
-                    $file = "<a class='dv-doc' href='" . $field['src'] . "'> download the document</a>";
+                    $file = "<a class='dv-doc' href='" . $field['src'] . "' download='" . $field['value'] . "'> download the document</a>";
                     break;
                 case FILETYPE_VIDEO:
                     $file = "<video class='dv-video' src='" . $field['src'] . "'> </video>";
@@ -174,7 +183,7 @@ class FormFactory {
             }
         }
 
-        return $file . $input;
+        return $file;
     }
 
     public static function __input($entitycore, $field, $directive = null) {
@@ -226,6 +235,10 @@ class FormFactory {
             $label = "";
             if (isset($field['label'])) {
                 $label = "<label class='dv_label ' >" . $field['label'] . " " . $etoil . "</label>\n";
+            }
+
+            if (!isset($field['setter'])) {
+                $entitycore->field[$key]["setter"] = $key;
             }
 
             if (in_array($field['type'], [FORMTYPE_TEXT, FORMTYPE_EMAIL, FORMTYPE_NUMBER, FORMTYPE_PASSWORD])) {
@@ -280,7 +293,14 @@ class FormFactory {
             }
         }
 
-        $form = $formaction . $form . $dvups_form . $formbutton . $formjs ;
+        $formcss = "";
+        if (isset($entitycore->addcss) && $entitycore->addcss) {
+            foreach ($entitycore->addcss as $css){
+                $formcss .= "<link href='$css' rel=\"stylesheet\" />";
+            }
+        }
+
+        $form = $formcss .$formaction . $form . $dvups_form . $formbutton . $formjs ;
 
         return $form;
     }

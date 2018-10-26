@@ -4,15 +4,42 @@
 
 var entityid = 0;
 var dform = {
+    binderror: function(error){
+
+        model.modalbody.find("#loader").remove();
+        //console.log(response.error);
+        var errorarray = [];
+        var keys = Object.keys(error);
+        var values = Object.values(error);
+        for (var i = 0; i < keys.length; i++) {
+            errorarray.push( "<b>" + keys[i] + "</b> : " + values[i]+ "");
+        }
+        model.modalbody.prepend('<div class="alert alert-danger alert-dismissable">\n' +
+            '                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>\n' +
+            '                                '+ errorarray.join("<br>") +'.\n' +
+            '                            </div>');
+
+    },
     callbackcreate : function (response){
-        console.log(response);
-        $("#dv_table").find("tbody").prepend(response.tablerow);
-        model._dismissmodal();
+        //console.log(response, "create");
+
+        if(response.success){
+            $("#dv_table").find("tbody").prepend(response.tablerow);
+            model._dismissmodal();
+            return;
+        }
+
+        dform.binderror(response.error);
     },
     callbackupdate : function (response){
-        console.log(response);
-        $("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
-        model._dismissmodal();
+        //console.log(response, "update");
+        if(response.success){
+            $("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
+            model._dismissmodal();
+            return;
+        }
+
+        dform.binderror(response.error);
     }
 };
 

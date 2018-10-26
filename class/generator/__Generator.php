@@ -360,6 +360,16 @@ Usage:
             if (!file_exists('Ressource/js'))
                 mkdir("Ressource/js", 0777);
 
+            $js = "Ressource/js/" . strtolower($entity->name);
+
+            $jsctrl = fopen($js . 'Ctrl.js', 'w');
+            fputs($jsctrl, "//".$entity->name. "Ctrl");
+            fclose($jsctrl);
+
+            $jsform = fopen($js . 'Form.js', 'w');
+            fputs($jsform, "//".$entity->name. "Form");
+            fclose($jsform);
+
             $vue = "Ressource/views/" . strtolower($entity->name);
             $frontend->viewsGenerator(__Generator::$projectcore->listmodule, $entity, __Generator::$projectcore->template, $vue);
         }
@@ -601,7 +611,7 @@ switch (Request::get('path')) {
                 g::json_encode($" . $name . "Ctrl->updateAction(R::get(\"id\")));
                 break;
         case '" . $name . "._show':
-                g::json_encode(" . ucfirst($name) . "Controller::renderDetail(R::get(\"id\")));
+                " . ucfirst($name) . "Controller::renderDetail(R::get(\"id\"));
                 break;
         case '" . $name . "._delete':
                 g::json_encode($" . $name . "Ctrl->deleteAction(R::get(\"id\")));

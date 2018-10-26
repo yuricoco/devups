@@ -60,7 +60,7 @@ class Product extends \Model implements JsonSerializable
         $this->image = new Image();
         $this->category = new Category();
         $this->subcategory = new Subcategory();
-        $this->storage = EntityCollection::entity_collection('storage');
+        $this->storage = [];
     }
 
     public function getId()
@@ -148,14 +148,14 @@ class Product extends \Model implements JsonSerializable
         return $this->storage;
     }
 
+    function setStorage($storages)
+    {
+        $this->storage = $storages;
+    }
+
     function addStorage(\Storage $storage)
     {
         $this->storage[] = $storage;
-    }
-
-    function dropStorageCollection()
-    {
-        $this->storage = EntityCollection::entity_collection('storage');
     }
 
 

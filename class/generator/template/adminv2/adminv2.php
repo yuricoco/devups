@@ -221,7 +221,7 @@ class Adminv2 {
 
 <script src=\"<?= CLASSJS ?>model.js\"></script>
 <script src=\"<?= CLASSJS ?>ddatatable.js\"></script>
-<script src=\"\"></script>
+<script src=\"Ressource/js/" . $name . "Ctrl.js\"></script>
 
 <?php } ?>
 @section('jsimport')

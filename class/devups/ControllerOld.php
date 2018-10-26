@@ -9,16 +9,15 @@ use Genesis as g;
  */
 class Controller {
 
-    protected $error = [];
-    protected $error_exist = false;
+    private $change_collection_adress;
 
-    public static function i() {
+    public static  function i() {
         $reflection = new ReflectionClass(get_called_class());
         return $reflection->newInstance();
     }
 
     /**
-     *
+     * 
      * @param type $resultCtrl controller method
      */
     public static function renderTemplate($view, $data) {
@@ -27,7 +26,7 @@ class Controller {
 
     /**
      * 11/11/2017
-     *
+     * 
      * @param \stdClass $Dao
      * @param int $par_page
      * @param type $next
@@ -74,15 +73,15 @@ class Controller {
                     $join = explode("-", $arrayfieldtype[0]);
 
                     $qb->andwhere($join[0] . "_id")
-                        ->in(
-                            $qb->addselect("id", new $join[0], false)
-                                ->where($join[1])
-                                ->like($_GET[$arrayfieldtype[0]])
-                                ->close()
-                        );
+                            ->in(
+                                    $qb->addselect("id", new $join[0], false)
+                                    ->where($join[1])
+                                    ->like($_GET[$arrayfieldtype[0]])
+                                    ->close()
+                    );
                 }
 //                elseif ($_GET[$arrayfieldtype[1]] == "collect") {
-//
+//                    
 //                    $join = explode("-", $arrayfieldtype[0]);
 //                    $qb->andwhere("id")->in($qb->addselect("id", new $join[0])->where($column)->like($value)->close());
 //                }
@@ -96,7 +95,7 @@ class Controller {
         return (new Controller())->lazyloading($entity, $next, $per_page, $qbcustom, $order);
     }
     /**
-     *
+     * 
      * @param \stdClass $entity
      * @param type $next
      * @param type $per_page
@@ -154,13 +153,13 @@ class Controller {
                     $listEntity = $qbcustom->orderby($order)->limit($next, $per_page)->__getAll();
                 } else
                     $listEntity = $qbcustom->limit($next, $per_page)->__getAll();
-
+                
             } else {
-                if ($order)
+                if ($order) 
                     $listEntity = $qb->select()->orderby($order)->limit($next, $per_page)->__getAll();
                 else
                     $listEntity = $qb->select()->limit($next, $per_page)->__getAll();
-
+                
             }
 
             if ($page == $pagination) {
@@ -195,7 +194,7 @@ class Controller {
 
     /**
      * 24/10/2016
-     *
+     * 
      * @param \stdClass $Dao
      * @param int $par_page
      * @param type $next
@@ -238,22 +237,22 @@ class Controller {
     }
 
     /**
-     * Hydrate l'entité passé en parametre sur la base de la variable post ou dans le cas des requete
+     * Hydrate l'entité passé en parametre sur la base de la variable post ou dans le cas des requete 
      * asynchrone, d'une chaine formater en json ou alors les arrays.
-     *
-     * @example $jsondata as \Array dans le cas de la persistance d'une
+     * 
+     * @example $jsondata as \Array dans le cas de la persistance d'une 
      * entité imbriqué dans celle courante
-     *
+     * 
      * @param stdClass $object l'instance de l'entité à hydrater
      * @param Mixed ( String or Array ) $jsondata optionnel
      * @return type
      * @throws InvalidArgumentException
      */
-    public function form_generat($object, $data = null, $entityform = null) {
-        return $this->form_fillingentity($object, $data, $entityform);
+    public static function form_generat($object, $data = null, $entityform = null) {
+        return self::form_fillingentity($object, $data, $entityform);
     }
 
-    public function form_fillingentity($object, $data = null, $entityform = null) {
+    public static function form_fillingentity($object, $data = null, $entityform = null) {
         if (!is_object($object))
             throw new InvalidArgumentException('$object must be an object.');
 
@@ -270,15 +269,21 @@ class Controller {
 //            if($jsondata){
 //                $object_array = Controller::formWithJson ($object, $jsondata, $change_collection_adresse);
 //            }else{
-        return $this->formWithPost($object, $entityform);
+        $object_array = Controller::formWithPost($object, $entityform);
 //            }
-
+        return Bugmanager::cast((object) $object_array, get_class($object));
     }
 
-    private function formWithPost($object, $entityform) {
+    private static function formWithPost($object, $entityform) {
         global $_ENTITY_FORM;
         global $_ENTITY_COLLECTION;
         global $__controller_traitment;
+        global $em;
+
+
+        $classmetadata = $em->getClassMetadata("\\" . get_class($object));
+        $fieldname = array_keys($classmetadata->fieldNames);
+        $association = array_keys($classmetadata->associationMappings);
 
         $__controller_traitment = true;
         $_ENTITY_COLLECTION = [];
@@ -293,6 +298,36 @@ class Controller {
         else {
             $entitycore = new stdClass();
             $entitycore->field = unserialize($_POST["dvups_form"][strtolower(get_class($object))]);
+            //$entitycore->field = $_SESSION["dvups_form"][strtolower(get_class($object))];
+//            unset($_SESSION[strtolower(get_class($object))]);
+        }
+
+        $object_array = (array) $object;
+        if (isset($object_array["dvfetched"])) {
+            unset($object_array["dvfetched"]);
+        }
+        $key_value = [];
+        $i = 0;
+        $j = 0;
+        foreach ($object_array as $key => $value) {
+            if (is_object($value)) {
+                $key_form = $association[$j];
+                $key_value[$key_form] = $key;
+                $j++;
+            } elseif (is_array($value) && $value) {
+                $key_form = strtolower(get_class($value[0]));
+
+                if (!isset($_ENTITY_FORM[$key_form]))
+                    $_ENTITY_FORM[$key_form] = [];
+
+                $key_value[$key_form] = $key;
+            } else {
+                if (isset($fieldname[$i])) {
+                    $key_form = $fieldname[$i];
+                    $key_value[$key_form] = $key;
+                    $i++;
+                }
+            }
         }
 
         foreach ($entitycore->field as $key => $value) {
@@ -300,9 +335,8 @@ class Controller {
 
                 if ($key_form == $key) {
 
-                    $currentfieldsetter = 'set' . ucfirst($value["setter"]);
-
                     if (isset($value['values'])) {
+
 
                         $_ENTITY_COLLECTION[] = [
                             'owner' => $object->getId()
@@ -311,8 +345,8 @@ class Controller {
                         $collection = [];
                         $oldselection = [];
 
-                        if ($_ENTITY_FORM[$key]) {
-                            foreach ($_ENTITY_FORM[$key] as $val) {
+                        if ($value_form) {
+                            foreach ($value_form as $val) {
 
                                 $reflect = new ReflectionClass($key);
                                 $value2 = $reflect->newInstance();
@@ -349,6 +383,7 @@ class Controller {
                         $toadd = EntityCollection::diff($collection, $intersect);
                         $todrop = EntityCollection::diff($oldselection, $intersect);
 
+
                         if ($toadd)
                             $_ENTITY_COLLECTION[]["toadd"] = true;
 
@@ -356,66 +391,39 @@ class Controller {
                             $_ENTITY_COLLECTION[]["todrop"] = array_values($todrop);
                         }
 
-                        if (!method_exists($object, $currentfieldsetter)) {
-                            $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                        }
-                        elseif($error = call_user_func(array($object, $currentfieldsetter), $toadd))
-                            $this->error[$key] = $error;
-
+                        $object_array[$key_value[$key]] = $toadd;
                     } else if (isset($value['options']) && !isset($value['arrayoptions']) && class_exists($key)) {// && is_object ($value['options'][0])
                         $reflect = new ReflectionClass($key);
                         $value2 = $reflect->newInstance();
 
-                        if ($value['options'] && isset($_ENTITY_FORM[$key])) {
-                            $value2->setId($_ENTITY_FORM[$key]);
-                            if (!method_exists($object, $currentfieldsetter)) {
-                                $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
-                            }
-                            elseif($error = call_user_func(array($object, $currentfieldsetter), $value2->__show(false)))
-                                $this->error[$key] = $error;
+                        if ($value['options'] && $value_form) {
+                            $value2->setId($value_form);
+                            $object_array[$key_value[$key]] = $value2->__show(false);
                         } else {
-                            if (!method_exists($object, $currentfieldsetter)) {
-                                $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                            }
-                            elseif($error = call_user_func(array($object, $currentfieldsetter), $value2))
-                                $this->error[$key] = $error;
+                            $object_array[$key_value[$key]] = $value2;
                         }
                     } else {
-
-                        if (isset($_ENTITY_FORM[$key])){
-                            if($value["type"] == "injection"){
-//                                $result = call_user_func(array($key."Controller", "createAction"));
-//                                if($error = call_user_func(array($object, $currentfieldsetter), $result[$key]))
-//                                    $this->error[$key] = $error;
-                            }
-                            elseif (!method_exists($object, $currentfieldsetter)) {
-                                $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                            }
-                            elseif($error = call_user_func(array($object, $currentfieldsetter), $_ENTITY_FORM[$key]))
-                                $this->error[$key] = $error;
-                        }
-
+                        if (isset($key_value[$key]))
+                            $object_array[$key_value[$key]] = $value_form;
                     }
                 }
-
             }
         }
 
-//        if($this->error)
-//            foreach ($this->error as $error){
-//                if($error){
-//                    $this->error_exist = true;
-//                    break;
-//                }
-//            }
-
-        return $object;
+        return $object_array;
     }
 
     public static function renderController($view, $resultCtrl) {
 
         extract($resultCtrl);
         include __DIR__ . "/../../" . $view;
+    }
+
+//        public abstract function _new() ;
+//        public abstract function _edit($id) ;
+
+    public function validemail($email) {
+        return ereg("^([a-zA-Z0-9_\.-]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([a-zA-Z0-9\-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$", $email);
     }
 
 }

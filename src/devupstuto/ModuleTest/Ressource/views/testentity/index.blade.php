@@ -79,7 +79,7 @@
 
 <script src="<?= CLASSJS ?>model.js"></script>
 <script src="<?= CLASSJS ?>ddatatable.js"></script>
-<script src=""></script>
+<script src="Ressource/js/testentityCtrl.js"></script>
 
 <?php } ?>
 @section('jsimport')

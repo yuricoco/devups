@@ -2,7 +2,7 @@
     /**
      * @Entity @Table(name="testentity")
      * */
-    class Testentity extends \Model implements JsonSerializable, DvupsTranslation{
+    class Testentity extends \Model implements JsonSerializable{
 
         /**
          * @Id @GeneratedValue @Column(type="integer")
@@ -13,12 +13,12 @@
          * @Column(name="name", type="string" , length=25 )
          * @var string
          **/
-        protected $name;
+        private $name;
         /**
          * @Column(name="description", type="text"  )
          * @var text
          **/
-        protected $description;
+        private $description; 
         
 
         
@@ -31,17 +31,16 @@
         public function getId() {
             return $this->id;
         }
-        public function getName($lang = false)
-        {
-            return $this->__gettranslate("name", $lang);
+        public function getName() {
+            return $this->name;
         }
+
         public function setName($name) {
             $this->name = $name;
         }
         
-        public function getDescription($lang = "fr")
-        {
-            return $this->__gettranslate("description", $lang);
+        public function getDescription() {
+            return $this->description;
         }
 
         public function setDescription($description) {
@@ -56,14 +55,5 @@
                                 'description' => $this->description,
                 ];
         }
-
-        public function dvupsTranslate()
-        {
-            extract($_POST);
-
-            $this->__inittranslate("name", $this->name, "fr");
-            $this->__inittranslate("name", $testentity_form["name_en"], "en");
-            $this->__inittranslate("description", $this->description, "fr");
-            $this->__inittranslate("description", $testentity_form["description_en"], "en");
-        }
-    }
+        
+}

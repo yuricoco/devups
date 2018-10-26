@@ -16,19 +16,19 @@
      switch (R::get('path')) {
                 
         case 'testentity._new':
-                g::json_encode(TestentityController::renderFormWidget());
+                g::json_encode(TestentityController::renderForm());
                 break;
         case 'testentity.create':
                 g::json_encode($testentityCtrl->createAction());
                 break;
         case 'testentity._edit':
-                g::json_encode(TestentityController::renderFormWidget(R::get("id")));
+                g::json_encode(TestentityController::renderForm(R::get("id")));
                 break;
         case 'testentity.update':
                 g::json_encode($testentityCtrl->updateAction(R::get("id")));
                 break;
         case 'testentity._show':
-                g::json_encode(TestentityController::renderDetail(R::get("id")));
+                TestentityController::renderDetail(R::get("id"));
                 break;
         case 'testentity._delete':
                 g::json_encode($testentityCtrl->deleteAction(R::get("id")));

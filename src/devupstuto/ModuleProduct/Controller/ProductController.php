@@ -67,7 +67,7 @@ class ProductController extends Controller
         $product = $this->form_generat(new Product(), $product_form);
 //        $result = ImageController::i()->createAction();
 //        $product->setImage($result["image"]);
-
+        //dv_dump($product);
         if ($id = $product->__insert()) {
             return array('success' => true, // pour le restservice
                 'product' => $product,
@@ -116,7 +116,7 @@ class ProductController extends Controller
      * @param type $id
      * @return \Array
      */
-    public function listAction($next = 1, $per_page = 10)
+    public function listAction($next = 1, $per_page = 20)
     {
 
         $lazyloading = $this->lazyloading(new Product(), $next, $per_page);

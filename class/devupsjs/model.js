@@ -107,7 +107,7 @@ var model = {
     },
     _post : function (action, form, callback) {
         var formdata = this._formdata(form);
-        model.modalbody.append('<div style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
+        model.modalbody.append('<div id="loader" style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
 
         $.ajax({
             url: "services.php?path="+this.entity+"."+action,

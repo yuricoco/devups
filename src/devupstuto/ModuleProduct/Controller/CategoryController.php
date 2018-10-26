@@ -6,7 +6,6 @@ use DClass\devups\Datatable as Datatable;
 class CategoryController extends Controller
 {
 
-
     public static function renderFormWidget($id = null)
     {
         if ($id)
@@ -68,21 +67,23 @@ class CategoryController extends Controller
     public function createAction()
     {
         extract($_POST);
-        $this->err = array();
 
         $category = $this->form_generat(new Category(), $category_form);
 
-        if ($id = $category->__insert()) {
-            return array('success' => true, // pour le restservice
-                'category' => $category,
-                'redirect' => 'index', // pour le web service
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        } else {
+        if ($this->error_exist)
             return array('success' => false, // pour le restservice
                 'category' => $category,
                 'action_form' => 'create', // pour le web service
-                'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
-        }
+                'error' => $this->error);
+
+        dv_dump($this->error_exist);
+
+        $category->__insert();
+        return array('success' => true, // pour le restservice
+                'category' => $category,
+                'redirect' => 'index', // pour le web service
+                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
 
     }
 

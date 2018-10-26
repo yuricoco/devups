@@ -155,6 +155,10 @@ abstract class Model extends \stdClass {
         }
 
         $dfile = new Dfile($file, $this);
+
+        if($dfile->error)
+            return false;
+
         if ($this->id) {
             $getcurrentfile = 'get' . ucfirst($file);
             if (!method_exists($this, $getcurrentfile)) {
@@ -167,12 +171,14 @@ abstract class Model extends \stdClass {
                 $dfile::deleteFile($currentfile, $dfile->uploaddir);
         }
 
-        $url = $dfile->hashname()->upload();
-        call_user_func(array($this, $uploadmethod), $url["file"]["hashname"]);
+        $url = $dfile->sanitize()->upload();
 
         if (!$url['success']) {
             return false;
         }
+
+        call_user_func(array($this, $uploadmethod), $url["file"]["hashname"]);
+
         return true;
     }
 

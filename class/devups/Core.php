@@ -27,10 +27,11 @@ class Core extends stdClass {
     }
 
     public function addjs($js, $path = ""){
-//        if(!$path)
-//            $this->addjs[] = __env . $this->classname ::classpath()."/Ressource/js/".$js.".js";
-//        else
-            $this->addjs[] = $path."/".$js.".js";
+        $this->addjs[] = $path.$js;//.".js";
+    }
+
+    public function addcss($css, $path = ""){
+        $this->addcss[] = $path.$css;//.".css";
     }
 
     public static function __extract($entity, $asarray = false) {
@@ -117,7 +118,8 @@ class Core extends stdClass {
             $files = array_diff(scandir($dir), array('.', '..'));
 
             foreach ($files as $file) {
-                $navigation[] = Core::findprojectcore($dir . "/" . $file, $file);
+                if($file != "requires.php")
+                    $navigation[] = Core::findprojectcore($dir . "/" . $file, $file);
             }
 
             return $navigation;

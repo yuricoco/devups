@@ -72,6 +72,10 @@ class BackendGenerator {
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
+        function set" . ucfirst($relation->entity) . "($" . $relation->entity . "){
+            $" . "this->" . $relation->entity . " = $" . $relation->entity . ";
+        }
+        
         function add" . ucfirst($relation->entity) . "(" . $antislash . ucfirst($relation->entity) . " $" . $relation->entity . "){
             $" . "this->" . $relation->entity . "[] = $" . $relation->entity . ";
         }
@@ -80,11 +84,7 @@ class BackendGenerator {
             $" . "this->" . $relation->entity . " = $" . "this->__hasmany('" . $relation->entity . "');
             return $" . "this->" . $relation->entity . ";
         }
-
-        function drop" . ucfirst($relation->entity) . "Collection() {
-                $" . "this->" . $relation->entity . " = EntityCollection::entity_collection('" . $relation->entity . "');
-        }
-
+        
                         ";
                 } elseif ($relation->cardinality == 'oneToOne' or $relation->nullable == 'DEFAULT') {
 
@@ -350,7 +350,6 @@ class " . ucfirst($name) . "Controller extends Controller{
 
     public function createAction($" . $name . "_form = null){
         extract($" . "_POST);
-        $" . "this->err = array();
 
         $" . $name . " = $" . "this->form_fillingentity(new " . ucfirst($name) . "(), $" . $name . "_form);\n ";
         // gestion des relations many to many dans le controller
@@ -366,27 +365,6 @@ class " . ucfirst($name) . "Controller extends Controller{
         //$" . $relation->entity . "Ctrl = new " . ucfirst($relation->entity) . "Controller();
         extract(" . ucfirst($relation->entity) . "Controller::i()->createAction());
         $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . "); ";
-                } elseif (false) {//$relation->cardinality == "manyToMany" &&
-                    $mtm[] = "
-        if (!empty($" . "id_" . $relation->entity . ")){
-                foreach($" . "id_" . $relation->entity . " as $" . "id){
-                        $" . $relation->entity . "Dao = new " . ucfirst($relation->entity) . "DAO();
-                        $" . $name . "->add" . ucfirst($relation->entity) . "($" . $relation->entity . "Dao->findById($" . "id));
-                }
-        }";
-
-                    $mtmedit[] = "
-        if (!empty($" . "id_" . $relation->entity . ") && 
-                        $" . "update_collection = $" . "this->updateEntityCollection($" . "_GET['collection'], $" . "id_" . $relation->entity . ")){
-                $" . $name . "->remove" . ucfirst($relation->entity) . "();
-                foreach($" . "id_" . $relation->entity . " as $" . "id){
-                        $" . $relation->entity . "Dao = new " . ucfirst($relation->entity) . "DAO();
-                        $" . $name . "->add" . ucfirst($relation->entity) . "($" . $relation->entity . "Dao->findById($" . "id));
-                }
-        }else
-                $" . $name . "->drop" . ucfirst($relation->entity) . "Collection();
-                $" . "update_collection = true;\n";
-                    $iter++;
                 }
             }
         }
@@ -404,18 +382,19 @@ class " . ucfirst($name) . "Controller extends Controller{
         }
 
         $contenu .= "
-        if ( $" . "id = $" . $name . "->__insert()) {
-            return 	array(	'success' => true, // pour le restservice
+        if ( $" . "this->error ) {
+            return 	array(	'success' => false,
                             '" . $name . "' => $" . $name . ",
-                            'tablerow' => Datatable::getSingleRowRest($" . $name . "),
-                            'redirect' => 'index', // pour le web service
-                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        } else {
-            return 	array(	'success' => false, // pour le restservice
-                            '" . $name . "' => $" . $name . ",
-                            'action_form' => 'create', // pour le web service
-                            'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
+                            'action_form' => 'create', 
+                            'error' => $" . "this->error);
         }
+        
+        $" . "id = $" . $name . "->__insert();
+        return 	array(	'success' => true,
+                        '" . $name . "' => $" . $name . ",
+                        'tablerow' => Datatable::getSingleRowRest($" . $name . "),
+                        'redirect' => 'index',
+                        'detail' => '');
 
     }
 
@@ -430,22 +409,24 @@ class " . ucfirst($name) . "Controller extends Controller{
 //                            for($i = 1; $i < count($entity->attribut); $i++){
                 if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
                     $contenu .= " 
-                        $".$name ."->savefile('" . $attribut->name . "');\n";
+                        $".$name ."->uploadfile('" . $attribut->name . "');\n";
             }
         endif;
-        $contenu .= "
-        if ($" . $name . "->__update()) {
-            return 	array('success' => true, // pour le restservice
+        $contenu .= "        
+        if ( $" . "this->error ) {
+            return 	array(	'success' => false,
                             '" . $name . "' => $" . $name . ",
-                            'tablerow' => Datatable::getSingleRowRest($" . $name . "),
-                            'redirect' => 'index', // pour le web service
-                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        } else {
-            return 	array('success' => false, // pour le restservice
-                            '" . $name . "' => $" . $name . ",
-                            'action_form' => 'update&id='.$" . "id, // pour le web service
-                            'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
+                            'action_form' => 'update&id='.$" . "id,
+                            'error' => $" . "this->error);
         }
+        
+        $" . $name . "->__update();
+        return 	array(	'success' => true,
+                        '" . $name . "' => $" . $name . ",
+                        'tablerow' => Datatable::getSingleRowRest($" . $name . "),
+                        'redirect' => 'index',
+                        'detail' => '');
+                        
     }
     
     public function deleteAction($" . "id){
@@ -687,10 +668,13 @@ class " . ucfirst($name) . "Controller extends Controller{
             
             $" . "entitycore->formaction = $" . "action;
             $" . "entitycore->formbutton = $" . "button;
+            
+            //$" . "entitycore->addcss('csspath');
                 
             " . $field . "
             
             $" . "entitycore->addDformjs($" . "action);
+            $" . "entitycore->addjs('Ressource/js/".$name."Form.js');
             
             return $" . "entitycore;
         }
@@ -747,29 +731,34 @@ class " . ucfirst($name) . "Controller extends Controller{
                 $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'email') {
                 $field .= "\t<?= Form::email('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
-            } elseif ($attribut->formtype == 'document') {
-                $field .= "\t\"type\" => FORMTYPE_FILE,
-                FH_FILETYPE => FILETYPE_" . strtoupper($attribut->formtype) . ",  
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
-            } elseif ($attribut->formtype == 'video') {
-                $field .= "\t\t\t\"type\" => FORMTYPE_FILE,
-                \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
-            } elseif ($attribut->formtype == 'music') {
-                $field .= "\"type\" => FORMTYPE_FILE,
-                \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
-            } elseif ($attribut->formtype == 'image') {
-                $field .= "\t<?= Form::file('" . $attribut->name . "', 
-                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+            } elseif (in_array($attribut->formtype, ['document', 'image', 'musique', 'video'])){
+
+                $field .= "\t<?= Form::filepreview($" . $name . "->get" . ucfirst($attribut->name) . "(),
                 $" . $name . "->show" . ucfirst($attribut->name) . "(),
                  ['class' => 'form-control'], 'image') ?>\n";
 
+                if ($attribut->formtype == 'document') {
+                    $field .= "\t<?= Form::file('" . $attribut->name . "', 
+                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                 ['class' => 'form-control'], 'document') ?>\n";
+                } elseif ($attribut->formtype == 'video') {
+                    $field .= "\t<?= Form::file('" . $attribut->name . "', 
+                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                 ['class' => 'form-control'], 'video') ?>\n";
+                } elseif ($attribut->formtype == 'music') {
+                    $field .= "\t<?= Form::file('" . $attribut->name . "', 
+                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                 ['class' => 'form-control'], 'audio') ?>\n";
+                } elseif ($attribut->formtype == 'image') {
+                    $field .= "\t<?= Form::file('" . $attribut->name . "', 
+                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                '',
+                 ['class' => 'form-control'], 'image') ?>\n";
+
+                }
             } else {
                 $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
+
             }
 
             $field .= " </div>\n";
@@ -846,7 +835,7 @@ class " . ucfirst($name) . "Controller extends Controller{
             } elseif ($attribut->formtype == 'textarea') {
                 $field .= "\t<p><?= $" . $name . "->get" . ucfirst($attribut->name) . "(); ?></p>\n";
             } elseif ($attribut->formtype == 'document') {
-                $field .= "\t<?= '<img src=\"$" . $name . "->show" . ucfirst($attribut->name) . "()\" />'; ?>\n";
+                $field .= "\t<?= 'Download : <a href=\"'.$" . $name . "->show" . ucfirst($attribut->name) . "().'\" download=\"'.$" . $name . "->get" . ucfirst($attribut->name) . "().'\">'.$" . $name . "->get" . ucfirst($attribut->name) . "().'</a>'; ?>\n";
             } elseif ($attribut->formtype == 'video') {
                 $field .= "\t<?= '<img src=\"$" . $name . "->show" . ucfirst($attribut->name) . "()\" />'; ?>\n";
             } elseif ($attribut->formtype == 'music') {
@@ -926,15 +915,19 @@ class " . ucfirst($name) . "Controller extends Controller{
         $field = $this->formwidget($entity, $listmodule);
 
         $contenu = "
+    <?php //Form::addcss('Ressource/js/".$name.".css') ?>
+    
     <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action_form\", \"method\"=> \"post\"]) ?>
 
      " . $field . "
        
     <?= Form::submit(\"save\", ['class' => 'btn btn-success']) ?>
     
-    <?= Form::addDformjs() ?>
+    <?= Form::close() ?>
     
-    <?= Form::close() ?>";
+    <?= Form::addDformjs() ?>    
+    <?= Form::addjs('Ressource/js/".$name."Form.js') ?>
+    ";
 
         $entityform = fopen('Form/' . ucfirst($name) . 'FormWidget.php', 'w');
         fputs($entityform, $contenu);

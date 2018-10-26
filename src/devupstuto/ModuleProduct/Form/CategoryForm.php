@@ -12,7 +12,8 @@
             $entitycore->field['name'] = [
                 "label" => 'Name', 
 			"type" => FORMTYPE_TEXT, 
-                "value" => $category->getName(), 
+			"setter" => "namesetter",
+                "value" => $category->getName(),
             ];
 
 
