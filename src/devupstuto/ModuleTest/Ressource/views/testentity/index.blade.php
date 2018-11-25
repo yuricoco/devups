@@ -21,7 +21,7 @@
     </div>
     <div class="col-lg-12">
         <div class="row">
-            <div class="col-lg-3 col-md-6">
+            <div class="col-lg-3 ">
                 <div class="panel panel-primary">
                     <div class="panel-heading">
                         <div class="row">
@@ -32,7 +32,7 @@
                     </div>
                 </div>
             </div>
-            <div style="float: right; margin-right: 30px;"  class="panel">
+            <div class=" col-md-offset-6 col-lg-3">
                 <?= Genesis::top_action(Testentity::class); ?>
             </div>
         </div>

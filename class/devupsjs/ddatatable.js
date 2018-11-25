@@ -160,8 +160,9 @@ var ddatatable = {
     },
     page: function (index) {
         this.setloader();
+        console.log("services.php?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam);
         $.get("services.php?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam, function (response) {
-            //console.log(response);
+            console.log(response);
             $("#dv_table").find("tbody").html(response.tablebody);
             $("#dv_pagination").replaceWith(response.tablepagination);
             removeloader();

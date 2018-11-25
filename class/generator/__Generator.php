@@ -171,7 +171,7 @@ Usage:
 //        __Generator::$modulecore = $module;
         __Generator::$projectcore = $project;
         
-        __Generator::moduleendless(__Generator::$projectcore, $module, $module->listentity);
+        __Generator::moduleendless(__Generator::$projectcore, $module, $module->listentity, true);
         
     }
 
@@ -286,6 +286,17 @@ Usage:
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
         __Generator::__entity($entity, $project);
+        __Generator::dependencies($project, __Generator::$modulecore, $entity);
+    }
+    /**
+     *
+     * @param type $namespace
+     */
+    public static function __entitydependencies($namespace, $project) {
+
+        $ns = explode("\\", $namespace);
+        $entity = __Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::dependencies($project, __Generator::$modulecore, $entity);
     }
 
     private static function __core($entity, $module){
@@ -459,15 +470,41 @@ Usage:
         chdir('../');
     }
 
-    private static function moduleendless($projet, $module, $modulelistentity) {
+    private static function moduleendless($projet, $module, $modulelistentity, $rewrite = false)
+    {
 
+        $traitement = new Traitement();
         $repertoire = ucfirst($module->name);
         if (!file_exists($repertoire)) {
             mkdir($repertoire, 0777);
         }
+        $dependance = array();
+
+        //I may optimize this part because at each iteration it goes and come from a directory it may take too much compute
+        // that's not necessary.
+        foreach ($modulelistentity as $entity) {
+            self::dependencies($projet, $module, $entity, $rewrite);
+        }
+
+        self::index($module, $modulelistentity);
+
+
         chdir($repertoire);
 
-        $traitement = new Traitement();
+        $frontend = new FrontendGenerator();
+        $frontend->layoutGenerator($module, $projet->template, "Ressource/views/");
+
+        // on sort du module
+        chdir('../');
+
+        self::services($module, $modulelistentity);
+
+    }
+
+    private static function index($module, $modulelistentity) {
+        $repertoire = ucfirst($module->name);
+        chdir($repertoire);
+
         $root = fopen('index.php', 'w');
 
         $contenu = "<?php
@@ -478,33 +515,6 @@ Usage:
         global $" . "views;
         $" . "views = __DIR__ . '/Ressource/views';
                 \n\n";
-
-        $dependance = array();
-
-        $package = "<?php ";
-        foreach ($modulelistentity as $entity) {
-            $name = ucfirst(strtolower($entity->name));
-            $requiremanytomany = "";
-
-            foreach ($entity->relation as $relation) {
-                if ($relation->cardinality == 'manyToMany') {
-                    $requiremanytomany .= "require 'Entity/" . $name."_".$relation->entity. ".php';";
-                }
-            }
-
-            $package .= "
-    require 'Entity/" . $name . ".php';
-    $requiremanytomany
-    //require 'Dao/" . $name . "DAO.php';
-    require 'Form/" . $name . "Form.php';
-    require 'Controller/" . $name . "Controller.php';
-    //require 'Genesis/" . $name . "Genesis.php';\n";
-        }
-
-        //$filename = strtolower(str_replace('/', '.', $module->name));
-        $moddepend = fopen(strtolower($projet->name) . "." . strtolower($module->name) . '.php', 'w');
-        fputs($moddepend, $package);
-        fclose($moddepend);
 
         $contenu .= "
     
@@ -554,13 +564,47 @@ switch (Request::get('path')) {
         fputs($root, $contenu);
         fclose($root);
 
-        $frontend = new FrontendGenerator();
-        $frontend->layoutGenerator($module, $projet->template, "Ressource/views/");
-
-        // on sort du module
         chdir('../');
+    }
 
-        self::services($module, $modulelistentity);
+    private static function dependencies($project, $module, $entity, $rewrite = false) {
+
+        $repertoire = ucfirst($module->name);
+
+        chdir($repertoire);
+
+        $filename = strtolower($project->name) . "." . strtolower($module->name) . '.php';
+        $package = "\n";
+        $mode = "a+";
+        if(!file_exists($filename) || $rewrite){
+            $package = "<?php ";
+            $mode = "w";
+        }
+
+        //foreach ($modulelistentity as $entity) {
+        $name = ucfirst(strtolower($entity->name));
+        $requiremanytomany = "";
+
+        foreach ($entity->relation as $relation) {
+            if ($relation->cardinality == 'manyToMany') {
+                $requiremanytomany .= "\nrequire 'Entity/" . $name."_".$relation->entity. ".php';";
+            }
+        }
+
+        $package .= "
+    require 'Entity/" . $name . ".php';$requiremanytomany
+    //require 'Dao/" . $name . "DAO.php';
+    require 'Form/" . $name . "Form.php';
+    require 'Controller/" . $name . "Controller.php';
+    //require 'Genesis/" . $name . "Genesis.php';\n";
+        //}
+
+        //$filename = strtolower(str_replace('/', '.', $module->name));
+        $moddepend = fopen($filename, $mode);
+        fputs($moddepend, $package);
+        fclose($moddepend);
+
+        chdir("../");
 
     }
 
@@ -626,7 +670,7 @@ switch (Request::get('path')) {
 
         $contenu .= "\n\t
         default:
-            echo json_encode(['error' => \"404 : page note found\", 'route' => R::get('path')]);
+            echo json_encode(['error' => \"404 : action note found\", 'route' => R::get('path')]);
             break;
      }
 

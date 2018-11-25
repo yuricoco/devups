@@ -116,7 +116,7 @@ class ProductController extends Controller
      * @param type $id
      * @return \Array
      */
-    public function listAction($next = 1, $per_page = 20)
+    public function listAction($next = 1, $per_page = 10)
     {
 
         $lazyloading = $this->lazyloading(new Product(), $next, $per_page);

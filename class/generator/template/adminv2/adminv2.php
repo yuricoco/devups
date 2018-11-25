@@ -135,7 +135,7 @@ class Adminv2 {
 			<?php " . ucfirst($name) . "Form::__renderDetailWidget($" . $name . "); ?>
 			
 	<div class=\"form-group text-center\">
-		<?php echo Genesis::actionListView(\"" . $name . "\", $" . $name . "->getId()); ?>
+		<?php //echo Genesis::actionListView(\"" . $name . "\", $" . $name . "->getId()); ?>
 	</div>
 	
 	</div>
@@ -172,7 +172,7 @@ class Adminv2 {
     </div>
     <div class=\"col-lg-12\">
         <div class=\"row\">
-            <div class=\"col-lg-3 col-md-6\">
+            <div class=\"col-lg-3 \">
                 <div class=\"panel panel-primary\">
                     <div class=\"panel-heading\">
                         <div class=\"row\">
@@ -183,7 +183,7 @@ class Adminv2 {
                     </div>
                 </div>
             </div>
-            <div style=\"float: right; margin-right: 30px;\"  class=\"panel\">
+            <div class=\" col-md-offset-6 col-lg-3\">
                 <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
             </div>
         </div>
@@ -247,7 +247,24 @@ class Adminv2 {
                                             </li>
                                     </ol>
                             </div>
-                            <div class=\"col-lg-12\"><?= $" . "__navigation  ?></div>
+    <div class=\"col-lg-12\">
+        <div class=\"row\">
+            <div class=\"col-lg-3 \">
+                <div class=\"panel panel-primary\">
+                    <div class=\"panel-heading\">
+                        <div class=\"row\">
+                            <div class=\"col-xs-12 \">
+                                <h5>Detail " . ucfirst($name) . "</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class=\" col-md-offset-6 col-lg-3\">
+                <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
+            </div>
+        </div>
+    </div>
                     </div>
                     <div class=\"row\">
                                             " . $show . "
@@ -271,15 +288,32 @@ class Adminv2 {
                             <div class=\"col-lg-12\">
                                     <ol class=\"breadcrumb\">
                                             <li class=\"active\">
-                                                    <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Ajout 
+                                                    <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Formula 
                                             </li>
                                     </ol>
                             </div>
-                            <div class=\"col-lg-12\"><?= $" . "__navigation  ?></div>
+    <div class=\"col-lg-12\">
+        <div class=\"row\">
+            <div class=\"col-lg-3 \">
+                <div class=\"panel panel-primary\">
+                    <div class=\"panel-heading\">
+                        <div class=\"row\">
+                            <div class=\"col-xs-12 \">
+                                <h5>Formula " . ucfirst($name) . "</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class=\" col-md-offset-6 col-lg-3\">
+                <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
+            </div>
+        </div>
+    </div>
                     </div>
                     <div class=\"row\">
                                     " . $new_edit . "
-                    <div>        
+                    </div>      
          
 @endsection";
 

@@ -494,7 +494,7 @@ class QueryBuilder extends \DBAL {
     }
 
     public function between($value1, $value2) {
-        $this->query .= " BETWEEN " . $value1 . " AND ". $value2;
+        $this->query .= " BETWEEN '" . $value1 . "' AND '". $value2."'";
         return $this;
     }
 
@@ -530,6 +530,14 @@ class QueryBuilder extends \DBAL {
 
         return " SUM(" . $column . ") $as ";
     }
+
+    public static function avg($column, $as = "") {
+        if($as)
+            $as = "as ".$as;
+
+        return " AVG(" . $column . ") $as ";
+    }
+
     public static function distinct($column) {
         return " DISTINCT " . $column . " ";
     }

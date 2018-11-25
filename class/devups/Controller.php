@@ -173,11 +173,20 @@ class Controller {
             $pagination = 0;
             $page = 1;
             $remain = 0;
-            if ($order) {
-                $listEntity = $qb->orderby($order)->__getAll();
-            } else {
-                $listEntity = $qb->select()->__getAll();
+            if($qbcustom != null){
+                if ($order) {
+                    $listEntity = $qbcustom->orderby($order)->__getAll();
+                } else {
+                    $listEntity = $qbcustom->__getAll();
+                }
+            }else{
+                if ($order) {
+                    $listEntity = $qb->select()->orderby($order)->__getAll();
+                } else {
+                    $listEntity = $qb->select()->__getAll();
+                }
             }
+            $per_page = $nb_element;
         }
 
         return array('success' => true, // pour le restservice

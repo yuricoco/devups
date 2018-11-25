@@ -29,7 +29,8 @@ class Image extends \Model implements JsonSerializable {
     }
 
     public function showImage() {
-        return Dfile::show($this->image, 'image');
+        $url = Dfile::show($this->image, 'image');
+        return Dfile::fileadapter($url, $this->image);
     }
 
     public function getImage() {

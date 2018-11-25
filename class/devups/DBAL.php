@@ -95,16 +95,18 @@ class DBAL extends Database {
         $global_navigation = Core::buildOriginCore();
         $enittyfoldes = [];
         $enittyfoldes[] = ROOT . "class/extends";
-        
+
         foreach ($global_navigation as $key => $project) {
             if (is_object($project)) {
                 foreach ($project->listmodule as $key => $module) {
                     if (is_object($module)) {
-                        $enittyfoldes[] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name . "/Entity";
-                        foreach ($module->listentity as $key => $entity) {
-                            if(is_object($entity))
-                                //var_dump($entity);
-                                $enittycollection[strtolower($entity->name)] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name;
+                        if(file_exists($rep = __DIR__ . "/../../src/" . $project->name . "/" . $module->name . "/Entity")){
+                            $enittyfoldes[] = $rep;
+                            foreach ($module->listentity as $key => $entity) {
+                                if(is_object($entity))
+                                    //var_dump($entity);
+                                    $enittycollection[strtolower($entity->name)] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name;
+                            }
                         }
                     }
                 }

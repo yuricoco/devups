@@ -20,7 +20,7 @@ class Database {
         
         $user = dbuser;
         $pass = dbpassword;
-        $dsn = 'mysql:host=localhost;dbname='. dbname;
+        $dsn = 'mysql:host='.dbhost.';dbname='. dbname;
         $this->dbname = dbname;
         
         try {

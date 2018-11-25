@@ -1,8 +1,10 @@
-<div class='form-group'>
-<label for='name'>Name</label>
-	<b><?= $testentity->getName(); ?></b>
- </div>
-<div class='form-group'>
-<label for='description'>Description</label>
-	<p><?= $testentity->getDescription(); ?></p>
- </div>
+
+        <div class="col-lg-12 col-md-12">
+                
+                    <?= \DClass\devups\Datatable::renderentitydata($testentity, [
+['label' => 'Name', 'value' => 'name'],
+['label' => 'Description', 'value' => 'description']
+]); ?>
+
+        </div>
+			

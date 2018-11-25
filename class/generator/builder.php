@@ -106,6 +106,11 @@ if (isset($argv[2])) {
             }
             break;
 
+        case 'core:g:dependencies':
+            __Generator::__entitydependencies($argv[2], $project); //,
+            echo $argv[2] . ": Dependencies generated with success";
+            break;
+
         case 'core:g:module':
             __Generator::module($project, $argv[2]); //, 
             echo $argv[2] . ": Module generated with success";
@@ -114,6 +119,16 @@ if (isset($argv[2])) {
         case 'core:g:moduleendless':
             __Generator::__moduleendless($project, $argv[2]); //, 
             echo $argv[2] . ": Moduleendless generated with success";
+            break;
+
+        case 'core:g:moduledependencies':
+            __Generator::__dependencies($project, $argv[2]); //,
+            echo $argv[2] . ": Dependencies generated with success";
+            break;
+
+        case 'core:g:moduleindex':
+            __Generator::__index($project, $argv[2]); //,
+            echo $argv[2] . ": Index generated with success";
             break;
 
         case 'core:g:moduleservices':

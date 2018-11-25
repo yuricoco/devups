@@ -21,6 +21,25 @@ class Dfile {
     private $compressionquality = 80;
     private $file_name = "";
 
+
+    public static function fileadapter($url, $name = "", $imgdir = ["style" => "max-width : 100%; max-height: 200px"]){
+
+        $ext = Dfile::getextension($name);
+        if (in_array($ext, Dfile::$EXTENSION_IMAGE)){
+            return '<img '.Form::serialysedirective($imgdir).' src="'.$url.'" alt="'.$name.'" />';
+        }elseif (in_array($ext, Dfile::$EXTENSION_DOCUMENT)){
+            if($ext == "pdf")
+                return '<embed type="application/PDF"  src="'.$url.'" width="100%" height="200" />'.$name.'';
+            else
+                return '<a href="'.$url.'" download="'.$name.'" >'.$name.'</a>';
+        }elseif (in_array($ext, Dfile::$EXTENSION_ARCHIVE)){
+            return '<a href="'.$url.'" download="'.$name.'" >'.$name.'</a>';
+        }else{
+            return "no file";
+        }
+
+    }
+
     public static function getimageatbase64($path, $default = 'no_image.jpg'){
         if(file_exists($path)){
             $type = pathinfo($path, PATHINFO_EXTENSION);
@@ -40,7 +59,7 @@ class Dfile {
 
     public static function uploadchunk($uploaddir) {
         $dfile = new Dfile(null);
-        $path = $dfile->chdirectory($dfile->filepath($uploaddir));
+        $path = self::chdirectory(self::filepath($uploaddir));
         $hashname = $_GET['hashName'];
         $filename = $_GET['fileName'];
 
@@ -74,7 +93,7 @@ class Dfile {
         $this->compressionquality = $quality;
     }
 
-    private function wd_remove_accents($str, $charset = 'utf-8') {
+    private static function wd_remove_accents($str, $charset = 'utf-8') {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);
 
         $str = preg_replace('#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
@@ -92,14 +111,14 @@ class Dfile {
     /**
       @param $default Dans le cas ou le developpeur voudrait spécifier sa propre image par défaut
      */
-    private function filepath($str, $charset = 'utf-8') {
+    private static function filepath($str, $charset = 'utf-8') {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);
 
-        $str = $this->wd_remove_accents($str);
+        $str = self::wd_remove_accents($str);
         return $str . '/';
     }
 
-    private function chdirectory($filepath) {
+    private static function chdirectory($filepath) {
 //	if(file_exists(UPLOAD_RESSOURCE2.$filepath))
 //            return UPLOAD_RESSOURCE2.$filepath;
         if (!file_exists(UPLOAD_DIR . $filepath))
@@ -108,16 +127,22 @@ class Dfile {
         return UPLOAD_DIR . $filepath;
     }
 
+    public $errornofile = false;
+
     public function __construct($file, $entity = null) {
-        if(!$file)
+
+        if(!$file){
             return $this;
+        }
+
 
         if ($entity) {
             $this->uploaddir = strtolower(get_class($entity));
             $entityname = $this->uploaddir;
         }
 
-        if ($entity && isset($_FILES[$entityname . '_form']) and $_FILES[$entityname . '_form']['error'][$file] == 0) {
+        if ($entity && isset($_FILES[$entityname . '_form']) && isset($_FILES[$entityname . '_form']['error'][$file]) &&
+            $_FILES[$entityname . '_form']['error'][$file] == 0) {
 
 //            $_files = [
             $this->name = $_FILES[$entityname . '_form']['name'][$file];
@@ -140,6 +165,7 @@ class Dfile {
             $this->error = $_FILES[$file]['error'];
             $this->file = $_FILES[$file];
         } else {
+            $this->errornofile = true;
             $this->error = true;
             $this->message[] = "no file found";
             return $this;
@@ -147,7 +173,7 @@ class Dfile {
 
         $this->file_name = $this->name;
         $this->imagesize = $this->getsize($this->tmp_name);
-        $this->extension = $this->getextension($this->name);
+        $this->extension = self::getextension($this->name);
         $this->settype();
     }
 
@@ -156,7 +182,7 @@ class Dfile {
         return getimagesize($file);
     }
 
-    private function getextension($name){
+    public static function getextension($name){
         return strtolower(pathinfo($name, PATHINFO_EXTENSION));
     }
 
@@ -195,7 +221,7 @@ class Dfile {
     }
 
     public function sanitize() {
-        $this->file_name = $this->wd_remove_accents($this->name);
+        $this->file_name = self::wd_remove_accents($this->name);
         return $this;
     }
 
@@ -243,7 +269,7 @@ class Dfile {
             return false;
 
         $this->imagesize = $this->getsize($source_url);
-        $this->extension = $this->getextension($relative_url);
+        $this->extension = self::getextension($relative_url);
         $this->settype();
 
         if (!empty($this->imagetoresize)) {
@@ -270,7 +296,7 @@ class Dfile {
         if (!$uploaddir)
             $uploaddir = $this->uploaddir;
 
-        $uploaddir = $this->chdirectory($this->filepath($uploaddir));
+        $uploaddir = self::chdirectory(self::filepath($uploaddir));
 //        list($width, $height) = $this->imagesize;
         $imagesize = $this->imagesize;
 
@@ -383,7 +409,7 @@ class Dfile {
 
     public function rename($newname, $sanitize = false) {
         if ($sanitize) {
-            $this->file_name = $this->wd_remove_accents($newname);
+            $this->file_name = self::wd_remove_accents($newname);
         } else {
             $this->file_name = $newname;
         }
@@ -428,7 +454,7 @@ class Dfile {
         $this->uploaddir = $path;
 
         if (!$absolut)
-            $path = $this->chdirectory($this->filepath($path));
+            $path = self::chdirectory(self::filepath($path));
 
         if (move_uploaded_file($this->tmp_name, $path . "tmp_".$this->file_name)) {
 
@@ -478,16 +504,24 @@ class Dfile {
 
     public static function show($image, $path = '', $default = 'no_image.jpg') {
 
-        $up = new UploadFile();
-
-        $path = $up->filepath($path);
-
+        $path = self::filepath($path);
+//        $ext = $up->getextension($image);
+//        if (in_array($ext, self::$EXTENSION_IMAGE)){
+//
+//        }
         if ($image && file_exists(UPLOAD_DIR . $path . $image))
             $image = SRC_FILE . $path . $image;
         else
             $image = asset($default);
 
         return $image;
+    }
+
+    public static function exist($image, $path = ''){
+        if ($image && file_exists(UPLOAD_DIR . $path . $image))
+            return true;
+
+        return false;
     }
 
     public function addvariante($param) {
@@ -505,12 +539,10 @@ class Dfile {
      */
     public static function deleteFile($name_file, $path = '', $absolute = false) {
 
-        $up = new UploadFile();
-
         if ($absolute) {
             $path2 = $path;
         } else {
-            $path2 = $up->chdirectory($up->filepath($path));
+            $path2 = self::chdirectory(self::filepath($path));
         }
 
 

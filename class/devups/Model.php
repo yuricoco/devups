@@ -490,7 +490,7 @@ abstract class Model extends \stdClass {
         return $dbal->belongto($this, $relation);
     }
 
-    public function __belongto2($relation, $recursif = false) {
+    public function __hasone($relation, $recursif = false) {
         if (!is_object($relation)) :
             $reflection = new ReflectionClass($relation);
             $relation = $reflection->newInstance();
@@ -498,6 +498,11 @@ abstract class Model extends \stdClass {
 
         $qb = new QueryBuilder($relation);
         return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
+    }
+
+    public function __get($attribut) {
+        $qb = new QueryBuilder($this);
+        return $qb->select($attribut)->where("this.id", $this->getId())->exec(DBAL::$FETCH)[0];
     }
 
     public function getId() {

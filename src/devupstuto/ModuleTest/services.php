@@ -42,7 +42,7 @@
 
 	
         default:
-            echo json_encode(['error' => "404 : page note found", 'route' => R::get('path')]);
+            echo json_encode(['error' => "404 : action note found", 'route' => R::get('path')]);
             break;
      }
 

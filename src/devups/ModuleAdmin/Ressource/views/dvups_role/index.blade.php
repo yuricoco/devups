@@ -19,7 +19,24 @@
                                 </li>
                         </ol>
                 </div>
-                <div class="col-lg-12"> <?= $__navigation  ?></div>
+            <div class="col-lg-12">
+                <div class="row">
+                    <div class="col-lg-3 col-md-6">
+                        <div class="panel panel-primary">
+                            <div class="panel-heading">
+                                <div class="row">
+                                    <div class="col-xs-12 ">
+                                        <h5>Manage Admin Role</h5>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="float: right; margin-right: 30px;" class="panel">
+                        <?= Genesis::top_action(Dvups_role::class); ?>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="row">
                 

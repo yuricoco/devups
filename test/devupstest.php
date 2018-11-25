@@ -5,8 +5,26 @@
  * Date: 6/14/2018
  * Time: 7:39 AM
  */
-require '../header.php';
+//require '../header.php';
 
-Dfile::init("file")->moveto("/");
+$package = "
+    require 'Entity/name.php';
+    //require 'Dao/nameDAO.php';
+    require 'Form/nameForm.php';
+    require 'Controller/nameController.php';
+    //require 'Genesis/nameGenesis.php';\n";
 
-//dv_dump($classmetadata);
+$filename = __DIR__."/services.php";
+
+$filecontent = "";
+$handle = fopen($filename, "r");
+if ($handle) {
+    while (($line = fgets($handle)) !== false) {
+        // process the line read.
+        $filecontent .= $line;
+    }
+
+    fclose($handle);
+} else {
+    // error opening the file.
+}

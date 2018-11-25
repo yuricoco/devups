@@ -36,6 +36,9 @@
         }
 
         public function setName($name) {
+            if(!$name)
+                return "field important";
+
             $this->name = $name;
         }
         

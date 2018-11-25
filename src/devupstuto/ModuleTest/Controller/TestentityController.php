@@ -38,7 +38,7 @@ class TestentityController extends Controller{
         ];
     }
 
-    public function listAction($next = 1, $per_page = 10){
+    public function listAction($next = 1, $per_page = 5){
 
         $lazyloading = $this->lazyloading(new Testentity(), $next, $per_page);
 
@@ -64,7 +64,7 @@ class TestentityController extends Controller{
         $testentity = $this->form_fillingentity(new Testentity(), $testentity_form);
  
 
-        if ( $this->error_exist ) {
+        if ( $this->error ) {
             return 	array(	'success' => false,
                             'testentity' => $testentity,
                             'action_form' => 'create', 
@@ -86,7 +86,7 @@ class TestentityController extends Controller{
         $testentity = $this->form_fillingentity(new Testentity($id), $testentity_form);
 
                     
-        if ( $this->error_exist ) {
+        if ( $this->error ) {
             return 	array(	'success' => false,
                             'testentity' => $testentity,
                             'action_form' => 'update&id='.$id,

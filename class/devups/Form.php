@@ -81,7 +81,11 @@ class Form extends FormFactory{
     public static function submit($name = "submit", $directive = []) {
         return "<input ".Form::serialysedirective($directive)." type='submit' value='".$name."' />";
     }
-    
+
+    public static function submitbtn($name = "submit", $directive = []) {
+        return "<button ".Form::serialysedirective($directive)." type='submit' >".$name."</button>";
+    }
+
     public static function reset($name = "reset", $directive = []) {
         return "<input ".Form::serialysedirective($directive)." type='reset' value='".$name."' >";
        
@@ -183,9 +187,22 @@ class Form extends FormFactory{
 
     }
 
+    private static function fieldnamesanitize($name){
+        $key = "";
+        $namearray = explode("[", $name);
+        if(count($namearray) > 1){
+            $name = $namearray[0];
+            if(strlen($namearray[1]) > 1)
+                $key = str_replace("]", "", $namearray[1]);
+
+            return Form::$name."_form[".$name.']['.$key.']';
+        }
+        return Form::$name."_form[".$name.']';
+    }
+
     public static function input($name, $value, $directive = [], $type = FORMTYPE_TEXT, $setter = "") {
                  
-        FormFactory::$fieldname = Form::$name."_form[".$name.']';
+        FormFactory::$fieldname = Form::fieldnamesanitize($name);
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["value"] = $value;
         $field["type"] = $type;

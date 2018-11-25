@@ -47,17 +47,20 @@ $("#"+model.entity+"-form").submit(function (e) {
     e.preventDefault();
     // var formserialize = $(this).serialize();
     // console.log(formserialize);
-    var action = "create";
+    var actionarray = $(this).attr("action").split("/");
+    var action = actionarray[1];
     var callback = function (response) { console.log(response); };
     entityid = $(this).data("id");
 
     if(entityid){
-        action = "update&id="+entityid;
+        //action = actionarray[1];
+        //action = "update&id="+entityid;
         callback = dform.callbackupdate;
     }else{
         callback = dform.callbackcreate;
     }
 
-    model._post(action, $(this), callback);
+    var formdata = model._formdata($(this));
+    model._post(action, formdata, callback);
 
 });

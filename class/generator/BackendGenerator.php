@@ -54,7 +54,7 @@ class BackendGenerator {
                         ]
                     ];
 
-                    $construteur .= "\n\t\t\t$" . "this->" . $relation->entity . " = EntityCollection::entity_collection('" . $relation->entity . "');";
+                    $construteur .= "\n\t\t\t$" . "this->" . $relation->entity . " = [];";
 
                     $attrib .= "
         /**
@@ -104,7 +104,7 @@ class BackendGenerator {
          *	@return " . $antislash . ucfirst($relation->entity) . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            //$" . "this->". $relation->entity . " = $" . "this->__belongto(\"" . $relation->entity . "\");
+            $" . "this->". $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -192,7 +192,8 @@ class BackendGenerator {
                     $construt .= "
                         
         public function show" . ucfirst($attribut->name) . "() {
-            return Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
+            $"."url = Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
+            return Dfile::fileadapter($"."url, $"."this->" . $attribut->name . ");
         }
         
         public function get" . ucfirst($attribut->name) . "() {
@@ -822,71 +823,48 @@ class " . ucfirst($name) . "Controller extends Controller{
         }
 
         foreach ($entity->attribut as $attribut) {
-
-            $field .= "<div class='form-group'>\n<label for='" . $attribut->name . "'>" . ucfirst($attribut->name) . "</label>\n";
-
-            if ($attribut->nullable == 'default') {
-                $field .= "\tFH_REQUIRE => false,\n ";
-            }
-
-            if (in_array($attribut->formtype, ['text', 'float', 'input', 'number', 'date', 'datetime', 'time',
-                'datepicker', 'radio', 'email'])) {
-                    $field .= "\t<b><?= $" . $name . "->get" . ucfirst($attribut->name) . "(); ?></b>\n";
-            } elseif ($attribut->formtype == 'textarea') {
-                $field .= "\t<p><?= $" . $name . "->get" . ucfirst($attribut->name) . "(); ?></p>\n";
-            } elseif ($attribut->formtype == 'document') {
-                $field .= "\t<?= 'Download : <a href=\"'.$" . $name . "->show" . ucfirst($attribut->name) . "().'\" download=\"'.$" . $name . "->get" . ucfirst($attribut->name) . "().'\">'.$" . $name . "->get" . ucfirst($attribut->name) . "().'</a>'; ?>\n";
-            } elseif ($attribut->formtype == 'video') {
-                $field .= "\t<?= '<img src=\"$" . $name . "->show" . ucfirst($attribut->name) . "()\" />'; ?>\n";
-            } elseif ($attribut->formtype == 'music') {
-                $field .= "\"type\" => FORMTYPE_FILE,
-                \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
-            } elseif ($attribut->formtype == 'image') {
-                $field .= "\t<img width='100' src=\"<?= $" . $name . "->show" . ucfirst($attribut->name) . "(); ?>\" />\n";
+            if ($attribut->formtype == 'image') {
+//                $listview[] = "'src:" . $attribut->name . "'";
+                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => 'src:" . $attribut->name . "']";
+//                        }elseif($entity->attribut[$i]->formtype == 'document'){
+//                        }elseif($entity->attribut[$i]->formtype == 'document'){
+//                        }elseif($entity->attribut[$i]->formtype == 'document'){
+                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
             } else {
-                $field .= "\t<b><?= $" . $name . "->get" . ucfirst($attribut->name) . "(); ?></b>\n";
+                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
+//                $listview[] = "'" . $attribut->name . "'";
             }
-
-            $field .= " </div>\n";
         }
 
         if (!empty($entity->relation)) {
             foreach ($entity->relation as $relation) {
 
+                if ($relation->cardinality == 'manyToMany')
+                    break;
+
                 $entitylink = $traitement->relation($listmodule, $relation->entity);
-
-                $enititylinkattrname = "id";
+                $entrel = ucfirst(strtolower($relation->entity));
+                $key = 0;
+                $entitylinkattrname = "id";
                 $entitylink->attribut = (array) $entitylink->attribut;
-
                 if (isset($entitylink->attribut[1])) {
                     $key = 1;
-                    $enititylinkattrname = $entitylink->attribut[$key]->name;
+                    $entitylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $field .= "<div class='form-group'>\n<label for='" . $relation->entity . "'>" . ucfirst($relation->entity) . "</label>\n";
-
-                if ($relation->cardinality == 'manyToOne') {
-                    $field .= "\t<?= '<b>'.$" . $name . "->get" . ucfirst($relation->entity) . "()->getId().'</b>'; ?>\n";
-
-                } elseif ($relation->cardinality == 'oneToOne' && $onetoone) {
-                    $field .= "<div>";
-                    $field .= $this->detailwidget($entitylink, $listmodule, false, $name."");
-                    $field .= "</div>\n";
-                } elseif ($relation->cardinality == 'manyToMany') {
-                    //FormManager::Options_ToCollect_Helper('name', new Dvups_right(), $dvups_role->getDvups_right()
-                    $field .= "<ul>
-                    <?php foreach ($" . $name . "->get" . ucfirst($relation->entity) . "() as $" . $relation->entity . "){ 
-                        echo '<li>'.$" . $relation->entity . "->getId().'</li>';
-                    } ?></ul>\n";
-                }
-
-                $field .= " </div>\n";
+                $listview[] = "\n['label' => '" . $entrel . "', 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
             }
         }
 
-        return $field;
+        //return $field;
+        return "
+        <div class=\"col-lg-12 col-md-12\">
+                
+                    <?= \DClass\devups\Datatable::renderentitydata($" . $name.", [" . implode(', ', $listview) . "\n]); ?>
+
+        </div>
+			";
+        ;
 
     }
 
