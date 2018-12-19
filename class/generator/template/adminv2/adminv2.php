@@ -124,7 +124,8 @@ class Adminv2 {
         $index = "
         <div class=\"col-lg-12 col-md-12\">
                 
-                    <?= \DClass\devups\Datatable::renderdata($" . "lazyloading, [" . implode(', ', $listview) . "\n]); ?>
+                    <?= \DClass\devups\Datatable::buildtable($" . "lazyloading, [" . implode(', ', $listview) . "\n])
+                    ->render(); ?>
 
         </div>
 			";

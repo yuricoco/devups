@@ -32,7 +32,7 @@ var dform = {
         dform.binderror(response.error);
     },
     callbackupdate : function (response){
-        //console.log(response, "update");
+        console.log(response, "update");
         if(response.success){
             $("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
             model._dismissmodal();

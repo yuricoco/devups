@@ -33,12 +33,11 @@ class TestentityController extends Controller{
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Testentity(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Datatable::getTableRest($lazyloading),
-            'tablepagination' => Datatable::pagination($lazyloading)
+            'datatable' => Datatable::getTableRest($lazyloading),
         ];
     }
 
-    public function listAction($next = 1, $per_page = 5){
+    public function listAction($next = 1, $per_page = 10){
 
         $lazyloading = $this->lazyloading(new Testentity(), $next, $per_page);
 

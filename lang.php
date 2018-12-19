@@ -9,15 +9,39 @@
 global $lang;
 
 $lang = [
-    "datatable.add" => [
-        "fr" => "Créer un nouveau contract",
-        "en" => "Create a new Contract",
+    "datatable.btnlist" => [
+        "en" => "List",
+        "fr" => "Lister",
     ],
-    "contract_list" => [
-        "fr" => "Liste des Contracts",
-        "en" => "Contract List",
+    "datatable.btnsearch" => [
+        "en" => "Search",
+        "fr" => "Rechercher",
     ],
-    "morning" => [
+    "datatable.btndelete" => [
+        "en" => "Delete",
+        "fr" => "Supprimer",
+    ],
+    "datatable.btnview" => [
+        "en" => "View",
+        "fr" => "Voir",
+    ],
+    "datatable.btnedit" => [
+        "en" => "Edit",
+        "fr" => "Editer",
+    ],
+    "datatable.btnadd" => [
+        "fr" => "Ajouter",
+        "en" => "Add",
+    ],
+    "datatable.nbligne" => [
+        "fr" => "Nombre de ligne",
+        "en" => "Number of line",
+    ],
+    "datatable.groupedaction" => [
+        "fr" => "Action groupée",
+        "en" => "Grouped action",
+    ],
+    "menu.morning" => [
         "fr" => "Bonjour",
         "en" => "Good morning",
     ],
@@ -27,8 +51,12 @@ $lang = [
     ],
 ];
 
-function gettranslation($ref, $local, $default = "no translation found"){
+function gettranslation($ref, $local = null, $default = "no translation found"){
     global $lang;
+
+    if($local != "fr" && $local != "en")
+        $local = local();
+
     if(!isset($lang[$ref]))
         return "reference: <b>".$ref."</b> not found!";
 

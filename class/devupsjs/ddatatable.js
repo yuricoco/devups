@@ -14,6 +14,7 @@ $(".dcheckbox").click(function () {
     ddatatable.uncheckall();
 });
 var ddatatable = {
+    baseurl : "services.php",
     currentpage : 1,
     per_page : 10,
     searchparam : "",
@@ -63,7 +64,7 @@ var ddatatable = {
 
             if(!confirm('Voulez-vous Supprimer les éléments selectionnés?')) return false;
 
-            $.get("services.php?path="+model.entity+"._deletegroup&ids="+ids.join(), function (response) {
+            $.get(this.baseurl+"?path="+model.entity+"._deletegroup&ids="+ids.join(), function (response) {
                 console.log(response);
                 $.each($trs, function (i, tr) {
                     tr.remove();
@@ -95,6 +96,7 @@ var ddatatable = {
             }
         });
 
+        $("#dcancel-search").removeClass("hidden");
         if(searchparam){
             this.searchparam = searchparam;
             this.page(1);
@@ -103,6 +105,7 @@ var ddatatable = {
     cancelsearch : function ($this) {
         this.searchparam = '';
         this.currentpage = 1;
+        $("#dcancel-search").addClass("hidden");
         this.page(1);
         // $.get("services.php?path="+model.entity+".datatable&next=1&per_page="+this.per_page, function (response) {
         //     //console.log(response);
@@ -121,9 +124,9 @@ var ddatatable = {
     orderasc:function (param) {
         console.log(param);
         this.setloader();
-        $.get("services.php?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param, function (response) {
+        $.get(this.baseurl+"?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param, function (response) {
             console.log(response);
-            $("#dv_table").find("tbody").html(response.tablebody);
+            $("#dv_table").find("tbody").html(response.datatable.tablebody);
             removeloader();
         }, 'json').error (function(resultat, statut, erreur){
             console.log(statut, erreur);
@@ -134,9 +137,9 @@ var ddatatable = {
     orderdesc:function (param) {
         console.log(param);
         this.setloader();
-        $.get("services.php?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param+" desc", function (response) {
+        $.get(this.baseurl+"?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param+" desc", function (response) {
             //console.log(response);
-            $("#dv_table").find("tbody").html(response.tablebody);
+            $("#dv_table").find("tbody").html(response.datatable.tablebody);
             removeloader();
         }, 'json').error (function(resultat, statut, erreur){
             console.log(statut, erreur);
@@ -161,13 +164,13 @@ var ddatatable = {
     page: function (index) {
         this.setloader();
         console.log("services.php?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam);
-        $.get("services.php?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam, function (response) {
+        $.get(this.baseurl+"?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam, function (response) {
             console.log(response);
-            $("#dv_table").find("tbody").html(response.tablebody);
-            $("#dv_pagination").replaceWith(response.tablepagination);
+            $("#dv_table").find("tbody").html(response.datatable.tablebody);
+            $("#dv_pagination").replaceWith(response.datatable.tablepagination);
             removeloader();
         }, 'json').error (function(resultat, statut, erreur){
-            console.log(statut, erreur);
+            console.log(resultat);
             $("#"+model.entity+"modal").show();
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
@@ -178,6 +181,11 @@ var ddatatable = {
 function removeloader(){
     $("#dv_table").find(".loader").remove();
 }
+
+$("#dt_nbrow").change(function () {
+    console.log($(this).val());
+    ddatatable.per_page = $(this).val();
+});
 
 $("#datatable-form").submit(function (e) {
     e.preventDefault();

@@ -32,8 +32,8 @@ class ProductController extends Controller
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Product(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Genesis::getTableRest($lazyloading),
-            'tablepagination' => Genesis::pagination($lazyloading)
+            'datatable' => Datatable::getTableRest($lazyloading),
+            //'tablepagination' => Datatable::pagination($lazyloading)
         ];
     }
 
@@ -99,7 +99,7 @@ class ProductController extends Controller
         if ($product->__update()) {
             return array('success' => true,
                 'product' => $product,
-                'updaterow' => Datatable::getSingleRowRest($product),
+                'tablerow' => Datatable::getSingleRowRest($product),
                 'redirect' => 'index',
                 'detail' => '');
         } else {
@@ -116,7 +116,7 @@ class ProductController extends Controller
      * @param type $id
      * @return \Array
      */
-    public function listAction($next = 1, $per_page = 10)
+    public function listAction($next = 1, $per_page = 5)
     {
 
         $lazyloading = $this->lazyloading(new Product(), $next, $per_page);

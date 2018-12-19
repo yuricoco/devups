@@ -48,13 +48,32 @@
     <div class="col-lg-12 col-md-12">
 
         <?=
-        \DClass\devups\Datatable::renderdata($lazyloading, [
+        \DClass\devups\Datatable::buildtable($lazyloading, [
             ['header' => 'Name', 'value' => 'name'],
             ['header' => 'Description', 'value' => 'description'],
             ['header' => 'Image', 'value' => 'src:Image.image'],
             ['header' => 'Category', 'value' => 'Category.name'],
             ['header' => 'Subcategory', 'value' => 'Subcategory.name']
-        ]);
+        ])
+            //->setperpage("all")
+            //->disablegroupaction()
+            ->disabledefaultgroupaction()
+
+            //->desablefilter()
+//            ->crud_url(
+//                "create", "update", "read", "delete"
+//            )
+            ->addrow([
+                "data" => [
+                    ["value" => "<label>Total Cost</label>"],
+                    ["value" => "<label>Total Cost</label>"],
+                    ["value" => "<label>Total Cost</label>"],
+                    ["value" => "<label>Total Cost</label>"],
+                    ["value" => "<label>Total Cost</label>"],
+                ],
+                "directive" => ["style" => "background: #f0ad4e !important;"]
+            ])
+            ->render();
         ?>
 
     </div>

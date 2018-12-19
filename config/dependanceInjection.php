@@ -11,6 +11,7 @@ if (file_exists(__DIR__ . '/../vendor')) {
 }
 
 require __DIR__ . '/constante.php';
+require __DIR__ . '/../lang.php';
 require __DIR__ . '/Database.php';
 require __DIR__ . '/dvups_functions.php';
 

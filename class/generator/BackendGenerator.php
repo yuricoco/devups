@@ -130,7 +130,7 @@ class BackendGenerator {
          *	@return " . $antislash . ucfirst($relation->entity) . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            //$" . "this->". $relation->entity . " = $" . "this->__belongto(\"" . $relation->entity . "\");
+            $" . "this->". $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -324,8 +324,7 @@ class " . ucfirst($name) . "Controller extends Controller{
     public function datatable($" . "next, $" . "per_page) {
         $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
         return ['success' => true,
-            'tablebody' => Datatable::getTableRest($" . "lazyloading),
-            'tablepagination' => Datatable::pagination($" . "lazyloading)
+            'datatable' => Datatable::getTableRest($" . "lazyloading),
         ];
     }
 
