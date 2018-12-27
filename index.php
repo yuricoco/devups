@@ -5,11 +5,6 @@ require 'header.php';
 use Genesis as g;
 
 //instanciation des controllers
-$storageCtrl = new StorageController();
-$categoryCtrl = new CategoryController();
-$subcategoryCtrl = new SubcategoryController();
-$productCtrl = new ProductController();
-$imageCtrl = new ImageController();
 
 
 (new Request('hello'));
