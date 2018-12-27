@@ -8,8 +8,6 @@
  */
 require __DIR__ . '/../header.php';
 
-require __DIR__ . '/../src/devups/ModuleAdmin/devups.moduleadmin.php';
-
 // move comment scope to enable authentication 
 if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
 
