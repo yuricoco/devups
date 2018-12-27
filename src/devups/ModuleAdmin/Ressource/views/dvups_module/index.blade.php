@@ -25,10 +25,10 @@
                 
         <div class="col-lg-12 col-md-12">
                 
-                    <?= \DClass\devups\Datatable::renderdata($lazyloading, [
+                    <?= \DClass\devups\Datatable::buildtable($lazyloading, [
 ['header' => 'Name', 'value' => 'name'],
 ['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
-]); ?>
+])->render(); ?>
 
         </div>
 			

@@ -17,6 +17,7 @@ var databinding = {
 }
 
 var model = {
+    baseredirect : "index.php",
     baseurl : "services.php",
     _showmodal: function(){
         //set content loader

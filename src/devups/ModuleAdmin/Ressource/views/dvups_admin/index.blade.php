@@ -40,12 +40,12 @@
     <div class="row">
 
         <div class="col-lg-12 col-md-12">
-            <div class="table-responsive">
+            <div class="">
 
-                <?= \DClass\devups\Datatable::renderdata($lazyloading, [
+                <?= \DClass\devups\Datatable::buildtable($lazyloading, [
                     ['header' => 'nom', 'value' => 'name'],
                     ['header' => 'login', 'value' => 'login'],
-                ], "callbackbtn");
+                ])->addcustomaction("callbackbtn")->render();
                 ?>
 
 

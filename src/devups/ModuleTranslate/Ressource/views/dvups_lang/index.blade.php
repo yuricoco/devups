@@ -41,12 +41,12 @@
 
         <div class="col-lg-12 col-md-12">
 
-            <?= \DClass\devups\Datatable::renderdata($lazyloading, [
+            <?= \DClass\devups\Datatable::buildtable($lazyloading, [
                 ['header' => 'Ref', 'value' => 'ref'],
                 ['header' => '_table', 'value' => '_table'],
                 ['header' => '_row', 'value' => '_row'],
                 ['header' => '_column', 'value' => '_column']
-            ], true, false); ?>
+            ], true, false)->render(); ?>
 
         </div>
 

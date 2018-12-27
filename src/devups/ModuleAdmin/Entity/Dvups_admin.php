@@ -99,6 +99,9 @@ class Dvups_admin extends Model implements JsonSerializable {
     }
 
     function setName($name) {
+        if(!$name)
+            return "name empty";
+
         $this->name = $name;
     }
 

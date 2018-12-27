@@ -56,12 +56,11 @@
             ['header' => 'Subcategory', 'value' => 'Subcategory.name']
         ])
             //->setperpage("all")
-            //->disablegroupaction()
-            ->disabledefaultgroupaction()
-
-            //->desablefilter()
+            ->disablegroupaction()
+            //->disabledefaultgroupaction()
+            ->desablefilter()
 //            ->crud_url(
-//                "create", "update", "read", "delete"
+//                "update", "read", "delete"
 //            )
             ->addrow([
                 "data" => [

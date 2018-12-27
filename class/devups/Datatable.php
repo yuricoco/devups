@@ -689,6 +689,7 @@ class Datatable {
 
     public function addcustomaction($action){
         $this->customaction[] = $action;
+        return $this;
     }
 
 }

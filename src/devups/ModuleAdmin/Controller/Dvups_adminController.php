@@ -108,22 +108,26 @@ class Dvups_adminController extends Controller {
         $this->err = array();
 
         $dvups_admin = $this->form_generat(new Dvups_admin(), $dvups_admin_form);
+
+        if ( $this->error ) {
+            return 	array(	'success' => false,
+                'testentity' => $dvups_admin,
+                'action_form' => 'create',
+                'error' => $this->error);
+        }
+
         $password = $dvups_admin->generatePassword();
         $dvups_admin->setPassword(sha1($password));
         $dvups_admin->setLogin($dvups_admin->generateLogin());
 
-        if ($dvups_admin->__insert()) {
-            return array('success' => true, // pour le restservice
-                'dvups_admin' => $dvups_admin,
-                'tablerow' => Datatable::getSingleRowRest($dvups_admin),
-                'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        } else {
-            return array('success' => false, // pour le restservice
-                'dvups_admin' => $dvups_admin,
-                'action_form' => 'create', // pour le web service
-                'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
-        }
+        $id = $dvups_admin->__insert();
+
+        return array('success' => true, // pour le restservice
+            'dvups_admin' => $dvups_admin,
+            'tablerow' => Datatable::getSingleRowRest($dvups_admin),
+            'redirect' => 'index.php?path=dvups_admin/added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
     }
 
     /**
@@ -149,18 +153,20 @@ class Dvups_adminController extends Controller {
 
         $dvups_admin = $this->form_generat(new Dvups_admin($id), $dvups_admin_form);
 
-        if ($dvups_admin->__save()) {
-            return array('success' => true, // pour le restservice
+        if ( $this->error ) {
+            return 	array(	'success' => false,
+                'testentity' => $dvups_admin,
+                'action_form' => 'create',
+                'error' => $this->error);
+        }
+
+        $dvups_admin->__update();
+
+        return array('success' => true, // pour le restservice
                 'dvups_admin' => $dvups_admin,
                 'tablerow' => Datatable::getSingleRowRest($dvups_admin),
-                'redirect' => 'index', // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        } else {
-            return array('success' => false, // pour le restservice
-                'dvups_admin' => $dvups_admin,
-                'view' => 'form', // pour le web service
-                'detail' => "Detail de l'action ou message d'erreur ou de succes"); //
-        }
+
     }
 
     public static function renderDetail($id)

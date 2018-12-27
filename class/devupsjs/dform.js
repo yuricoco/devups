@@ -24,6 +24,9 @@ var dform = {
         //console.log(response, "create");
 
         if(response.success){
+            if(response.redirect)
+                window.location.href = response.redirect;
+
             $("#dv_table").find("tbody").prepend(response.tablerow);
             model._dismissmodal();
             return;
