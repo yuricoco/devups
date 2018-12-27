@@ -10,6 +10,10 @@ header("Access-Control-Allow-Origin: *");
 
 switch (Request::get('path')) {
 
+    case 'hello':
+        g::json_encode(["success" => true, "message" => "Hello Devups. Services are available :)"]);
+        break;
+
 //    case 'service':
 //        g::json_encode([]);
 //        break;
