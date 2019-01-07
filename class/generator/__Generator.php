@@ -23,22 +23,31 @@ class __Generator {
 
 Usage:
   command [options] [arguments]\n\nAvailable commands:\n";
-        
+
         $commend[] = "core:g:component <component>                      // generate an entity crud from core eg: component\module\entity";
-        $commend[] = "core:g:module <component\module>                  // generate an entity crud from core eg: component\module\entity";
-        $commend[] = "core:g:crud <component\module\entity>             // generate an entity crud from core";
-        $commend[] = "core:g:entity <component\module\entity>           // generate an entity from core eg: component\module\entity";
-        $commend[] = "core:g:controller <component\module\entity>       // generate a controller from core eg: component\module\entity";
-        $commend[] = "core:g:form <component\module\entity>             // generate an entity from core eg: component\module\entity";
-        $commend[] = "core:g:formwidget <component\module\entity>            // generate an entity from core eg: component\module\entity";
-        $commend[] = "core:g:views <component\module\entity>            // generate an entity from core eg: component\module\entity";
-        $commend[] = "core:g:viewswidget <component\module\entity>          // generate an entity from core eg: component\module\entity\n ";
-        $commend[] = "core:g:genesis <component\module\entity>          // generate an entity from core eg: component\module\entity\n ";
+        $commend[] = "core:g:module <component\\module>                  // generate an entity crud from core eg: component\module\entity";
+        $commend[] = "core:g:crud <component\module\\entity>             // generate an entity crud from core";
+        $commend[] = "core:g:entity <component\module\\entity>           // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:controller <component\module\\entity>       // generate a controller from core eg: component\module\entity";
+        $commend[] = "core:g:form <component\module\\entity>             // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:formwidget <component\module\\entity>            // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:views <component\module\\entity>            // generate an entity from core eg: component\module\entity";
+        $commend[] = "core:g:viewswidget <component\module\\entity>          // generate an entity from core eg: component\module\entity\n ";
+        //$commend[] = "core:g:genesis <component\module\\entity>          // generate an entity from core eg: component\module\entity\n ";
+        $commend[] = "core:g:dependencies <component\module\\entity>          // generate an entity from core eg: component\module\entity\n ";
+
+        $commend[] = "core:g:moduleendless <component\module>          // generate the module index; services; dependencies and layout\n ";
+        $commend[] = "core:g:moduledependencies <component\module>          // generate the module dependencies from core eg: component\module\entity\n ";
+        $commend[] = "core:g:moduleindex <component\module>          // generate an entity from core eg: component\module\entity\n ";
+        $commend[] = "core:g:moduleservices <component\module>          // generate an entity from core eg: component\module\entity\n ";
+        $commend[] = "core:g:moduleressources <component\module>          // generate an entity from core eg: component\module\entity\n ";
+
+        $commend[] = "entity:g:core <component\module\\entity>          // generate a core from entity eg: component\module\entity\n ";
 
         $commend[] = "install                 // create database, create database schema and create master admin ";
         $commend[] = "dvups_:update           // update right of master admin on new modules and entities ";
 
-        echo implode("\n\t -> ", $commend);
+        echo "\n\t -> ".implode("\n\t -> ", $commend);
         
     }
 
@@ -179,6 +188,22 @@ Usage:
      *
      * @param type $namespace
      */
+    public static function __dependencies($project, $namespace) {
+
+        $ns = str_replace("\\", "/", $namespace);
+        $mn = explode("/", $ns);
+        $module = __Generator::findmodule($project, $mn[1]);
+
+        __Generator::$projectcore = $project;
+
+        __Generator::moduledependencies(__Generator::$projectcore, $module, $module->listentity);
+
+    }
+
+    /**
+     *
+     * @param type $namespace
+     */
     public static function __services($project, $namespace) {
 
         $ns = str_replace("\\", "/", $namespace);
@@ -186,6 +211,21 @@ Usage:
         $module = __Generator::findmodule($project, $mn[1]);
 
         __Generator::services($module, $module->listentity);
+
+    }
+
+    /**
+     *
+     * @param type $namespace
+     */
+    public static function __ressources($project, $namespace) {
+
+        $ns = str_replace("\\", "/", $namespace);
+        $mn = explode("/", $ns);
+        $module = __Generator::findmodule($project, $mn[1]);
+        __Generator::$projectcore = $project;
+
+        __Generator::moduleressources(__Generator::$projectcore, $module, $module->listentity);
 
     }
 
@@ -359,30 +399,7 @@ Usage:
 //            $rootgenerate->entityRooting($entity);
 
         if ($crud['views']) {
-            if (!file_exists('Ressource'))
-                mkdir('Ressource', 0777);
-
-            if (!file_exists('Ressource/views'))
-                mkdir('Ressource/views', 0777);
-
-            if (!file_exists('Ressource/views/' . strtolower($entity->name)))
-                mkdir('Ressource/views/' . strtolower($entity->name), 0777);
-
-            if (!file_exists('Ressource/js'))
-                mkdir("Ressource/js", 0777);
-
-            $js = "Ressource/js/" . strtolower($entity->name);
-
-            $jsctrl = fopen($js . 'Ctrl.js', 'w');
-            fputs($jsctrl, "//".$entity->name. "Ctrl");
-            fclose($jsctrl);
-
-            $jsform = fopen($js . 'Form.js', 'w');
-            fputs($jsform, "//".$entity->name. "Form");
-            fclose($jsform);
-
-            $vue = "Ressource/views/" . strtolower($entity->name);
-            $frontend->viewsGenerator(__Generator::$projectcore->listmodule, $entity, __Generator::$projectcore->template, $vue);
+            self::ressources($entity, $frontend);
         }
 
         $name = strtolower($entity->name);
@@ -394,6 +411,35 @@ Usage:
         fclose($entitycore);
 
         chdir('../');
+    }
+
+    private static function ressources($entity, $frontend){
+
+        if (!file_exists('Ressource'))
+            mkdir('Ressource', 0777);
+
+        if (!file_exists('Ressource/views'))
+            mkdir('Ressource/views', 0777);
+
+        if (!file_exists('Ressource/views/' . strtolower($entity->name)))
+            mkdir('Ressource/views/' . strtolower($entity->name), 0777);
+
+        if (!file_exists('Ressource/js'))
+            mkdir("Ressource/js", 0777);
+
+        $js = "Ressource/js/" . strtolower($entity->name);
+
+        $jsctrl = fopen($js . 'Ctrl.js', 'w');
+        fputs($jsctrl, "//".$entity->name. "Ctrl");
+        fclose($jsctrl);
+
+        $jsform = fopen($js . 'Form.js', 'w');
+        fputs($jsform, "//".$entity->name. "Form");
+        fclose($jsform);
+
+        $vue = "Ressource/views/" . strtolower($entity->name);
+        $frontend->viewsGenerator(__Generator::$projectcore->listmodule, $entity, __Generator::$projectcore->template, $vue);
+
     }
 
     /**
@@ -470,35 +516,74 @@ Usage:
         chdir('../');
     }
 
+    private static function moduledependencies($project, $module, $modulelistentity){
+
+        $repertoire = ucfirst($module->name);
+
+        chdir($repertoire);
+
+        $filename = strtolower($project->name) . "." . strtolower($module->name) . '.php';
+        $package = "<?php ";
+
+        foreach ($modulelistentity as $entity) {
+            $name = ucfirst(strtolower($entity->name));
+            $requiremanytomany = "";
+
+            foreach ($entity->relation as $relation) {
+                if ($relation->cardinality == 'manyToMany') {
+                    $requiremanytomany .= "\nrequire 'Entity/" . $name."_".$relation->entity. ".php';";
+                }
+            }
+
+            $package .= "
+    require 'Entity/" . $name . ".php';$requiremanytomany
+    //require 'Dao/" . $name . "DAO.php';
+    require 'Form/" . $name . "Form.php';
+    require 'Controller/" . $name . "Controller.php';
+    //require 'Genesis/" . $name . "Genesis.php';\n";
+
+        }
+
+        $moddepend = fopen($filename, "w");
+        fputs($moddepend, $package);
+        fclose($moddepend);
+
+        chdir("../");
+    }
+
     private static function moduleendless($projet, $module, $modulelistentity, $rewrite = false)
     {
 
-        $traitement = new Traitement();
         $repertoire = ucfirst($module->name);
         if (!file_exists($repertoire)) {
             mkdir($repertoire, 0777);
         }
-        $dependance = array();
 
-        //I may optimize this part because at each iteration it goes and come from a directory it may take too much compute
-        // that's not necessary.
-        foreach ($modulelistentity as $entity) {
-            self::dependencies($projet, $module, $entity, $rewrite);
-        }
+        self::moduledependencies($projet, $module, $modulelistentity);
 
         self::index($module, $modulelistentity);
 
+        self::moduleressources($projet, $module, $modulelistentity, false);
 
+        self::services($module, $modulelistentity);
+
+    }
+
+    private static function moduleressources($projet, $module, $modulelistentity, $withentityviews = true){
+        $repertoire = ucfirst($module->name);
         chdir($repertoire);
 
         $frontend = new FrontendGenerator();
         $frontend->layoutGenerator($module, $projet->template, "Ressource/views/");
 
+        if($withentityviews)
+            foreach ($modulelistentity as $entity) {
+                $entity->attribut = (array) $entity->attribut;
+                self::ressources($entity, $frontend);
+            }
+
         // on sort du module
         chdir('../');
-
-        self::services($module, $modulelistentity);
-
     }
 
     private static function index($module, $modulelistentity) {

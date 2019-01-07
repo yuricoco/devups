@@ -196,3 +196,5 @@ ddatatable.pagination = function (page) {
     this.currentpage = page;
     this.page(page);
 };
+
+ddatatable.per_page = $("input[name='per_page_custom']").val();

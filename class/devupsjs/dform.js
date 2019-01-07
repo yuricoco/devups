@@ -27,6 +27,9 @@ var dform = {
             if(response.redirect)
                 window.location.href = response.redirect;
 
+            else if(response.reload)
+                window.location.reload();
+
             $("#dv_table").find("tbody").prepend(response.tablerow);
             model._dismissmodal();
             return;
@@ -37,6 +40,12 @@ var dform = {
     callbackupdate : function (response){
         console.log(response, "update");
         if(response.success){
+            if(response.redirect)
+                window.location.href = response.redirect;
+
+            else if(response.reload)
+                window.location.reload();
+
             $("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
             model._dismissmodal();
             return;

@@ -166,21 +166,22 @@ class FormFactory {
     public static function __filepreview($field){
         $file = "";
         if ($field['value']) {
-            switch ($field[FH_FILETYPE]) {
-
-                case FILETYPE_DOCUMENT:
-                    $file = "<a class='dv-doc' href='" . $field['src'] . "' download='" . $field['value'] . "'> download the document</a>";
-                    break;
-                case FILETYPE_VIDEO:
-                    $file = "<video class='dv-video' src='" . $field['src'] . "'> </video>";
-                    break;
-                case FILETYPE_AUDIO:
-                    $file = "<audio class='dv-audio' src='" . $field['src'] . "'> </audio>";
-                    break;
-                case FILETYPE_IMAGE:
-                    $file = "<img class='dv-img' width='120' src='" . $field['src'] . "' />";
-                    break;
-            }
+            $file = $field['src'];
+//            switch ($field[FH_FILETYPE]) {
+//
+//                case FILETYPE_DOCUMENT:
+//                    $file = "<a class='dv-doc' href='" . $field['src'] . "' download='" . $field['value'] . "'> download the document</a>";
+//                    break;
+//                case FILETYPE_VIDEO:
+//                    $file = "<video class='dv-video' src='" . $field['src'] . "'> </video>";
+//                    break;
+//                case FILETYPE_AUDIO:
+//                    $file = "<audio class='dv-audio' src='" . $field['src'] . "'> </audio>";
+//                    break;
+//                case FILETYPE_IMAGE:
+//                    $file = $field['src'];
+//                    break;
+//            }
         }
 
         return $file;

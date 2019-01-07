@@ -12,6 +12,10 @@ class Controller {
     protected $error = [];
     protected $error_exist = false;
 
+    /**
+     * @return $this
+     * @throws ReflectionException
+     */
     public static function i() {
         $reflection = new ReflectionClass(get_called_class());
         return $reflection->newInstance();
@@ -392,7 +396,7 @@ class Controller {
                     } else {
 
                         if (isset($_ENTITY_FORM[$key])){
-                            if($value["type"] == "injection"){
+                            if(isset($value["type"]) && $value["type"] == "injection"){
 //                                $result = call_user_func(array($key."Controller", "createAction"));
 //                                if($error = call_user_func(array($object, $currentfieldsetter), $result[$key]))
 //                                    $this->error[$key] = $error;

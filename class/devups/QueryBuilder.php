@@ -212,6 +212,33 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
+    /**
+     * @param bool $update
+     * @return $this
+     */
+    public function __dclone($update = false) {
+        unset($this->objectVar[0]);
+        $col =  "`".strtolower(implode('`,`', $this->objectVar))."`";
+        $objectVar = explode(",", $col);
+        if($update)
+            foreach ($objectVar as $i => $var){
+                foreach ($update as $key => $value){
+                    if($var == "`".$key."`"){
+                        $objectVar[$i] = "'".$value."'";
+                        unset($update[$key]);
+                    }
+                }
+//                if(count($update))
+//                    break;
+            }
+
+        $this->query = " insert into `" . $this->table . "` (" . $col . ") select " . strtolower(implode(' ,', $objectVar)) . " from `" . $this->table . "` ";
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
     public function delete() {
         $this->columns = null;
 

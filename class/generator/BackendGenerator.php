@@ -393,7 +393,6 @@ class " . ucfirst($name) . "Controller extends Controller{
         return 	array(	'success' => true,
                         '" . $name . "' => $" . $name . ",
                         'tablerow' => Datatable::getSingleRowRest($" . $name . "),
-                        'redirect' => 'index',
                         'detail' => '');
 
     }
@@ -424,7 +423,6 @@ class " . ucfirst($name) . "Controller extends Controller{
         return 	array(	'success' => true,
                         '" . $name . "' => $" . $name . ",
                         'tablerow' => Datatable::getSingleRowRest($" . $name . "),
-                        'redirect' => 'index',
                         'detail' => '');
                         
     }

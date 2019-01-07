@@ -306,7 +306,7 @@ class Datatable {
 
         $html .= $this->perpagebuilder();
 
-        $html .= "
+        $html .= "<input name=\"per_page_custom\" value='". $this->per_page ."' class='hidden' />
     </div>
     </div>";
 
@@ -394,7 +394,7 @@ class Datatable {
         return $this;
     }
 
-    public function desablefilter(){
+    public function disablefilter(){
         $this->searchaction = false;
         return $this;
     }

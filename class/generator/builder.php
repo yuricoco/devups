@@ -136,6 +136,11 @@ if (isset($argv[2])) {
             echo $argv[2] . ": Services generated with success";
             break;
 
+        case 'core:g:moduleressources':
+            __Generator::__ressources($project, $argv[2]); //,
+            echo $argv[2] . ": Ressources generated with success";
+            break;
+
         case 'core:g:component':
             __Generator::component(Core::getComponentCore($argv[2])); //, 
             echo $project->name . ": component generated with success";

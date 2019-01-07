@@ -131,7 +131,7 @@ abstract class Model extends \stdClass {
 
     /**
      *
-     * @param type $param
+     * @param string $fileparam
      * @return \Dfile
      */
     public static function Dfile($fileparam) {
@@ -185,18 +185,22 @@ abstract class Model extends \stdClass {
 
 
     /**
-     * return the row as design in the database
+     * return the number of row in the database if parameter is an object ...
      * @example http://easyprod.spacekola.com description
-     * @param type $id
-     * @return $this
+     * @param Mixed $parameter either null or an object in relation with it
+     * @return integer
      */
-    public static function count() {
+    public static function count($parameter  = null) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->__countEl();
+        if(is_null($parameter))
+            return $qb->select()->__countEl();
+
+        if(is_object($parameter))
+            return $qb->select()->where($parameter)->__countEl(false);
 
     }
 
@@ -204,7 +208,7 @@ abstract class Model extends \stdClass {
     /**
      * return the firt
      * @example http://easyprod.spacekola.com description
-     * @param type $id
+     * @param boolean $recursif
      * @return $this
      */
     public static function first($recursif = true) {
@@ -219,7 +223,7 @@ abstract class Model extends \stdClass {
     /**
      * return the row as design in the database
      * @example http://easyprod.spacekola.com description
-     * @param type $id
+     * @param boolean $recursif
      * @return $this
      */
     public static function last($recursif = true) {
@@ -230,6 +234,8 @@ abstract class Model extends \stdClass {
         $qb = new QueryBuilder($entity);
         return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne($recursif);
     }
+
+
     public static function lastrow() {
 
         $reflection = new ReflectionClass(get_called_class());
@@ -252,6 +258,22 @@ abstract class Model extends \stdClass {
 
         $qb = new QueryBuilder($entity);
         return $qb->select()->limit($i - 1, $i)->__getOne($recursif);
+    }
+
+    /**
+     * return the attribut as design in the database
+     * @example http://easyprod.spacekola.com description
+     * @param Str $attribut
+     * @param int $id
+     * @return $this
+     */
+    public static function getattribut($attribut, $id) {
+
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        return $qb->select($attribut)->where("this.id", $id)->exec(DBAL::$FETCH)[0];
     }
 
     /**
@@ -381,12 +403,38 @@ abstract class Model extends \stdClass {
     }
 
     /**
+     * @param null $id
+     * @param null $update
+     * @return integer the id of the cloned row
+     * @throws ReflectionException
+     */
+    public static function dclone($id = null, $update = null){
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        if($id)
+            return $qb->__dclone($update)->where("this.id", $id)->exec(DBAL::$INSERT);
+
+        return $qb->__dclone($update);
+    }
+
+    /**
      * create a new entry
      * @return integer
      */
     public function __insert() {
         $dbal = new DBAL();
         return $dbal->createDbal($this);
+    }
+
+    /**
+     * @param array $update
+     * @return integer
+     */
+    public function __dclone($update = []) {
+        $qb = new QueryBuilder($this);
+        return $qb->__dclone($update)->where("this.id", $this->getId())->exec(DBAL::$INSERT);
     }
 
     /**
@@ -416,6 +464,10 @@ abstract class Model extends \stdClass {
             return $dbal->createDbal($this);
     }
 
+    /**
+     * @param bool $recursif
+     * @return $this|$this
+     */
     public function __show($recursif = false) {
         if ($this->dvfetched) {
             return $this;
@@ -424,6 +476,7 @@ abstract class Model extends \stdClass {
         $dbal = new DBAL();
         return $dbal->findByIdDbal($this, $recursif);
     }
+
     public function __findrow() {
         $qb = new QueryBuilder($this);
         return $qb->select()->where("id", "=", $this->id)->__getOneRow();
@@ -469,7 +522,13 @@ abstract class Model extends \stdClass {
         }
     }
 
-    public function __belongto($relation) {
+    /**
+     * @param $relation
+     * @param bool $recursif
+     * @return $this
+     * @throws ReflectionException
+     */
+    public function __belongsto($relation) {
 
         if(is_object($relation) && ($relation->dvfetched || !$relation->dvinrelation))
             return $relation;
@@ -490,6 +549,12 @@ abstract class Model extends \stdClass {
         return $dbal->belongto($this, $relation);
     }
 
+    /**
+     * @param $relation
+     * @param bool $recursif
+     * @return $this
+     * @throws ReflectionException
+     */
     public function __hasone($relation, $recursif = false) {
         if (!is_object($relation)) :
             $reflection = new ReflectionClass($relation);
