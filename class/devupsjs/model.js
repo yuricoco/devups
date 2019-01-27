@@ -122,6 +122,20 @@ var model = {
         model.formentity = formentity;
         return formdata;
     },
+    _get : function (action, callback) {
+
+        $.ajax({
+            url: this.baseurl+"?path="+this.entity+"."+action,
+            //data: formdata,
+            method: "GET",
+            dataType: "json",
+            success: callback,
+            error: function (e) {
+                console.log(e);//responseText
+                model.modalbody.html(e.responseText);
+            }
+        });
+    },
     _post : function (action, formdata, callback) {
         // var formdata = this._formdata(form);
         // model.modalbody.append('<div id="loader" style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');

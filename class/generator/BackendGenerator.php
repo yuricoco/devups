@@ -161,6 +161,19 @@ class BackendGenerator {
             $length = "";
             $nullable = "";
 
+            if (in_array($attribut->formtype, ["radio", "checkbox", "select"]) && isset($attribut->enum)) {
+                $staticenum = [];
+                foreach ($attribut->enum as $key => $enum){
+                    $staticenum[] = " '$key' => '$enum'";
+                }
+
+                $construt .= "
+        /**
+         **/
+        public static $" . strtoupper($attribut->name) . "S = [".implode(",", $staticenum)."];";
+
+            }
+
             if ($attribut->datatype == "string") {
                 $length = ', length=' . $attribut->size . '';
             }
@@ -168,12 +181,16 @@ class BackendGenerator {
             if ($attribut->nullable == 'default') {
                 $nullable = ", nullable=true";
             }
+            $defaultvalue = "";
+            if (isset($attribut->defaultvalue) && !in_array($attribut->datatype, ['date', 'datetime', 'time'])) {
+                $defaultvalue = " = " . $attribut->defaultvalue . ' ';
+            }
             $construt .= "
         /**
          * @Column(name=\"" . $attribut->name . "\", type=\"" . $attribut->datatype . "\" $length $nullable)
          * @var " . $attribut->datatype . "
          **/
-        private $" . $attribut->name . ";";
+        private $" . $attribut->name . "$defaultvalue;";
         }
         $otherattrib = true;
 //        }
@@ -363,23 +380,32 @@ class " . ucfirst($name) . "Controller extends Controller{
                 if ($relation->cardinality == "oneToOne") {
                     $contenu .= "
         //$" . $relation->entity . "Ctrl = new " . ucfirst($relation->entity) . "Controller();
-        extract(" . ucfirst($relation->entity) . "Controller::i()->createAction());
+        //extract(" . ucfirst($relation->entity) . "Controller::i()->createAction());
+        $" . $relation->entity . " = $" . "this->form_fillingentity(new " . ucfirst($relation->entity) . "(), $" . $relation->entity . "_form);
+        $" . $relation->entity . "->__insert();
         $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . "); ";
                 }
             }
         }
         $contenu .= "\n" . implode($mtm, "\n");
         $otherattrib = false;
-        if (isset($entity->attribut[1])) {
-            $otherattrib = true;
-            foreach ($entity->attribut as $attribut) {
+//        if (isset($entity->attribut[1])) {
+//            $otherattrib = true;
+        foreach ($entity->attribut as $attribut) {
 //			for($i = 1; $i < count($entity->attribut); $i++){
-                if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
-                    $contenu .= "
-            $".$name ."->uploadfile('" . $attribut->name . "');
-            ";
+            if (in_array($attribut->formtype, ['document', 'music', 'video', 'image'])){
+                $otherattrib = true;
+                $contenu .= "
+        $".$name ."->uploadfile('" . $attribut->name . "');\n";
             }
+
+            if (in_array($attribut->datatype, ['date', 'datetime', 'time']) && isset($attribut->defaultvalue)){
+                $contenu .= "
+        $".$name ."->set" . ucfirst($attribut->name) . "(new DateTime());\n";
+            }
+
         }
+//        }
 
         $contenu .= "
         if ( $" . "this->error ) {
@@ -531,7 +557,11 @@ class " . ucfirst($name) . "Controller extends Controller{
             $classdevupsmetadata["relation"][] = $dvfield;
         }
 
-        $entitycore = fopen('Core/' . $name . 'Core.json', 'w');
+        if (!file_exists('Core')) {
+            mkdir('Core', 0777);
+        }
+
+        $entitycore = fopen('Core/' . $name . 'Core.json', 'w+');
         $contenu = json_encode($classdevupsmetadata);
         fputs($entitycore, $contenu);
 

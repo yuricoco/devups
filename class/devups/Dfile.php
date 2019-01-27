@@ -14,12 +14,13 @@ class Dfile {
     public static $EXTENSION_VIDEO = array('mp4', 'avi', 'mov', 'mkv', 'webm', 'ogg', 'crdownload');
     public static $EXTENSION_DOCUMENT = array('pdf', 'docx', 'doc', 'txt', 'ico', 'xls', 'xlsx', 'ppt', 'pptx');
     public static $EXTENSION_ARCHIVE = array('rar', 'zip', 'iso');
-    
+
     public $uploaddir;
     private $file;
     private $original = true;
     private $compressionquality = 80;
     private $file_name = "";
+    private $constraintfiletype = null;
 
 
     public static function fileadapter($url, $name = "", $imgdir = ["style" => "max-width : 100%; max-height: 200px"]){
@@ -47,7 +48,7 @@ class Dfile {
             return 'data:image/' . $type . ';base64,' . base64_encode($data);
         }
 
-        $data = file_get_contents(ROOT."web/asset/default/".$default);
+        $data = file_get_contents(ROOT."web/assets/default/".$default);
         return 'data:image/jpg;base64,' . base64_encode($data);
     }
 
@@ -109,7 +110,7 @@ class Dfile {
         return $this;
     }
     /**
-      @param $default Dans le cas ou le developpeur voudrait spécifier sa propre image par défaut
+    @param $default Dans le cas ou le developpeur voudrait spécifier sa propre image par défaut
      */
     private static function filepath($str, $charset = 'utf-8') {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);
@@ -152,12 +153,12 @@ class Dfile {
 //            ];
             $this->file = $_FILES[$entityname . '_form'];
 //            $result = call_user_func(array($entity, $uploadmethod), $_files);
-        /*} elseif (is_string($file) && file_exists(UPLOAD_DIR . $file)) {
-            $this->name = $_FILES[$file]['name'];
-            $this->size = $_FILES[$file]['size'];
-            $this->tmp_name = $_FILES[$file]['tmp_name'];
-            $this->error = $_FILES[$file]['error'];
-            $this->file = $_FILES[$file];*/
+            /*} elseif (is_string($file) && file_exists(UPLOAD_DIR . $file)) {
+                $this->name = $_FILES[$file]['name'];
+                $this->size = $_FILES[$file]['size'];
+                $this->tmp_name = $_FILES[$file]['tmp_name'];
+                $this->error = $_FILES[$file]['error'];
+                $this->file = $_FILES[$file];*/
         } elseif (is_string($file) && isset($_FILES[$file]) && $_FILES[$file]['error'] == 0) {
             $this->name = $_FILES[$file]['name'];
             $this->size = $_FILES[$file]['size'];
@@ -435,7 +436,11 @@ class Dfile {
 
     private function validation() {
 
-        if ($this->error) {
+        if ($this->constraintfiletype && $this->type != $this->constraintfiletype) {
+//            die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $this->message, $this->file));
+            $this->error = array("success" => false, 'err' => "The file type is not valid for the contraint ");
+            return true;
+        }elseif ($this->error) {
 //            die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $this->message, $this->file));
             $this->error = array("success" => false, 'err' => implode(" || ", $this->message));
             return true;
@@ -444,6 +449,11 @@ class Dfile {
             return true;
         }
         return false;
+    }
+
+    public function setConstraintfiletype($type = "image"){
+        $this->constraintfiletype = $type;
+        return $this;
     }
 
     public function moveto($path, $absolut = false) {
@@ -512,7 +522,7 @@ class Dfile {
         if ($image && file_exists(UPLOAD_DIR . $path . $image))
             $image = SRC_FILE . $path . $image;
         else
-            $image = asset($default);
+            $image = d_assets($default);
 
         return $image;
     }
@@ -528,12 +538,13 @@ class Dfile {
         $this->variante[] = $param;
         return $this;
     }
-    public function delete($path) {
-        
+
+    private function unlink($src_file) {
+        unlink($src_file);
     }
     /**
      * delete the file named $image
-     * 
+     *
      * @param type $name_file the name of the file you want to delete
      * @return boolean true if file delete an array if the file doesn't exist
      */
@@ -567,3 +578,4 @@ class Dfile {
     }
 
 }
+

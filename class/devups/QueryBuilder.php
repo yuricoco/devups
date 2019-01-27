@@ -46,27 +46,6 @@ class QueryBuilder extends \DBAL {
     }
 
     /**
-     * Add an array of where clauses to the query.
-     *
-     * @param  array  $column
-     * @param  string  $boolean
-     * @param  string  $method
-     * @return $this
-     */
-//    protected function addArrayOfWheres($column, $boolean, $method = 'where')
-//    {
-//        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
-//            foreach ($column as $key => $value) {
-//                if (is_numeric($key) && is_array($value)) {
-//                    $query->{$method}(...array_values($value));
-//                } else {
-//                    $query->$method($key, '=', $value, $boolean);
-//                }
-//            }
-//        }, $boolean);
-//    }
-
-    /**
      * Prepare the value and operator for a where clause.
      *
      * @param  string  $value
@@ -97,7 +76,7 @@ class QueryBuilder extends \DBAL {
      */
     protected function invalidOperatorAndValue($operator, $value) {
         return is_null($value) && in_array($operator, $this->operators) &&
-                !in_array($operator, ['=', '<>', '!=']);
+            !in_array($operator, ['=', '<>', '!=']);
     }
 
     /**
@@ -108,7 +87,7 @@ class QueryBuilder extends \DBAL {
      */
     protected function invalidOperator($operator) {
         return !in_array(strtolower($operator), $this->operators, true) &&
-                !in_array(strtolower($operator), $this->grammar->getOperators(), true);
+            !in_array(strtolower($operator), $this->grammar->getOperators(), true);
     }
 
     /**
@@ -150,10 +129,10 @@ class QueryBuilder extends \DBAL {
     public function close() {
 //        $params = $this->parameters;
         $query = $this->query;
-        
+
         // restaure sequence before any other select
         $this->query = $this->querysequence;
-        
+
         $this->instanciateVariable($this->sequenceobject);
 
         return $query;
@@ -249,16 +228,19 @@ class QueryBuilder extends \DBAL {
     }
 
     /**
-     * 
+     *
      * @param type $arrayvalues
      * @param type $seton
      * @param type $case
      * @return $this
      */
-    public function update($arrayvalues = null, $seton = null, $case = null) {
+    public function update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true) {
         $this->join();
         $this->columns = null;
-        $this->query = "  update `" . $this->table . "` " . $this->defaultjoin;
+        if($defauljoin)
+            $this->query = "  update `" . $this->table . "` " . $this->defaultjoin;
+        else
+            $this->query = "  update `" . $this->table . "` " ;
 
         if ($arrayvalues)
             return $this->set($arrayvalues, $seton, $case);
@@ -288,7 +270,7 @@ class QueryBuilder extends \DBAL {
         }
         // update one column on one row
         elseif ($arrayvalues && $seton != null) {
-        //elseif (true) {
+            //elseif (true) {
             $this->parameters[] = $seton;
             $this->query .= " $arrayvalues = ? ";
             $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
@@ -346,7 +328,7 @@ class QueryBuilder extends \DBAL {
     }
 
     /**
-     * init innerjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current 
+     * init innerjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current
      * class
      * @param type $classname
      * @param type $classnameon
@@ -354,10 +336,10 @@ class QueryBuilder extends \DBAL {
      */
     public function innerjoin($classname, $classnameon = "") {
         $this->join = strtolower(get_class($classname));
-        
+
         if(!$classnameon)
             $classnameon = $this->objectName;
-        
+
         $this->query .= " inner join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
 //        $this->query .= " inner join `" . $this->join . "` ";
 
@@ -365,7 +347,7 @@ class QueryBuilder extends \DBAL {
     }
 
     /**
-     * init leftjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current 
+     * init leftjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current
      * class
      * @param type $classname
      * @param type $classnameon
@@ -373,10 +355,10 @@ class QueryBuilder extends \DBAL {
      */
     public function leftjoin($classname, $classnameon = "") {
         $this->join = strtolower($classname);
-        
+
         if(!$classnameon)
             $classnameon = $this->objectName;
-        
+
         // on ".strtolower(get_class($entity)).".id = ".strtolower(get_class($entity_owner)).".".strtolower(get_class($entity))."_id
         $this->query .= " left join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
 //        $this->query .= " left join `" . $this->join . "` ";
@@ -402,7 +384,7 @@ class QueryBuilder extends \DBAL {
     public function where($column, $operator = null, $value = null, $link = "where") {
         $this->endquery = "";
 //        if(is_array($critere)){
-//            
+//
 //        }
 //        $this->columns = is_array($columns) ? $columns : func_get_args();
 
@@ -411,7 +393,7 @@ class QueryBuilder extends \DBAL {
             if ($this->defaultjoinsetted) {
                 $this->query .= " " . $link . " " . strtolower(get_class($column)) . '.id';
             } else {
-                $this->query .= " " . $link . " " . strtolower(get_class($column)) . '_id';                
+                $this->query .= " " . $link . " " . strtolower(get_class($column)) . '_id';
             }
 
             if ($column->getId()) {
@@ -474,7 +456,7 @@ class QueryBuilder extends \DBAL {
     }
 
     /**
-     * 
+     *
      * @param String|Array $values
      * @return $this
      */
@@ -616,7 +598,7 @@ class QueryBuilder extends \DBAL {
     }
 
     public function __countEl($recursif = true) {
-        return $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
+        return (float) $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
 }

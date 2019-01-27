@@ -131,7 +131,7 @@ abstract class Model extends \stdClass {
 
     /**
      *
-     * @param string $fileparam
+     * @param type $param
      * @return \Dfile
      */
     public static function Dfile($fileparam) {
@@ -182,13 +182,11 @@ abstract class Model extends \stdClass {
         return true;
     }
 
-
-
     /**
-     * return the number of row in the database if parameter is an object ...
+     * return the row as design in the database
      * @example http://easyprod.spacekola.com description
-     * @param Mixed $parameter either null or an object in relation with it
-     * @return integer
+     * @param type $id
+     * @return $this
      */
     public static function count($parameter  = null) {
 
@@ -208,7 +206,7 @@ abstract class Model extends \stdClass {
     /**
      * return the firt
      * @example http://easyprod.spacekola.com description
-     * @param boolean $recursif
+     * @param type $id
      * @return $this
      */
     public static function first($recursif = true) {
@@ -223,7 +221,7 @@ abstract class Model extends \stdClass {
     /**
      * return the row as design in the database
      * @example http://easyprod.spacekola.com description
-     * @param boolean $recursif
+     * @param type $id
      * @return $this
      */
     public static function last($recursif = true) {
@@ -235,7 +233,12 @@ abstract class Model extends \stdClass {
         return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne($recursif);
     }
 
-
+    /**
+     * return the row as design in the database
+     * @example http://easyprod.spacekola.com description
+     * @param type $id
+     * @return $this
+     */
     public static function lastrow() {
 
         $reflection = new ReflectionClass(get_called_class());
@@ -298,7 +301,7 @@ abstract class Model extends \stdClass {
      * when recursif set to true, the DBAL does recursif request to hydrate the association entity and those of it.
      * @param type $id the id of the entity
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
-     * @return type
+     * @return $this
      */
     public static function find($id, $recursif = true) {
 
@@ -392,20 +395,20 @@ abstract class Model extends \stdClass {
      * @param Mixed $case id
      * @return \QueryBuilder
      */
-    public static function update($arrayvalues = null, $seton = null, $case = null) {
+    public static function update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true) {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
         if ($seton != null && is_array($arrayvalues) || $case != null && !is_array($case))
             $entity->setId($case);
 
         $qb = new QueryBuilder($entity);
-        return $qb->update($arrayvalues, $seton, $case);
+        return $qb->update($arrayvalues, $seton, $case, $defauljoin);
     }
 
     /**
      * @param null $id
      * @param null $update
-     * @return integer the id of the cloned row
+     * @return mixed
      * @throws ReflectionException
      */
     public static function dclone($id = null, $update = null){
@@ -443,15 +446,15 @@ abstract class Model extends \stdClass {
      * @param Mixed $arrayvalues
      * @param Mixed $seton
      * @param Mixed $case
-     * @return boolean
+     * @return boolean | \QueryBuilder
      */
-    public function __update($arrayvalues = null, $seton = null, $case = null) {
+    public function __update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true) {
         $dbal = new DBAL();
         if (!$arrayvalues) {
             return $dbal->updateDbal($this);
         } else {
             $qb = new QueryBuilder($this);
-            return $qb->update($arrayvalues, $seton, $case);
+            return $qb->update($arrayvalues, $seton, $case, $defauljoin);
         }
     }
 
@@ -464,10 +467,6 @@ abstract class Model extends \stdClass {
             return $dbal->createDbal($this);
     }
 
-    /**
-     * @param bool $recursif
-     * @return $this|$this
-     */
     public function __show($recursif = false) {
         if ($this->dvfetched) {
             return $this;
@@ -528,7 +527,7 @@ abstract class Model extends \stdClass {
      * @return $this
      * @throws ReflectionException
      */
-    public function __belongsto($relation) {
+    public function __belongto($relation) {
 
         if(is_object($relation) && ($relation->dvfetched || !$relation->dvinrelation))
             return $relation;

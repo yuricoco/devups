@@ -37,7 +37,7 @@ if(!isset($_SESSION["__lang"] )){
 }
 
 
-function asset($src){
+function d_assets($src){
     return __env .'web/' . $src;
 }
 
@@ -80,7 +80,7 @@ function getadmin() {
     return unserialize($_SESSION[ADMIN]);
 }
 
-function url($path, $id = "", $title = "") {
+function d_url($path, $id = "", $title = "") {
     global $__lang;
 
     $path = $__lang . $path;

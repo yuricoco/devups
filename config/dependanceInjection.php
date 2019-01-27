@@ -11,17 +11,18 @@ if (file_exists(__DIR__ . '/../vendor')) {
 }
 
 require __DIR__ . '/constante.php';
-require __DIR__ . '/../lang.php';
 require __DIR__ . '/Database.php';
 require __DIR__ . '/dvups_functions.php';
 
-//    require __DIR__ . '/../class/lib/lib_dependances.php';
+require __DIR__ . '/../class/lib/lib_dependances.php';
+require __DIR__ . '/../class/extends/extends_dependances.php';
 
 require __DIR__ . '/../class/devups/Bugmanager.php';
 require __DIR__ . '/../class/devups/Core.php';
 require __DIR__ . '/../class/devups/DBAL.php';
 require __DIR__ . '/../class/devups/QueryBuilder.php';
 require __DIR__ . '/../class/devups/Dfile.php';
+require __DIR__ . '/../class/devups/ScanDir.php';
 require __DIR__ . '/../class/devups/Model.php';
 require __DIR__ . '/../class/devups/DvupsTranslation.php';
 require __DIR__ . '/../class/devups/EntityCollection.php';

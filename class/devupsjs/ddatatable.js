@@ -88,12 +88,20 @@ var ddatatable = {
     },
     search: function (form) {
         var $input = form.find("thead").find('input');
+        var $selects = form.find('select');
         this.currentpage = 1;
         var searchparam = '';
+        var valueparam = '';
         $.each($input, function (i, input) {
-            if ($(input).val()){
-                searchparam += "&" + $(input).attr('name') + "=" + $(input).val();
+            if($(input).attr('type') === "radio" && input.checked){
+                valueparam = $(input).val();
+            }else if ($(input).val()){
+                valueparam = $(input).val();
             }
+            searchparam += "&" + $(input).attr('name') + "=" + valueparam;
+        });
+        $.each($selects, function (i, select) {
+            searchparam += "&" + $(select).attr('name') + "=" + $(select).val();
         });
 
         $("#dcancel-search").removeClass("hidden");

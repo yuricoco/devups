@@ -4,24 +4,24 @@ use Doctrine\ORM\Tools\Setup;
 use Doctrine\ORM\EntityManager;
 
 /**
- * Description of DBAL 3.1.0 * 
+ * Description of DBAL 3.1.0 *
  * Abstraction database layer implement object \DateTime structire
- * nullable value for many to one relation 
+ * nullable value for many to one relation
  *
- * @author Atemkeng Azankang  
+ * @author Atemkeng Azankang
  */
 class DBAL extends Database {
 
     /**
      *
-     * @var type 
+     * @var type
      */
     protected $object;
     protected $classmetadata;
 
     /**
      *
-     * @var type 
+     * @var type
      */
     protected $objectName;
     protected $table;
@@ -37,44 +37,44 @@ class DBAL extends Database {
 
     /**
      *
-     * @var type 
+     * @var type
      */
     protected $objectVar;
 
     /**
      *
-     * @var type 
+     * @var type
      */
     protected $objectValue;
 
     /**
      *
-     * @var type 
+     * @var type
      */
     protected $nbVar;
 
     /**
      * collection d'objet utilisé dans les relations de n:n et dans les relations 1:n bidirectionnelles
-     * @var type 
+     * @var type
      */
     protected $listeEntity;
     protected $objectCollection;
 
     /**
      *
-     * @var type 
+     * @var type
      */
     private $select;
 
     /**
      *
-     * @var type 
+     * @var type
      */
     private $en;
 
     /**
      * liste des entités en relation de 1:n et 1:1
-     * @var type 
+     * @var type
      */
     protected $entity_link_list;
     private $iterat;
@@ -91,7 +91,7 @@ class DBAL extends Database {
 //    public static function getEntityManager() {
     public static function getEntityManager() {
         global $enittycollection;
-        
+
         $global_navigation = Core::buildOriginCore();
         $enittyfoldes = [];
         $enittyfoldes[] = ROOT . "class/extends";
@@ -126,7 +126,7 @@ class DBAL extends Database {
             'user' => dbuser,
             'password' => dbpassword,
             'host' => dbhost,
-                //    'path' => __DIR__ . '/db.sqlite',
+            //    'path' => __DIR__ . '/db.sqlite',
         );
 
         // obtaining the entity manager
@@ -150,9 +150,9 @@ class DBAL extends Database {
 
     /**
      * persiste les entités issue d'un attribut en relation de n:n
-     * 
+     *
      * @param integer $id l'id de l'entité proprietère de la relation
-     * @return 
+     * @return
      */
     private function manyToManyAdd($id, $update = false, $change_collection = []) {
         /**
@@ -230,7 +230,7 @@ class DBAL extends Database {
      * cette methode est utilisé lors de l'update et non lors du delete mais il se peut que il ait une
      * moyen de faire son update sans les supprimer. mais je ne l'ai pas encore trouvé donc sa rester une
      * hypothèse
-     * 
+     *
      * @param type $id
      * @return type
      */
@@ -242,32 +242,32 @@ class DBAL extends Database {
             return true;
 
         foreach ($change_collection as $i => $listentity) {
-            
+
             if (!empty($listentity['todrop'])) {
 
                 $entityName = strtolower(get_class($listentity['todrop'][0]));
                 $objectarray = (array) $listentity['todrop'][0];
                 $arrayvalues = array_values($objectarray);
                 foreach ($arrayvalues as $value) {
-                    
-                        foreach ($listentity['todrop'] as $entity) {
-                            if ($this->tableExists($entityName . '_' . $this->objectName)) {
-                                $entityTable = $entityName . "_" . $this->objectName;
-                            } elseif ($this->tableExists($this->objectName . "_" . $entityName)) {
-                                $entityTable = $this->objectName . "_" . $entityName;
-                            } else {
-                                $entityTable = $entityName;
-                            }
 
-                            $sql .= "delete from " . $entityTable . "  where " . $entityName . "_id = " . $entity->getId() . " and " . $this->objectName . "_id = $id; ";
+                    foreach ($listentity['todrop'] as $entity) {
+                        if ($this->tableExists($entityName . '_' . $this->objectName)) {
+                            $entityTable = $entityName . "_" . $this->objectName;
+                        } elseif ($this->tableExists($this->objectName . "_" . $entityName)) {
+                            $entityTable = $this->objectName . "_" . $entityName;
+                        } else {
+                            $entityTable = $entityName;
                         }
-                        
+
+                        $sql .= "delete from " . $entityTable . "  where " . $entityName . "_id = " . $entity->getId() . " and " . $this->objectName . "_id = $id; ";
+                    }
+
                 }
             } else {
                 $success = TRUE;
             }
         }
-        
+
         if ($sql != "") {
 
             $query = $this->link->prepare($sql);
@@ -378,7 +378,7 @@ class DBAL extends Database {
     /**
      * createDbal
      * persiste les entités en base de données.
-     * 
+     *
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
@@ -420,7 +420,7 @@ class DBAL extends Database {
     /**
      * createDbal
      * persiste les entités en base de données.
-     * 
+     *
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
@@ -447,7 +447,7 @@ class DBAL extends Database {
     /**
      * createDbal
      * persiste les entités en base de données.
-     * 
+     *
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
@@ -499,7 +499,7 @@ class DBAL extends Database {
     /**
      * createDbal
      * persiste les entités en base de données.
-     * 
+     *
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
@@ -522,7 +522,7 @@ class DBAL extends Database {
 
         $id = $this->executeDbal($sql, $values, 1);
         $this->object->setId($id);
-        
+
         // implement translation if anabled in class
         if(method_exists($this->object, 'dvupsTranslate')){
             $this->object->dvupsTranslate();
@@ -531,14 +531,14 @@ class DBAL extends Database {
         if (isset($this->objectCollection) && is_array($this->objectCollection) && !empty($this->objectCollection)) {
             $this->manyToManyAdd($id, false, null);
         }
-        
+
         return $this->object->getId();
     }
 
     /**
      * updateDbal
      * met à jour l'entité passé en parametre. et celon la valeur de $change_collection, la collection d'objet de l'entité en question.
-     * 
+     *
      * @param \stdClass $object l'entité a persister
      * @param array $change_collection Autorise la modification de la collection d'objet en bd true par defaut
      * @return \stdClass
@@ -570,7 +570,7 @@ class DBAL extends Database {
         if(method_exists($this->object, 'dvupsTranslate')){
             $this->object->dvupsTranslate();
         }
-        
+
         $this->manyToManyDelete($this->objectValue[0], $_ENTITY_COLLECTION);
 
         if (isset($this->objectCollection) && is_array($this->objectCollection) && !empty($this->objectCollection)) {
@@ -584,7 +584,7 @@ class DBAL extends Database {
     /**
      * findAllDbal
      * returne toutes les occurences de l'entite en bd
-     * 
+     *
      * @return array
      */
     public function findAllDbal($critere = "") {
@@ -689,7 +689,7 @@ class DBAL extends Database {
 
     /**
      * Return the row of the database map with the object.
-     * 
+     *
      * @param String $sql
      * @param Array $values
      * @return Object
@@ -714,7 +714,7 @@ class DBAL extends Database {
 
     /**
      * return entire entity with all linked one
-     * 
+     *
      * @param type $sql
      * @param type $values
      * @param type $collection
@@ -746,7 +746,7 @@ class DBAL extends Database {
 
     /**
      * Return array of base entity
-     * 
+     *
      * @param type $sql
      * @param type $values
      * @return type
@@ -770,7 +770,7 @@ class DBAL extends Database {
 
     /**
      * Return array of entire entity
-     * 
+     *
      * @param type $sql
      * @param type $values
      * @param type $collection
@@ -813,27 +813,27 @@ class DBAL extends Database {
      * prend en parametre un tableau qui est le résultat d'une requete avec jointure et retourne
      * l'entité souhaité.
      * la version actuelle ne peut traiter que la premiere couche d'imbrication mais c'est deja un bon debut
-     * 
+     *
      * @param type $flowBD
      * @param type $object
      * @param type $entity_link_list
      * @param type $arrayReturn
      * @param type $list
      * @param type $recursif
-     * 
+     *
      * @return type
      */
     private function orm($flowBD, $object, $imbricateindex = 0, $recursif = true, $collection = false) {
 
         $object_array = (array) $object;
-        
+
         foreach ($object_array as $key => $value) {
 //                    $imbricateindex = 0;
 
             $k = str_replace(get_class($object), '', $key);
             $k = str_replace('*', '', $k);
             $k2 = substr($k, 2);
-            
+
             foreach ($flowBD as $key2 => $value2) {
 
                 if (is_object($value)) {
@@ -869,7 +869,7 @@ class DBAL extends Database {
                         $object_array[$key] = $object->__hasmany(strtolower(get_class($value[0])));
                     else
                         $object_array[$key] = $value;
-                    
+
                     break;
                 } else {
                     if ($k2 == $key2) {
@@ -878,12 +878,12 @@ class DBAL extends Database {
                         } else {
                             $object_array[$key] = $flowBD[$key2];
                         }
-                        
+
                         break;
                     }
                 }
             }
-            
+
         }
 
         $object_array["dvinrelation"] = true;
@@ -892,10 +892,10 @@ class DBAL extends Database {
     }
 
     /**
-     * 
+     *
      * @param type $flowBD les données de la bd extrait par PDO avec le parametre PDO::FETCH_NAMED
      * @param type $object the instance of the entity
-     * @param Boolean $collection 
+     * @param Boolean $collection
      * @param Boolean $recursif weither or not the requeste should go deeper in finding entity relation.
      * @return type
      */
@@ -917,7 +917,7 @@ class DBAL extends Database {
      * methode qui initialise les variables d'instance. elle est notament utilisé pour permetre de persister
      * des entités en utilisant directement les methodes du dbal sans passé par le dao comme ça se faisait
      * avant.
-     * 
+     *
      * @param type $object
      */
     protected function instanciateVariable($object) {
@@ -952,12 +952,12 @@ class DBAL extends Database {
 
             $fieldname = array_keys($this->classmetadata->fieldNames);
             $association = array_keys($this->classmetadata->associationMappings);
-                if(!$this->tableExists($this->table)){
-                    if($metadata = $em->getClassMetadata("\\" . $this->objectName)){
-                        $this->table = $metadata->table['name'];
-                    }
-
+            if(!$this->tableExists($this->table)){
+                if($metadata = $em->getClassMetadata("\\" . $this->objectName)){
+                    $this->table = $metadata->table['name'];
                 }
+
+            }
 
             foreach ($objecarray as $obkey => $value) {
                 // gere les attributs hérités en visibilité protected

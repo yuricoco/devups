@@ -58,11 +58,26 @@ function gettranslation($ref, $local = null, $default = "no translation found"){
         $local = local();
 
     if(!isset($lang[$ref]))
-        return "reference: <b>".$ref."</b> not found!";
+        return $ref;
 
     if(!isset($lang[$ref][$local]))
         return $default;
 
     return $lang[$ref][$local];
 
+}
+
+
+function translatecollection($local = null){
+    global $lang;
+    $contentcollection = [];
+
+    if($local != "fr" && $local != "en")
+        $local = local();
+
+    foreach ($lang as $ref => $translate){
+        $contentcollection[str_replace(".", "_", $ref)] = $translate[$local];
+    }
+
+    return $contentcollection;
 }

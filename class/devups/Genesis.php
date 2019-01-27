@@ -15,7 +15,7 @@ use Philo\Blade\Blade;
  */
 class Genesis {
 
-    public static function top_action($action) {
+    public static function top_action($action, $statefull = false) {
         $action = strtolower($action);
         $index_ajouter = "index.php?path=$action/_new";
         $index_modifier = "index.php?path=$action/index";
@@ -26,15 +26,25 @@ class Genesis {
 
         if ($rigths) {
             if (in_array('create', $rigths)) {
-                if (in_array('create', $_SESSION['action']))
-                    $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
-                    //$top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                if (in_array('create', $_SESSION['action'])){
+                    if(!$statefull)
+                        $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                    else
+                        $top_action .= '<a href="' . $index_ajouter . '" class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+
+                }
+                //$top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
             }
         }elseif (isset($_SESSION['action'])) {
-            if (in_array('create', $_SESSION['action']))
-                $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+            if (in_array('create', $_SESSION['action'])){
+                if(!$statefull)
+                    $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                else
+                    $top_action .= '<a href="' . $index_ajouter . '" class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
 
-        else {
+            }
+
+            else {
                 $top_action .= "<span class='alert alert-info' >not rigth contact the administrator</span>";
             }
         }
@@ -82,6 +92,7 @@ class Genesis {
 
         $blade = new Blade([web_dir . "views", admin_dir . 'views'], admin_dir . "cache");
         echo $blade->view()->make($view, $compilate)->render();
+        //die;
     }
 
     public static function renderView($view, $data = [], $redirect = false) {
