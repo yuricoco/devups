@@ -375,7 +375,8 @@ class Datatable {
 
         $customaction = [];
         foreach ($this->groupactioncore as $action){
-            $customaction[] = "<span id='".$action["id"]."' class=\"btn btn-info\" >".$action["label"]."</span>";
+            //$customaction[] = "<span id='".$action["id"]."' class=\"btn btn-info\" >".$action["label"]."</span>";
+            $customaction[] = call_user_func(array(self::$class, $action."Groupaction")); //, $param)
         }
 
         return '

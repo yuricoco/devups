@@ -27,4 +27,5 @@ cd to_project_root
 
 # get Started
 
-the tutorial is available on http://easyprod.spacekola.com/devups :)
+- the video tutorial is available on https://www.useloom.com/share/bb07d145a9eb42e5a6adf7108603ad23 :)
+- the tutorial is available on http://easyprod.spacekola.com/devups :)
