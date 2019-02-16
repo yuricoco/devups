@@ -52,11 +52,11 @@ class Request {
             return false;
     }
 
-    public static function get($key) {
+    public static function get($key, $default = false) {
         if (isset(Request::$uri_get_param[$key]))
             return Request::$uri_get_param[$key];
         else
-            return false;
+            return $default;
     }
 
     public static function post($key) {

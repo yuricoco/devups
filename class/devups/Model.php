@@ -188,7 +188,7 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function count($parameter  = null) {
+    public static function count($parameter  = null, $value = null) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
@@ -199,6 +199,8 @@ abstract class Model extends \stdClass {
 
         if(is_object($parameter))
             return $qb->select()->where($parameter)->__countEl(false);
+
+        return $qb->select()->where($parameter, "=", $value)->__countEl(false);
 
     }
 

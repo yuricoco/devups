@@ -183,6 +183,9 @@ var ddatatable = {
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
 
+    },
+    replacerow: function (entityid, tablerow) {
+        $("#dv_table").find("#"+entityid).replaceWith(tablerow);
     }
 };
 

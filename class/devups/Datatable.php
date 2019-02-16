@@ -526,6 +526,9 @@ class Datatable {
         foreach ($this->header as $valuetd) {
             $th[] = '<th>' . $valuetd['header'] . '</th>';
             $value = $valuetd["value"];
+            if(!isset($valuetd["order"]))
+                $valuetd["order"] = true;
+
             $thfvalue = '';
             $join = explode(".", $value);
             if (isset($join[1])) {
@@ -538,8 +541,14 @@ class Datatable {
                         $thfvalue = call_user_func(array(self::$class, $valuetd["search"].'Search'), $value);
                         //$thfvalue = '<input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" ><div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
                     }
+//                    else
+//                        $valuetd["order"] = false;
                 }else{
-                    $thfvalue = '<input name="' . str_replace(".", "-", $value) . '" placeholder="' . $valuetd['header'] . '" class="form-control" ><div class="torder"><i onclick="ddatatable.orderasc(\'orderjoin=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'orderjoin=' . $value . '\')" class="fa fa-angle-down"></i></div>';
+                    $thfvalue = '<input name="' . str_replace(".", "-", $value) . '" placeholder="' . $valuetd['header'] . '" class="form-control" >';
+                }
+
+                if($valuetd["order"]){
+                    $thfvalue .= '<div class="torder"><i onclick="ddatatable.orderasc(\'orderjoin=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'orderjoin=' . $value . '\')" class="fa fa-angle-down"></i></div>';
                 }
                 $fields[] = str_replace(".", "-", $value) . ":join";
             } else {
@@ -549,8 +558,14 @@ class Datatable {
                         $thfvalue = call_user_func(array(self::$class, $valuetd["search"].'Search'), $value);
                         //$thfvalue = '<input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" ><div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
                     }
+//                    else
+//                        $valuetd["order"] = false;
+
                 }else
-                    $thfvalue = '<input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" ><div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
+                    $thfvalue = '<input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" >';
+
+                if($valuetd["order"])
+                    $thfvalue .= '<div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
 
                 $fields[] = $value . ":attr";
             }
