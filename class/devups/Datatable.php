@@ -577,7 +577,7 @@ class Datatable {
         if ($this->searchaction) {
             $thf[] = '<th>'//<input name="path" value="' . $_GET['path'] . '" hidden >
                 . '<input name="dfilters" value="' . implode(",", $fields) . '" hidden >'
-                . '<button class="btn btn-default">search</button><input id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-default hidden" value="cancel" /></th>';
+                . '<button class="btn btn-default">search</button><input id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-default" value="cancel" hidden /></th>';
 
             return ["th" => '<tr>'.implode(" ", $th).'</tr>',
                 "thf" => '<tr>'.implode(" ", $thf) .'</tr>'];

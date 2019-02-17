@@ -279,20 +279,19 @@ class QueryBuilder extends \DBAL {
         else {
             $arrayset = [];
             foreach ($arrayvalues as $key => $value) {
+                $keymap = explode(".", $key);
                 if (is_object($value)) {
                     if (strtolower(get_class($value)) == "datetime") {
                         $date = array_values((array) $value);
                         $this->parameters[] = $date[0];
-                        $arrayset[] = " `$key` = ? ";
+                        $arrayset[] = " ".implode('.`', $keymap)."` = ? ";
                     } else {
-
                         $this->parameters[] = $value->getId();
                         $arrayset[] = strtolower(get_class($value)) . "_id = ? ";
                     }
                 } else {
-
                     $this->parameters[] = $value;
-                    $arrayset[] = " `$key` = ? ";
+                    $arrayset[] = " ".implode('.`', $keymap)."` = ? ";
                 }
             }
             $this->query .= implode(", ", $arrayset);

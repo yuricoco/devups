@@ -62,28 +62,33 @@ class Controller {
 
     private function filter(\stdClass $entity, \QueryBuilder $qb) {
 
-        $fieldarray = explode(",", $_GET['dfilters']);
+        $fieldarray = explode(",", Request::get('dfilters'));
 
         foreach ($fieldarray as $fieldwithtype) {
             $arrayfieldtype = explode(":", $fieldwithtype);
 
-            if (isset($_GET[$arrayfieldtype[0]])) {
+            if (Request::get($arrayfieldtype[0])) {
                 if ($arrayfieldtype[1] == "attr") {
                     if($qb->hasrelation)
-                        $qb->andwhere(get_class($entity) .".".$arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
+                        $qb->andwhere(get_class($entity) .".".$arrayfieldtype[0])->like(Request::get($arrayfieldtype[0]));
                     else
-                        $qb->andwhere($arrayfieldtype[0])->like($_GET[$arrayfieldtype[0]]);
+                        $qb->andwhere($arrayfieldtype[0])->like(Request::get($arrayfieldtype[0]));
                 } elseif ($arrayfieldtype[1] == "join") {
 
                     $join = explode("-", $arrayfieldtype[0]);
 
-                    $qb->andwhere($join[0] . "_id")
-                        ->in(
-                            $qb->addselect("id", new $join[0], false)
-                                ->where($join[1])
-                                ->like($_GET[$arrayfieldtype[0]])
-                                ->close()
-                        );
+                    if($join[1] == "id"){
+                        $qb->andwhere($join[0] . "_id", "=", Request::get($arrayfieldtype[0]));
+                    }else{
+                        $qb->andwhere($join[0] . "_id")
+                            ->in(
+                                $qb->addselect("id", new $join[0], false)
+                                    ->where($join[1])
+                                    ->like(Request::get($arrayfieldtype[0]))
+                                    ->close()
+                            );
+                    }
+
                 }
 //                elseif ($_GET[$arrayfieldtype[1]] == "collect") {
 //
@@ -111,26 +116,26 @@ class Controller {
         $remain = true;
         $qb = new QueryBuilder($entity);
         $classname = strtolower(get_class($entity));
-        if (isset($_GET['next']) && isset($_GET['per_page']))
-            extract($_GET);
+        if (Request::get("next") && Request::get('per_page'))
+            extract(Request::$uri_get_param);
 
-        if(isset($_GET['order'])){
-            $order = $_GET['order'];
+        if($order = Request::get('order')){
+            //$order = $_GET['order'];
             if($entity->inrelation())
-                $order = $classname.".".$_GET['order'];
-        }elseif(isset($_GET['orderjoin']))
-            $order = strtolower($_GET['orderjoin']);
+                $order = $classname.".".$order;//$_GET['order'];
+        }elseif(Request::get('orderjoin'))
+            $order = strtolower(Request::get('orderjoin'));
 
 
         if ($qbcustom != null) {
 
-            if (isset($_GET["dfilters"]))
+            if (Request::get("dfilters"))
                 $qbcustom = $this->filter($entity, $qbcustom);
 
             $nb_element = $qbcustom->__countEl(false);
         } else {
 
-            if (isset($_GET["dfilters"])) {
+            if (Request::get("dfilters")) {
                 $qbcustom = $this->filter($entity, $qb);
                 $nb_element = $qbcustom->__countEl(false);
             } else {
