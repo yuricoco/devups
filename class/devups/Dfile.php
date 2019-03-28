@@ -417,7 +417,7 @@ class Dfile {
         return $this;
     }
 
-    public static function d_rename($oldname, $newname, $oldpath = "", $newpath = ""){
+    public static function d_rename($oldname, $newname, $oldpath = "", $newpath = "", $ext = ""){
         $path = UPLOAD_DIR;
         if($oldpath){
             $path = UPLOAD_DIR.$oldpath;
@@ -427,7 +427,9 @@ class Dfile {
         else
             $newpath = $path;
 
-        rename($path."/".$oldname, $newpath."/".$newname);
+        if(file_exists($path."/".$oldname))
+            rename($path."/".$oldname, $newpath."/".$newname.$ext);
+
     }
 
     public function upload() {

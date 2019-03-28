@@ -1,123 +1,101 @@
-
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN">
 <html xmlns="http://www.w3.org/1999/xhtml">
-    <head>
-        <!-- iso-8859-1  -->
-        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-        <meta name="author" content="Sunhosting">
-            <link href="<?php echo IHM; ?>bootstrap/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<head>
+    <!-- iso-8859-1  -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="author" content="Sunhosting">
+    <title class="mdi mdi-sort-variant">Dashboard | Dvups Admin</title>
+    <!-- plugins:css -->
+    <link rel="stylesheet" href="<?= VENDOR; ?>mdi/css/materialdesignicons.min.css">
+    <link rel="stylesheet" href="<?= VENDOR; ?>base/vendor.bundle.base.css">
+    <!-- endinject -->
+    <!-- plugin css for this page -->
+    <link rel="stylesheet" href="<?= VENDOR; ?>datatables.net-bs4/dataTables.bootstrap4.css">
+    <!-- End plugin css for this page -->
+    <!-- inject:css -->
+    <link rel="stylesheet" href="<?= assets; ?>css/style.css">
+    <!-- endinject -->
+    <link rel="shortcut icon" href="<?= assets; ?>favicon.png"/>
 
-            <title>app v3</title>
-            <!-- DataTables CSS -->
-            <link href="<?php echo IHM; ?>datatables/css/dataTables.responsive.css" rel="stylesheet"/>
+    @section('cssimport')
 
-            <!-- MetisMenu CSS -->
-            <link href="<?php echo IHM; ?>metisMenu/dist/metisMenu.min.css" rel="stylesheet"/>
+    @show
 
-            <!-- Timeline CSS -->
-            <link href="<?php echo IHM; ?>dist/css/timeline.css" rel="stylesheet"/>
+</head>
 
-            <!-- Custom CSS -->
-            <link href="<?php echo IHM; ?>dist/css/sb-admin-2.css" rel="stylesheet"/>
+<body>
 
-            <!-- Custom Fonts -->
-            <link href="<?php echo IHM; ?>font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css"/>
+<div id="container-scroller">
 
-            <link href="<?php echo IHM; ?>dist/css/jquery-ui.css" rel="stylesheet"/>
-            <link href="<?php echo RESSOURCE2; ?>css_add/css_add.css" rel="stylesheet"/>
+    <!-- Navigation -->
 
-            @section('cssimport')
-
-            @show
-
-    </head>
-
-    <body>
-
-        <div id="wrapper">
-
-            <!-- Navigation -->
-
-            <!-- Navigation -->
-            <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <span  class="navbar-brand" >
-                        Devups Admin v{{ __v }} | Bonjour <b>{{ getadmin()->getName() }}</b>
-                        <a href="{{ __env }}" target="__blank"></a>
-
-                        <!--a href="<?= Dvups_lang::classroot() ?>changelang&lang=fr">fr</a>
-                        <a href="<?= Dvups_lang::classroot() ?>changelang&lang=en">en</a-->
-
-                    </span>
-
-                </div>
-                <!-- /.navbar-header -->
-
-                @include("layout.navbartop")
-                <!-- /.navbar-top-links -->
-
-                <div class="navbar-default sidebar" role="navigation">
-                    @include("layout.navbar")
-                    <?php //include admin_dir . "views/navbar.blade.php"; ?>
-
-                    <!-- /.sidebar-collapse -->
-                </div>
-                <!-- /.navbar-static-side -->
-            </nav>
-
-            <div id="page-wrapper">
-                
-            @yield('content')
-            
+    <!-- Navigation -->
+    <nav class="navbar col-lg-12 col-12 p-0 fixed-top d-flex flex-row">
+        <div class="navbar-brand-wrapper d-flex justify-content-center">
+            <div class="navbar-brand-inner-wrapper d-flex justify-content-between align-items-center w-100">
+                <a class="navbar-brand brand-logo" href="index.html"><img src="{{assets}}images/logo.svg" alt="logo"/></a>
+                <a class="navbar-brand brand-logo-mini" href="index.html"><img src="{{assets}}images/logo-mini.svg" alt="logo"/></a>
+                <button id="dbody" class="navbar-toggler navbar-toggler align-self-center" type="button" data-toggle="minimize">
+                    <span class="mdi mdi-sort-variant"></span>
+                </button>
             </div>
-            <!-- /#page-wrapper -->
-
         </div>
-        <!-- /#wrapper -->
-        <div id="log_erreur"></div>
-        <!-- jQuery -->
-        <!-- jQuery -->
-        <script src="<?php echo JS ?>jquery.js" ></script>
-        <!-- Angular -->
-        <script src="<?php echo JS ?>angular.min.js" ></script>
-        <!--<script src="<?php echo JS ?>angular-route.min.js" ></script>-->
-        <script src="<?php echo JS ?>angular-file-model.js" ></script>
-        <!-- Bootstrap Core JavaScript -->
-        <script src="<?php echo IHM; ?>bootstrap/dist/js/bootstrap.min.js"></script>
 
-        <!-- Metis Menu Plugin JavaScript -->
-        <script src="<?php echo IHM; ?>metisMenu/dist/metisMenu.min.js"></script>
+    @include("layout.navbartop")
 
-        <!-- Morris Charts JavaScript -->
-        <script src="<?php echo IHM; ?>raphael/raphael-min.js"></script>
+    </nav>
 
-        <!-- Custom Theme JavaScript -->
-        <script src="<?php echo IHM; ?>dist/js/sb-admin-2.js"></script>
+    <div class="container-fluid page-body-wrapper">
 
-        <script src="<?php echo JS ?>jquery-ui.js" ></script>
-        <script src="<?php echo JS ?>main.js" ></script>
+        <nav class="sidebar sidebar-offcanvas" id="sidebar">
+            @include("layout.navbar")
+        </nav>
 
-        <!-- Morris Charts JavaScript -->
-        <script src="<?= VENDOR ?>raphael/raphael.min.js"></script>
+        <div class="main-panel">
+            <div class="content-wrapper">
+                @yield('content')
+            </div>
+            <footer class="footer">
+                <div class="d-sm-flex justify-content-center justify-content-sm-between">
+                    <span class="text-muted text-center text-sm-left d-block d-sm-inline-block">Copyright © 2018 <a href="https://www.urbanui.com/" target="_blank">Urbanui</a>. All rights reserved.</span>
+                    <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">Hand-crafted & made with <i class="mdi mdi-heart text-danger"></i></span>
+                </div>
+            </footer>
+        </div>
 
-        <?php
-        if (function_exists("script"))
-        script();
-        ?>
-            @section('jsimport')
-            
-        <script src="<?= VENDOR ?>morrisjs/morris.min.js"></script>
-        <script src="<?= VENDOR ?>data/morris-data.js"></script>
+    </div>
 
-            @show
+</div>
 
-    </body>
+<!-- plugins:js -->
+<script src="<?= VENDOR; ?>base/vendor.bundle.base.js"></script>
+<!-- endinject -->
+<!-- Plugin js for this page-->
+<script src="<?= VENDOR; ?>chart.js/Chart.min.js"></script>
+<script src="<?= VENDOR; ?>datatables.net/jquery.dataTables.js"></script>
+<script src="<?= VENDOR; ?>datatables.net-bs4/dataTables.bootstrap4.js"></script>
+<!-- End plugin js for this page-->
+<!-- inject:js -->
+<script src="<?= assets; ?>js/off-canvas.js"></script>
+<script src="<?= assets; ?>js/hoverable-collapse.js"></script>
+<script src="<?= assets; ?>js/template.js"></script>
+<!-- endinject -->
+<!-- Custom js for this page-->
+<script src="<?= assets; ?>js/dashboard.js"></script>
+<script src="<?= assets; ?>js/data-table.js"></script>
+<script src="<?= assets; ?>js/jquery.dataTables.js"></script>
+<script src="<?= assets; ?>js/dataTables.bootstrap4.js"></script>
+<!-- End custom js for this page-->
+
+<?php
+if (function_exists("script"))
+    script();
+?>
+@section('jsimport')
+
+@show
+
+</body>
 
 </html>
 

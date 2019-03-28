@@ -2,19 +2,9 @@
  * Created by Aurelien Atemkeng on 7/26/2018.
  */
 
-var totalpage = $("#pagination-notice").data('notice');
-
-$("#deletegroup").click(function () {
-    ddatatable.groupdelete();
-});
-$("#checkall").click(function () {
-    ddatatable.checkall();
-});
-$(".dcheckbox").click(function () {
-    ddatatable.uncheckall();
-});
 var ddatatable = {
     baseurl : "services.php",
+    entity : "",
     currentpage : 1,
     per_page : 10,
     searchparam : "",
@@ -57,7 +47,7 @@ var ddatatable = {
         var thisclass = this;
         this.groupaction(function (ids, $trs) {
 
-            if(ids == ''){
+            if(ids === ''){
                 alert("Aucun element selectionné!")
                 return false;
             }
@@ -86,25 +76,29 @@ var ddatatable = {
         });
         callback(ids, $trs);
     },
-    search: function (form) {
-        var $input = form.find("thead").find('input');
+    search: function (el) {
+        var form = $(el).parents("tr.th-filter");
+        var $input = form.find('input');
         var $selects = form.find('select');
         this.currentpage = 1;
         var searchparam = '';
-        var valueparam = '';
+
         $.each($input, function (i, input) {
+            var valueparam = '';
             if($(input).attr('type') === "radio" && input.checked){
                 valueparam = $(input).val();
             }else if ($(input).val()){
                 valueparam = $(input).val();
             }
             searchparam += "&" + $(input).attr('name') + "=" + valueparam;
+
         });
+
         $.each($selects, function (i, select) {
             searchparam += "&" + $(select).attr('name') + "=" + $(select).val();
         });
 
-        $("#dcancel-search").removeClass("hidden");
+        $("#dcancel-search").show();
         if(searchparam){
             this.searchparam = searchparam;
             this.page(1);
@@ -113,7 +107,7 @@ var ddatatable = {
     cancelsearch : function ($this) {
         this.searchparam = '';
         this.currentpage = 1;
-        $("#dcancel-search").addClass("hidden");
+        $("#dcancel-search").hide();
         this.page(1);
         // $.get("services.php?path="+model.entity+".datatable&next=1&per_page="+this.per_page, function (response) {
         //     //console.log(response);
@@ -122,8 +116,7 @@ var ddatatable = {
         //     removeloader();
         // }, 'json');//
     },
-    setperpage: function(per_page){
-        this.per_page = per_page;
+    setperpage: function(){
         this.page(1);
     },
     callback: function (response) {
@@ -132,7 +125,9 @@ var ddatatable = {
     orderasc:function (param) {
         console.log(param);
         this.setloader();
-        $.get(this.baseurl+"?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param, function (response) {
+        this.per_page = $("#dt_nbrow").val();
+        this.order = "&"+param+" asc";
+        $.get(this.geturl(), function (response) {
             console.log(response);
             $("#dv_table").find("tbody").html(response.datatable.tablebody);
             removeloader();
@@ -145,11 +140,13 @@ var ddatatable = {
     orderdesc:function (param) {
         console.log(param);
         this.setloader();
-        $.get(this.baseurl+"?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+"&"+param+" desc", function (response) {
+        this.per_page = $("#dt_nbrow").val();
+        this.order = "&"+param+" desc";
+        $.get(this.geturl(), function (response) {
             //console.log(response);
             $("#dv_table").find("tbody").html(response.datatable.tablebody);
             removeloader();
-        }, 'json').error (function(resultat, statut, erreur){
+        }, 'json').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
             $("#"+model.entity+"modal").modal("show");
             databinding.bindmodal(resultat.responseText);
@@ -169,15 +166,19 @@ var ddatatable = {
     removeloader: function () {
         $("#dv_table").find(".loader").remove();
     },
+    geturl: function(){
+        return this.baseurl+"?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+this.order;
+    },
     page: function (index) {
         this.setloader();
-        console.log("services.php?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam);
-        $.get(this.baseurl+"?path="+model.entity+".datatable&next="+index+"&per_page="+this.per_page+""+this.searchparam, function (response) {
+        this.per_page = $("#dt_nbrow").val();
+        console.log(this.geturl());
+        $.get(this.geturl(), function (response) {
             console.log(response);
             $("#dv_table").find("tbody").html(response.datatable.tablebody);
             $("#dv_pagination").replaceWith(response.datatable.tablepagination);
             removeloader();
-        }, 'json').error (function(resultat, statut, erreur){
+        }, 'json').fail (function(resultat, statut, erreur){
             console.log(resultat);
             $("#"+model.entity+"modal").show();
             databinding.bindmodal(resultat.responseText);
@@ -186,26 +187,63 @@ var ddatatable = {
     },
     replacerow: function (entityid, tablerow) {
         $("#dv_table").find("#"+entityid).replaceWith(tablerow);
+    },
+    removerow: function (entityid) {
+        $("#dv_table").find("#"+entityid).remove();
+    },
+    addrow: function (tablerow) {
+        $("#dv_table").find("tbody").prepend(tablerow);
+    },
+    init: function () {
+        console.log(typeof $);
+        if(typeof $ === 'undefined'){
+            console.log("not ready");
+            return;
+        }
+
+        console.log("ready");
+
+        $("#dt_nbrow").change(function () {
+            console.log($(this).val());
+            ddatatable.per_page = $(this).val();
+            ddatatable.page(1);
+        });
+
+        $("#datatable-form").submit(function (e) {
+            e.preventDefault();
+            ddatatable.search($(this));
+        });
+
+        ddatatable.pagination = function (page) {
+
+            this.currentpage = page;
+            this.page(page);
+        };
+
+        $("#deletegroup").click(function () {
+            ddatatable.groupdelete();
+        });
+        $("#checkall").click(function () {
+            ddatatable.checkall();
+        });
+        $(".dcheckbox").click(function () {
+            ddatatable.uncheckall();
+        });
+
+        ddatatable.baseurl = $("#dv_table").data('route')+"services.php";
+
     }
 };
 
 function removeloader(){
     $("#dv_table").find(".loader").remove();
+    $('html,body').animate({scrollTop:$("#dbody").offset().top},500);
 }
 
-$("#dt_nbrow").change(function () {
-    console.log($(this).val());
-    ddatatable.per_page = $(this).val();
-});
 
-$("#datatable-form").submit(function (e) {
-    e.preventDefault();
-    ddatatable.search($(this));
-});
+setTimeout(function () {
 
-ddatatable.pagination = function (page) {
-    this.currentpage = page;
-    this.page(page);
-};
+    ddatatable.init();
 
-ddatatable.per_page = $("input[name='per_page_custom']").val();
+}, 800)
+

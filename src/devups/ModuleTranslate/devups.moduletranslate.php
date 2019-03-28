@@ -1,4 +1,8 @@
-<?php 
+<?php
+
+require 'Entity/Generalinfo.php';
+require 'Controller/GeneralinfoController.php';
+
     require 'Entity/Dvups_lang.php';
     require 'Dao/Dvups_langDAO.php';
     require 'Form/Dvups_langForm.php';

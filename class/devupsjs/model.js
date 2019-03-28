@@ -34,17 +34,21 @@ var model = {
 
         $.get(this.baseurl+"?path="+this.entity+"._new", function (response) {
             databinding.checkrenderform(response);
-        }, 'json').error (function(resultat, statut, erreur){
+        }, 'json').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
             databinding.bindmodal(resultat.responseText);
         });
 
     },
     _edit: function (id, callback) {
+        var regex = /_/gi;
+        //string..replace(regex, '-')
+
+        console.log(this.baseurl+"?path="+this.entity+"._edit&id="+id)
         $.get(this.baseurl+"?path="+this.entity+"._edit&id="+id, function (response) {
             databinding.checkrenderform(response);
-        }, 'json').error (function(resultat, statut, erreur){
-            console.log(statut, erreur);
+        }, 'json').fail (function(resultat, statut, erreur){
+            console.log(statut, resultat);
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
     },
@@ -61,7 +65,7 @@ var model = {
             if(callback)
                 callback(response);
 
-        }, 'json').error (function(resultat, statut, erreur){
+        }, 'json').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
@@ -71,10 +75,28 @@ var model = {
 
         $.get(this.baseurl+"?path="+this.entity+"._show&id="+id, function (response) {
             databinding.bindmodal(response);
-        }, 'html').error (function(resultat, statut, erreur){
+        }, 'html').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
+
+    },
+    _formdatacustom: function(tbody){
+
+        var $rows = tbody.find("tr");
+        var formentity = {};
+        $.each($rows, function (i, row) {
+
+            var $inputs = $(row).find('input');
+            var $textareas = $(row).find('textarea');
+
+            var value = {fr : $textareas.eq(1).val(), en: $textareas.eq(0).val()}
+
+            formentity[$inputs.eq(0).val()] = value;
+        })
+
+        model.formentity = formentity;
+        return formentity
 
     },
     _formdata : function (form) {
@@ -98,6 +120,10 @@ var model = {
                 formentity[$(input).attr('name')] = $(input).val();
             }
             else if($(input).attr('type') === "password" ) {
+                formdata.append($(input).attr('name'), $(input).val());
+                formentity[$(input).attr('name')] = $(input).val();
+            }
+            else if($(input).attr('type') === "email" ) {
                 formdata.append($(input).attr('name'), $(input).val());
                 formentity[$(input).attr('name')] = $(input).val();
             }
@@ -136,9 +162,26 @@ var model = {
             }
         });
     },
-    _post : function (action, formdata, callback) {
+
+    _post : function (action, formdata, callback, fd = true) {
         // var formdata = this._formdata(form);
         // model.modalbody.append('<div id="loader" style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
+        if(!fd){
+
+            $.ajax({
+                url: this.baseurl+"?path="+this.entity+"."+action,
+                data: formdata,
+                method: "POST",
+                dataType: "json",
+                success: callback,
+                error: function (e) {
+                    console.log(e);//responseText
+                    model.modalbody.html(e.responseText);
+                }
+            });
+
+            return;
+        }
 
         $.ajax({
             url: this.baseurl+"?path="+this.entity+"."+action,
@@ -157,12 +200,26 @@ var model = {
     },
     getformvalue: function (field) {
         return this.formentity[this.entity+"_form["+field+"]"];
+    },
+    init: function () {
+
+        console.log(typeof $);
+        if(typeof $ === 'undefined'){
+            console.log("not ready");
+            return;
+        }
+
+        model.baseurl = $("#dv_table").data('route')+"services.php";
+        model.entity = $("#dv_table").data('entity');
+        model.modal = $("#"+model.entity+"modal");
+        model.modalbody = $("#"+model.entity+"modal").find(".modal-body");
+
     }
 };
 
-model.entity = $("#dv_table").data('entity');
-model.modal = $("#"+model.entity+"modal");
-model.modalbody = $("#"+model.entity+"modal").find(".modal-body");
+setTimeout(function () {
+    model.init();
+}, 800)
 
 // $("#model_new").attr("href", "#");
 // $("#model_new").click(function (e) {

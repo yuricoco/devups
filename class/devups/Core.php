@@ -181,6 +181,7 @@ class Core extends stdClass {
                         if(!$dventity->getId()){
 //                            $dventity = new Dvups_entity();
                             $dventity->setName($entityname);
+                            $dventity->setUrl($entityname);
                             $dventity->setDvups_module($dvmodule);
                             $dventity->__insert();
                             

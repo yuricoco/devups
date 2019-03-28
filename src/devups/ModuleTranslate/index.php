@@ -21,6 +21,10 @@ switch (Request::get('path')) {
         Genesis::renderBladeView("layout");
         break;
 
+    case 'generalinfo/index':
+        Genesis::renderView('generalinfo.index',  GeneralinfoController::getdata());
+        break;
+
     case 'dvups_lang/changelang':
         setlang(Request::get('lang'));
         redirect("admin");

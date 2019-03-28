@@ -19,6 +19,6 @@ switch (Request::get('path')) {
 //        break;
 
     default :
-        echo json_encode("404 :".Request::get('path')." page note found");
+        echo json_encode(["success" => false, "message" => "404 :".Request::get('path')." page note found"]);
         break;
 }

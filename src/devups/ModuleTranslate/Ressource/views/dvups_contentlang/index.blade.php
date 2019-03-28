@@ -18,34 +18,17 @@
                 </li>
             </ol>
         </div>
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-12 ">
-                                    <h5>Manage Content lang</h5>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div style="float: right; margin-right: 30px;" class="panel">
-                    <?= Genesis::top_action(Dvups_contentlang::class); ?>
-                </div>
-            </div>
-        </div>
+        <div class="col-lg-12"> <?= $__navigation  ?></div>
     </div>
     <div class="row">
 
         <div class="col-lg-12 col-md-12">
 
-            <?= \DClass\devups\Datatable::buildtable($lazyloading, [
-                ['header' => 'Dvups lang ref', 'value' => 'Dvups_lang.ref'],
+            <?= \DClass\devups\Datatable::renderdata($lazyloading, [
                 ['header' => 'Content', 'value' => 'content'],
                 ['header' => 'Lang', 'value' => 'lang'],
-            ])->render(); ?>
+                ['header' => 'Dvups_lang', 'value' => 'Dvups_lang.ref']
+            ]); ?>
 
         </div>
 
@@ -76,16 +59,5 @@
 @section('jsimport')
     <script src="<?= CLASSJS ?>model.js"></script>
     <script src="<?= CLASSJS ?>ddatatable.js"></script>
-    <script>
-        model._newtranslation = function(id){
-            this._showmodal();
-
-            $.get("services.php?path="+this.entity+"._newtranslation&id="+id, function (response) {
-                databinding.checkrenderform(response);
-            }, 'json').error (function(resultat, statut, erreur){
-                console.log(statut, erreur);
-                databinding.bindmodal(resultat.responseText);
-            });
-        };
-    </script>
+    <script></script>
 @show

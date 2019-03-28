@@ -13,9 +13,42 @@ namespace DClass\devups;
  * @author Aurelien Atemkeng
  */
 class Datatable {
+    public static $btnedit_class = "btn btn-warning btn-sm";
+    public static $btnview_class = "btn btn-info btn-sm";
+    public static $btndelete_class = "btn btn-danger btn-sm";
+    public static $btnsearch_class = "btn btn-primary";
+    public static $table_class = "table table-striped table-hover dataTable no-footer";
+
     private $entity = null;
     private static $class;
-    
+
+    public $html = "";
+    public $lazyloading = "";
+    public $tablefilter = "";
+    public $pagination = "";
+    public $header = []; // describe the model of the table (available column and metadata of row)
+    public $tablebody = "";
+
+    public $defaultaction = "stateless";
+    public $customaction = [];
+    public $groupaction = false;
+    public $groupactioncore = [];
+    public $searchaction = false;
+    public $openform = "";
+    public $closeform = "";
+
+    public static $url_delete = "";
+    public static $url_update = "";
+    public static $url_read = "";
+    public static $url_create = "";
+    public $base_url = "";
+
+    public $pagejump = 10;
+    public $per_page = 10;
+    public $paginationenabled = true;
+
+    public $additionnalrow = [];
+
     static function init2(\stdClass $entity, $next = 0, $per_page = 10) {
         $dt = new Datatable();
         $dt->entity = $entity;
@@ -41,7 +74,7 @@ class Datatable {
             if (in_array('update', $rigths)) {
                 if (in_array('update', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= '<span onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="btn btn-default btn-sm" ><i class="fa fa-edit" ></i> edit</span>';
+                        $actionlien .= ' <button onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</button>';
                     else{
                         $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '" class="btn btn-default btn-sm model_edit" ><i class="fa fa-edit" ></i> edit</a>';
                     }
@@ -52,7 +85,7 @@ class Datatable {
 
                 if (in_array('read', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= '<span onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="btn btn-default btn-sm" ><i class="fa fa-eye" ></i> view</span> .';
+                        $actionlien .= ' <button onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</button>';
                     else{
                         $actionlien .= '<a href="index.php?path=' . $path . '/_show&id=' . $id . '" class="btn btn-default btn-sm" ><i class="fa fa-eye" ></i> view</a>';
                     }
@@ -60,8 +93,8 @@ class Datatable {
             }
             if (in_array('delete', $rigths)) {
                 if (in_array('delete', $_SESSION['action']))
-                    $actionlien .= '<span onclick="model._delete(this, ' . $id . ')"'
-                        . ' class="btn btn-default" >delete</span>';
+                    $actionlien .= ' <button onclick="model._delete(this, ' . $id . ')"'
+                        . ' class="'.self::$btndelete_class.'" >delete</button>';
             }
         }
 
@@ -72,23 +105,23 @@ class Datatable {
 
                 if (in_array('update', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= '<span onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="btn btn-default btn-sm" ><i class="fa fa-edit" ></i> edit</span>';
+                        $actionlien .= ' <button onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</button>';
                     else{
-                        $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '" class="btn btn-default model_edit btn-sm" ><i class="fa fa-edit" ></i> edit</a>';
+                        $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</a>';
                     }
                 }
 
                 if (in_array('read', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= '<span onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="btn btn-default btn-sm" ><i class="fa fa-eye" ></i> view</span> .';
+                        $actionlien .= ' <button onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</button>';
                     else{
-                        $actionlien .= '<a href="index.php?path=' . $path . '/_show&id=' . $id . '" class="btn btn-default btn-sm" ><i class="fa fa-eye" ></i> view</a>';
+                        $actionlien .= '<a href="index.php?path=' . $path . '/_show&id=' . $id . '" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</a>';
                     }
                 }
 
                 if (in_array('delete', $_SESSION['action']))
-                    $actionlien .= '<span onclick="model._delete(this, ' . $id . ')"'
-                        . ' class="btn btn-danger btn-sm" ><i class="fa fa-close" ></i> delete</span>';
+                    $actionlien .= ' <button onclick="model._delete(this, ' . $id . ')"'
+                        . ' class="'.self::$btndelete_class.'" ><i class="fa fa-close" ></i> delete</button>';
 
             }else {
                 $actionlien .= "<span class='alert alert-info btn-sm' >not rigth contact the administrator</span>";
@@ -114,90 +147,63 @@ class Datatable {
 
     private static function getTableEntityBody($entity, $header) {
 
-            foreach ($header as $valuetd) {
-                // will call the default get[Value] of the attribut
-                $value = $valuetd["value"];
-                // but if dev set get the will call custom get[Get]
-                if(isset($valuetd["get"]))
-                    $value = $valuetd["get"];
+        foreach ($header as $valuetd) {
+            // will call the default get[Value] of the attribut
+            $value = $valuetd["value"];
+            // but if dev set get the will call custom get[Get]
+            if(isset($valuetd["get"]))
+                $value = $valuetd["get"];
 
-                $join = explode(".", $value);
-                if (isset($join[1])) {
+            $join = explode(".", $value);
+            if (isset($join[1])) {
 
-                    $collection = explode("::", $join[0]);
-                    $src = explode(":", $join[0]);
+                $collection = explode("::", $join[0]);
+                $src = explode(":", $join[0]);
 
-                    if (isset($src[1]) and $src[0] = 'src') {
+                if (isset($src[1]) and $src[0] = 'src') {
 
-                        $entityjoin = call_user_func(array($entity, 'get' . ucfirst($src[1])));
-                        $file = call_user_func(array($entityjoin, 'show' . ucfirst($join[1])));
+                    $entityjoin = call_user_func(array($entity, 'get' . ucfirst($src[1])));
+                    $file = call_user_func(array($entityjoin, 'show' . ucfirst($join[1])));
 
-                        $td = "<td>" . $file . "</td>";
-                    } elseif (isset($collection[1])) {
-                        $td = [];
-                        $entitycollection = call_user_func(array($entity, 'get' . ucfirst($collection[1])));
-                        foreach ($entitycollection as $entity) {
-                            $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
-                            $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
-                        }
-                        $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
-                    } else {
+                    $td = "<td>" . $file . "</td>";
+                } elseif (isset($collection[1])) {
+                    $td = [];
+                    $entitycollection = call_user_func(array($entity, 'get' . ucfirst($collection[1])));
+                    foreach ($entitycollection as $entity) {
                         $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
                         $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
                     }
+                    $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
                 } else {
+                    $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
+                    $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
+                }
+            } else {
 
-                    $src = explode(":", $join[0]);
+                $src = explode(":", $join[0]);
 
-                    if (isset($src[1]) and $src[0] = 'src') {
+                if (isset($src[1]) and $src[0] = 'src') {
 
-                        $file = call_user_func(array($entity, 'show' . ucfirst($src[1])));
-                        $td = "<td>" . $file . "</td>";
+                    $file = call_user_func(array($entity, 'show' . ucfirst($src[1])));
+                    $td = "<td>" . $file . "</td>";
+                } else {
+                    if (is_object(call_user_func(array($entity, 'get' . ucfirst($value)))) && get_class(call_user_func(array($entity, 'get' . ucfirst($value)))) == "DateTime") {
+                        $td = '<td>' . call_user_func(array($entity, 'get' . ucfirst($value)))->format('d M Y') . '</td>';
                     } else {
-                        if (is_object(call_user_func(array($entity, 'get' . ucfirst($value)))) && get_class(call_user_func(array($entity, 'get' . ucfirst($value)))) == "DateTime") {
-                            $td = '<td>' . call_user_func(array($entity, 'get' . ucfirst($value)))->format('d M Y') . '</td>';
-                        } else {
-                            $td = '<td>' . call_user_func(array($entity, 'get' . ucfirst($value))) . '</td>';
-                        }
+                        $td = '<td>' . call_user_func(array($entity, 'get' . ucfirst($value))) . '</td>';
                     }
                 }
-
-                $tr[] = '<tr ><td><b>' . $valuetd["label"] . '</b></td>' . $td . '</tr>';
-
             }
+
+            $tr[] = '<tr ><td><b>' . $valuetd["label"] . '</b></td>' . $td . '</tr>';
+
+        }
 
         return $tr;
     }
 
-    public $html = "";
-    public $lazyloading = "";
-    public $tablefilter = "";
-    public $pagination = "";
-    public $header = []; // describe the model of the table (available column and metadata of row)
-    public $tablebody = "";
-
-    public $defaultaction = "stateless";
-    public $customaction = [];
-    public $groupaction = true;
-    public $groupactioncore = [];
-    public $searchaction = true;
-    public $openform = "";
-    public $closeform = "";
-
-    public static $url_delete = "";
-    public static $url_update = "";
-    public static $url_read = "";
-    public static $url_create = "";
-    public $base_url = "";
-
-    public $pagejump = 10;
-    public $per_page = 10;
-    public $paginationenabled = true;
-
-    public $additionnalrow = [];
-
-    public static function buildtable($lazyloading, $header, $action = true, $defaultaction = 'stateless',
-                                      $groupedaction = true, $searchaction = true, $tbattr = ["class" => "table table-bordered table-hover table-striped"]){
+    public static function buildtable($lazyloading, $header, $action = true,
+                                      $tbattr = ["class" => "table table-bordered table-hover table-striped"]){
 
         $datatable = new Datatable();
 
@@ -216,9 +222,6 @@ class Datatable {
         
         $datatable->header = $header;
         $datatable->action = $action;
-        $datatable->defaultaction = $defaultaction;
-        $datatable->groupaction = $groupedaction;
-        $datatable->searchaction = $searchaction;
 
         return $datatable;
 
@@ -235,11 +238,12 @@ class Datatable {
             $this->closeform = '</form>';
         }
         $html = '
-    <div class="row">'.$this->openform;
+    <div class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">';
 
         $html .= '
     <style>
         th{position: relative;}
+        tr.th-filter th{padding: 0px !important;}
         .torder{z-index: 3; position: absolute; top:0; right: 0; padding: 15px 12px}
         .loader{
         position: absolute;
@@ -254,9 +258,7 @@ class Datatable {
             font-size: 50px;
             background: rgba(51,122,183,0.3);
         }
-    </style>
-
-    <div class="col-lg-12 col-md-12"><div class="table-responsive">';
+    </style>';//.$this->openform;
 
 
         $html .= $this->tableoption();
@@ -270,7 +272,7 @@ class Datatable {
         $theader = $this->headerbuilder();
 
         if (!$this->listentity) {
-            $tb = [];
+            $tb = "";
         }else
             $tb = self::tablebodybuilder($this->listentity, $this->header,
                 $this->defaultaction, $this->groupaction, $this->customaction);
@@ -280,9 +282,10 @@ class Datatable {
             $newrows = $this->rowbuilder();
         }
 
-        $html .= '<table id="dv_table" data-entity="'.self::$class.'"  class="table table-bordered table-hover table-striped" >'
-            . '<thead>' . $theader['th'] . '' . $theader['thf'] . '</thead>'
-            . '<tbody>' . implode(" ", $tb) . '</tbody>'
+        $dentity = \Dvups_entity::select()->where("this.name", self::$class)->__getOne();
+        $html .= '<table id="dv_table" data-route="'.path( 'src/'. strtolower($dentity->dvups_module->getProject()) .'/'. $dentity->dvups_module->getName() . '/').'" data-entity="'.self::$class.'"  class="'.self::$table_class.'" >'
+            . '<thead>' . $theader['th'] . $theader['thf'] . '</thead>'
+            . '<tbody>' . $tb . '</tbody>'
             . '<tfoot>' . $newrows . '</tfoot>'
             . '</table>';
 
@@ -290,15 +293,14 @@ class Datatable {
         if($this->paginationenabled)
             $html .= $this->paginationbuilder();
 
-        $html .= $this->closeform."</div>";
+        $html .= "</div>";//$this->closeform.
 
         return  $html;
     }
 
     private function tableoption() {
 
-        $html = '<div class="col-lg-12 col-md-12">
-<div class="row">';
+        $html = '<div class="col-lg-12 col-md-12"><div class="row">';
 
         if($this->groupaction){
             $html .= $this->groupactionbuilder();
@@ -306,9 +308,7 @@ class Datatable {
 
         $html .= $this->perpagebuilder();
 
-        $html .= "<input name=\"per_page_custom\" value='". $this->per_page ."' class='hidden' />
-    </div>
-    </div>";
+        $html .= "</div></div>";
 
         return $html;
     }
@@ -317,19 +317,14 @@ class Datatable {
      * @param bool $sure
      */
     public function addgroupaction($action){
-
+        $this->groupaction = true;
         $this->groupactioncore[] = $action;
 
         return $this;
     }
 
-    public function disablegroupaction(){
-        $this->groupaction = false;
-        return $this;
-    }
-
-    public function disablepagination(){
-        $this->paginationenabled = false;
+    public function enablegroupaction(){
+        $this->groupaction = true;
         return $this;
     }
 
@@ -365,7 +360,7 @@ class Datatable {
         return implode("", $tr);
     }
 
-    public $defaultgroupaction = '<span id="deletegroup" class="btn btn-danger">delete</span>';
+    public $defaultgroupaction = '<button id="deletegroup" class="btn btn-danger">delete</button>';
     public function disabledefaultgroupaction(){
         $this->defaultgroupaction = "";
         return $this;
@@ -387,16 +382,25 @@ class Datatable {
 
     }
 
-    public function setperpage($nbjump = 10){//$jump = 10,
-
-        $this->pagejump = 10;
-        $this->per_page = $nbjump;
-
+    public function setjumppage($jump = 10){
+        $this->pagejump = $jump;
         return $this;
     }
 
-    public function disablefilter(){
-        $this->searchaction = false;
+
+    public function setperpage($nbjump = 10){
+        $this->per_page = $nbjump;
+        return $this;
+    }
+
+    public function disablepagination(){
+        $this->paginationenabled = false;
+        $this->per_page = "no";
+        return $this;
+    }
+
+    public function enablefilter(){
+        $this->searchaction = true;
         return $this;
     }
 
@@ -407,7 +411,7 @@ class Datatable {
         $html = '                    
             <div class="col-lg-4 col-md-12 ">
 
-        <label class=" col-lg-7" >Number of line to show </label>';
+        <label class=" col-lg-7" >Line to show </label>';
 
         $html .= '<select id="dt_nbrow" class="form-control" style="width:100px;" onchange="ddatatable.setperpage(this.options[this.selectedIndex].value)" >';
         //$html .= '<option value="&next=' . $current_page . '&per_page=10" >10</option>';
@@ -423,12 +427,13 @@ class Datatable {
     }
 
     public function paginationbuilder() {
-        //extract($lazyloading);
+
         if (!$this->listentity) {
-            return' no page';
+            return'<div id="dv_pagination" class="col-lg-12"> no page</div>';
         }
 
-        //if($this->pagination <= 1){return '';}
+        if(!is_numeric($this->per_page))
+            return "<div id=\"dv_pagination\" class=\"col-lg-12\"></div>";
 
         $html = '<div id="dv_pagination" class="col-lg-12"><div class="row">
             <div id="pagination-notice" data-notice="' . $this->pagination . '" class="col-lg-6 col-md-6">Showing ' . ( ($this->current_page - 1) * $this->per_page + 1) . ' to ' . $this->per_page * $this->current_page . ' of ' . $this->nb_element . '</div>
@@ -439,20 +444,20 @@ class Datatable {
                 <div class="dataTables_paginate paging_simple_numbers text-right">
                     <ul class="pagination">';
         if ($this->previous > 0)
-            $html .= '<li class="paginate_button previous"><a onclick="ddatatable.previous()" >previous</a></li>';//' . $url . '&next=' . $previous . '&per_page=' . $per_page . '
+            $html .= '<li class="paginate_button previous"><a href="javascript:ddatatable.previous()" >previous</a></li>';//' . $url . '&next=' . $previous . '&per_page=' . $per_page . '
         else
             $html .= '<li class="paginate_button previous disabled"><a href="#">previous</a></li>';
 
         for ($page = 1; $page <= $this->pagination; $page++) {
             if ($page == $this->current_page) {
-                $html .= '<li class="paginate_button active "><a onclick="ddatatable.pagination(' . $page . ')" data-next="' . $page . '" >' . $page . '</a></li>';//' . $url . '&next=' . $page . '&per_page=' . $per_page . '
+                $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';//' . $url . '&next=' . $page . '&per_page=' . $per_page . '
             } else {
-                $html .= '<li class="paginate_button "><a onclick="ddatatable.pagination(' . $page . ')" data-next="' . $page . '" >' . $page . '</a></li>';//' . $url . '&next=' . $page . '&per_page=' . $per_page . '
+                $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';//' . $url . '&next=' . $page . '&per_page=' . $per_page . '
             }
         }
 
         if ($this->remain)
-            $html .= '<li class="paginate_button next"><a onclick="ddatatable.next()" >next</a></li>';//' . $url . '&next=' . $next . '&per_page=' . $per_page . '
+            $html .= '<li class="paginate_button next"><a href="javascript:ddatatable.next();" >next</a></li>';//' . $url . '&next=' . $next . '&per_page=' . $per_page . '
         else
             $html .= '<li class="paginate_button next disabled"><a href="#" >next</a></li>';
 
@@ -473,7 +478,7 @@ class Datatable {
             extract($_SESSION["dv_datatable"]);
 
             self::$class = $class;
-            return self::tablebodybuilder([$entity], $header, $defaultaction, $groupaction, $customaction)[0];
+            return self::tablebodybuilder([$entity], $header, $defaultaction, $groupaction, $customaction);
 
         }
             //return self::getTableRest(\Controller::lastpersistance($entity))[0];
@@ -489,7 +494,7 @@ class Datatable {
 
             return [
                 'tablebody' => '<div id="dv_table" data-entity="'.self::$class.'" class="text-center">la liste est vide</div>',
-                'tablepagination' => "the list is empty"
+                'tablepagination' => '<div id="dv_pagination" class="col-lg-12"> no page</div>'
             ];
 
         }
@@ -527,47 +532,39 @@ class Datatable {
             $th[] = '<th>' . $valuetd['header'] . '</th>';
             $value = $valuetd["value"];
             if(!isset($valuetd["order"]))
-                $valuetd["order"] = true;
+                $valuetd["order"] = false;
 
             $thfvalue = '';
             $join = explode(".", $value);
             if (isset($join[1])) {
-
-//                $collection = explode("::", $join[0]);
-//                $src = explode(":", $join[0]);
+                $thisfield = str_replace(".", "-", $value) . ":attr";
                 if(!$this->searchaction){ }
                 elseif(isset($valuetd["search"]) ){
-                    if($valuetd["search"]){
-                        $thfvalue = call_user_func(array(self::$class, $valuetd["search"].'Search'), $value);
-                        //$thfvalue = '<input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" ><div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
-                    }
-//                    else
-//                        $valuetd["order"] = false;
+                    if(is_string($valuetd["search"])){
+                        $thfvalue = call_user_func(array(self::$class, $valuetd["search"].'Search'), $thisfield);
+                    }else
+                        $thfvalue = '<input name="' . $thisfield . '" value="" placeholder="' . $valuetd['header'] . '" class="form-control" >';
                 }else{
-                    $thfvalue = '<input name="' . str_replace(".", "-", $value) . '" placeholder="' . $valuetd['header'] . '" class="form-control" >';
                 }
 
                 if($valuetd["order"]){
                     $thfvalue .= '<div class="torder"><i onclick="ddatatable.orderasc(\'orderjoin=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'orderjoin=' . $value . '\')" class="fa fa-angle-down"></i></div>';
                 }
-                $fields[] = str_replace(".", "-", $value) . ":join";
+                //$fields[] = str_replace(".", "-", $value) . ":join";
             } else {
+                $thisfield = $value . ":attr";
                 if(!$this->searchaction){ }
                 elseif(isset($valuetd["search"])) {
-                    if ($valuetd["search"]) {
-                        $thfvalue = call_user_func(array(self::$class, $valuetd["search"].'Search'), $value);
-                        //$thfvalue = '<input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" ><div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
-                    }
-//                    else
-//                        $valuetd["order"] = false;
+                    if (is_string($valuetd["search"])) {
+                        $thfvalue = call_user_func(array(self::$class, $valuetd["search"].'Search'), $thisfield);
+                    }else
+                        $thfvalue = '<input name="' . $thisfield . '" placeholder="' . $valuetd['header'] . '" value="" class="form-control" >';
 
-                }else
-                    $thfvalue = '<input name="' . $value . '" placeholder="' . $valuetd['header'] . '" class="form-control" >';
-
+                }
                 if($valuetd["order"])
                     $thfvalue .= '<div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
 
-                $fields[] = $value . ":attr";
+                //$fields[] = $value . ":attr";
             }
             $thf[] = '<th >' . $thfvalue . '</th>';
         }
@@ -576,11 +573,11 @@ class Datatable {
 
         if ($this->searchaction) {
             $thf[] = '<th>'//<input name="path" value="' . $_GET['path'] . '" hidden >
-                . '<input name="dfilters" value="' . implode(",", $fields) . '" hidden >'
-                . '<button class="btn btn-default">search</button><input id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-default" value="cancel" hidden /></th>';
+                . '<input name="dfilters" value="on" hidden >' //' . implode(",", $fields) . '
+                . '<button onclick="ddatatable.search(this)" class="'.self::$btnsearch_class.'" >search</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
 
             return ["th" => '<tr>'.implode(" ", $th).'</tr>',
-                "thf" => '<tr>'.implode(" ", $thf) .'</tr>'];
+                "thf" => '<tr class="th-filter">'.implode(" ", $thf) .'</tr>'];
         }else{
             return ["th" => '<tr>'.implode(" ", $th).'</tr>', "thf" => ''];
         }
@@ -667,15 +664,15 @@ class Datatable {
                     $dact = "";
                     if(self::$url_read){
                         $show = str_replace('$id', $entity->getId(), self::$url_read);
-                        $dact .= '<a href="' . $show . '" class="btn btn-default btn-sm" ><i class="fa fa-eye" ></i> view</a>';
+                        $dact .= '<a href="' . $show . '" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</a>';
                     }
                     if(self::$url_update){
                         $update = str_replace('$id', $entity->getId(), self::$url_update);
-                        $dact .= '<a href="' . $update . '" class="btn btn-default btn-sm" ><i class="fa fa-edit" ></i> edit</a>';
+                        $dact .= '<a href="' . $update . '" class="'.self::$btnedit_class.'" >'.gettranslation("dt.button.edit").'</a>';
                     }
                     if(self::$url_delete){
                         $delete = str_replace('$id', $entity->getId(), self::$url_delete);
-                        $dact .= '<a href="' . $delete . '" class="btn btn-default btn-sm" ><i class="fa fa-delete" ></i> delete</a>';
+                        $dact .= '<a href="' . $delete . '" class="'.self::$btndelete_class.'" ><i class="fa fa-delete" ></i> delete</a>';
                     }
                 }
             }
@@ -691,7 +688,7 @@ class Datatable {
             $tb[] = '<tr id="' . $entity->getId() . '" >' . implode(" ", $tr) . '</tr>';
         }
 
-        return $tb;
+        return implode(" ", $tb);
 
     }
 

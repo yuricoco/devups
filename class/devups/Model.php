@@ -518,7 +518,10 @@ abstract class Model extends \stdClass {
         if ($this->getId()) {
             $dbal = new DBAL();
             return $dbal->hasmany($this, $collection, $exec, $incollectionof, $recursif);
-        } else {
+        }
+        elseif (!$exec)
+            return new QueryBuilder($this);
+        else {
             return [];
         }
     }

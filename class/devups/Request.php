@@ -66,4 +66,9 @@ class Request {
             return false;
     }
 
+    public static function set($key, $value)
+    {
+        Request::$uri_get_param[$key] = $value;
+    }
+
 }

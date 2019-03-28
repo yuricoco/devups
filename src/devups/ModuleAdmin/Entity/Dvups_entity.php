@@ -18,10 +18,28 @@ class Dvups_entity extends Model implements JsonSerializable {
     private $name;
 
     /**
+     * @Column(name="url", type="string" , length=25, nullable=true  )
+     * @var string
+     * */
+    private $url;
+
+    /**
      * @Column(name="label", type="string" , length=125, nullable=true )
      * @var string
      * */
     private $label;
+
+
+    /**
+     * @ManyToOne(targetEntity="\Dvups_module")
+     * @var \Dvups_module
+     */
+    public $dvups_module;
+
+    /**
+     * @var \Dvups_right
+     */
+    public $dvups_right;
 
     /**
      * @return string
@@ -54,17 +72,6 @@ class Dvups_entity extends Model implements JsonSerializable {
         $this->label = $label;
     }
 
-    /**
-     * @ManyToOne(targetEntity="\Dvups_module")
-     * @var \Dvups_module
-     */
-    public $dvups_module;
-
-    /**
-     * @var \Dvups_right
-     */
-    public $dvups_right;
-
     public function __construct($id = null) {
 
         if ($id) {
@@ -92,6 +99,31 @@ class Dvups_entity extends Model implements JsonSerializable {
     }
 
     /**
+     * @return string
+     */
+    public function getUrl()
+    {
+        if(!$this->url)
+            return strtolower(str_replace('_', '-', $this->name));
+
+        return $this->url;
+    }
+
+    /**
+     * @param string $url
+     */
+    public function setUrl($url)
+    {
+        if(!$url)
+            $url = $this->name;
+
+        $nameseo = str_replace('_', '-', $url); // supprime les autres caractères
+
+        $this->url = strtolower($nameseo);
+
+    }
+
+    /**
      *  manyToOne
      * 	@return \Dvups_module
      */
@@ -99,11 +131,14 @@ class Dvups_entity extends Model implements JsonSerializable {
         return $this->dvups_module;
     }
 
-    function setDvups_module(\Dvups_module $dvups_module) {
+    function setDvups_module($dvups_module) {
         $this->dvups_module = $dvups_module;
     }
+    function setDvups_right($dvups_right) {
+        $this->dvups_right = $dvups_right;
+    }
 
-    /**
+        /**
      *  manyToMany
      * 	@return \Dvups_right
      */

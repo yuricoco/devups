@@ -30,20 +30,6 @@ class Dvups_contentlangController extends Controller{
         ];
     }
 
-    public static function rendernewTranslationForm($id = null, $action = "create")
-    {
-        $dvups_contentlang = Dvups_contentlang::find($id);
-        if ($id) {
-            $action = "update&id=" . $id;
-            $dvups_lang = Dvups_lang::find($id);
-            //$dvups_lang->collectStorage();
-        }
-
-        return ['success' => true,
-            'form' => Dvups_contentlangForm::__renderForm($dvups_contentlang, $action, true),
-        ];
-    }
-
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Dvups_contentlang(), $next, $per_page);
         return ['success' => true,

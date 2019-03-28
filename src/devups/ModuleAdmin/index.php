@@ -6,29 +6,8 @@ require '../../../admin/header.php';
 
 $adminCtrl = new Dvups_adminController();
 
-if (isset($_GET['path']) and $_GET['path'] == 'connexion') {
-
-    if (isset($_POST['login']) and $_POST['login'] != '' and isset($_POST['password'])) {
-        $reponse = $adminCtrl->connexionAction($_POST['login'], $_POST['password']);
-
-        if ($reponse['success']) {
-            header("location: " . __env . "admin/");
-        } else {
-            header("Location: " . __env . "admin/login.php?err=" . $reponse['detail']);
-        }
-    } else {
-        header("Location: " . __env . "admin/login.php?err=Entré le login et le mot de passe.");
-    }
-}
-
-
-    if (isset($_GET['path']) and $_GET['path'] == 'deconnexion') {
-
-        $adminCtrl->deconnexionAction($moi);
-    }
-
-global $views;
-$views = __DIR__ . '/Ressource/views';
+global $viewdir;
+$viewdir[] = __DIR__ . '/Ressource/views';
 
     define('CHEMINMODULE', ' <a href="index.php" target="_self" class="titre_module">Administration du system global</a> &gt; <a href="index.php?path=layout" target="_self" class="titre_module">Module ModuleAdmin</a> ');
 
@@ -44,9 +23,9 @@ $views = __DIR__ . '/Ressource/views';
 
 
     //extract($_GET['path']);
-    if (isset($_GET['path'])) {
+    if (Request::get('path')) {
 
-        $path = explode('/', $_GET['path']);
+        $path = explode('/', Request::get('path'));
 
         switch ($path[ENTITY]) {
 
@@ -54,23 +33,23 @@ $views = __DIR__ . '/Ressource/views';
                 Genesis::renderBladeView("layout");
                 break;
 
-            case 'dvups_admin':
+            case 'dvups-admin':
                 Dvups_adminGenesis::genesis($path[VIEW], $controllers);
                 break;
 
-            case 'dvups_module':
+            case 'dvups-module':
                 Dvups_moduleGenesis::genesis($path[VIEW], $controllers);
                 break;
 
-            case 'dvups_entity':
+            case 'dvups-entity':
                 Dvups_entityGenesis::genesis($path[VIEW], $controllers);
                 break;
 
-            case 'dvups_role':
+            case 'dvups-role':
                 Dvups_roleGenesis::genesis($path[VIEW], $controllers);
                 break;
 
-            case 'dvups_right':
+            case 'dvups-right':
                 Dvups_rightGenesis::genesis($path[VIEW], $controllers);
                 break;
 

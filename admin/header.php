@@ -7,6 +7,9 @@
  * and open the template in the editor.
  */
 require __DIR__ . '/../header.php';
+define('VENDOR', __env. 'admin/vendors/');
+define('assets', __env. 'admin/');
+
 
 // move comment scope to enable authentication 
 if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
@@ -16,7 +19,9 @@ if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
 } 
 
 
-global $global_navigation;
+global $global_navigation, $viewdir;
+
+$viewdir = [admin_dir . "views"];
 $dvups_navigation = unserialize($_SESSION['navigation']);
 
 //$global_navigation = Core::buildOriginCore();

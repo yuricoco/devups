@@ -35,7 +35,7 @@ class Dvups_entityController extends Controller
         if ($id) {
             $action = "update&id=" . $id;
             $dvups_entity = Dvups_entity::find($id);
-            //$dvups_entity->collectStorage();
+            $dvups_entity->collectDvups_right();
         }
 
         return ['success' => true,
@@ -47,8 +47,7 @@ class Dvups_entityController extends Controller
     {
         $lazyloading = $this->lazyloading(new Dvups_entity(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Datatable::getTableRest($lazyloading),
-            'tablepagination' => Datatable::pagination($lazyloading)
+            'datatable' => Datatable::getTableRest($lazyloading),
         ];
     }
 
@@ -74,7 +73,6 @@ class Dvups_entityController extends Controller
         if ($id = $dvups_entity->__insert()) {
             return array('success' => true, // pour le restservice
                 'dvups_entity' => $dvups_entity,
-                'redirect' => 'index', // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
             return array('success' => false, // pour le restservice
@@ -94,7 +92,7 @@ class Dvups_entityController extends Controller
         if ($dvups_entity->__update()) {
             return array('success' => true, // pour le restservice
                 'dvups_entity' => $dvups_entity,
-                'redirect' => 'index', // pour le web service
+                'tablerow' => Datatable::getSingleRowRest($dvups_entity),
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
             return array('success' => false, // pour le restservice

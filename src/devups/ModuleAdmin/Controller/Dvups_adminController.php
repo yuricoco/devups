@@ -49,29 +49,40 @@ class Dvups_adminController extends Controller {
         }
     }
 
-    public function deconnexionAction($admin) {
+    public function deconnexionAction() {
 
         $_SESSION[ADMIN] = array();
-        session_destroy();
+        unset($_SESSION[ADMIN]);
+        //session_destroy();
         header("location: " . path('admin/login.php'));
     }
 
-    public function connexionAction($login, $password) {
+    public function connexionAction($login = "", $password = "") {
+        if (!isset($_POST['login']) and $_POST['login'] != '' and !isset($_POST['password'])) {
+            header("Location: " . __env . "admin/login.php?error=Entré le login et le mot de passe.");
+        }
+        extract($_POST);
 
         $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
         //dv_dump($login, $password, $admin);
         if (!$admin->getId())
-            return array('success' => false, "err" => 'Login ou mot de passe incorrect.');
+            header("Location: " . __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
+            //return array('success' => false, "err" => 'Login ou mot de passe incorrect.');
 
-        $admin->collectDvups_role();
+        //$admin->collectDvups_role();
 
         Dvups_roleController::getNavigationAction($admin);
 
         $_SESSION[ADMIN] = serialize($admin);
-        
-        return array('success' => true,
-            'url' => 'index.php',
-            'detail' => 'detail de l\'action.');
+
+        $admin->setLastloginAt(date("Y-m-d H:i:s"));
+        $admin->__update("lastlogin_at", date("Y-m-d H:i:s"))->exec();
+
+        header("location: " . __env . "admin/");
+
+//        return array('success' => true,
+//            'url' => 'index.php',
+//            'detail' => 'detail de l\'action.');
     }
 
     /**
@@ -139,7 +150,7 @@ class Dvups_adminController extends Controller {
     public function __editAction($id) {
         //$dvups_adminDao = new Dvups_adminDAO();
         $dvups_admin = (new DBAL())->findByIdDbal(new Dvups_admin($id));
-        $dvups_admin->collectDvups_role();
+        //$dvups_admin->collectDvups_role();
 
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
@@ -190,17 +201,24 @@ class Dvups_adminController extends Controller {
 
     public function datatable($next, $per_page)
     {
-        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page);
+        $qb = Dvups_admin::select()
+            ->where("login", "!=", "dv_admin");
+            //->andwhere("password", "!=", sha1("admin"));
+
+        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb,"dvups_admin.id desc");
         return ['success' => true,
-            'tablebody' => Datatable::getTableRest($lazyloading),
-            'tablepagination' => Datatable::pagination($lazyloading)
+            'datatable' => Datatable::getTableRest($lazyloading),
         ];
     }
 
     public function listAction($next = 1, $per_page = 10)
     {
 
-        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, null, "dvups_admin.id desc");
+        $qb = Dvups_admin::select()
+            ->where("login", "!=", "dv_admin");
+            //->andwhere("password", "!=", sha1("admin"));
+
+        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb, "dvups_admin.id desc");
 
         return array('success' => true, // pour le restservice
             'lazyloading' => $lazyloading, // pour le web service

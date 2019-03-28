@@ -413,7 +413,7 @@ Usage:
         chdir('../');
     }
 
-    private static function ressources($entity, $frontend){
+    private static function ressources($entity, \FrontendGenerator $frontend){
 
         if (!file_exists('Ressource'))
             mkdir('Ressource', 0777);
@@ -590,27 +590,44 @@ Usage:
         $repertoire = ucfirst($module->name);
         chdir($repertoire);
 
+        $root = fopen('.htaccess', 'w');
+
+        $htaccess = "\n
+RewriteEngine On
+
+RewriteRule    ^/?$    index.php    [NC,L]
+RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]    # Process all products
+RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC,L]    # Process all products
+
+<IfModule mod_headers.c>
+    Header always set X-FRAME-OPTIONS \"DENY\"
+</IfModule>
+                \n";
+
+        fputs($root, $htaccess);
+        fclose($root);
+
+
         $root = fopen('index.php', 'w');
 
         $contenu = "<?php
             //" . $module->name . "
         
         require '../../../admin/header.php';
-        
-        global $" . "views;
-        $" . "views = __DIR__ . '/Ressource/views';
+        global $" . "viewdir;
+        $" . "viewdir[] = __DIR__ . '/Ressource/views';
                 \n\n";
 
         $contenu .= "
     
-    define('CHEMINMODULE', ' <a href=\"index.php\" target=\"_self\" class=\"titre_module\">Administration du system global</a> &gt; <a href=\"index.php?path=layout\" target=\"_self\" class=\"titre_module\">Module " . ucfirst($module->name) . "</a> ');\n
+        define('CHEMINMODULE', ' ');\n
     
         ";
 //        foreach ($arraycontroller as $controller) {
 //            $contenu .= $controller;
 //        }
         foreach ($modulelistentity as $entity) {
-            $contenu .= "\t\t$" . strtolower($entity->name) . "Ctrl = new " . ucfirst($entity->name) . "Controller();";
+            $contenu .= "\t\t$" . strtolower($entity->name) . "Ctrl = new " . ucfirst($entity->name) . "Controller();\n";
         }
 
         $contenu .= "\t\t
@@ -620,22 +637,16 @@ Usage:
 switch (Request::get('path')) {
 
     case 'layout':
-        Genesis::renderBladeView(\"layout\");
+        Genesis::renderView(\"layout\");
         break;
         ";
 
         foreach ($modulelistentity as $entity) {
             $name = strtolower($entity->name);
             $contenu .= "
-    case '" . $name . "/index':
+    case '" . str_replace("_", "-", $name) . "/index':
         Genesis::renderView('".$name.".index',  $".$name."Ctrl->listAction());
-        break;					
-    case '" . $name . "/create':
-        Genesis::renderView( '".$name.".form', $".$name."Ctrl->createAction(), true);
-        break;					
-    case '" . $name . "/update':
-        Genesis::renderView( '".$name.".form',  $".$name."Ctrl->updateAction($"."_GET['id']), true);
-        break;\n\n";
+        break;\n";
         }
 
         $contenu .= "\n\t\t
@@ -755,7 +766,7 @@ switch (Request::get('path')) {
 
         $contenu .= "\n\t
         default:
-            echo json_encode(['error' => \"404 : action note found\", 'route' => R::get('path')]);
+            echo json_encode(['success' => false, 'error' => ['message' => \"404 : action note found\", 'route' => R::get('path')]]);
             break;
      }
 
@@ -784,8 +795,6 @@ switch (Request::get('path')) {
         
 	define ('RESSOURCE', __DIR__ . '/../admin/Ressource/' );
 	define ('RESSOURCE2', sanitize_src( '/../admin/Ressource/') );
-	define ('VENDOR', sanitize_src( '/../admin/vendor/') );
-	define ('UPLOAD_DIR_SRC', sanitize_src( '/../admin/Ressource/js/') );
 	define ('UPLOAD_DIR', __DIR__. '/../uploads/' );
         define('JS', sanitize_src( '/../admin/Ressource/js/') );
         define('IMG', sanitize_src( '/../admin/Ressource/img/') );

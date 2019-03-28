@@ -11,10 +11,12 @@
  *
  * @author Aurelien Atemkeng
  */
-class QueryBuilder extends \DBAL {
+class QueryBuilder extends \DBAL
+{
 
 //    private $table;    
     private $query = "";
+    private $sequence = "";
     private $parameters = [];
     private $columns = "*";
     private $defaultjoin = "";
@@ -37,7 +39,8 @@ class QueryBuilder extends \DBAL {
         'not similar to', 'not ilike', '~~*', '!~~*',
     ];
 
-    public function __construct($entity = null) {
+    public function __construct($entity = null)
+    {
         $this->initwhereclause = false;
         if ($entity)
             parent::__construct($entity);
@@ -48,14 +51,15 @@ class QueryBuilder extends \DBAL {
     /**
      * Prepare the value and operator for a where clause.
      *
-     * @param  string  $value
-     * @param  string  $operator
-     * @param  bool  $useDefault
+     * @param  string $value
+     * @param  string $operator
+     * @param  bool $useDefault
      * @return array
      *
      * @throws \InvalidArgumentException
      */
-    protected function prepareValueAndOperator($value, $operator, $useDefault = false) {
+    protected function prepareValueAndOperator($value, $operator, $useDefault = false)
+    {
         if ($useDefault) {
             return [$operator, '='];
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
@@ -70,11 +74,12 @@ class QueryBuilder extends \DBAL {
      *
      * Prevents using Null values with invalid operators.
      *
-     * @param  string  $operator
-     * @param  mixed  $value
+     * @param  string $operator
+     * @param  mixed $value
      * @return bool
      */
-    protected function invalidOperatorAndValue($operator, $value) {
+    protected function invalidOperatorAndValue($operator, $value)
+    {
         return is_null($value) && in_array($operator, $this->operators) &&
             !in_array($operator, ['=', '<>', '!=']);
     }
@@ -82,10 +87,11 @@ class QueryBuilder extends \DBAL {
     /**
      * Determine if the given operator is supported.
      *
-     * @param  string  $operator
+     * @param  string $operator
      * @return bool
      */
-    protected function invalidOperator($operator) {
+    protected function invalidOperator($operator)
+    {
         return !in_array(strtolower($operator), $this->operators, true) &&
             !in_array(strtolower($operator), $this->grammar->getOperators(), true);
     }
@@ -93,10 +99,11 @@ class QueryBuilder extends \DBAL {
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  array|mixed $columns
      * @return $this
      */
-    public function addselect($columns = "*", $object = null, $defaultjoin = true) {
+    public function addselect($columns = "*", $object = null, $defaultjoin = true)
+    {
 
         // save currente sequence
         $this->querysequence = $this->query;
@@ -126,7 +133,8 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
-    public function close() {
+    public function close()
+    {
 //        $params = $this->parameters;
         $query = $this->query;
 
@@ -138,7 +146,8 @@ class QueryBuilder extends \DBAL {
         return $query;
     }
 
-    private function initdefaultjoin() {
+    private function initdefaultjoin()
+    {
 
         if (!empty($this->entity_link_list)) {
             foreach ($this->entity_link_list as $entity_link) {
@@ -150,10 +159,11 @@ class QueryBuilder extends \DBAL {
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  array|mixed $columns
      * @return $this
      */
-    public function join() {
+    public function join()
+    {
         $this->defaultjoinsetted = true;
         if (!empty($this->entity_link_list)) {
             foreach ($this->entity_link_list as $entity_link) {
@@ -167,10 +177,11 @@ class QueryBuilder extends \DBAL {
      * Set the columns to be selected.
      *
      * @example name, description, category
-     * @param  array|mixed  $columns
+     * @param  array|mixed $columns
      * @return $this
      */
-    public function select($columns = '*', $object = null, $defaultjoin = true) {
+    public function select($columns = '*', $object = null, $defaultjoin = true)
+    {
         $this->defaultjoin = "";
         if (is_object($columns)):
             $this->instanciateVariable($columns);
@@ -195,15 +206,16 @@ class QueryBuilder extends \DBAL {
      * @param bool $update
      * @return $this
      */
-    public function __dclone($update = false) {
+    public function __dclone($update = false)
+    {
         unset($this->objectVar[0]);
-        $col =  "`".strtolower(implode('`,`', $this->objectVar))."`";
+        $col = "`" . strtolower(implode('`,`', $this->objectVar)) . "`";
         $objectVar = explode(",", $col);
-        if($update)
-            foreach ($objectVar as $i => $var){
-                foreach ($update as $key => $value){
-                    if($var == "`".$key."`"){
-                        $objectVar[$i] = "'".$value."'";
+        if ($update)
+            foreach ($objectVar as $i => $var) {
+                foreach ($update as $key => $value) {
+                    if ($var == "`" . $key . "`") {
+                        $objectVar[$i] = "'" . $value . "'";
                         unset($update[$key]);
                     }
                 }
@@ -218,10 +230,11 @@ class QueryBuilder extends \DBAL {
     /**
      * @return $this
      */
-    public function delete() {
+    public function delete()
+    {
         $this->columns = null;
-
-        $this->query = "  delete from `" . $this->table . "` ";
+        $this->sequence = 'delete';
+        $this->query = "  delete `" . $this->table . "` from `" . $this->table . "` ";
         $this->endquery = " where id = " . $this->instanceid;
 
         return $this;
@@ -234,13 +247,11 @@ class QueryBuilder extends \DBAL {
      * @param type $case
      * @return $this
      */
-    public function update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true) {
+    public function update($arrayvalues = null, $seton = null, $case = null)
+    {
         $this->join();
         $this->columns = null;
-        if($defauljoin)
-            $this->query = "  update `" . $this->table . "` " . $this->defaultjoin;
-        else
-            $this->query = "  update `" . $this->table . "` " ;
+        $this->query = "  update `" . $this->table . "` " . $this->defaultjoin;
 
         if ($arrayvalues)
             return $this->set($arrayvalues, $seton, $case);
@@ -248,11 +259,17 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
-    public function set($arrayvalues, $seton = null, $case = null) {
+    public function set($arrayvalues, $seton = null, $case = null)
+    {
         $this->query .= " set ";
 
         // update a column on multiple rows
-        if (is_array($case)) {
+        if (is_object($arrayvalues)) {
+            $class = strtolower(get_class($arrayvalues));
+            $this->parameters[] = $arrayvalues->getId();
+            $this->query .= " " . $this->table . "." . $class . "_id = ? ";
+            $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
+        } elseif (is_array($case)) {
 
             $whens = [];
             $this->query .= " `" . $arrayvalues . "` = CASE " . $seton . " ";
@@ -267,31 +284,33 @@ class QueryBuilder extends \DBAL {
 
             $whens = implode("', '", $whens);
             $this->endquery = " WHERE `" . $arrayvalues . "`  IN('" . $whens . "'); ";
-        }
-        // update one column on one row
+        } // update one column on one row
         elseif ($arrayvalues && $seton != null) {
             //elseif (true) {
             $this->parameters[] = $seton;
             $this->query .= " $arrayvalues = ? ";
             $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
-        }
-        // update multiple column on one row
+        } // update multiple column on one row
         else {
             $arrayset = [];
             foreach ($arrayvalues as $key => $value) {
                 $keymap = explode(".", $key);
+                $dot = "`";
+                if (count($keymap) == 2)
+                    $dot = "";
+
                 if (is_object($value)) {
                     if (strtolower(get_class($value)) == "datetime") {
-                        $date = array_values((array) $value);
+                        $date = array_values((array)$value);
                         $this->parameters[] = $date[0];
-                        $arrayset[] = " ".implode('.`', $keymap)."` = ? ";
+                        $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
                     } else {
                         $this->parameters[] = $value->getId();
                         $arrayset[] = strtolower(get_class($value)) . "_id = ? ";
                     }
                 } else {
                     $this->parameters[] = $value;
-                    $arrayset[] = " ".implode('.`', $keymap)."` = ? ";
+                    $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
                 }
             }
             $this->query .= implode(", ", $arrayset);
@@ -304,10 +323,11 @@ class QueryBuilder extends \DBAL {
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed  $columns
+     * @param  array|mixed $columns
      * @return $this
      */
-    public function selectcount($object = null) {
+    public function selectcount($object = null)
+    {
         $columns = "COUNT(*)";
         if ($object):
             $this->instanciateVariable($object);
@@ -333,10 +353,11 @@ class QueryBuilder extends \DBAL {
      * @param type $classnameon
      * @return $this
      */
-    public function innerjoin($classname, $classnameon = "") {
+    public function innerjoin($classname, $classnameon = "")
+    {
         $this->join = strtolower(get_class($classname));
 
-        if(!$classnameon)
+        if (!$classnameon)
             $classnameon = $this->objectName;
 
         $this->query .= " inner join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
@@ -352,20 +373,26 @@ class QueryBuilder extends \DBAL {
      * @param type $classnameon
      * @return $this
      */
-    public function leftjoin($classname, $classnameon = "") {
+    public function leftjoin($classname, $classnameon = "")
+    {
         $this->join = strtolower($classname);
 
-        if(!$classnameon)
+        if (!$classnameon)
             $classnameon = $this->objectName;
 
+        $from = '';
+//        if($this->sequence == 'delete')
+//            $from = " from `" . $this->table . "` ";
         // on ".strtolower(get_class($entity)).".id = ".strtolower(get_class($entity_owner)).".".strtolower(get_class($entity))."_id
-        $this->query .= " left join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
+        $this->query .= $from . " left join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
 //        $this->query .= " left join `" . $this->join . "` ";
+        $this->sequence = '';
 
         return $this;
     }
 
-    public function on($entity) {
+    public function on($entity)
+    {
         //" left join `".strtolower(get_class($entity)).
         $this->query .= " on " . $this->join . ".id = " . strtolower(get_class($entity)) . "." . $this->join . "_id";
 
@@ -375,15 +402,16 @@ class QueryBuilder extends \DBAL {
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|array|\Closure  $column
-     * @param  string|null  $operator
-     * @param  mixed   $value
+     * @param  string|array|\Closure $column
+     * @param  string|null $operator
+     * @param  mixed $value
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $link = "where") {
+    public function where($column, $operator = null, $value = null, $link = "where")
+    {
         $this->endquery = "";
 //        if(is_array($critere)){
-//
+//            
 //        }
 //        $this->columns = is_array($columns) ? $columns : func_get_args();
 
@@ -396,31 +424,44 @@ class QueryBuilder extends \DBAL {
             }
 
             if ($column->getId()) {
-                if($operator == "not"){
+                if ($operator == "not") {
                     $this->query .= " != ? ";
-                }else{
+                } else {
                     $this->query .= " = ? ";
                 }
                 $this->parameters[] = $column->getId();
             } else {
                 $this->query .= " is null ";
             }
-        }elseif (is_array($column)) {
-            if(is_array($operator)){
-                for ($index = 0; $index < count($column); $index++){
+        } elseif (is_array($column)) {
+            if (is_array($operator)) {
+                for ($index = 0; $index < count($column); $index++) {
                     $this->andwhere($column[$index], "=", $operator[$index]);
                 }
-            }elseif (is_array($column[0])){
-                foreach ($column as $value){
+            } elseif (is_array($column[0])) {
+                foreach ($column as $value) {
                     $this->andwhere($value[0], $value[1], $value[2]);
                 }
-            }else{
-                foreach ($column as $key => $value){
+            } else {
+                foreach ($column as $key => $value) {
                     $this->andwhere($key, "=", $value);
                 }
             }
         } else {
-            $this->query .= " " . $link . " " . $column;
+            $keymap = explode(".", $column);
+            if(count($keymap) == 2){
+                $this->query .= " " . $link . " " . $column;
+            }else{
+                $keymapattr = explode(" ", $column);
+                if(count($keymapattr) >= 2){
+                    $column = $keymapattr[0];
+                    unset($keymapattr[0]);
+                    $extra = implode(" ", $keymapattr);
+                    $this->query .= " " . $link .' `'.$column."` ".$extra;
+                }else
+                    $this->query .= " " . $link .' `'.$column."` ";
+            }
+            //$this->query .= " " . $link . " " . $column;
             if ($operator) {
                 if (in_array($operator, $this->operators)) {
                     $this->query .= " " . $operator . " ? ";
@@ -439,14 +480,16 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
-    public function andwhere($column, $sign = null, $value = null) {
+    public function andwhere($column, $sign = null, $value = null)
+    {
         if ($this->initwhereclause)
             return $this->where($column, $sign, $value, 'and');
         else
             return $this->where($column, $sign, $value, 'where');
     }
 
-    public function orwhere($column, $sign = null, $value = null) {
+    public function orwhere($column, $sign = null, $value = null)
+    {
 //        return $this->where($column, $sign, $value, 'or');
         if ($this->initwhereclause)
             return $this->where($column, $sign, $value, 'or');
@@ -459,7 +502,8 @@ class QueryBuilder extends \DBAL {
      * @param String|Array $values
      * @return $this
      */
-    public function in($values) {
+    public function in($values)
+    {
         if (is_array($values))
             $this->query .= " in (" . implode(",", $values) . ")";
         else
@@ -468,7 +512,8 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
-    public function notin($values) {
+    public function notin($values)
+    {
         if (is_array($values))
             $this->query .= " not in (" . implode(",", $values) . ")";
         else
@@ -477,7 +522,8 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
-    public function like($value) {
+    public function like($value)
+    {
 //        if (is_array($values))
 //            $this->query .= " LIKE '%" . implode(",", $values) . "%'";
 //        else
@@ -486,32 +532,38 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
-    public function _like($value) {
+    public function _like($value)
+    {
         $this->query .= " LIKE '%" . $value . "' ";
         return $this;
     }
 
-    public function like_($value) {
+    public function like_($value)
+    {
         $this->query .= " LIKE '" . $value . "%' ";
         return $this;
     }
 
-    public function groupby($critere) {
+    public function groupby($critere)
+    {
         $this->query .= " group by " . $critere;
         return $this;
     }
 
-    public function between($value1, $value2) {
-        $this->query .= " BETWEEN '" . $value1 . "' AND '". $value2."'";
+    public function between($value1, $value2)
+    {
+        $this->query .= " BETWEEN '" . $value1 . "' AND '" . $value2 . "'";
         return $this;
     }
 
-    public function orderby($critere) {
+    public function orderby($critere)
+    {
         $this->query .= " order by " . $critere;
         return $this;
     }
 
-    public function limit($start = 1, $max = null) {
+    public function limit($start = 1, $max = null)
+    {
         if ($max)
             $this->query .= " limit " . $start . ", " . $max;
         else
@@ -520,84 +572,99 @@ class QueryBuilder extends \DBAL {
         return $this;
     }
 
-    private function initquery($columns) {
+    private function initquery($columns)
+    {
         return " select " . $columns . " from `" . $this->table . "` ";
     }
 
-    protected function querysanitize($sql) {
-        return str_replace("this.", $this->table.".", $sql);
+    protected function querysanitize($sql)
+    {
+        return str_replace("this.", $this->table . ".", $sql);
     }
 
     /**
      * @param $column
      * @return $this
      */
-    public static function sum($column, $as = "") {
-        if($as)
-            $as = "as ".$as;
+    public static function sum($column, $as = "")
+    {
+        if ($as)
+            $as = "as " . $as;
 
         return " SUM(" . $column . ") $as ";
     }
 
-    public static function avg($column, $as = "") {
-        if($as)
-            $as = "as ".$as;
+    public static function avg($column, $as = "")
+    {
+        if ($as)
+            $as = "as " . $as;
 
         return " AVG(" . $column . ") $as ";
     }
 
-    public static function distinct($column) {
+    public static function distinct($column)
+    {
         return " DISTINCT " . $column . " ";
     }
 
-    public function getSqlQuery() {
+    public function getSqlQuery()
+    {
         if ($this->columns)
             return $this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query . $this->endquery);
         else
             return $this->querysanitize($this->query . $this->endquery);
     }
 
-    public function exec($action = 0) {
-        if(in_array($action, [DBAL::$FETCH, DBAL::$FETCHALL]))
+    public function exec($action = 0)
+    {
+        if (in_array($action, [DBAL::$FETCH, DBAL::$FETCHALL]))
             return $this->executeDbal($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, $action);
 
         return $this->executeDbal($this->querysanitize($this->query . $this->endquery), $this->parameters, $action);
     }
 
-    public function __getFirst($recursif = true) {
+    public function __getFirst($recursif = true)
+    {
         return $this->limit(1)->__getOne($recursif);
     }
 
-    public function __getLast($recursif = true) {
-        return $this->orderby($this->table.".id desc")->limit(1)->__getOne($recursif);
+    public function __getLast($recursif = true)
+    {
+        return $this->orderby($this->table . ".id desc")->limit(1)->__getOne($recursif);
     }
 
-    public function __getIndex($index, $recursif = true) {
-        $i = (int) $index;
+    public function __getIndex($index, $recursif = true)
+    {
+        $i = (int)$index;
         return $this->limit($i - 1, $i)->__getOne($recursif);
     }
 
-    public function __getAllRow($setdefaultjoin = false) {
-        if($setdefaultjoin)
+    public function __getAllRow($setdefaultjoin = false)
+    {
+        if ($setdefaultjoin)
             return $this->__findAllRow($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters);
 
         return $this->__findAllRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
     }
 
-    public function __getAll($recursif = true) {
+    public function __getAll($recursif = true)
+    {
         return $this->__findAll($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
-    public function __getOneRow() {
+    public function __getOneRow()
+    {
         return $this->__findOneRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
     }
 
-    public function __getOne($recursif = true) {
+    public function __getOne($recursif = true)
+    {
         return $this->__findOne($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
-    public function __countEl($recursif = true) {
-        return (float) $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
+    public function __countEl($recursif = true)
+    {
+        return $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
 }

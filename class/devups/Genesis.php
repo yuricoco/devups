@@ -28,9 +28,9 @@ class Genesis {
             if (in_array('create', $rigths)) {
                 if (in_array('create', $_SESSION['action'])){
                     if(!$statefull)
-                        $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                        $top_action .= '<button id="model_new" onclick="model._new()"  class="btn btn-success" ><i class="fa fa-plus"></i> add</button>';
                     else
-                        $top_action .= '<a href="' . $index_ajouter . '" class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                        $top_action .= '<a href="' . $index_ajouter . '" class="btn btn-success" ><i class="fa fa-plus"></i> add</a>';
 
                 }
                 //$top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
@@ -38,9 +38,9 @@ class Genesis {
         }elseif (isset($_SESSION['action'])) {
             if (in_array('create', $_SESSION['action'])){
                 if(!$statefull)
-                    $top_action .= '<a id="model_new" onclick="model._new()"  class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                    $top_action .= '<button id="model_new" onclick="model._new()"  class="btn btn-success" ><i class="fa fa-plus"></i> add</button>';
                 else
-                    $top_action .= '<a href="' . $index_ajouter . '" class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
+                    $top_action .= '<a href="' . $index_ajouter . '" class="btn btn-success" ><i class="fa fa-plus"></i> add</a>';
 
             }
 
@@ -49,7 +49,7 @@ class Genesis {
             }
         }
 
-        $top_action .= '<a href="' . $index_modifier . '" target="_self" class="btn btn-default" ><i class="fa fa-list"></i> Listing</a> .';
+        $top_action .= ' <a href="' . $index_modifier . '" target="_self" class="btn btn-primary" ><i class="fa fa-list"></i> Listing</a> .';
 
         return $top_action;
     }
@@ -97,7 +97,7 @@ class Genesis {
 
     public static function renderView($view, $data = [], $redirect = false) {
 
-        global $views;
+        global $viewdir;
 
         if ($redirect && isset($data['redirect'])) {
             $classroot = Request::classroot("path");
@@ -106,7 +106,7 @@ class Genesis {
 
         $data["__navigation"] = "";//Genesis::top_action($action, $classroot);
 
-        $blade = new Blade([$views, admin_dir . 'views'], admin_dir . "cache");
+        $blade = new Blade($viewdir, admin_dir . "cache");
         echo $blade->view()->make($view, $data)->render();
     }
 

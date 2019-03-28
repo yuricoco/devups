@@ -3,6 +3,7 @@
 require 'header.php';
 
 //instanciation des controllers
+$adminCtrl = new Dvups_adminController();
 
 
 if (isset($_GET['path'])) {
@@ -16,9 +17,16 @@ switch ($path[ENTITY]) {
         Genesis::render("dashboard");
         break;
 
+    case 'connexion':
+        $adminCtrl->connexionAction();
+        break;
+    case 'deconnexion':
+        $adminCtrl->deconnexionAction();
+        break;
+
     default :
         // inclusion du layout du site 
-        include 'web/404.html';
+        Genesis::render("404");
         break;
 }
                         

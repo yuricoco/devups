@@ -16,11 +16,15 @@ $dvups_contentlangCtrl = new Dvups_contentlangController();
 
 switch (Request::get('path')) {
 
+    case 'generalinfo.convertphparraytojson':
+        g::json_encode(GeneralinfoController::parsedatalangphparraytojson());
+        break;
+    case 'generalinfo.save':
+        g::json_encode(GeneralinfoController::savedata());
+        break;
+
     case 'dvups_lang._new':
         g::json_encode(Dvups_langController::renderForm());
-        break;
-    case 'dvups_lang._newtranslation':
-        g::json_encode(Dvups_langController::renderForm(R::get("id")));
         break;
 
     case 'dvups_lang._edit':
@@ -43,9 +47,6 @@ switch (Request::get('path')) {
         g::json_encode($dvups_langCtrl->datatable(R::get('next'), R::get('per_page')));
         break;
 
-    case 'dvups_contentlang._new':
-        g::json_encode(Dvups_contentlangController::renderForm());
-        break;
     case 'dvups_contentlang._new':
         g::json_encode(Dvups_contentlangController::renderForm());
         break;

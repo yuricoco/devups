@@ -27,7 +27,7 @@ switch (Request::get('path')) {
 
     default :
         // inclusion du layout du site 
-        include 'web/404.html';
+        g::render('404');
         break;
 }
                         

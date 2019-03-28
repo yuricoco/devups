@@ -276,7 +276,7 @@ class FormFactory {
         }
 
         $formaction = "";
-        $dvups_form = "<textarea style='display:none' name='dvups_form[".$entitycore->name."]' >".serialize($entitycore->field)."</textarea>";
+        $dvups_form = "<textarea style='display:none' name='dvups_form[".$entitycore->name."]' >".json_encode($entitycore->field)."</textarea>";
 
         if ($entitycore->formaction) {
             $formaction = "<form id='" . $entitycore->name . "-form' action='index.php?path=" . $entitycore->name . "/" . $entitycore->formaction . "'  data-id='".$entitycore->entity->getId()."' enctype='multipart/form-data' method='post' >\n";
@@ -284,20 +284,20 @@ class FormFactory {
 
         $formbutton = "";
         if ($entitycore->formbutton) {
-            $formbutton = "<input class='btn btn-default' type='submit' value='save' /><input class='btn btn-default' type='reset' value='reset' >\n</form>";
+            $formbutton = "<button class='btn btn-success btn-block' type='submit' >Save</button></form>";//<input class='btn btn-light' type='reset' value='reset' >
         }
 
         $formjs = "";
         if (isset($entitycore->addjs) && $entitycore->addjs) {
             foreach ($entitycore->addjs as $js){
-                $formjs .= "<script src='$js' ></script>";
+                $formjs .= "<script src='$js.js' ></script>";
             }
         }
 
         $formcss = "";
         if (isset($entitycore->addcss) && $entitycore->addcss) {
             foreach ($entitycore->addcss as $css){
-                $formcss .= "<link href='$css' rel=\"stylesheet\" />";
+                $formcss .= "<link href='$css.css' rel=\"stylesheet\" />";
             }
         }
 

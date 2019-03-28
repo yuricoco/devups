@@ -40,6 +40,7 @@
                 
         public function jsonSerialize() {
                 return [
+                                'id' => $this->id,
                                 'name' => $this->name,
                 ];
         }

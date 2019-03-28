@@ -1,14 +1,14 @@
 
-
-INSERT INTO `dvups_admin` (`id`, `name`, `login`, `password`) VALUES
-(1, 'admin', 'admin', 'd033e22ae348aeb5660fc2140aec35850c4da997');
-
 --
 -- Déchargement des données de la table `dvups_role`
 --
 
 INSERT INTO `dvups_role` (`id`, `name`, `alias`) VALUES
 (1, 'admin', 'admin');
+
+
+INSERT INTO `dvups_admin` (`id`, `name`, `login`, `password`, dvups_role_id) VALUES
+(1, 'admin', 'dv_admin', 'd033e22ae348aeb5660fc2140aec35850c4da997', 1);
 
 --
 -- Déchargement des données de la table `dvups_module`

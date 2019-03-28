@@ -11,7 +11,8 @@ class Dvups_roleController extends Controller{
 
         $admin->manageentity = [];
         $dvups_navigation = [];
-        foreach ($admin->getDvups_role() as $key => $role) {
+        $role = $admin->getDvups_role();
+        //foreach ($admin->getDvups_role() as $key => $role) {
 
             $role->collectDvups_entity();
             $role->collectDvups_module();
@@ -32,8 +33,8 @@ class Dvups_roleController extends Controller{
                 $right[] = $value->getName();
             }
 
-            break;
-        }
+//            break;
+//        }
 
         $_SESSION['action'] = $right;
         $_SESSION["navigation"] = serialize($dvups_navigation);
@@ -100,11 +101,9 @@ class Dvups_roleController extends Controller{
 
                     $dvups_role = $this->form_generat(new Dvups_role(), $dvups_role_form);
  
-
                     if ( $id = $dvups_role->__insert()) {
                             return 	array(	'success' => true, // pour le restservice
                                             'dvups_role' => $dvups_role,
-                                            'redirect' => 'index', // pour le web service
                                             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
                     } else {
                             return 	array(	'success' => false, // pour le restservice
@@ -119,12 +118,10 @@ class Dvups_roleController extends Controller{
                     extract($_POST);
                         
                     $dvups_role = $this->form_generat(new Dvups_role($id), $dvups_role_form);
-
                     
                     if ($dvups_role->__update()) {
                             return 	array('success' => true, // pour le restservice
                                             'dvups_role' => $dvups_role,
-                                            'redirect' => 'index', // pour le web service
                                             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
                     } else {
                             return 	array('success' => false, // pour le restservice

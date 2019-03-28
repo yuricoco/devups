@@ -2,7 +2,8 @@
 RewriteEngine On
 
 RewriteRule    ^/?$    index.php    [NC,L] 
-RewriteRule    ^/login?$    login.php?    [NC,L] 
+RewriteRule    ^/connexion?$    index.php?path=connexion    [NC,L]
+RewriteRule    ^/login?$    login.php?    [NC,L]
 
 <IfModule mod_headers.c>
     Header always set X-FRAME-OPTIONS "DENY"

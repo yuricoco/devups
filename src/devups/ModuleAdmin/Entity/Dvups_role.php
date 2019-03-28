@@ -128,6 +128,21 @@ class Dvups_role extends Model implements JsonSerializable {
      *  manyToMany
      * 	@return \Dvups_right
      */
+    function setDvups_right($rigth) {
+        $this->dvups_right = $rigth;
+    }
+    function setDvups_module($dvups_module) {
+        $this->dvups_module = $dvups_module;
+    }
+
+    function setDvups_entity($dvups_entity) {
+        $this->dvups_entity = $dvups_entity;
+    }
+
+        /**
+     *  manyToMany
+     * 	@return \Dvups_right
+     */
     function getDvups_right() {
         return $this->dvups_right;
     }

@@ -12,6 +12,11 @@ class Dvups_admin extends Model implements JsonSerializable {
     private $id;
 
     /**
+     * @Column(name="lastlogin_at", type="datetime", nullable=true )
+     * @var string
+     * */
+    private $lastlogin_at;
+    /**
      * @Column(name="name", type="string" , length=255 )
      * @var string
      * */
@@ -29,7 +34,9 @@ class Dvups_admin extends Model implements JsonSerializable {
      * */
     private $password;
 
+
     /**
+     * @ManyToOne(targetEntity="\Dvups_role")
      * @var \Dvups_role
      */
     public $dvups_role;
@@ -83,7 +90,8 @@ class Dvups_admin extends Model implements JsonSerializable {
             $this->id = $id;
         }
 
-        $this->dvups_role = EntityCollection::entity_collection('dvups_role');
+        //$this->dvups_role = EntityCollection::entity_collection('dvups_role');
+        $this->dvups_role = new Dvups_role();
     }
 
     public function getId() {
@@ -92,6 +100,22 @@ class Dvups_admin extends Model implements JsonSerializable {
 
     public function setId($id) {
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLastloginAt()
+    {
+        return $this->lastlogin_at;
+    }
+
+    /**
+     * @param string $lastlogin_at
+     */
+    public function setLastloginAt($lastlogin_at)
+    {
+        $this->lastlogin_at = $lastlogin_at;
     }
 
     function getName() {
@@ -119,6 +143,9 @@ class Dvups_admin extends Model implements JsonSerializable {
 
     public function setPassword($password) {
         $this->password = $password;
+    }
+    function setDvups_role($dvups_role) {
+        $this->dvups_role = $dvups_role;
     }
 
     /**
@@ -151,14 +178,14 @@ class Dvups_admin extends Model implements JsonSerializable {
     }
 
     function callbackbtnAction(){
-        return "<a class='btn btn-default' href='index.php?path=dvups_admin/resetcredential&id=".$this->getId()."'>reset password</a>";
+        return "<a class='btn btn-default' href='dvups-admin/resetcredential&id=".$this->getId()."'>reset password</a>";
     }
 
     public function jsonSerialize() {
         return [
             'login' => $this->login,
             'password' => $this->password,
-            'dvups_role' => $this->dvups_role,
+            //'dvups_role' => $this->dvups_role,
         ];
     }
 

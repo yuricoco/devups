@@ -60,7 +60,49 @@ class Controller {
             'detail' => '');
     }
 
-    private function filter(\stdClass $entity, \QueryBuilder $qb) {
+    /**
+     * @var \QueryBuilder $currentqb
+     */
+    private $currentqb;
+
+    private function filterswicher($opt, $attr, $value)
+    {
+        switch ($opt) {
+            case "eq":
+                $this->currentqb->andwhere($attr, "=", $value);
+                break;
+            case "gt":
+                $this->currentqb->andwhere($attr, ">", $value);
+                break;
+            case "lt":
+                $this->currentqb->andwhere($attr, "<", $value);
+                break;
+            default:
+                $this->currentqb->andwhere($attr)->like($value);
+                break;
+        }
+
+    }
+
+    private function filter(\stdClass $entity, \QueryBuilder $qb)
+    {
+        $this->currentqb = $qb;
+        $getparam = Request::$uri_get_param;
+        foreach ($getparam as $key => $value) {
+            $attr = explode(":", $key);
+            $join = explode("-", $attr[0]);
+            if (isset($join[1])) {
+                $this->filterswicher($attr[1], $join[0] . "." . $join[1], $value);
+            } else if ($this->currentqb->hasrelation && isset($attr[1]))
+                $this->filterswicher($attr[1], get_class($entity) . "." . $join[0], $value);
+            elseif (isset($attr[1]))
+                $this->filterswicher($attr[1], $join[0], $value);
+
+        }
+        return $this->currentqb;
+    }
+
+    private function filterold(\stdClass $entity, \QueryBuilder $qb) {
 
         $fieldarray = explode(",", Request::get('dfilters'));
 
@@ -119,8 +161,8 @@ class Controller {
         if (Request::get("next") && Request::get('per_page'))
             extract(Request::$uri_get_param);
 
-        if($order = Request::get('order')){
-            //$order = $_GET['order'];
+        if(Request::get('order')){
+            $order = Request::get('order');
             if($entity->inrelation())
                 $order = $classname.".".$order;//$_GET['order'];
         }elseif(Request::get('orderjoin'))
@@ -310,7 +352,7 @@ class Controller {
             $entitycore = $entityform::formBuilder($object);
         else {
             $entitycore = new stdClass();
-            $entitycore->field = unserialize($_POST["dvups_form"][strtolower(get_class($object))]);
+            $entitycore->field = json_decode($_POST["dvups_form"][strtolower(get_class($object))], true);
         }
 
         foreach ($entitycore->field as $key => $value) {
