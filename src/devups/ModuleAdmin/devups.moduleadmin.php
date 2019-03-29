@@ -35,6 +35,6 @@
 
 	require 'Entity/Dvups_right_dvups_entity.php';
 
-	require 'Entity/Dvups_role_dvups_admin.php';
+	//require 'Entity/Dvups_role_dvups_admin.php';
 
 	require 'Entity/Dvups_right_dvups_role.php';

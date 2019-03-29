@@ -191,7 +191,7 @@ class Dvups_adminController extends Controller {
         if ($id) {
             $action = "update&id=" . $id;
             $dvups_admin = Dvups_admin::find($id);
-            $dvups_admin->collectDvups_role();
+            //$dvups_admin->collectDvups_role();
         }
 
         return ['success' => true,

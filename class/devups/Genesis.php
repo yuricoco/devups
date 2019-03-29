@@ -18,7 +18,7 @@ class Genesis {
     public static function top_action($action, $statefull = false) {
         $action = strtolower($action);
         $index_ajouter = "index.php?path=$action/_new";
-        $index_modifier = "index.php?path=$action/index";
+        $index_modifier = "index";
 
         $rigths = getadmin()->availableentityright($action);
 

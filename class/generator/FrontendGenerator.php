@@ -18,7 +18,11 @@
 				case 'adminv2':
 					Adminv2::modulelinkGenerator($projet);
 				break;
-				default:
+                case 'adminv3':
+                    Adminv3::modulelinkGenerator($projet);
+                    break;
+                default:
+                    Adminv2::modulelinkGenerator($projet);
 				break;
 			}
 		}
@@ -27,19 +31,23 @@
 			switch($template){
 				case 'egestion':
 					Egestion::layoutGenerator($listentity);
-				break;
+				    break;
 				case 'adminv1':
 					Adminv1::layoutGenerator($listentity);
-				break;
+				    break;
 				case 'adminv2':
 					Adminv2::layoutGenerator($module, $view);
-				break;
-				default:
-				break;
+				    break;
+                case 'adminv3':
+                    Adminv3::layoutGenerator($module, $view);
+                    break;
+                default:
+                    Adminv2::layoutGenerator($module, $view);
+				    break;
 			}
 		}
 			
-		public function viewsGenerator($listemodule, $entity, $template = 'adminv1', $view = ""){
+		public function viewsGenerator($listemodule, $entity, $template = 'adminv2', $view = ""){
 			switch($template){
 				case 'egestion':
 					Egestion::viewsGenerator($listemodule, $entity);
@@ -50,7 +58,11 @@
 				case 'adminv2':
 					Adminv2::viewsGenerator($listemodule, $entity, $view."/");
 				break;
+				case 'adminv3':
+					Adminv3::viewsGenerator($listemodule, $entity, $view."/");
+				break;
 				default:
+                    Adminv2::viewsGenerator($listemodule, $entity, $view."/");
 				break;
 			}
 		}

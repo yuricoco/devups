@@ -15,6 +15,7 @@ class Bugmanager {
     
     static function getError($class, $methode, $line, $error = null, $sql = null, $entity = null, $values = []) {
         $debug = [
+            "success"=> false,
             'class' => $class,
             'methode' => $methode,
             'at line' => $line,
@@ -28,10 +29,11 @@ class Bugmanager {
 //            header("location: /");
 //            die;
 //        }
-        
+        //return $debug;
 //        if(SYSTEM_DEBUG){
-            echo "<pre>";
-            var_dump($debug);
+//        Genesis::json_encode($debug);
+//        die;
+            dv_dump($debug);
 //        }
 //        else{
 //            return json_encode($debug);

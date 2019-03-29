@@ -14,7 +14,7 @@ class Dvups_adminDAO extends DBAL {
         }
     }
 
-    public function selectall(Admin $admin) {
+    public function selectall(DvAdmin $admin) {
         //$query = $this->link->query("select * from Admin WHERE id != ".$admin->getId());
         $array = $query = $this->findAllByCritereDbal("WHERE admin.id != 1 AND admin.id != " . $admin->getId());
         return $array;

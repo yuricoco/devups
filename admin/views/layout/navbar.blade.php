@@ -9,7 +9,7 @@
     </li>
     @foreach ($dvups_navigation as $key => $module)
         <li class="nav-item">
-            <a class="nav-link" data-toggle="collapse" href="#nav-{{$module["module"]->getName()}}" aria-expanded="false" aria-controls="ui-basic">
+            <a class="nav-link" data-toggle="collapse" href="#nav-{{$module["module"]->getName()}}" aria-expanded="false" aria-controls="nav-{{$module["module"]->getName()}}">
                 <i class="mdi mdi-circle-outline menu-icon"></i>
                 <span class="menu-title">{{$module["module"]->getLabel()}}</span>
                 <i class="menu-arrow"></i>

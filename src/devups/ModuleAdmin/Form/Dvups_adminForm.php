@@ -18,13 +18,13 @@ class Dvups_adminForm extends FormManager
             "value" => $dvups_admin->getName(),
         ];
 
-//        $entitycore->field['dvups_role'] = [
-//            "type" => FORMTYPE_RADIO,
-//            "value" => $dvups_admin->dvups_role->getId(),
-//            //"values" => FormManager::Options_Helper('name', $dvups_admin->getDvups_role()),
-//            "label" => 'Dvups_role',
-//            "options" => FormManager::Options_Helper('name', Dvups_role::allrows()),
-//        ];
+        $entitycore->field['dvups_role'] = [
+            "type" => FORMTYPE_RADIO,
+            "value" => $dvups_admin->dvups_role->getId(),
+            //"values" => FormManager::Options_Helper('name', $dvups_admin->getDvups_role()),
+            "label" => 'Dvups_role',
+            "options" => FormManager::Options_Helper('name', Dvups_role::allrows()),
+        ];
 
         //if($dvups_admin->getId())
         $entitycore->addDformjs();

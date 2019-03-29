@@ -66,7 +66,7 @@ var model = {
                 callback(response);
 
         }, 'json').fail (function(resultat, statut, erreur){
-            console.log(statut, erreur);
+            console.log(resultat);
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
 

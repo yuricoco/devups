@@ -237,8 +237,7 @@ class Datatable {
             $this->openform = '<form id="datatable-form" action="#" method="get" >';
             $this->closeform = '</form>';
         }
-        $html = '
-    <div class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">';
+        $html = '';//<div class="dataTables_wrapper container-fluid dt-bootstrap4 no-footer">
 
         $html .= '
     <style>
@@ -293,7 +292,7 @@ class Datatable {
         if($this->paginationenabled)
             $html .= $this->paginationbuilder();
 
-        $html .= "</div>";//$this->closeform.
+        $html .= "";//</div> $this->closeform.
 
         return  $html;
     }

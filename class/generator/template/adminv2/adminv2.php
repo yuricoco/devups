@@ -1,6 +1,6 @@
 <?php
 
-class Adminv2 {
+class Adminv2 extends DvAdmin {
 
     private $traitement;
 
@@ -79,75 +79,8 @@ class Adminv2 {
     static function viewsGenerator($listemodule, $entity, $_dir) {
 
         $name = strtolower($entity->name);
-        $traitement = new Traitement();
-        $listview = [];
 
-        $key = 0;
-        if (isset($entity->attribut[1])) {
-            $key = 1;
-        }
-
-        foreach ($entity->attribut as $attribut) {
-            if ($attribut->formtype == 'image') {
-//                $listview[] = "'src:" . $attribut->name . "'";
-                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => 'src:" . $attribut->name . "']";
-//                        }elseif($entity->attribut[$i]->formtype == 'document'){
-//                        }elseif($entity->attribut[$i]->formtype == 'document'){
-//                        }elseif($entity->attribut[$i]->formtype == 'document'){
-                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
-            } else {
-                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
-//                $listview[] = "'" . $attribut->name . "'";
-            }
-        }
-
-        if (!empty($entity->relation)) {
-            foreach ($entity->relation as $relation) {
-
-                if ($relation->cardinality == 'manyToMany')
-                    break;
-
-                $entitylink = $traitement->relation($listemodule, $relation->entity);
-                $entrel = ucfirst(strtolower($relation->entity));
-                $key = 0;
-                $entitylinkattrname = "id";
-                $entitylink->attribut = (array) $entitylink->attribut;
-                if (isset($entitylink->attribut[1])) {
-                    $key = 1;
-                    $entitylinkattrname = $entitylink->attribut[$key]->name;
-                }
-
-                $listview[] = "\n['header' => '" . $entrel . "', 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
-            }
-        }
-
-        $index = "
-        <div class=\"col-lg-12 col-md-12\">
-                
-                    <?= \DClass\devups\Datatable::buildtable($" . "lazyloading, [" . implode(', ', $listview) . "\n])
-                    ->render(); ?>
-
-        </div>
-			";
-
-       /* $show = "
-                    <div class=\"col-lg-12 col-md-12\">
-                    
-			<?php " . ucfirst($name) . "Form::__renderDetailWidget($" . $name . "); ?>
-			
-	<div class=\"form-group text-center\">
-		<?php //echo Genesis::actionListView(\"" . $name . "\", $" . $name . "->getId()); ?>
-	</div>
-	
-	</div>
-					";
-
-        $new_edit = "
-                    <div class=\"col-lg-12\" >
-
-                                    <?= " . ucfirst($name) . "Form::__renderForm($" . $name . ", $" . "action_form, true); ?>
-
-                        </div>";*/
+        $index = self::buildindexdatatable($listemodule, $entity);
 
         //---------------------------------- $head.
         $layout = "
@@ -182,7 +115,12 @@ class Adminv2 {
 <hr>
 
 <div class=\"row\">
+        <div class=\"col-lg-12 col-md-12\">
+        
+    <div class=\"dataTables_wrapper container-fluid dt-bootstrap4 no-footer\">
     " . $index . "
+        </div>
+        </div>
 </div>
         
 <div class=\"modal fade\" id=\"" . $name . "modal\" tabindex=\"-1\" role=\"dialog\"
@@ -212,7 +150,7 @@ class Adminv2 {
 
 <script src=\"<?= CLASSJS ?>model.js\"></script>
 <script src=\"<?= CLASSJS ?>ddatatable.js\"></script>
-<script src=\"Ressource/js/" . $name . "Ctrl.js\"></script>
+<script src=\"<?= " . ucfirst($name) . "::classpath('Ressource/js/" . $name . "Ctrl.js') ?>\"></script>
 
 <?php } ?>
 @section('jsimport')

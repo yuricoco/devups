@@ -42,20 +42,20 @@ abstract class Model extends \stdClass {
      * static method gives the path of the module where the entity is/
      * @return string the path of the module where the class is.
      */
-    public static function classpath(){
+    public static function classpath($src = "", $route = __env){
         $reflector = new ReflectionClass(get_called_class());
         $fn = $reflector->getFileName();
         $dirname = explode("src", dirname($fn));
         $dirname = str_replace("Entity", "", $dirname[1]);
-        return "src".$dirname;
+        return $route."src".$dirname.$src;
     }
 
-    public static function classroot(){
+    public static function classroot($src){
         $reflector = new ReflectionClass(get_called_class());
         $fn = $reflector->getFileName();
         $dirname = explode("src", dirname($fn));
         $dirname = str_replace("Entity", "", $dirname[1]);
-        return __env."src".$dirname."/index.php?path=".strtolower(get_called_class())."/";
+        return ROOT."src".$dirname.$src;
     }
 
     /**

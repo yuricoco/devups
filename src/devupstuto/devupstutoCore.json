@@ -1,6 +1,6 @@
 {
   "name": "devupstuto",
-  "template": "adminv2",
+  "template": "adminv3",
   "listmodule": [
     {
       "name": "ModuleStock",

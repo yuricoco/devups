@@ -71,11 +71,11 @@ class Form extends FormFactory{
     }
 
     public static function addjs($js){
-            return "<script src='".$js."' ></script>";
+            return "<script src='".$js.".js' ></script>";
     }
 
     public static function addcss($css){
-        return "<link href='$css' rel=\"stylesheet\" />";
+        return "<link href='$css.css' rel=\"stylesheet\" />";
     }
 
     public static function submit($name = "submit", $directive = []) {

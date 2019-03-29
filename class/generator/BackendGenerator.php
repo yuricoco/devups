@@ -702,7 +702,7 @@ class " . ucfirst($name) . "Controller extends Controller{
             " . $field . "
             
             $" . "entitycore->addDformjs($" . "action);
-            $" . "entitycore->addjs('Ressource/js/".$name."Form.js');
+            $" . "entitycore->addjs(" . ucfirst($name) . "::classpath('Ressource/js/".$name."Form'));
             
             return $" . "entitycore;
         }
@@ -712,11 +712,11 @@ class " . ucfirst($name) . "Controller extends Controller{
         }
         
         public static function __renderFormWidget(\\" . ucfirst($name) . " $" . $name . ", $" . "action_form = null) {
-            include ROOT." . ucfirst($name) . "::classpath().\"Form/" . ucfirst($name) . "FormWidget.php\";
+            include " . ucfirst($name) . "::classroot(\"Form/" . ucfirst($name) . "FormWidget.php\");
         }
 
         public static function __renderDetailWidget(\\" . ucfirst($name) . " $" . $name . "){
-            include ROOT . " . ucfirst($name) . "::classpath() . \"Form/" . ucfirst($name) . "DetailWidget.php\";
+            include " . ucfirst($name) . "::classroot(\"Form/" . ucfirst($name) . "DetailWidget.php\");
         }
     }
     ";
@@ -920,7 +920,7 @@ class " . ucfirst($name) . "Controller extends Controller{
         $field = $this->formwidget($entity, $listmodule);
 
         $contenu = "
-    <?php //Form::addcss('Ressource/js/".$name.".css') ?>
+    <?php //Form::addcss(' . ucfirst($name) . '::classpath('Ressource/js/".$name."')) ?>
     
     <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action_form\", \"method\"=> \"post\"]) ?>
 
@@ -931,7 +931,7 @@ class " . ucfirst($name) . "Controller extends Controller{
     <?= Form::close() ?>
     
     <?= Form::addDformjs() ?>    
-    <?= Form::addjs('Ressource/js/".$name."Form.js') ?>
+    <?= Form::addjs(' . ucfirst($name) . '::classpath('Ressource/js/".$name."Form')) ?>
     ";
 
         $entityform = fopen('Form/' . ucfirst($name) . 'FormWidget.php', 'w');

@@ -19,7 +19,7 @@
 
             
             $entitycore->addDformjs($action);
-            //$entitycore->addjs('Ressource/js/storageForm.js');
+            $entitycore->addjs(Storage::classpath('Ressource/js/storageForm'));
             
             return $entitycore;
         }
@@ -29,11 +29,11 @@
         }
         
         public static function __renderFormWidget(\Storage $storage, $action_form = null) {
-            include ROOT.Storage::classpath()."Form/StorageFormWidget.php";
+            include Storage::classroot("Form/StorageFormWidget.php");
         }
 
         public static function __renderDetailWidget(\Storage $storage){
-            include ROOT . Storage::classpath() . "Form/StorageDetailWidget.php";
+            include Storage::classroot("Form/StorageDetailWidget.php");
         }
     }
     
