@@ -3,8 +3,8 @@
 
 require '../../../admin/header.php';
 
-global $views;
-$views = __DIR__ . '/Ressource/views';
+global $viewdir;
+$viewdir[] = __DIR__ . '/Ressource/views';
 
 
 define('CHEMINMODULE', ' <a href="index.php" target="_self" class="titre_module">Administration du system global</a> &gt; <a href="index.php?path=layout" target="_self" class="titre_module">Module ModuleTranslate</a> ');

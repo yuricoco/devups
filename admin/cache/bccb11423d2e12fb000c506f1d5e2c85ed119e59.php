@@ -21,6 +21,11 @@
 
     <?php echo $__env->yieldSection(); ?>
 
+    <script >
+        var __env = '<?= __env ?>';
+        var __lang = '<?= __lang ?>';
+        var translate = <?= json_encode(translatecollection()) ?>;
+    </script>
 </head>
 
 <body>

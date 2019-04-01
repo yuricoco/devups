@@ -30,7 +30,10 @@ class GeneralinfoController
         $content = file_get_contents(self::$path);
         $info = json_decode($content, true);
 
-        return ["info" => $info];
+        return [
+            "admin" => getadmin(),
+            "info" => $info
+        ];
     }
 
     public static function savedata()

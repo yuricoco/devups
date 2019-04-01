@@ -3,7 +3,7 @@
 model.convertphparraytojson =  function (el) {
 
     if(!confirm("This action will overwrite the whole file of lang! \n\nContinue?")) return false;
-
+    model.baseurl = __env+"src/devups/ModuleTranslate/services.php";
     model.entity = "generalinfo";
     model._get("convertphparraytojson", function (response) {
         console.log(response);
@@ -19,6 +19,8 @@ model.saveinfo =  function (el) {
 
     var fd = new FormData();
     fd.append("content", JSON.stringify(model.formentity))
+
+    model.baseurl = __env+"src/devups/ModuleTranslate/services.php";
     model.entity = "generalinfo";
     model._post("save", fd, function (response) {
         console.log(response);

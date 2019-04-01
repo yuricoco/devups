@@ -19,13 +19,7 @@
     </style>
 
     <div class="row">
-        <div class="col-lg-12">
-            <ol class="breadcrumb">
-                <li class="active">
-                    <i class="fa fa-dashboard"></i> <?php echo CHEMINMODULE; ?> > Liste
-                </li>
-            </ol>
-        </div>
+
         <div class="col-lg-12">
             <div class="row">
                 <div class="col-lg-3 ">
@@ -39,7 +33,7 @@
                         </div>
                     </div>
                 </div>
-                <div class=" col-md-offset-6 col-lg-3">
+                <div class=" col-md-6 col-lg-9 text-right">
                     <?php if($admin->getLogin() == "admin" ){ ?>
                         <label class="btn btn-info" onclick="model.convertphparraytojson(this)" >Convert phparray to json</label>
                     <?php } ?>
@@ -47,7 +41,7 @@
             </div>
         </div>
     </div>
-
+<hr>
     <div class="row">
 
         <div class="col-lg-12 col-md-12">
@@ -100,7 +94,7 @@
 
 <script src="<?= CLASSJS ?>model.js"></script>
 <script src="<?= CLASSJS ?>ddatatable.js"></script>
-<script src="Ressource/js/generalinfoCtrl.js"></script>
+<script src="<?= Generalinfo::classpath('Ressource/js/generalinfoCtrl.js') ?>"></script>
 
 <?php } ?>
 @section('jsimport')

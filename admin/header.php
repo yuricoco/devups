@@ -8,7 +8,7 @@
  */
 require __DIR__ . '/../header.php';
 define('VENDOR', __env. 'admin/vendors/');
-define('assets', __env. 'admin/');
+define('assets', __env. 'admin/assets/');
 
 
 // move comment scope to enable authentication 
