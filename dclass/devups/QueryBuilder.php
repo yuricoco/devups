@@ -497,6 +497,15 @@ class QueryBuilder extends \DBAL
             return $this->where($column, $sign, $value, 'where');
     }
 
+    public function orwhere_str($column, $sign = null, $value = null)
+    {
+//        return $this->where($column, $sign, $value, 'or');
+        if ($this->initwhereclause)
+            return $this->where_str($column, $sign, $value, 'or');
+        else
+            return $this->where_str($column, $sign, $value, 'where');
+    }
+
     public function where_str($constraint, $link = "where")
     {
         $this->query .= " " . $link . " " . $constraint;
@@ -619,9 +628,11 @@ class QueryBuilder extends \DBAL
     public function getSqlQuery()
     {
         if ($this->columns)
-            return $this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query . $this->endquery);
+            $sql = $this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query . $this->endquery);
         else
-            return $this->querysanitize($this->query . $this->endquery);
+            $sql = $this->querysanitize($this->query . $this->endquery);
+
+        return ["sql" => $sql, "parameters" => $this->parameters];
     }
 
     public function exec($action = 0)

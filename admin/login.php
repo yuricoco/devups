@@ -1,6 +1,8 @@
 <?php
 
 require '../config/constante.php';
+define('VENDOR', __env. 'admin/vendors/');
+define('assets', __env. 'admin/assets/');
 
 $action = 'index.php?path=connexion';
 
@@ -21,9 +23,9 @@ $action = 'index.php?path=connexion';
     <!-- plugin css for this page -->
     <!-- End plugin css for this page -->
     <!-- inject:css -->
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="<?= assets; ?>css/style.css">
     <!-- endinject -->
-    <link rel="shortcut icon" href="images/favicon.png" />
+    <link rel="shortcut icon" href="<?= assets; ?>images/favicon.png" />
 </head>
 
 <body>
@@ -34,7 +36,7 @@ $action = 'index.php?path=connexion';
                 <div class="col-lg-6 d-flex align-items-center justify-content-center">
                     <div class="auth-form-transparent text-left p-3">
                         <div class="brand-logo">
-                            <img src="images/logo.svg" alt="logo">
+                            <img src="<?= assets; ?>images/logo.svg" alt="logo">
                         </div>
                         <h4>Welcome back!</h4>
                         <h6 class="font-weight-light">Happy to see you again!</h6>
@@ -84,9 +86,9 @@ $action = 'index.php?path=connexion';
 <script src="vendors/base/vendor.bundle.base.js"></script>
 <!-- endinject -->
 <!-- inject:js -->
-<script src="js/off-canvas.js"></script>
-<script src="js/hoverable-collapse.js"></script>
-<script src="js/template.js"></script>
+<script src="<?= assets; ?>js/off-canvas.js"></script>
+<script src="<?= assets; ?>js/hoverable-collapse.js"></script>
+<script src="<?= assets; ?>js/template.js"></script>
 <!-- endinject -->
 </body>
 

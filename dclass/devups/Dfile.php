@@ -21,6 +21,7 @@ class Dfile {
     private $compressionquality = 80;
     private $file_name = "";
     private $constraintfiletype = null;
+    private $type;
 
 
     public static function fileadapter($url, $name = "", $imgdir = ["style" => "max-width : 100%; max-height: 200px"]){
@@ -120,6 +121,15 @@ class Dfile {
     }
 
     private static function chdirectory($filepath) {
+//	if(file_exists(UPLOAD_RESSOURCE2.$filepath))
+//            return UPLOAD_RESSOURCE2.$filepath;
+        if (!file_exists(UPLOAD_DIR . $filepath))
+            mkdir(UPLOAD_DIR . $filepath, 0777, true);
+
+        return UPLOAD_DIR . $filepath;
+    }
+
+    public static function makedir($filepath) {
 //	if(file_exists(UPLOAD_RESSOURCE2.$filepath))
 //            return UPLOAD_RESSOURCE2.$filepath;
         if (!file_exists(UPLOAD_DIR . $filepath))
@@ -514,15 +524,19 @@ class Dfile {
         }
     }
 
-    public static function show($image, $path = '', $default = 'no_image.jpg') {
+    public static function show($image, $path = '', $default = 'no_image.jpg', $hidesrc = false) {
 
         $path = self::filepath($path);
 //        $ext = $up->getextension($image);
 //        if (in_array($ext, self::$EXTENSION_IMAGE)){
 //
 //        }
-        if ($image && file_exists(UPLOAD_DIR . $path . $image))
-            $image = SRC_FILE . $path . $image;
+        if ($image && file_exists(UPLOAD_DIR . $path . $image)){
+            if($hidesrc)
+                $image = __env."web/fileheader.php?src=" . $path . $image;
+            else
+                $image = SRC_FILE . $path . $image;
+        }
         else
             $image = d_assets($default);
 

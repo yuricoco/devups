@@ -94,7 +94,7 @@ class DBAL extends Database {
 
         $global_navigation = Core::buildOriginCore();
         $enittyfoldes = [];
-        $enittyfoldes[] = ROOT . "class/extends";
+        $enittyfoldes[] = ROOT . "dclass/extends";
 
         foreach ($global_navigation as $key => $project) {
             if (is_object($project)) {

@@ -13,6 +13,7 @@
  */
 abstract class Model extends \stdClass {
 
+    public static $jsonmodel;
     public $dvfetched = false;
     public $dvinrelation = false;
 

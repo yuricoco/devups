@@ -680,7 +680,7 @@ class UploadFile extends stdClass {
 //            elseif($image && file_exists($path.$image))
 //                    $image = $path.$image;
         else
-            $image = DEFAULT_FILE . $default;
+            $image = SRC_FILE . $default;
 
         return $image;
     }

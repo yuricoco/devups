@@ -6,7 +6,13 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-require __DIR__ . '/../header.php';
+
+session_start();
+
+require __DIR__.'/../config/dependanceInjection.php';
+require __DIR__.'/../lang.php';
+require __DIR__.'/../src/requires.php';
+
 define('VENDOR', __env. 'admin/vendors/');
 define('assets', __env. 'admin/assets/');
 

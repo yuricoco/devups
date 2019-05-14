@@ -71,4 +71,10 @@ class Request {
         Request::$uri_get_param[$key] = $value;
     }
 
+    public static function geturi()
+    {
+        $uri = $_SERVER["REQUEST_URI"];
+        return str_replace(__base_dir, "", $uri);
+    }
+
 }

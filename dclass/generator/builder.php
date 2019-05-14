@@ -170,7 +170,7 @@ if (isset($argv[2])) {
             $dvupsadminsql = file_get_contents($path);
             $rqg->executeDbal($dvupsadminsql);
             
-            echo "\n\n > Set the master admin.\n\nData master admin initialized with success.\ncredential\nlogin: admin\npassword: admin\n\nYour project is ready to use. Do your best :)";
+            echo "\n\n > Set the master admin.\n\nData master admin initialized with success.\ncredential\nlogin: dv_admin\npassword: admin\n\nYour project is ready to use. Do your best :)";
             break;
 
         case 'database:create':

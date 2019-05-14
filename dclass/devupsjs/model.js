@@ -19,6 +19,19 @@ var databinding = {
 var model = {
     baseredirect : "index.php",
     baseurl : "services.php",
+
+    url: function (route, parameter) {
+        var getAttr = "";
+        if (parameter) {
+            var keys = Object.keys(parameter);
+            var values = Object.values(parameter);
+            for (var i = 0; i < keys.length; i++) {
+                getAttr += "&" + keys[i] + "=" + values[i];
+            }
+        }
+
+        return this.baseurl + "?path=" + route + getAttr;
+    },
     _showmodal: function(){
         //set content loader
         model.modalbody.html('<div style="height: 150px; text-align: center; padding: 5%">Loading ...</div>');
@@ -200,6 +213,9 @@ var model = {
     },
     getformvalue: function (field) {
         return this.formentity[this.entity+"_form["+field+"]"];
+    },
+    getformfield: function (field) {
+        return $("input[name='"+this.entity+"_form["+field+"]']");
     },
     init: function () {
 

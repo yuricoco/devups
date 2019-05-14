@@ -243,13 +243,13 @@ class Controller {
         return array('success' => true, // pour le restservice
             'classname' => $classname,
             'listEntity' => $listEntity,
-            'nb_element' => $nb_element,
+            'nb_element' => (int) $nb_element,
             'per_page' => $per_page,
             'pagination' => $pagination,
             'current_page' => $page,
             'next' => $next + 1,
-            'previous' => $page - 1,
-            'remain' => $remain,
+            'previous' => (int) $page - 1,
+            'remain' => (int) $remain,
             'detail' => '');
     }
 
@@ -309,22 +309,22 @@ class Controller {
      * @return type
      * @throws InvalidArgumentException
      */
-    public function form_generat($object, $data = null, $entityform = null) {
-        return $this->form_fillingentity($object, $data, $entityform);
+    public function form_generat($object, $data = null, $entityform = null, $deeper = false) {
+        return $this->form_fillingentity($object, $data, $entityform, $deeper);
     }
 
-    public function form_fillingentity($object, $data = null, $entityform = null) {
+    public function form_fillingentity($object, $data = null, $entityform = null, $deeper = false) {
         if (!is_object($object))
             throw new InvalidArgumentException('$object must be an object.');
 
         if(!$data)
-            return $object;
+            return $object->__show($deeper);
 
         global $_ENTITY_FORM;
         $_ENTITY_FORM = $data;
 
         if ($object->getId()) {
-            $object = $object->__show(false);
+            $object = $object->__show($deeper);
         }
 
 //            if($jsondata){
@@ -422,7 +422,9 @@ class Controller {
                         elseif($error = call_user_func(array($object, $currentfieldsetter), $toadd))
                             $this->error[$key] = $error;
 
-                    } else if (isset($value['options']) && !isset($value['arrayoptions']) && class_exists($key)) {// && is_object ($value['options'][0])
+                    }
+                    else
+                        if (isset($value['options']) && !isset($value['arrayoptions']) && class_exists($key)) {// && is_object ($value['options'][0])
                         $reflect = new ReflectionClass($key);
                         $value2 = $reflect->newInstance();
 

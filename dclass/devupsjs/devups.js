@@ -1,6 +1,6 @@
 var devups = {
 
-    upload: function  (file, url, onprogress, onload, oncomplete, _datatype, _postname) {
+    upload: function  (file, url, onprogress, onload, oncomplete, _datatype, _postname, form) {
 
         if(!_postname)
             _postname = "file";
@@ -31,7 +31,10 @@ var devups = {
                     oncomplete(xhr.response)
             }
         };
-        var form = new FormData();
+
+        if(!form )
+            form = new FormData();
+
         form.append(_postname, file);
         xhr.send(form);
     },
@@ -56,6 +59,20 @@ var devups = {
         } else {
             return [];
         }
+    },
+    escapeHtml: function (text) {
+        var map = {
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+            '"': '&quot;',
+            "'": '&#039;',
+            '↵': '<br>'
+        };
+        if (text)
+            return text.replace(/↵[&<>"']/g, function (m) {
+                return map[m];
+            });
     },
     round: function(variable){
         return Math.round(variable*100)/100;

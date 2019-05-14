@@ -78,10 +78,12 @@ Usage:
     private static function findmodule($project, $search) {
         $modulecore = null;
         foreach ($project->listmodule as $module) {
-            $modules[] = $module->name;
-            if ($module->name == $search) {
-                $modulecore = $module;
-                break;
+            if(is_object($module)){
+                $modules[] = $module->name;
+                if ($module->name == $search) {
+                    $modulecore = $module;
+                    break;
+                }
             }
             // generator::module();
         }
@@ -182,6 +184,19 @@ Usage:
         
         __Generator::moduleendless(__Generator::$projectcore, $module, $module->listentity, true);
         
+    }
+    /**
+     *
+     * @param type $namespace
+     */
+    public static function __index($project, $namespace) {
+
+       $ns = str_replace("\\", "/", $namespace);
+        $mn = explode("/", $ns);
+        $module = __Generator::findmodule($project, $mn[1]);
+
+        __Generator::index($module, $module->listentity);
+
     }
 
     /**
@@ -359,7 +374,6 @@ Usage:
 
         $backend = new BackendGenerator();
         $frontend = new AdminTemplateGenerator();
-        $rootgenerate = new RootGenerator();
 
 //        $entity = Core::findentitycore($ns[0].'/'.$ns[1].'/Core/'.$ns[0].'.json');
 
@@ -394,9 +408,6 @@ Usage:
 
         if (isset($crud['detailwidget']) && $crud['detailwidget'])
             $backend->detailWidgetGenerator($entity, $project->listmodule);
-
-//        if ($crud['genes'])
-//            $rootgenerate->entityRooting($entity);
 
         if ($crud['views']) {
             self::ressources($entity, $frontend);

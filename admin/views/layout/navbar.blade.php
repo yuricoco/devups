@@ -17,7 +17,7 @@
             <div class="collapse" id="nav-{{$module["module"]->getName()}}">
                 <ul class="nav flex-column sub-menu">
                     @foreach ($module["entities"] as $entity)
-                    <li class="nav-item"> <a class="nav-link" href="<?= path( 'src/'. strtolower($module["module"]->getProject()) .'/'. $module["module"]->getName() . '/' . $entity->getUrl() .'/index') ?>"><?= $entity->getLabel() ?> | gérer <span class="fa fa-angle-right"></span></a></li>
+                    <li class="nav-item"> <a class="nav-link" href="<?= path( 'src/'. strtolower($module["module"]->getProject()) .'/'. $module["module"]->getName() . '/' . $entity->getUrl() .'/index') ?>"><?= $entity->getLabel() ?> | manage <span class="fa fa-angle-right"></span></a></li>
                     @endforeach
                 </ul>
             </div>

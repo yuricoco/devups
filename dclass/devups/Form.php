@@ -71,11 +71,11 @@ class Form extends FormFactory{
     }
 
     public static function addjs($js){
-            return "<script src='".$js.".js' ></script>";
+            return "<script src='".$js.".js?v="._jsversion."' ></script>";
     }
 
     public static function addcss($css){
-        return "<link href='$css.css' rel=\"stylesheet\" />";
+        return "<link href='$css.css?v="._cssversion."' rel='stylesheet' />";
     }
 
     public static function submit($name = "submit", $directive = []) {
@@ -211,6 +211,14 @@ class Form extends FormFactory{
         
         return Form::__input("", $field, Form::serialysedirective($directive));
         
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function number($name, $value, $directive = [], $setter = "")
+    {
+        return self::input($name, $value, $directive, FORMTYPE_NUMBER, $setter);
     }
     
     public static function email($name, $value, $directive = [], $setter = "") {

@@ -55,6 +55,11 @@ class Genesis {
     }
 
     public static function json_encode($value, $options = 0, $depth = 512) {
+        global $_start;
+        if(is_array($value)){
+            $_end = microtime(true);
+            $value["exectime"] = $_end - $_start;
+        }
         echo json_encode($value, $options, $depth);
     }
 
