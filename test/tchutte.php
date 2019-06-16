@@ -12,7 +12,7 @@ require '../header.php';
 /**
  * insertion
  */
-//$storage = new Storage();
+$storage = new Storage();
 //$storage->town = "edea";
 //$storage->__insert();
 /**

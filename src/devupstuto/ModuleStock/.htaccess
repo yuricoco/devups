@@ -1,0 +1,12 @@
+
+
+RewriteEngine On
+
+RewriteRule    ^/?$    index.php    [NC,L]
+RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]    # Process all products
+RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC,L]    # Process all products
+
+<IfModule mod_headers.c>
+    Header always set X-FRAME-OPTIONS "DENY"
+</IfModule>
+                

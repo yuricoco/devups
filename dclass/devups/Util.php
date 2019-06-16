@@ -34,4 +34,9 @@ class Util
         return unserialize($_SESSION[USERLOCATION]);
     }
 
+    public static function dateiso($creationdate)
+    {
+        return date("Y-m-d H:i:s", strtotime($creationdate));
+    }
+
 }

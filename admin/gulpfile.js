@@ -1,181 +1,123 @@
-'use strict'
-
 var gulp = require('gulp');
+var less = require('gulp-less');
 var browserSync = require('browser-sync').create();
-var sass = require('gulp-sass');
-var rename = require('gulp-rename');
-var del = require('del');
-var runSequence = require('run-sequence');
-var replace = require('gulp-replace');
-var injectPartials = require('gulp-inject-partials');
-var inject = require('gulp-inject');
-var sourcemaps = require('gulp-sourcemaps');
-var concat = require('gulp-concat');
-var merge = require('merge-stream');
+var header = require('gulp-header');
+var cleanCSS = require('gulp-clean-css');
+var rename = require("gulp-rename");
+var uglify = require('gulp-uglify');
+var pkg = require('./package.json');
 
-gulp.paths = {
-    dist: 'dist',
-};
+// Set the banner content
+var banner = ['/*!\n',
+    ' * Start Bootstrap - <%= pkg.title %> v<%= pkg.version %> (<%= pkg.homepage %>)\n',
+    ' * Copyright 2013-' + (new Date()).getFullYear(), ' <%= pkg.author %>\n',
+    ' * Licensed under <%= pkg.license.type %> (<%= pkg.license.url %>)\n',
+    ' */\n',
+    ''
+].join('');
 
-var paths = gulp.paths;
+// Compile LESS files from /less into /css
+gulp.task('less', function() {
+    return gulp.src('less/sb-admin-2.less')
+        .pipe(less())
+        .pipe(header(banner, { pkg: pkg }))
+        .pipe(gulp.dest('dist/css'))
+        .pipe(browserSync.reload({
+            stream: true
+        }))
+});
 
+// Minify compiled CSS
+gulp.task('minify-css', ['less'], function() {
+    return gulp.src('dist/css/sb-admin-2.css')
+        .pipe(cleanCSS({ compatibility: 'ie8' }))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest('dist/css'))
+        .pipe(browserSync.reload({
+            stream: true
+        }))
+});
 
+// Copy JS to dist
+gulp.task('js', function() {
+    return gulp.src(['js/sb-admin-2.js'])
+        .pipe(header(banner, { pkg: pkg }))
+        .pipe(gulp.dest('dist/js'))
+        .pipe(browserSync.reload({
+            stream: true
+        }))
+})
 
-// Static Server + watching scss/html files
-gulp.task('serve', ['sass'], function() {
+// Minify JS
+gulp.task('minify-js', ['js'], function() {
+    return gulp.src('js/sb-admin-2.js')
+        .pipe(uglify())
+        .pipe(header(banner, { pkg: pkg }))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest('dist/js'))
+        .pipe(browserSync.reload({
+            stream: true
+        }))
+});
 
+// Copy vendor libraries from /bower_components into /vendor
+gulp.task('copy', function() {
+    gulp.src(['bower_components/bootstrap/dist/**/*', '!**/npm.js', '!**/bootstrap-theme.*', '!**/*.map'])
+        .pipe(gulp.dest('vendor/bootstrap'))
+
+    gulp.src(['bower_components/bootstrap-social/*.css', 'bower_components/bootstrap-social/*.less', 'bower_components/bootstrap-social/*.scss'])
+        .pipe(gulp.dest('vendor/bootstrap-social'))
+
+    gulp.src(['bower_components/datatables/media/**/*'])
+        .pipe(gulp.dest('vendor/datatables'))
+
+    gulp.src(['bower_components/datatables-plugins/integration/bootstrap/3/*'])
+        .pipe(gulp.dest('vendor/datatables-plugins'))
+
+    gulp.src(['bower_components/datatables-responsive/css/*', 'bower_components/datatables-responsive/js/*'])
+        .pipe(gulp.dest('vendor/datatables-responsive'))
+
+    gulp.src(['bower_components/flot/*.js'])
+        .pipe(gulp.dest('vendor/flot'))
+
+    gulp.src(['bower_components/flot.tooltip/js/*.js'])
+        .pipe(gulp.dest('vendor/flot-tooltip'))
+
+    gulp.src(['bower_components/font-awesome/**/*', '!bower_components/font-awesome/*.json', '!bower_components/font-awesome/.*'])
+        .pipe(gulp.dest('vendor/font-awesome'))
+
+    gulp.src(['bower_components/jquery/dist/jquery.js', 'bower_components/jquery/dist/jquery.min.js'])
+        .pipe(gulp.dest('vendor/jquery'))
+
+    gulp.src(['bower_components/metisMenu/dist/*'])
+        .pipe(gulp.dest('vendor/metisMenu'))
+
+    gulp.src(['bower_components/morrisjs/*.js', 'bower_components/morrisjs/*.css', '!bower_components/morrisjs/Gruntfile.js'])
+        .pipe(gulp.dest('vendor/morrisjs'))
+
+    gulp.src(['bower_components/raphael/raphael.js', 'bower_components/raphael/raphael.min.js'])
+        .pipe(gulp.dest('vendor/raphael'))
+
+})
+
+// Run everything
+gulp.task('default', ['minify-css', 'minify-js', 'copy']);
+
+// Configure the browserSync task
+gulp.task('browserSync', function() {
     browserSync.init({
-        port: 3000,
-        server: "./",
-        ghostMode: false,
-        notify: false
-    });
+        server: {
+            baseDir: ''
+        },
+    })
+})
 
-    gulp.watch('scss/**/*.scss', ['sass']);
-    gulp.watch('**/*.html').on('change', browserSync.reload);
-    gulp.watch('js/**/*.js').on('change', browserSync.reload);
-
+// Dev task with browserSync
+gulp.task('dev', ['browserSync', 'less', 'minify-css', 'js', 'minify-js'], function() {
+    gulp.watch('less/*.less', ['less']);
+    gulp.watch('dist/css/*.css', ['minify-css']);
+    gulp.watch('js/*.js', ['minify-js']);
+    // Reloads the browser whenever HTML or JS files change
+    gulp.watch('pages/*.html', browserSync.reload);
+    gulp.watch('dist/js/*.js', browserSync.reload);
 });
-
-
-
-// Static Server without watching scss files
-gulp.task('serve:lite', function() {
-
-    browserSync.init({
-        server: "./",
-        ghostMode: false,
-        notify: false
-    });
-
-    gulp.watch('**/*.css').on('change', browserSync.reload);
-    gulp.watch('**/*.html').on('change', browserSync.reload);
-    gulp.watch('js/**/*.js').on('change', browserSync.reload);
-
-});
-
-
-
-gulp.task('sass', function () {
-    return gulp.src('./scss/**/style.scss')
-        .pipe(sourcemaps.init())
-        .pipe(sass({outputStyle: 'expanded'}).on('error', sass.logError))
-        .pipe(sourcemaps.write('./maps'))
-        .pipe(gulp.dest('./css'))
-        .pipe(browserSync.stream());
-});
-
-
-
-gulp.task('sass:watch', function () {
-    gulp.watch('./scss/**/*.scss');
-});
-
-
-/*sequence for injecting partials and replacing paths*/
-gulp.task('inject', function() {
-  runSequence('injectPartial' , 'injectCommonAssets' , 'injectLayoutStyles', 'replacePath');
-});
-
-
-
-/* inject partials like sidebar and navbar */
-gulp.task('injectPartial', function () {
-  return gulp.src("./**/*.html", { base: "./" })
-    .pipe(injectPartials())
-    .pipe(gulp.dest("."));
-});
-
-
-
-/* inject Js and CCS assets into HTML */
-gulp.task('injectCommonAssets', function () {
-  return gulp.src('./**/*.html')
-    .pipe(inject(gulp.src([ 
-        './vendors/mdi/css/materialdesignicons.min.css',
-        './vendors/base/vendor.bundle.base.css', 
-        './vendors/base/vendor.bundle.base.js',
-    ], {read: false}), {name: 'plugins', relative: true}))
-    .pipe(inject(gulp.src([
-        './css/*.css', 
-        './js/off-canvas.js', 
-        './js/hoverable-collapse.js', 
-        './js/template.js', 
-        './js/todolist.js'
-    ], {read: false}), {relative: true}))
-    .pipe(gulp.dest('.'));
-});
-
-/* inject Js and CCS assets into HTML */
-gulp.task('injectLayoutStyles', function () {
-    return gulp.src('./**/*.html')
-        .pipe(inject(gulp.src([
-            './css/style.css', 
-        ], {read: false}), {relative: true}))
-        .pipe(gulp.dest('.'));
-});
-
-/*replace image path and linking after injection*/
-gulp.task('replacePath', function(){
-    gulp.src(['./pages/*/*.html'], { base: "./" })
-        .pipe(replace('="images/', '="../../images/'))
-        .pipe(replace('href="pages/', 'href="../../pages/'))
-        .pipe(replace('href="documentation/', 'href="../../documentation/'))
-        .pipe(replace('href="index.html"', 'href="../../index.html"'))
-        .pipe(gulp.dest('.'));
-    gulp.src(['./pages/*.html'], { base: "./" })
-        .pipe(replace('="images/', '="../images/'))
-        .pipe(replace('"pages/', '"../pages/'))
-        .pipe(replace('href="index.html"', 'href="../index.html"'))
-        .pipe(gulp.dest('.'));
-    gulp.src(['./index.html'], { base: "./" })
-        .pipe(replace('="images/', '="images/'))
-        .pipe(gulp.dest('.'));
-});
-
-/*sequence for building vendor scripts and styles*/
-gulp.task('bundleVendors', function() {
-    runSequence('clean:vendors','buildBaseVendorStyles','buildBaseVendorScripts','copyRecursiveVendorFiles');
-});
-
-gulp.task('clean:vendors', function () {
-    return del([
-      'vendors/**/*'
-    ]);
-});
-
-/*Building vendor scripts needed for basic template rendering*/
-gulp.task('buildBaseVendorScripts', function() {
-    return gulp.src([
-        './node_modules/jquery/dist/jquery.min.js', 
-        './node_modules/popper.js/dist/umd/popper.min.js', 
-        './node_modules/bootstrap/dist/js/bootstrap.min.js', 
-        './node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js'
-    ])
-      .pipe(concat('vendor.bundle.base.js'))
-      .pipe(gulp.dest('./vendors/base'));
-});
-
-/*Building vendor styles needed for basic template rendering*/
-gulp.task('buildBaseVendorStyles', function() {
-    return gulp.src(['./node_modules/perfect-scrollbar/css/perfect-scrollbar.css'])
-      .pipe(concat('vendor.bundle.base.css'))
-      .pipe(gulp.dest('./vendors/base'));
-});
-
-gulp.task('copyRecursiveVendorFiles', function() {
-    gulp.src(['./node_modules/chart.js/dist/Chart.min.js'])
-        .pipe(gulp.dest('./vendors/chart.js'));
-    gulp.src(['./node_modules/datatables.net/js/jquery.dataTables.js'])
-        .pipe(gulp.dest('./vendors/datatables.net'));
-    gulp.src(['./node_modules/datatables.net-bs4/js/dataTables.bootstrap4.js'])
-        .pipe(gulp.dest('./vendors/datatables.net-bs4'));
-    gulp.src(['./node_modules/datatables.net-bs4/css/dataTables.bootstrap4.css'])
-        .pipe(gulp.dest('./vendors/datatables.net-bs4'));
-    gulp.src(['./node_modules/@mdi/font/css/materialdesignicons.min.css'])
-        .pipe(gulp.dest('./vendors/mdi/css'));
-    gulp.src(['./node_modules/@mdi/font/fonts/*'])
-        .pipe(gulp.dest('./vendors/mdi/fonts'));
-});
-
-gulp.task('default', ['serve']);

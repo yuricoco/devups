@@ -52,27 +52,31 @@ var dform = {
         }
 
         dform.binderror(response.error);
+    },
+    _submit: function(el, url){
+        // var formserialize = $(this).serialize();
+        // console.log(formserialize);
+        var actionarray = $(el).attr("action").split("/");
+        var action = actionarray[1];
+        var callback = function (response) { console.log(response); };
+        entityid = $(el).data("id");
+
+        if(entityid){
+            //action = actionarray[1];
+            //action = "update&id="+entityid;
+            callback = dform.callbackupdate;
+        }else{
+            callback = dform.callbackcreate;
+        }
+
+        var formdata = model._formdata($(el));
+        //model._post(action, formdata, callback);
+        console.log(url);
+        return false;
     }
 };
 
-$("#"+model.entity+"-form").submit(function (e) {
-    e.preventDefault();
-    // var formserialize = $(this).serialize();
-    // console.log(formserialize);
-    var actionarray = $(this).attr("action").split("/");
-    var action = actionarray[1];
-    var callback = function (response) { console.log(response); };
-    entityid = $(this).data("id");
-
-    if(entityid){
-        //action = actionarray[1];
-        //action = "update&id="+entityid;
-        callback = dform.callbackupdate;
-    }else{
-        callback = dform.callbackcreate;
-    }
-
-    var formdata = model._formdata($(this));
-    model._post(action, formdata, callback);
-
-});
+// $("#"+model.entity+"-form").submit(function (e) {
+//     e.preventDefault();
+//     dform._submit(this)
+// });

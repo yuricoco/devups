@@ -74,6 +74,9 @@ class Request {
     public static function geturi()
     {
         $uri = $_SERVER["REQUEST_URI"];
+        if(__prod)
+            return substr($uri, -strlen($uri)+1);
+
         return str_replace(__base_dir, "", $uri);
     }
 

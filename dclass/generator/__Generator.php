@@ -33,7 +33,6 @@ Usage:
         $commend[] = "core:g:formwidget <component\module\\entity>            // generate an entity from core eg: component\module\entity";
         $commend[] = "core:g:views <component\module\\entity>            // generate an entity from core eg: component\module\entity";
         $commend[] = "core:g:viewswidget <component\module\\entity>          // generate an entity from core eg: component\module\entity\n ";
-        //$commend[] = "core:g:genesis <component\module\\entity>          // generate an entity from core eg: component\module\entity\n ";
         $commend[] = "core:g:dependencies <component\module\\entity>          // generate an entity from core eg: component\module\entity\n ";
 
         $commend[] = "core:g:moduleendless <component\module>          // generate the module index; services; dependencies and layout\n ";
@@ -370,23 +369,16 @@ Usage:
      * 
      * @param type $namespace
      */
-    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'dao' => true, 'ctrl' => true, 'form' => true, 'genes' => true, 'views' => true, 'detailwidget' => true]) {
+    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'ctrl' => true, 'form' => true, 'views' => false, 'detailwidget' => true]) {
 
         $backend = new BackendGenerator();
         $frontend = new AdminTemplateGenerator();
 
-//        $entity = Core::findentitycore($ns[0].'/'.$ns[1].'/Core/'.$ns[0].'.json');
-
         $repertoire = ucfirst(__Generator::$modulecore->name);
 
-//        if (!file_exists($repertoire)) {            
         __Generator::__module(__Generator::$modulecore, $setdependance);
-//        }
 
         chdir($repertoire);
-
-//        if(!$setdependance)
-//            __Generator::moduleendless(__Generator::$projectcore, __Generator::$modulecore, [$entity]);
 
         $entity->attribut = (array) $entity->attribut;
 
@@ -394,11 +386,8 @@ Usage:
         if ($crud['entity'])
             $backend->entityGenerator($entity);
 
-//        if ($crud['dao'])
-//            $backend->daoGenerator($entity);
-
         if ($crud['ctrl'])
-            $backend->controllerGenerator($entity);
+            $backend->controllerGenerator($entity, $project->listmodule);
 
         if ($crud['form'])
             $backend->formGenerator($entity, $project->listmodule);
@@ -409,9 +398,9 @@ Usage:
         if (isset($crud['detailwidget']) && $crud['detailwidget'])
             $backend->detailWidgetGenerator($entity, $project->listmodule);
 
-        if ($crud['views']) {
-            self::ressources($entity, $frontend);
-        }
+        //if ($crud['views']) {
+        self::ressources($entity, $frontend, $crud['views']);
+        //}
 
         $name = strtolower($entity->name);
 
@@ -424,7 +413,7 @@ Usage:
         chdir('../');
     }
 
-    private static function ressources($entity, \AdminTemplateGenerator $frontend){
+    private static function ressources($entity, \AdminTemplateGenerator $frontend, $views = false){
 
         if (!file_exists('Ressource'))
             mkdir('Ressource', 0777);
@@ -448,8 +437,10 @@ Usage:
         fputs($jsform, "//".$entity->name. "Form");
         fclose($jsform);
 
-        $vue = "Ressource/views/" . strtolower($entity->name);
-        $frontend->viewsGenerator(__Generator::$projectcore->listmodule, $entity, $vue."/");
+        if($views){
+            $vue = "Ressource/views/" . strtolower($entity->name);
+            $frontend->viewsGenerator(__Generator::$projectcore->listmodule, $entity, $vue."/");
+        }
 
     }
 
@@ -458,9 +449,6 @@ Usage:
      * @param type $namespace
      */
     public static function __module($module, $setdependance = true) {
-
-        //$repertoire = explode('/', $module->name);
-        $retour = '';
 
         $repertoire = ucfirst($module->name);
         if (!file_exists($repertoire)) {
@@ -479,16 +467,7 @@ Usage:
         if (!file_exists("Core")) {
             mkdir('Core', 0777);
         }
-        /* ENTITYDAO */
 
-//        if (!file_exists("Dao")) {
-//            mkdir('Dao', 0777);
-//        }
-        /* ENTITYDAO */
-
-//        if (!file_exists("Genesis")) {
-//            mkdir('Genesis', 0777);
-//        }
         /* CONTROLLER */
 
         if (!file_exists("Controller")) {
@@ -511,17 +490,13 @@ Usage:
         if (!file_exists(strtolower($module->name) . 'Core.json')) {
 
             $modulecore = fopen(strtolower($module->name) . 'Core.json', 'w');
-    //            $module->listentity = [];
+
             $contenu = json_encode($module);
             fputs($modulecore, $contenu);
 
             fclose($modulecore);
-    //            $module->listentity = $module_entities;
-        }
 
-    //        if (!file_exists('index.php') && $setdependance) {
-    //            __Generator::moduleendless(__Generator::$projectcore, $module, $module->listentity);
-    //        }
+        }
 
         // on sort du module
         chdir('../');
@@ -548,10 +523,8 @@ Usage:
 
             $package .= "
     require 'Entity/" . $name . ".php';$requiremanytomany
-    //require 'Dao/" . $name . "DAO.php';
     require 'Form/" . $name . "Form.php';
-    require 'Controller/" . $name . "Controller.php';
-    //require 'Genesis/" . $name . "Genesis.php';\n";
+    require 'Controller/" . $name . "Controller.php';\n";
 
         }
 
@@ -587,10 +560,10 @@ Usage:
         $frontend = new AdminTemplateGenerator();
         $frontend->layoutGenerator($module, "Ressource/views/");
 
-        if($withentityviews)
+        //if($withentityviews)
             foreach ($modulelistentity as $entity) {
                 $entity->attribut = (array) $entity->attribut;
-                self::ressources($entity, $frontend);
+                self::ressources($entity, $frontend, $withentityviews);
             }
 
         // on sort du module
@@ -634,9 +607,7 @@ RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC
         define('CHEMINMODULE', ' ');\n
     
         ";
-//        foreach ($arraycontroller as $controller) {
-//            $contenu .= $controller;
-//        }
+
         foreach ($modulelistentity as $entity) {
             $contenu .= "\t\t$" . strtolower($entity->name) . "Ctrl = new " . ucfirst($entity->name) . "Controller();\n";
         }
@@ -656,7 +627,7 @@ switch (Request::get('path')) {
             $name = strtolower($entity->name);
             $contenu .= "
     case '" . str_replace("_", "-", $name) . "/index':
-        Genesis::renderView('".$name.".index',  $".$name."Ctrl->listAction());
+        $".$name."Ctrl->listView();
         break;\n";
         }
 
@@ -700,10 +671,8 @@ switch (Request::get('path')) {
 
         $package .= "
     require 'Entity/" . $name . ".php';$requiremanytomany
-    //require 'Dao/" . $name . "DAO.php';
     require 'Form/" . $name . "Form.php';
-    require 'Controller/" . $name . "Controller.php';
-    //require 'Genesis/" . $name . "Genesis.php';\n";
+    require 'Controller/" . $name . "Controller.php';\n";
         //}
 
         //$filename = strtolower(str_replace('/', '.', $module->name));
@@ -750,19 +719,19 @@ switch (Request::get('path')) {
             $name = strtolower($entity->name);
             $contenu .= "
         case '" . $name . "._new':
-                g::json_encode(" . ucfirst($name) . "Controller::renderForm());
+                g::json_encode(" . ucfirst($name) . "Form::render());
                 break;
         case '" . $name . ".create':
                 g::json_encode($" . $name . "Ctrl->createAction());
                 break;
         case '" . $name . "._edit':
-                g::json_encode(" . ucfirst($name) . "Controller::renderForm(R::get(\"id\")));
+                g::json_encode(" . ucfirst($name) . "Form::render(R::get(\"id\")));
                 break;
         case '" . $name . ".update':
                 g::json_encode($" . $name . "Ctrl->updateAction(R::get(\"id\")));
                 break;
         case '" . $name . "._show':
-                " . ucfirst($name) . "Controller::renderDetail(R::get(\"id\"));
+                " . ucfirst($name) . "Form::__renderDetailWidget(R::get(\"id\"));
                 break;
         case '" . $name . "._delete':
                 g::json_encode($" . $name . "Ctrl->deleteAction(R::get(\"id\")));

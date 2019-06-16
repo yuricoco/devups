@@ -143,6 +143,12 @@ switch (Request::get('path')) {
         g::json_encode($dvups_roleCtrl->datatable(R::get('next'), R::get('per_page')));
         break;
 
+    case 'dvups_:update':
+        if (Core::updateDvupsTable())
+            echo "Data admin updated with success";
+        else
+            echo "Data admin already uptodate";
+        break;
 
     default:
         echo json_encode("404 : page  '" . Request::get('path') . "' note found");

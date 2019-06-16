@@ -10,13 +10,13 @@ class Traitement {
                 foreach ($module->listentity as $entity) {
                     //var_dump($entity->name, $entityname);
                     if (strtolower($entityname) == strtolower($entity->name)) {
-                        $relation = $entity;
+                        return $entity;
                         break;
                     }
                 }
             }
         }
-        return $relation;
+        return null;
     }
 
     function dependancesinjection($listemodule, $entityname) {

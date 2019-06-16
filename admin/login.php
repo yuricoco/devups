@@ -1,95 +1,75 @@
 <?php
 
 require '../config/constante.php';
-define('VENDOR', __env. 'admin/vendors/');
+define('VENDOR', __env. 'admin/vendor/');
 define('assets', __env. 'admin/assets/');
 
 $action = 'index.php?path=connexion';
 
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Majestic Admin</title>
-    <!-- plugins:css -->
-    <link rel="stylesheet" href="vendors/mdi/css/materialdesignicons.min.css">
-    <link rel="stylesheet" href="vendors/base/vendor.bundle.base.css">
-    <!-- endinject -->
-    <!-- plugin css for this page -->
-    <!-- End plugin css for this page -->
-    <!-- inject:css -->
-    <link rel="stylesheet" href="<?= assets; ?>css/style.css">
-    <!-- endinject -->
-    <link rel="shortcut icon" href="<?= assets; ?>images/favicon.png" />
+    <!-- iso-8859-1  -->
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="author" content="Sunhosting">
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="vendor/dist/css/sb-admin-2.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <link href="vendor/dist/css/jquery-ui.css" rel="stylesheet">
+
+    <title>app v2.7.5 release </title>
 </head>
 
 <body>
-<div class="container-scroller">
-    <div class="container-fluid page-body-wrapper full-page-wrapper">
-        <div class="content-wrapper d-flex align-items-stretch auth auth-img-bg">
-            <div class="row flex-grow">
-                <div class="col-lg-6 d-flex align-items-center justify-content-center">
-                    <div class="auth-form-transparent text-left p-3">
-                        <div class="brand-logo">
-                            <img src="<?= assets; ?>images/logo.svg" alt="logo">
-                        </div>
-                        <h4>Welcome back!</h4>
-                        <h6 class="font-weight-light">Happy to see you again!</h6>
-                        <form  method="post" action="<?php echo $action; ?>" class="pt-3">
-                            <div class="form-group">
-                                <label for="exampleInputEmail">Username</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend bg-transparent">
-                      <span class="input-group-text bg-transparent border-right-0">
-                        <i class="mdi mdi-account-outline text-primary"></i>
-                      </span>
-                                    </div>
-                                    <input type="text" class="form-control form-control-lg border-left-0" name="login" id="exampleInputEmail" placeholder="Login">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputPassword">Password</label>
-                                <div class="input-group">
-                                    <div class="input-group-prepend bg-transparent">
-                      <span class="input-group-text bg-transparent border-right-0">
-                        <i class="mdi mdi-lock-outline text-primary"></i>
-                      </span>
-                                    </div>
-                                    <input type="password" class="form-control form-control-lg border-left-0" name="password" id="exampleInputPassword" placeholder="Password">
-                                </div>
-                            </div>
-                            <div class="my-2 d-flex justify-content-between align-items-center">
-                                <a href="#" class="auth-link text-black">Forgot password?</a>
-                            </div>
-                            <div class="my-3">
-                                <button type="submit" class="btn btn-block btn-primary btn-lg font-weight-medium auth-form-btn" >LOGIN</button>
-                            </div>
-                        </form>
-                    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="login-panel panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Please Sign In
+                        <!--a href="<?=  $translate ?>fr">fr</a>
+                        <a href="<?=  $translate ?>en">en</a-->
+                    </h3>
                 </div>
-                <div class="col-lg-6 login-half-bg d-flex flex-row">
-                    <p class="text-white font-weight-medium text-center flex-grow align-self-end">Copyright &copy; 2018  All rights reserved.</p>
+                <div class="panel-body">
+                    <form role="form" method="post" action="<?= $action; ?>">
+                        <fieldset>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="Login" name="login" type="text" autofocus/>
+                            </div>
+                            <div class="form-group">
+                                <input class="form-control" placeholder="Password" name="password" type="password"
+                                       value=""/>
+                            </div>
+
+                            <button type="submit" class="btn btn-lg btn-success btn-block">Se connecter</button>
+                        </fieldset>
+                    </form>
                 </div>
             </div>
         </div>
-        <!-- content-wrapper ends -->
     </div>
-    <!-- page-body-wrapper ends -->
 </div>
-<!-- container-scroller -->
-<!-- plugins:js -->
-<script src="vendors/base/vendor.bundle.base.js"></script>
-<!-- endinject -->
-<!-- inject:js -->
-<script src="<?= assets; ?>js/off-canvas.js"></script>
-<script src="<?= assets; ?>js/hoverable-collapse.js"></script>
-<script src="<?= assets; ?>js/template.js"></script>
-<!-- endinject -->
+<!-- /#wrapper -->
+<div id="log_erreur"></div>
+<!-- jQuery -->
+<!-- jQuery -->
+<script src="vendor/jquery/jquery.min.js"></script>
+
+<!-- Bootstrap Core JavaScript -->
+<script src="vendor/bootstrap/js/bootstrap.min.js"></script>
+
+<!-- Custom Theme JavaScript -->
+<script src="vendor/dist/js/sb-admin-2.js"></script>
+
 </body>
 
 </html>

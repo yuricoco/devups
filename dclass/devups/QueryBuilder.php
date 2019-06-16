@@ -643,18 +643,30 @@ class QueryBuilder extends \DBAL
         return $this->executeDbal($this->querysanitize($this->query . $this->endquery), $this->parameters, $action);
     }
 
-    public function __getFirst($recursif = true)
+    public function __getFirst($recursif = true, $collect = [])
     {
+        if(is_numeric($recursif))
+            $this->limit_iteration = $recursif;
+
+        $this->setCollect($collect);
         return $this->limit(1)->__getOne($recursif);
     }
 
-    public function __getLast($recursif = true)
+    public function __getLast($recursif = true, $collect = [])
     {
+        if(is_numeric($recursif))
+            $this->limit_iteration = $recursif;
+
+        $this->setCollect($collect);
         return $this->orderby($this->table . ".id desc")->limit(1)->__getOne($recursif);
     }
 
-    public function __getIndex($index, $recursif = true)
+    public function __getIndex($index, $recursif = true, $collect = [])
     {
+        if(is_numeric($recursif))
+            $this->limit_iteration = $recursif;
+
+        $this->setCollect($collect);
         $i = (int)$index;
         return $this->limit($i - 1, $i)->__getOne($recursif);
     }
@@ -667,8 +679,13 @@ class QueryBuilder extends \DBAL
         return $this->__findAllRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
     }
 
-    public function __getAll($recursif = true)
+    public function __getAll($recursif = true, $collect = [])
     {
+
+        if(is_numeric($recursif))
+            $this->limit_iteration = $recursif;
+
+        $this->setCollect($collect);
         return $this->__findAll($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
@@ -677,8 +694,13 @@ class QueryBuilder extends \DBAL
         return $this->__findOneRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
     }
 
-    public function __getOne($recursif = true)
+    public function __getOne($recursif = true, $collect = [])
     {
+
+        if(is_numeric($recursif))
+            $this->limit_iteration = $recursif;
+
+        $this->setCollect($collect);
         return $this->__findOne($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 

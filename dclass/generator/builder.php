@@ -28,6 +28,7 @@ function getcomponent($namespace) {
 
     $ns = explode("\\", $namespace);
     return __Generator::findproject($components, $ns[0]);
+
 }
 
 $project = null;

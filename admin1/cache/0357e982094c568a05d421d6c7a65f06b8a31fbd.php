@@ -10,44 +10,41 @@
 <?php $__env->startSection('content'); ?>
 
     <div class="row">
-        <div class="col-lg-12">
-            <ol class="breadcrumb">
-                <li class="active">
-                    <i class="fa fa-dashboard"></i> <?php echo CHEMINMODULE; ?> > Liste
-                </li>
-            </ol>
-        </div>
-        <div class="col-lg-12">
-            <div class="row">
-                <div class="col-lg-3 col-md-6">
-                    <div class="panel panel-primary">
-                        <div class="panel-heading">
-                            <div class="row">
-                                <div class="col-xs-12 ">
-                                    <h5>Manage Admin</h5>
-                                </div>
-                            </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="panel panel-primary">
+                <div class="panel-heading">
+                    <div class="row">
+                        <div class="col-xs-12 ">
+                            <h5>Manage Admin</h5>
                         </div>
                     </div>
                 </div>
-                <div style="float: right; margin-right: 30px;" class="panel">
-                    <?= Genesis::top_action(Dvups_admin::class); ?>
-                </div>
             </div>
         </div>
+        <div class="col-lg-9 col-md-6 text-right">
+
+            <?php if(getadmin()->getLogin() == "dv_admin" ){ ?>
+            <label class="btn btn-info" onclick="updateprivilege(this)" >Update master admin privilage</label>
+            <?php } ?>
+            <?= Genesis::top_action(Dvups_admin::class); ?>
+        </div>
     </div>
+    <hr>
     <div class="row">
 
-        <div class="col-lg-12 col-md-12">
-            <div class="">
+        <div class="col-lg-12 col-md-12  stretch-card">
+            <div class="card">
+            <div class="card-body">
 
                 <?= \DClass\devups\Datatable::buildtable($lazyloading, [
-                    ['header' => 'nom', 'value' => 'name'],
+                    ['header' => 'nom', 'value' => 'name', 'search' => true],
                     ['header' => 'login', 'value' => 'login'],
-                ])->addcustomaction("callbackbtn")->render();
+                ])
+                    ->addcustomaction("callbackbtn")
+                    ->render();
                 ?>
 
-
+            </div>
             </div>
         </div>
 
@@ -78,6 +75,17 @@
 
     <script src="<?= CLASSJS ?>model.js"></script>
     <script src="<?= CLASSJS ?>ddatatable.js"></script>
-    <script></script>
+
+    <script>
+
+        function updateprivilege(el) {
+            $(el).html("... processing ")
+            model._get('services.php?path=dvups_:update', function (response) {
+                console.log(response);
+                $(el).html(response)
+            }, 'text')
+        }
+
+    </script>
 <?php echo $__env->yieldSection(); ?>
 <?php echo $__env->make('layout', array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>

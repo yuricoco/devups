@@ -31,6 +31,7 @@ class Datatable {
 
     public $defaultaction = "stateless";
     public $customaction = [];
+    public static $rowaction = [];
     public $groupaction = false;
     public $groupactioncore = [];
     public $searchaction = false;
@@ -55,28 +56,27 @@ class Datatable {
         return $dt;
     }
 
-    public static function actionListView($path, $id, $ajax = true, $userside = false) {
-        $actionlien = "";
+    public static function actionListView($path, $id, $ajax = true, $customaction = "", $userside = false) {
 
         if($userside){
 
-            $actionlien .= '<a href="#"  class="btn btn-default" ><i class="fa fa-edit" ></i>edit</a>';
-            $actionlien .= '<a href="#" target="_self" class="btn btn-default" >show</a> .';
+            self::$rowaction[] = '<a href="#"  class="btn btn-default" ><i class="fa fa-edit" ></i>edit</a>';
+            self::$rowaction[] = '<a href="#" target="_self" class="btn btn-default" >show</a> .';
 
-            return $actionlien;
+            return 1;
         }
 
         if (!isset($_SESSION['action']))
-            return "<span class='alert alert-info' >not rigth contact the administrator</span>";
+            return false;
 
         $rigths = getadmin()->availableentityright($path);
         if ($rigths) {
             if (in_array('update', $rigths)) {
                 if (in_array('update', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= ' <button onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</button>';
+                        self::$rowaction[] = ' <button onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</button>';
                     else{
-                        $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '" class="btn btn-default btn-sm model_edit" ><i class="fa fa-edit" ></i> edit</a>';
+                        self::$rowaction[] = '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '" class="btn btn-default btn-sm model_edit" ><i class="fa fa-edit" ></i> edit</a>';
                     }
                 }
             }
@@ -85,17 +85,20 @@ class Datatable {
 
                 if (in_array('read', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= ' <button onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</button>';
+                        self::$rowaction[] = ' <button onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</button>';
                     else{
-                        $actionlien .= '<a href="index.php?path=' . $path . '/_show&id=' . $id . '" class="btn btn-default btn-sm" ><i class="fa fa-eye" ></i> view</a>';
+                        self::$rowaction[] = '<a href="index.php?path=' . $path . '/_show&id=' . $id . '" class="btn btn-default btn-sm" ><i class="fa fa-eye" ></i> view</a>';
                     }
                 }
             }
             if (in_array('delete', $rigths)) {
                 if (in_array('delete', $_SESSION['action']))
-                    $actionlien .= ' <button onclick="model._delete(this, ' . $id . ')"'
+                    self::$rowaction[] = ' <button onclick="model._delete(this, ' . $id . ')"'
                         . ' class="'.self::$btndelete_class.'" >delete</button>';
             }
+
+            return true;
+
         }
 
         elseif (isset($_SESSION['action'])) {
@@ -105,29 +108,30 @@ class Datatable {
 
                 if (in_array('update', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= ' <button onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</button>';
+                        self::$rowaction[] = ' <button onclick="model._edit(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</button>';
                     else{
-                        $actionlien .= '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</a>';
+                        self::$rowaction[] = '<a href="index.php?path=' . $path . '/_edit&id=' . $id . '" class="'.self::$btnedit_class.'" ><i class="fa fa-edit" ></i> edit</a>';
                     }
                 }
 
                 if (in_array('read', $_SESSION['action'])){
                     if($ajax)
-                        $actionlien .= ' <button onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</button>';
+                        self::$rowaction[] = ' <button onclick="model._show(' . $id . ')" data-toggle="modal" data-target="#' . $path . 'modal" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</button>';
                     else{
-                        $actionlien .= '<a href="index.php?path=' . $path . '/_show&id=' . $id . '" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</a>';
+                        self::$rowaction[] = '<a href="index.php?path=' . $path . '/_show&id=' . $id . '" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</a>';
                     }
                 }
 
                 if (in_array('delete', $_SESSION['action']))
-                    $actionlien .= ' <button onclick="model._delete(this, ' . $id . ')"'
+                    self::$rowaction[] = ' <button onclick="model._delete(this, ' . $id . ')"'
                         . ' class="'.self::$btndelete_class.'" ><i class="fa fa-close" ></i> delete</button>';
 
+                return true;
             }else {
-                $actionlien .= "<span class='alert alert-info btn-sm' >not rigth contact the administrator</span>";
+                return false;
             }
         }
-        return $actionlien;
+
     }
 
     public static function renderentitydata($entity, $header){
@@ -233,6 +237,7 @@ class Datatable {
     }
 
     public function render(){
+        self::$rowaction = [];
         if($this->searchaction){
             $this->openform = '<form id="datatable-form" action="#" method="get" >';
             $this->closeform = '</form>';
@@ -652,37 +657,58 @@ class Datatable {
                 $tr[] = "<td>" . $tdcontent . "</td>";
             }
 
-            $dact = "";
+            $actionbutton = true;
             $act = "";
+
+            self::$rowaction = [];
+            // the user may write the method in the entity for better code practice
+            if (!empty($customaction)) {
+                foreach ($customaction as $action)
+                    self::$rowaction[] = call_user_func(array($entity, $action.'Action'));
+            }
+
             if ($defaultaction) {
                 if($defaultaction === "statefull")
-                    $dact = self::actionListView(self::$class, $entity->getId(), false);
+                    $actionbutton = self::actionListView(self::$class, $entity->getId(), false, $act);
                 elseif($defaultaction === "stateless")
-                    $dact = self::actionListView(self::$class, $entity->getId());
+                    $actionbutton = self::actionListView(self::$class, $entity->getId(), true, $act);
                 else{
-                    $dact = "";
                     if(self::$url_read){
                         $show = str_replace('$id', $entity->getId(), self::$url_read);
-                        $dact .= '<a href="' . $show . '" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</a>';
+                        self::$rowaction[] = '<a href="' . $show . '" class="'.self::$btnview_class.'" ><i class="fa fa-eye" ></i> view</a>';
                     }
                     if(self::$url_update){
                         $update = str_replace('$id', $entity->getId(), self::$url_update);
-                        $dact .= '<a href="' . $update . '" class="'.self::$btnedit_class.'" >'.gettranslation("dt.button.edit").'</a>';
+                        self::$rowaction[] = '<a href="' . $update . '" class="'.self::$btnedit_class.'" >'.gettranslation("dt.button.edit").'</a>';
                     }
                     if(self::$url_delete){
                         $delete = str_replace('$id', $entity->getId(), self::$url_delete);
-                        $dact .= '<a href="' . $delete . '" class="'.self::$btndelete_class.'" ><i class="fa fa-delete" ></i> delete</a>';
+                        self::$rowaction[] = '<a href="' . $delete . '" class="'.self::$btndelete_class.'" ><i class="fa fa-delete" ></i> delete</a>';
                     }
                 }
             }
 
-            // the user may write the method in the entity for better code practice
-            if (!empty($customaction)) {
-                foreach ($customaction as $action)
-                    $act .= call_user_func(array($entity, $action.'Action'));
+            if($actionbutton){
+
+                foreach (self::$rowaction as $action)
+                    $act .= '<li>'. $action . '</li>';
+
+                $actionbutton = <<<EOD
+    <div class="dropdown">
+        <a class="dropdown-toggle" data-toggle="dropdown" href="#" aria-expanded="false">
+            Action<i class="fa fa-caret-down"></i>
+        </a>
+        <ul class="dropdown-menu dropdown-messages">            
+            $act
+        </ul>
+        <!-- /.dropdown-messages -->
+    </div>
+EOD;
+            }else{
+                $actionbutton = "<span class='alert alert-info' >not rigth contact the administrator</span>";
             }
 
-            $tr[] = '<td>' .  $act . $dact . '</td>';
+            $tr[] = '<td>' .  $actionbutton . '</td>';
 
             $tb[] = '<tr id="' . $entity->getId() . '" >' . implode(" ", $tr) . '</tr>';
         }
@@ -702,6 +728,13 @@ class Datatable {
     }
 
     public function addcustomaction($action){
+        /**
+         * $customaction is an instance attribut. it's called while rendering the datatable via ajax
+         *
+         * but rowaction is a static attribut therefore it's built each time the datatable is rendering and data from
+         * customaction are use at that moment.
+         */
+        //self::$rowaction[] = call_user_func(array($this->entity, $action.'Action'));
         $this->customaction[] = $action;
         return $this;
     }

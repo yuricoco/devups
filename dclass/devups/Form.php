@@ -24,7 +24,7 @@ class Form extends FormFactory{
 
         Form::$classname = get_class($enitty);
         Form::$name = strtolower(Form::$classname);
-        $action = $directives["action"];
+        $action = trim($directives["action"]);
         $directives["action"] = "index.php?path=".Form::$name."/".trim($action);
         if($overideaction)
             $directives["action"] = trim($action);
@@ -34,7 +34,9 @@ class Form extends FormFactory{
             $formdirective[] = $key ."='" . $value ."'";
         }
 
-        return "<form id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
+        //return "<form id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
+
+        return "<form onsubmit=\"return dform._submit(this, '".Form::$name."/$action' )\" id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
 
     }
 

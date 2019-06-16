@@ -6,9 +6,16 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-require __DIR__ . '/../header.php';
-define('VENDOR', __env. 'admin/vendor/');
-define('assets', __env. 'admin/');
+
+session_start();
+
+require __DIR__.'/../config/dependanceInjection.php';
+require __DIR__.'/../lang.php';
+require __DIR__.'/../src/requires.php';
+
+define('VENDOR', __env. 'admin/vendors/');
+define('assets', __env. 'admin/assets/');
+
 
 // move comment scope to enable authentication 
 if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {

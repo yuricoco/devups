@@ -30,13 +30,7 @@ define('web_dir', __DIR__ . '/../web/');
 
 define('SRC_FILE', __env. 'uploads/');
 define('RESSOURCE2', __env. 'admin/Ressource/');
-//define('VENDOR', __env. 'admin/vendor/');
-define('UPLOAD_DIR_SRC', __env. 'admin/Ressource/js/');
-define('JS', __env. 'admin/Ressource/js/');
-define('CLASSJS', __env. 'DClass/devupsjs/');
-define('IMG', __env. 'admin/Ressource/img/');
-define('CSS', __env. 'admin/Ressource/css/');
-define('IHM', __env. 'admin/Ressource/ihm/');
+define('CLASSJS', __env. 'dclass/devupsjs/');
 
 define('ENTITY', 0);
 define('VIEW', 1);

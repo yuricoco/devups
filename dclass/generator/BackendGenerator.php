@@ -158,6 +158,9 @@ class BackendGenerator {
 
         foreach ($entity->attribut as $attribut) {
 
+            if($attribut->name == "id")
+                continue;
+
             $length = "";
             $nullable = "";
 
@@ -204,6 +207,9 @@ class BackendGenerator {
         }";
         if ($otherattrib) {
             foreach ($entity->attribut as $attribut) {
+
+                if($attribut->name == "id")
+                    continue;
 
                 if (in_array($attribut->formtype, ['document', 'image', 'music', 'video'])) {
                     $construt .= "
@@ -302,7 +308,8 @@ class BackendGenerator {
 
     /* 	CREATION DU CONTROLLER 	 */
 
-    public function controllerGenerator($entity) {
+    public function controllerGenerator($entity, $listmodule) {
+        $datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
         $name = strtolower($entity->name);
 
         $classController = fopen('Controller/' . ucfirst($name) . 'Controller.php', 'w');
@@ -313,29 +320,18 @@ use DClass\devups\Datatable as Datatable;
 
 class " . ucfirst($name) . "Controller extends Controller{
 
+    public function listView($" . "next = 1, $" . "per_page = 10){
 
-    public static function renderFormWidget($" . "id = null) {
-        if($" . "id)
-            " . ucfirst($name) . "Form::__renderFormWidget(" . ucfirst($name) . "::find($" . "id), 'update');
-        else
-            " . ucfirst($name) . "Form::__renderFormWidget(new " . ucfirst($name) . "(), 'create');
-    }
+        $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
 
-    public static function renderDetail($" . "id) {
-        " . ucfirst($name) . "Form::__renderDetailWidget(" . ucfirst($name) . "::find($" . "id));
-    }
+        self::$" . "jsfiles[] = " . ucfirst($name) . "::classpath('Ressource/js/" . $name . "Ctrl.js');
 
-    public static function renderForm($" . "id = null, $" . "action = \"create\") {
-        $" . $name . " = new " . ucfirst($name) . "();
-        if($" . "id){
-            $" . "action = \"update&id=\".$" . "id;
-            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-            //$" . $name . "->collectStorage();
-        }
+        $" . "this->entitytarget = '" . ucfirst($name) . "';
+        $" . "this->title = \"Manage " . ucfirst($name) . "\";
+        $" . "datatablemodel = $datatablemodel;
+        
+        $" . "this->renderListView($" . "lazyloading, $" . "datatablemodel);
 
-        return ['success' => true,
-            'form' => " . ucfirst($name) . "Form::__renderForm($" . $name . ", $" . "action, true),
-        ];
     }
 
     public function datatable($" . "next, $" . "per_page) {
@@ -343,26 +339,6 @@ class " . ucfirst($name) . "Controller extends Controller{
         return ['success' => true,
             'datatable' => Datatable::getTableRest($" . "lazyloading),
         ];
-    }
-
-    public function listAction($" . "next = 1, $" . "per_page = 10){
-
-        $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
-
-        return array('success' => true, // pour le restservice
-            'lazyloading' => $" . "lazyloading, // pour le web service
-            'detail' => '');
-
-    }
-    
-    public  function showAction($" . "id){
-
-            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-
-            return array( 'success' => true, 
-                            '" . $name . "' => $" . $name . ",
-                            'detail' => 'detail de l\'action.');
-
     }
 
     public function createAction($" . $name . "_form = null){
@@ -484,26 +460,6 @@ class " . ucfirst($name) . "Controller extends Controller{
         return array('success' => true, // pour le restservice
                 'redirect' => 'index', // pour le web service
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-
-    }
-
-    public function __newAction(){
-
-        return 	array(	'success' => true, // pour le restservice
-                        '" . $name . "' => new " . ucfirst($name) . "(),
-                        'action_form' => 'create', // pour le web service
-                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-
-    }
-
-    public function __editAction($" . "id){
-
-       $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-
-        return array('success' => true, // pour le restservice
-                        '" . $name . "' => $" . $name . ",
-                        'action_form' => 'update&id='.$" . "id, // pour le web service
-                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
     }
 
@@ -650,6 +606,9 @@ class " . ucfirst($name) . "Controller extends Controller{
             foreach ($entity->relation as $relation) {
 
                 $entitylink = $traitement->relation($listmodule, $relation->entity);
+                if(is_null($entitylink))
+                    continue;
+
                 $entrel = ucfirst(strtolower($relation->entity));
                 $key = 0;
                 $enititylinkattrname = "id";
@@ -711,11 +670,25 @@ class " . ucfirst($name) . "Controller extends Controller{
             return FormFactory::__renderForm(" . ucfirst($name) . "Form::formBuilder($" . $name . ", $" . "action, $" . "button));
         }
         
+        public static function render($" . "id = null, $" . "action = \"create\") {
+            $" . $name . " = new " . ucfirst($name) . "();
+            if($" . "id){
+                $" . "action = \"update&id=\".$" . "id;
+                $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+                //$" . $name . "->collectStorage();
+            }
+    
+            return ['success' => true,
+                'form' => " . ucfirst($name) . "Form::__renderForm($" . $name . ", $" . "action, true),
+            ];
+        }
+        
         public static function __renderFormWidget(\\" . ucfirst($name) . " $" . $name . ", $" . "action_form = null) {
             include " . ucfirst($name) . "::classroot(\"Form/" . ucfirst($name) . "FormWidget.php\");
         }
 
-        public static function __renderDetailWidget(\\" . ucfirst($name) . " $" . $name . "){
+        public static function __renderDetailWidget($" . "id){
+            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
             include " . ucfirst($name) . "::classroot(\"Form/" . ucfirst($name) . "DetailWidget.php\");
         }
     }
@@ -870,6 +843,9 @@ class " . ucfirst($name) . "Controller extends Controller{
                     break;
 
                 $entitylink = $traitement->relation($listmodule, $relation->entity);
+                if(is_null($entitylink))
+                    continue;
+
                 $entrel = ucfirst(strtolower($relation->entity));
                 $key = 0;
                 $entitylinkattrname = "id";

@@ -213,13 +213,13 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function first($recursif = true) {
+    public static function first($recursif = true, $collect = []) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->limit(1)->__getOne($recursif);
+        return $qb->select()->limit(1)->__getOne($recursif, $collect);
     }
 
     /**
@@ -228,13 +228,13 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function last($recursif = true) {
+    public static function last($recursif = true, $collect = []) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne($recursif);
+        return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne($recursif, $collect);
     }
 
     /**
@@ -258,13 +258,13 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function get($index = 1, $recursif = true) {
+    public static function get($index = 1, $recursif = true, $collect = []) {
         $i = (int) $index;
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->limit($i - 1, $i)->__getOne($recursif);
+        return $qb->select()->limit($i - 1, $i)->__getOne($recursif, $collect);
     }
 
     /**
@@ -307,13 +307,14 @@ abstract class Model extends \stdClass {
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
      * @return $this
      */
-    public static function find($id, $recursif = true) {
+    public static function find($id, $recursif = true, $collect = []) {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
         $entity->setId($id);
 
         $dbal = new DBAL();
+        $dbal->setCollect($collect);
         return $dbal->findByIdDbal($entity, $recursif);
     }
 
@@ -323,7 +324,7 @@ abstract class Model extends \stdClass {
      * when recursif set to true, the DBAL does recursif request to hydrate the association entity and those of it.
      * @param type $id the id of the entity
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
-     * @return type
+     * @return \QueryBuilder
      */
     public static function delete($id = null) {
 
@@ -577,7 +578,7 @@ abstract class Model extends \stdClass {
     }
 
     public function getId() {
-        return $this->id;
+        return  (int) $this->id;
     }
 
     public function setId($id) {
@@ -586,6 +587,12 @@ abstract class Model extends \stdClass {
 
     public function scan_entity_core() {
         return Core::__extract($this);
+    }
+
+    public function __construct($id = null){
+
+        if( $id ) { $this->id = $id; }
+
     }
 
 }

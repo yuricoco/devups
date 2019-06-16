@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManager;
  */
 class DBAL extends Database {
 
+    protected $collect = [];
     /**
      *
      * @var type
@@ -131,6 +132,15 @@ class DBAL extends Database {
 
         // obtaining the entity manager
         return EntityManager::create($conn, $config);
+    }
+
+
+    public function setCollect(array $collect)
+    {
+        foreach ($collect as $el){
+            $this->collect[] = str_replace("this.", $this->table.".", $el);
+        }
+        //$this->collect = $collect;
     }
 
     protected $em;
@@ -823,9 +833,21 @@ class DBAL extends Database {
      *
      * @return type
      */
+
+
+    protected $iteration = 0;
+    protected $limit_iteration = 0;
+
     private function orm($flowBD, $object, $imbricateindex = 0, $recursif = true, $collection = false) {
 
         $object_array = (array) $object;
+
+        if($this->limit_iteration != 0 && $this->iteration >= $this->limit_iteration){
+
+            $object_array["dvinrelation"] = true;
+
+            return $object_array;
+        }
 
         foreach ($object_array as $key => $value) {
 //                    $imbricateindex = 0;
@@ -837,23 +859,33 @@ class DBAL extends Database {
             foreach ($flowBD as $key2 => $value2) {
 
                 if (is_object($value)) {
+                    // object imbricate
+                    $innerrecursif = $recursif;
 
                     if (strtolower(get_class($value)) . '_id' == $key2) {
 
+                        if(!Empty($this->collect)){
+                            $el = strtolower(get_class($object)).".".strtolower(get_class($value));
+                            if (!in_array($el, $this->collect)) {
+                                //break;
+                                $innerrecursif = false;
+                            }
+                        }
                         if (is_array($flowBD[$key2])) {
 
                             $imbricateindex++;
-
+                            $this->iteration++;
                             $value->setId($this->inarray4($flowBD[$key2]));
 
-                            if ($recursif)
+                            if ($innerrecursif)
                                 $object_array[$key] = $this->findByIdDbal($value);
                             else
                                 $object_array[$key] = $value;
                         }else {
 
+                            $this->iteration++;
                             $value->setId($flowBD[$key2]);
-                            if ($recursif)
+                            if ($innerrecursif)
                                 $object_array[$key] = $this->findByIdDbal($value);
                             else
                                 $object_array[$key] = $value;

@@ -30,6 +30,10 @@ class DvAdmin
                     break;
 
                 $entitylink = $traitement->relation($listemodule, $relation->entity);
+
+                if(is_null($entitylink))
+                    continue;
+
                 $entrel = ucfirst(strtolower($relation->entity));
                 $key = 0;
                 $entitylinkattrname = "id";
@@ -43,12 +47,7 @@ class DvAdmin
             }
         }
 
-        $index = "
-                
-                    <?= \DClass\devups\Datatable::buildtable($" . "lazyloading, [" . implode(', ', $listview) . "\n])
-                    ->render(); ?>
-
-			";
+        $index = "[" . implode(', ', $listview) . "\n]";
 
         return $index;
 

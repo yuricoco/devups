@@ -23,6 +23,10 @@
             </div>
         </div>
         <div class="col-lg-9 col-md-6 text-right">
+
+            <?php if(getadmin()->getLogin() == "dv_admin" ){ ?>
+            <label class="btn btn-info" onclick="updateprivilege(this)" >Update master admin privilage</label>
+            <?php } ?>
             <?= Genesis::top_action(Dvups_admin::class); ?>
         </div>
     </div>
@@ -40,7 +44,6 @@
                     ->addcustomaction("callbackbtn")
                     ->render();
                 ?>
-
 
             </div>
             </div>
@@ -73,5 +76,16 @@
 
     <script src="<?= CLASSJS ?>model.js"></script>
     <script src="<?= CLASSJS ?>ddatatable.js"></script>
-    <script></script>
+
+    <script>
+
+        function updateprivilege(el) {
+            $(el).html("... processing ")
+            $.get(model.baseurl+'services.php?path=dvups_:update', function (response) {
+                console.log(response);
+                $(el).html(response)
+            }, 'text')
+        }
+
+    </script>
 @show

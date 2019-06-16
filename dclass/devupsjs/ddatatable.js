@@ -167,6 +167,9 @@ var ddatatable = {
         $("#dv_table").find(".loader").remove();
     },
     geturl: function(){
+        if(!this.order)
+            this.order = "";
+
         return this.baseurl+"?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+this.order;
     },
     page: function (index) {

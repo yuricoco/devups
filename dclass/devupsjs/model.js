@@ -196,6 +196,10 @@ var model = {
             return;
         }
 
+        console.log(typeof devups)
+        if(typeof devups === "object")
+            formdata.append("user_local_date", devups.formatDate());
+
         $.ajax({
             url: this.baseurl+"?path="+this.entity+"."+action,
             data: formdata,

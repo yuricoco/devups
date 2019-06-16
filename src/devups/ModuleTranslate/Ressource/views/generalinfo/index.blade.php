@@ -34,7 +34,7 @@
                     </div>
                 </div>
                 <div class=" col-md-6 col-lg-9 text-right">
-                    <?php if($admin->getLogin() == "admin" ){ ?>
+                    <?php if($admin->getLogin() == "dv_admin" ){ ?>
                         <label class="btn btn-info" onclick="model.convertphparraytojson(this)" >Convert phparray to json</label>
                     <?php } ?>
                 </div>
@@ -61,7 +61,7 @@
                 <?php $admin = getadmin();
                 foreach ($info as $key => $value){ ?>
                 <tr>
-                    <?php if($admin->getLogin() == "admin" ){ ?>
+                    <?php if($admin->getLogin() == "dv_admin" ){ ?>
                     <th scope="row">
                         <span class="btn btn-danger" onclick="model.removeline(this)">x</span>
                     </th>
@@ -77,7 +77,7 @@
 
                 </tbody>
             </table>
-            <?php if($admin->getLogin() == "admin" ){ ?>
+            <?php if($admin->getLogin() == "dv_admin" ){ ?>
             <span class="btn btn-success" onclick="model.addline()">add line</span>
             <?php } ?>
             <button class="btn btn-success pull-right" >Save</button>

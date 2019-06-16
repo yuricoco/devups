@@ -115,12 +115,15 @@ class AdminTemplateGenerator extends DvAdmin {
 <hr>
 
 <div class=\"row\">
-        <div class=\"col-lg-12 col-md-12\">
-        
-    <div class=\"dataTables_wrapper container-fluid dt-bootstrap4 no-footer\">
-    " . $index . "
+    <div class=\"col-lg-12 col-md-12  stretch-card\">
+        <div class=\"card\">
+            <div class=\"card-body\">
+                <div class=\"dataTables_wrapper container-fluid dt-bootstrap4 no-footer\">
+                    " . $index . "
+                </div>
+            </div>
         </div>
-        </div>
+    </div>
 </div>
         
 <div class=\"modal fade\" id=\"" . $name . "modal\" tabindex=\"-1\" role=\"dialog\"
@@ -161,94 +164,94 @@ class AdminTemplateGenerator extends DvAdmin {
         fclose($view);
 
         //----------------------------------
-        /* $layout = "
- @extends('layout')
- @section('title', 'Show')
+       /* $layout = "
+@extends('layout')
+@section('title', 'Show')
 
 
- @section('content')
+@section('content')
+                
+                    <div class=\"row\">
+                            <div class=\"col-lg-12\">
+                                    <ol class=\"breadcrumb\">
+                                            <li class=\"active\">
+                                                    <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Detail 
+                                            </li>
+                                    </ol>
+                            </div>
+    <div class=\"col-lg-12\">
+        <div class=\"row\">
+            <div class=\"col-lg-3 \">
+                <div class=\"panel panel-primary\">
+                    <div class=\"panel-heading\">
+                        <div class=\"row\">
+                            <div class=\"col-xs-12 \">
+                                <h5>Detail " . ucfirst($name) . "</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class=\" col-md-offset-6 col-lg-3\">
+                <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
+            </div>
+        </div>
+    </div>
+                    </div>
+                    <div class=\"row\">
+                                            " . $show . "
+                    </div>        
+         
+@endsection";
 
-                     <div class=\"row\">
-                             <div class=\"col-lg-12\">
-                                     <ol class=\"breadcrumb\">
-                                             <li class=\"active\">
-                                                     <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Detail
-                                             </li>
-                                     </ol>
-                             </div>
-     <div class=\"col-lg-12\">
-         <div class=\"row\">
-             <div class=\"col-lg-3 \">
-                 <div class=\"panel panel-primary\">
-                     <div class=\"panel-heading\">
-                         <div class=\"row\">
-                             <div class=\"col-xs-12 \">
-                                 <h5>Detail " . ucfirst($name) . "</h5>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
-             <div class=\" col-md-offset-6 col-lg-3\">
-                 <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
-             </div>
-         </div>
-     </div>
-                     </div>
-                     <div class=\"row\">
-                                             " . $show . "
-                     </div>
+        $view = fopen($_dir . 'show.blade.php', 'w');
+        fputs($view, $layout);
+        fclose($view);
 
- @endsection";
-
-         $view = fopen($_dir . 'show.blade.php', 'w');
-         fputs($view, $layout);
-         fclose($view);
-
-         //----------------------------------
-         $layout = "
- @extends('layout')
- @section('title', 'Form')
+        //----------------------------------
+        $layout = "
+@extends('layout')
+@section('title', 'Form')
 
 
- @section('content')
+@section('content')
 
-                     <div class=\"row\">
-                             <div class=\"col-lg-12\">
-                                     <ol class=\"breadcrumb\">
-                                             <li class=\"active\">
-                                                     <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Formula
-                                             </li>
-                                     </ol>
-                             </div>
-     <div class=\"col-lg-12\">
-         <div class=\"row\">
-             <div class=\"col-lg-3 \">
-                 <div class=\"panel panel-primary\">
-                     <div class=\"panel-heading\">
-                         <div class=\"row\">
-                             <div class=\"col-xs-12 \">
-                                 <h5>Formula " . ucfirst($name) . "</h5>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
-             <div class=\" col-md-offset-6 col-lg-3\">
-                 <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
-             </div>
-         </div>
-     </div>
-                     </div>
-                     <div class=\"row\">
-                                     " . $new_edit . "
-                     </div>
+                    <div class=\"row\">
+                            <div class=\"col-lg-12\">
+                                    <ol class=\"breadcrumb\">
+                                            <li class=\"active\">
+                                                    <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Formula 
+                                            </li>
+                                    </ol>
+                            </div>
+    <div class=\"col-lg-12\">
+        <div class=\"row\">
+            <div class=\"col-lg-3 \">
+                <div class=\"panel panel-primary\">
+                    <div class=\"panel-heading\">
+                        <div class=\"row\">
+                            <div class=\"col-xs-12 \">
+                                <h5>Formula " . ucfirst($name) . "</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class=\" col-md-offset-6 col-lg-3\">
+                <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
+            </div>
+        </div>
+    </div>
+                    </div>
+                    <div class=\"row\">
+                                    " . $new_edit . "
+                    </div>      
+         
+@endsection";
 
- @endsection";
-
-         $view = fopen($_dir . 'form.blade.php', 'w');
-         fputs($view, $layout);
-         fclose($view);*/
+        $view = fopen($_dir . 'form.blade.php', 'w');
+        fputs($view, $layout);
+        fclose($view);*/
 
     }
 

@@ -480,4 +480,22 @@ class Controller {
         include __DIR__ . "/../../" . $view;
     }
 
+    protected $entitytarget = "";
+    protected $title = "View Title";
+    public static $cssfiles = [];
+    public static $jsfiles = [];
+
+    public function renderListView($lazyloading, $datatablemodel) {
+
+        Genesis::renderView('defaultindex',
+            array('success' => true, // pour le restservice
+            'title' => $this->title, // pour le web service
+            'entity' => $this->entitytarget, // pour le web service
+            'lazyloading' => $lazyloading, // pour le web service
+            'datatablemodel' => $datatablemodel, // pour le web service
+            'detail' => '')
+        );
+
+    }
+
 }

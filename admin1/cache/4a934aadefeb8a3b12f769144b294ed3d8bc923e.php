@@ -1,103 +1,129 @@
-<ul class="nav navbar-top-links navbar-right">
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="fa fa-envelope fa-fw"></i>  <i class="fa fa-caret-down"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-messages">
-            <li>
-                <a href="#">
-                    <div>
-                        <strong>John Smith</strong>
-                        <span class="pull-right text-muted">
-                                            <em>Yesterday</em>
-                                        </span>
+<div class="navbar-menu-wrapper d-flex align-items-center justify-content-end">
+    <ul class="navbar-nav mr-lg-4 w-100">
+        <li class="nav-item nav-search d-none d-lg-block w-100">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                <span class="input-group-text" id="search">
+                  <i class="mdi mdi-magnify"></i>
+                </span>
+                </div>
+                <input type="text" class="form-control" placeholder="Search now" aria-label="search" aria-describedby="search">
+            </div>
+        </li>
+    </ul>
+    <ul class="navbar-nav navbar-nav-right">
+        <li class="nav-item dropdown mr-1">
+            <a class="nav-link count-indicator dropdown-toggle d-flex justify-content-center align-items-center" id="messageDropdown" href="#" data-toggle="dropdown">
+                <i class="mdi mdi-message-text mx-0"></i>
+                <span class="count"></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="messageDropdown">
+                <p class="mb-0 font-weight-normal float-left dropdown-header">Messages</p>
+                <a class="dropdown-item">
+                    <div class="item-thumbnail">
+                        <img src="<?php echo e(assets); ?>images/faces/face4.jpg" alt="image" class="profile-pic">
                     </div>
-                    <div>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque eleifend...</div>
-                </a>
-            </li>
-            <li class="divider"></li>
-            <li>
-                <a class="text-center" href="#">
-                    <strong>Read All Messages</strong>
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-        </ul>
-        <!-- /.dropdown-messages -->
-    </li>
-    <!-- /.dropdown -->
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="fa fa-tasks fa-fw"></i>  <i class="fa fa-caret-down"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-tasks">
-            <li>
-                <a href="#">
-                    <div>
-                        <p>
-                            <strong>Task 1</strong>
-                            <span class="pull-right text-muted">40% Complete</span>
+                    <div class="item-content flex-grow">
+                        <h6 class="ellipsis font-weight-normal">David Grey
+                        </h6>
+                        <p class="font-weight-light small-text text-muted mb-0">
+                            The meeting is cancelled
                         </p>
-                        <div class="progress progress-striped active">
-                            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width: 40%">
-                                <span class="sr-only">40% Complete (success)</span>
-                            </div>
+                    </div>
+                </a>
+                <a class="dropdown-item">
+                    <div class="item-thumbnail">
+                        <img src="<?php echo e(assets); ?>images/faces/face2.jpg" alt="image" class="profile-pic">
+                    </div>
+                    <div class="item-content flex-grow">
+                        <h6 class="ellipsis font-weight-normal">Tim Cook
+                        </h6>
+                        <p class="font-weight-light small-text text-muted mb-0">
+                            New product launch
+                        </p>
+                    </div>
+                </a>
+                <a class="dropdown-item">
+                    <div class="item-thumbnail">
+                        <img src="<?php echo e(assets); ?>images/faces/face3.jpg" alt="image" class="profile-pic">
+                    </div>
+                    <div class="item-content flex-grow">
+                        <h6 class="ellipsis font-weight-normal"> Johnson
+                        </h6>
+                        <p class="font-weight-light small-text text-muted mb-0">
+                            Upcoming board meeting
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </li>
+        <li class="nav-item dropdown mr-4">
+            <a class="nav-link count-indicator dropdown-toggle d-flex align-items-center justify-content-center notification-dropdown" id="notificationDropdown" href="#" data-toggle="dropdown">
+                <i class="mdi mdi-bell mx-0"></i>
+                <span class="count"></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="notificationDropdown">
+                <p class="mb-0 font-weight-normal float-left dropdown-header">Notifications</p>
+                <a class="dropdown-item">
+                    <div class="item-thumbnail">
+                        <div class="item-icon bg-success">
+                            <i class="mdi mdi-information mx-0"></i>
                         </div>
                     </div>
-                </a>
-            </li>
-            <li class="divider"></li>
-            <li>
-                <a class="text-center" href="#">
-                    <strong>See All Tasks</strong>
-                    <i class="fa fa-angle-right"></i>
-                </a>
-            </li>
-        </ul>
-        <!-- /.dropdown-tasks -->
-    </li>
-    <!-- /.dropdown -->
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="fa fa-bell fa-fw"></i>  <i class="fa fa-caret-down"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-alerts">
-            <li>
-                <a href="#">
-                    <div>
-                        <i class="fa fa-comment fa-fw"></i> New Comment
-                        <span class="pull-right text-muted small">4 minutes ago</span>
+                    <div class="item-content">
+                        <h6 class="font-weight-normal">Application Error</h6>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                            Just now
+                        </p>
                     </div>
                 </a>
-            </li>
-            <li class="divider"></li>
-            <li>
-                <a class="text-center" href="#">
-                    <strong>See All Alerts</strong>
-                    <i class="fa fa-angle-right"></i>
+                <a class="dropdown-item">
+                    <div class="item-thumbnail">
+                        <div class="item-icon bg-warning">
+                            <i class="mdi mdi-settings mx-0"></i>
+                        </div>
+                    </div>
+                    <div class="item-content">
+                        <h6 class="font-weight-normal">Settings</h6>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                            Private message
+                        </p>
+                    </div>
                 </a>
-            </li>
-        </ul>
-        <!-- /.dropdown-alerts -->
-    </li>
-    <!-- /.dropdown -->
-    <li class="dropdown">
-        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="fa fa-user fa-fw"></i>  <i class="fa fa-caret-down"></i>
-        </a>
-        <ul class="dropdown-menu dropdown-user">
-            <li>
-                <a href="<?= __env.Dvups_admin::classpath().'index.php?path=dvups_admin/_editpassword' ?>"><i class="fa fa-fw fa-user"></i> update password</a>
-            </li>
-        <!--                         <li>
-                                                        <a href="<?= __DIR__ ?>/../../src/devups/ModuleAdmin/index.php?path=admin/changerphoto"><i class="fa fa-gear fa-fw"></i> Photo</a>
-                                                    </li>-->
-            <li class="divider"></li>
-            <li>
-                <a href="<?= path('src/devups/ModuleAdmin/index.php?path=deconnexion') ?>"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
-            </li>
-        </ul>
-        <!-- /.dropdown-user -->
-    </li>
-    <!-- /.dropdown -->
-</ul>
+                <a class="dropdown-item">
+                    <div class="item-thumbnail">
+                        <div class="item-icon bg-info">
+                            <i class="mdi mdi-account-box mx-0"></i>
+                        </div>
+                    </div>
+                    <div class="item-content">
+                        <h6 class="font-weight-normal">New user registration</h6>
+                        <p class="font-weight-light small-text mb-0 text-muted">
+                            2 days ago
+                        </p>
+                    </div>
+                </a>
+            </div>
+        </li>
+        <li class="nav-item nav-profile dropdown">
+            <a class="nav-link dropdown-toggle" href="#" data-toggle="dropdown" id="profileDropdown">
+                <img src="<?php echo e(assets); ?>images/faces/face5.jpg" alt="profile"/>
+                <span class="nav-profile-name"><?php echo e(getadmin()->getName()); ?></span>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="profileDropdown">
+                <a href="<?= __env.Dvups_admin::classpath().'dvups-admin/_editpassword' ?>" class="dropdown-item">
+                    <i class="mdi mdi-settings text-primary"></i>
+                    Settings
+                </a>
+                <a class="dropdown-item"
+                   href="<?= path('admin/index.php?path=deconnexion') ?>">
+                    <i class="mdi mdi-logout text-primary"></i>
+                    Logout
+                </a>
+            </div>
+        </li>
+    </ul>
+    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+    </button>
+</div>
