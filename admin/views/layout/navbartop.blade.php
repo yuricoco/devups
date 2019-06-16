@@ -94,7 +94,7 @@
                                                     </li>-->
             <li class="divider"></li>
             <li>
-                <a href="<?= path('src/devups/ModuleAdmin/index.php?path=deconnexion') ?>"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
+                <a href="<?= path('admin/index.php?path=deconnexion') ?>"><i class="fa fa-fw fa-power-off"></i> Log Out</a>
             </li>
         </ul>
         <!-- /.dropdown-user -->
