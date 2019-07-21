@@ -1,5 +1,4 @@
-<?php 
-	//chdir '../';
-//	require 'template/egestion/egestion.php';
-//	require 'template/adminv1/adminv1.php';
-	require 'DvAdmin.php';
+<?php
+
+require ROOT."dclass/generator/template/DvAdmin.php";
+require ROOT."admin/generator/AdminTemplateGenerator.php";

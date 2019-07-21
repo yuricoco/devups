@@ -330,7 +330,10 @@ class " . ucfirst($name) . "Controller extends Controller{
         $" . "this->title = \"Manage " . ucfirst($name) . "\";
         $" . "datatablemodel = $datatablemodel;
         
-        $" . "this->renderListView($" . "lazyloading, $" . "datatablemodel);
+        $" . "this->renderListView(
+            Datatable::buildtable($" . "lazyloading, $" . "datatablemodel)
+                ->render()
+        );
 
     }
 
@@ -387,7 +390,7 @@ class " . ucfirst($name) . "Controller extends Controller{
         if ( $" . "this->error ) {
             return 	array(	'success' => false,
                             '" . $name . "' => $" . $name . ",
-                            'action_form' => 'create', 
+                            'action' => 'create', 
                             'error' => $" . "this->error);
         }
         
@@ -648,9 +651,14 @@ class " . ucfirst($name) . "Controller extends Controller{
         }
 
         $contenu = "<?php \n
+        
+use Genesis as g;
+
     class " . ucfirst($name) . "Form extends FormManager{
 
-        public static function formBuilder(\\" . ucfirst($name) . " $" . $name . ", $" . "action = null, $" . "button = false) {
+        public static function formBuilder($" . "dataform, $" . "button = false) {
+            $" . $name . " = new \\" . ucfirst($name) . "();
+            extract($" . "dataform);
             $" . "entitycore = new Core($" . $name . ");
             
             $" . "entitycore->formaction = $" . "action;
@@ -666,31 +674,43 @@ class " . ucfirst($name) . "Controller extends Controller{
             return $" . "entitycore;
         }
         
-        public static function __renderForm(\\" . ucfirst($name) . " $" . $name . ", $" . "action = null, $" . "button = false) {
-            return FormFactory::__renderForm(" . ucfirst($name) . "Form::formBuilder($" . $name . ", $" . "action, $" . "button));
+        public static function __renderForm($" . "dataform, $" . "button = false) {
+            return FormFactory::__renderForm(" . ucfirst($name) . "Form::formBuilder($" . "dataform,  $" . "button));
         }
         
-        public static function render($" . "id = null, $" . "action = \"create\") {
-            $" . $name . " = new " . ucfirst($name) . "();
-            if($" . "id){
-                $" . "action = \"update&id=\".$" . "id;
-                $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-                //$" . $name . "->collectStorage();
-            }
-    
-            return ['success' => true,
-                'form' => " . ucfirst($name) . "Form::__renderForm($" . $name . ", $" . "action, true),
+        public static function getFormData($" . "id = null, $" . "action = \"create\")
+        {
+            if (!$" . "id):
+                $" . $name . " = new " . ucfirst($name) . "();
+                
+                return [
+                    'success' => true,
+                    '" . $name . "' => $" . $name . ",
+                    'action' => \"create\",
+                ];
+            endif;
+            
+            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+            return [
+                'success' => true,
+                '" . $name . "' => $" . $name . ",
+                'action' => \"update&id=\" . $"."id,
             ];
+
         }
         
-        public static function __renderFormWidget(\\" . ucfirst($name) . " $" . $name . ", $" . "action_form = null) {
-            include " . ucfirst($name) . "::classroot(\"Form/" . ucfirst($name) . "FormWidget.php\");
+        public static function render($" . "id = null, $" . "action = \"create\")
+        {
+            g::json_encode(['success' => true,
+                'form' => self::__renderForm(self::getFormData($" . "id, $" . "action),true),
+            ]);
         }
 
-        public static function __renderDetailWidget($" . "id){
-            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-            include " . ucfirst($name) . "::classroot(\"Form/" . ucfirst($name) . "DetailWidget.php\");
+        public static function renderWidget($" . "id = null, $" . "action = \"create\")
+        {
+            Genesis::renderView(\"" . $name . ".formWidget\", self::getFormData($" . "id, $" . "action));
         }
+        
     }
     ";
         $entityform = fopen('Form/' . ucfirst($name) . 'Form.php', 'w');
@@ -817,6 +837,7 @@ class " . ucfirst($name) . "Controller extends Controller{
         $field = '';
         $traitement = new Traitement();
         $name = strtolower($entity->name);
+        $listview = [];
 
         if ($mother) {
             $field .= "<?php $".$name." = $".$mother."->get".ucfirst($entity->name)."(); ?>";

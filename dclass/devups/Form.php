@@ -36,7 +36,7 @@ class Form extends FormFactory{
 
         //return "<form id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
 
-        return "<form onsubmit=\"return dform._submit(this, '".Form::$name."/$action' )\" id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
+        return "<form action='" . Form::$name . "/" . $action . "' onsubmit=\"return dform._submit(this, '".Form::$name."/$action' )\" id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
 
     }
 

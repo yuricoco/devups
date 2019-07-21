@@ -124,6 +124,9 @@ switch (Request::get('path')) {
     case 'dvups_role._new':
         g::json_encode(Dvups_roleController::renderForm());
         break;
+    case 'dvups_role.create':
+        g::json_encode($dvups_roleCtrl->createAction());
+        break;
     case 'dvups_role.update':
         g::json_encode($dvups_roleCtrl->updateAction(R::get("id")));
         break;
@@ -151,7 +154,7 @@ switch (Request::get('path')) {
         break;
 
     default:
-        echo json_encode("404 : page  '" . Request::get('path') . "' note found");
+        g::json_encode("404 : page  '" . Request::get('path') . "' note found");
         break;
 }
 

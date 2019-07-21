@@ -1,16 +1,16 @@
 <?php
 
+//require __DIR__ . '/../../config/constante.php';
+
 require __DIR__ . '/../../config/dependanceInjection.php';
 
 require __DIR__ . '/BackendGenerator.php';
 require __DIR__ . '/android/BackendGeneratorJava.php';
 require __DIR__ . '/RequestGenerator.php';
 require __DIR__ . '/Traitement.php';
-require __DIR__ . '/template/Templatedependences.php';
 require __DIR__ . '/__Generator.php';
 require __DIR__ . '/android/__Generatorjava.php';
 
-require ROOT . '/admin/generator/AdminTemplateGenerator.php';
 
 $module_entities = [];
 

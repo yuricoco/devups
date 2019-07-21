@@ -12,13 +12,6 @@
 @section('content')
 
         <div class="row">
-                <div class="col-lg-12">
-                        <ol class="breadcrumb">
-                                <li class="active">
-                                        <i class="fa fa-dashboard"></i> <?php echo CHEMINMODULE; ?>  > Liste 
-                                </li>
-                        </ol>
-                </div>
             <div class="col-lg-12">
                 <div class="row">
                     <div class="col-lg-3 col-md-6">
@@ -41,6 +34,8 @@
         <div class="row">
                 
         <div class="col-lg-12 col-md-12">
+            <div class="card">
+                <div class="card-body">
                 
                     <?= \DClass\devups\Datatable::buildtable($lazyloading, [
 ['header' => 'Name', 'value' => 'name'], 
@@ -48,7 +43,9 @@
 ])->render(); ?>
 
         </div>
-			
+        </div>
+        </div>
+
         </div>
         
         <div class="modal fade" id="dvups_rolemodal" tabindex="-1" role="dialog"

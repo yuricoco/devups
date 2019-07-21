@@ -24,8 +24,12 @@
      * @Column(name="project", type="string" , length=25 )
      * @var string
      * */
-        private $project; 
-        
+        private $project;
+
+        /**
+         * @var \Dvups_entity
+         */
+        public $dvups_entity;
 
         
         public function __construct($id = null){
@@ -33,6 +37,22 @@
                 if( $id ) { $this->id = $id; }   
                           
 }
+
+        public static function init($name)
+        {
+            $dvmodule = new Dvups_module();
+            $dvups_navigation = unserialize($_SESSION[dv_role_navigation]);
+            foreach ($dvups_navigation as $key => $module){
+                if ($module["module"]->getName() == $name){
+                    $dvmodule = $module["module"];
+                    $dvmodule->dvups_entity = $module["entities"];
+                    return $dvmodule;
+                }
+            }
+//            $module = Dvups_module::select()->where("name", $name)->__getOne();
+//            $module->dvups_entity = $module->__hasmany(Dvups_entity::class);
+            return $dvmodule;
+        }
 
         /**
          * @return string

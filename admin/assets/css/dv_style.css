@@ -1,0 +1,31 @@
+
+.dv_datatable th{position: relative;}
+.dv_datatable tr.th-filter th{padding: 0px !important;}
+.dv_datatable .torder{z-index: 3; position: absolute; top:0; right: 0; padding: 15px 12px}
+.dv_datatable .loader{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 3;
+    padding: 25% 0;
+    text-align: center;
+    color: white;
+    font-size: 50px;
+    background: rgba(51,122,183,0.3);
+}
+
+.app-main {
+    display: block;
+}
+.app-wrapper-footer{
+    /*position: absolute;*/
+    /*bottom: 0;*/
+    /*width: calc(100% - 80px)!important;*/
+}
+
+.dv_modal{
+    width: 500px; background: transparent; display: block; min-height: 50px; padding-top: 80px;
+    transition: .5s;
+}

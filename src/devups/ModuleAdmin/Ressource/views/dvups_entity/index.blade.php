@@ -9,39 +9,13 @@
                 
 @show
 
-@section('content')
+@section('layout_content')
 
-        <div class="row">
-            <div class="col-lg-12">
-                <ol class="breadcrumb">
-                    <li class="active">
-                        <i class="fa fa-dashboard"></i> <?php echo CHEMINMODULE; ?> > Liste
-                    </li>
-                </ol>
-            </div>
-            <div class="col-lg-12">
-                <div class="row">
-                    <div class="col-lg-3 col-md-6">
-                        <div class="panel panel-primary">
-                            <div class="panel-heading">
-                                <div class="row">
-                                    <div class="col-xs-12 ">
-                                        <h5>Manage Admin</h5>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div style="float: right; margin-right: 30px;" class="panel">
-                        <?= Genesis::top_action(Dvups_entity::class); ?>
-                    </div>
-                </div>
-            </div>
-        </div>
         <div class="row">
                 
         <div class="col-lg-12 col-md-12">
-                
+            <div class="card">
+                <div class="card-body">
                     <?= \DClass\devups\Datatable::buildtable($lazyloading, [
 ['header' => 'Name', 'value' => 'name'], 
 ['header' => 'Dvups_module', 'value' => 'Dvups_module.name'],
@@ -49,29 +23,25 @@
 ])->render(); ?>
 
         </div>
-			
         </div>
-        
-        <div class="modal fade" id="dvups_entitymodal" tabindex="-1" role="dialog"
-             aria-labelledby="modallabel">
-            <div  class="modal-dialog" role="document">
-                <div class="modal-content">
-        
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal"
-                                aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                        <h3 class="title" id="modallabel">Modal Label</h3>
+        </div>
+
+        </div>
+
+        <div id="dvups_entitybox" class="swal2-container swal2-fade swal2-shown" style="display:none; overflow-y: auto;">
+            <div role="dialog" aria-labelledby="swal2-title" aria-describedby="swal2-content" class="swal2-modal swal2-show dv_modal" tabindex="1"
+                 style="">
+                <div class="main-card mb-3 card  box-container">
+                    <div class="card-header">Modal Tile
+
+                        <button onclick="model._dismissmodal()" type="button" class="swal2-close" aria-label="Close this dialog" style="display: block;">×</button>
                     </div>
-                    <div class="modal-body panel generalinformation"> </div>
-                    <div class="modal-footer">
-                        <button data-dismiss="modal" aria-label="Close" type="button" class="btn btn-danger" >Close</button>
-                    </div>
-        
+                    <div class="card-body"></div>
                 </div>
-        
+
             </div>
         </div>
-        
+
 @endsection
 
 @section('jsimport')

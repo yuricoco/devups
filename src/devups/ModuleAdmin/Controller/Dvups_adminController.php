@@ -136,7 +136,7 @@ class Dvups_adminController extends Controller {
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
             'tablerow' => Datatable::getSingleRowRest($dvups_admin),
-            'redirect' => 'index.php?path=dvups_admin/added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
+            'redirect' => Dvups_admin::classpath().'dvups-admin/added?login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
     }
@@ -223,6 +223,32 @@ class Dvups_adminController extends Controller {
         return array('success' => true, // pour le restservice
             'lazyloading' => $lazyloading, // pour le web service
             'detail' => '');
+
+    }
+
+    public function listView($next = 1, $per_page = 10)
+    {
+
+        $qb = Dvups_admin::select()
+            ->where("login", "!=", "dv_admin");
+        //->andwhere("password", "!=", sha1("admin"));
+
+        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb, "dvups_admin.id desc");
+
+        //self::$jsfiles[] = Client::classpath('Ressource/js/dvups_roleCtrl.js');
+
+        $this->entitytarget = 'dvups_admin';
+        $this->title = "Manage Admin";
+        $datatablemodel = [
+            ['header' => 'nom', 'value' => 'name'],
+            ['header' => 'login', 'value' => 'login'],
+        ];
+
+        $this->renderListView(
+            \DClass\devups\Datatable::buildtable($lazyloading, $datatablemodel)
+                ->addcustomaction("callbackbtn")
+                ->render()
+        );
 
     }
 

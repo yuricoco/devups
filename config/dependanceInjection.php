@@ -37,6 +37,8 @@ require __DIR__ . '/../dclass/devups/FormManager.php';
 require __DIR__ . '/../dclass/devups/Form.php';
 require __DIR__ . '/../dclass/devups/Request.php';
 
+require __DIR__ . '/../dclass/generator/template/Templatedependences.php';
+
 global $enittycollection;
 global $em;
 $em = DBAL::getEntityManager();

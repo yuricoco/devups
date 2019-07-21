@@ -1,38 +1,166 @@
 <?php
 
-class AdminTemplateGenerator extends DvAdmin {
+class AdminTemplateGenerator extends DvAdmin
+{
 
     private $traitement;
 
-    function __construct() {
+    function __construct()
+    {
         $this->traitement = new Traitement();
     }
 
-    static function modulelinkGenerator($projet) {
+    static function dt_btn_action($rowaction, $customrowactions, $actionDropdown)
+    {
+
+//        self::$rowaction[] = [
+//            'type'=> 'btn',
+//            'content'=> '<i class="fa fa-eye" ></i> view',
+//            'class'=> ''.self::$btnview_class.'',
+//            'action'=> 'onclick="model._show(' . $id . ')"',
+//            'modal'=> 'data-toggle="modal" data-target="#' . $path . 'modal" ',
+//        ];
+        //
+
+        $actionclass = ['edit' => "mb-2 mr-2 btn btn-warning",
+            'show' => "mb-2 mr-2 btn btn-info", 'delete' => "mb-2 mr-2 btn btn-danger",];
+
+        $act = "";
+
+        if (!$actionDropdown){
+
+            foreach ($customrowactions as $el) {
+                $act .= '' . $el . '';
+            }
+            foreach ($rowaction as $el) {
+
+                if (isset($actionclass[$el["class"]]))
+                    $el["class"] = $actionclass[$el["class"]];
+
+                $act .= '<button type="button" class="' . $el["class"] . '" ' . $el["action"] . ' >' . $el["content"] . '</button>';
+//            $act .= '<li class="nav-item"><button '. $el["modal"] . '  class="'. $actionclass[$el["class"]] . ' btn-block" '. $el["action"] . ' >'. $el["content"] . '</button></li>';
+
+            }
+
+            return <<<EOF
+$act
+EOF;
+        }
+
+        foreach ($customrowactions as $el) {
+            $act .= '<li class="nav-item">' . $el . '</li>';
+        }
+        foreach ($rowaction as $el) {
+
+            if (isset($actionclass[$el["class"]]))
+                $el["class"] = $actionclass[$el["class"]];
+
+            $act .= '<li class="nav-item"><button type="button" class="' . $el["class"] . ' btn-block" ' . $el["action"] . ' >' . $el["content"] . '</button></li>';
+//            $act .= '<li class="nav-item"><button '. $el["modal"] . '  class="'. $actionclass[$el["class"]] . ' btn-block" '. $el["action"] . ' >'. $el["content"] . '</button></li>';
+
+        }
+
+        return <<<EOF
+<div class="d-inline-block dropdown">
+    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" class="btn-shadow dropdown-toggle btn btn-light">
+        
+        Actions
+    </button>
+    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-131px, 33px, 0px);">
+        <ul class="nav flex-column"> $act </ul>
+    </div>
+</div>
+EOF;
+
+    }
+
+    static function modulelinkGenerator($projet)
+    {
         return "";
     }
 
-    static function layoutGenerator($module, $_dir) {
+    static function layoutGenerator($module, $_dir)
+    {
 
         $layout = "@extends('layout.layout')
 @section('title', 'Page Title')
 
+<?php function style(){ ?>
+
+<?php foreach (Controller::$" . "cssfiles as $" . "cssfile){ ?>
+<link href=\"<?= $" . "cssfile ?>\" rel=\"stylesheet\">
+<?php } ?>
+
+<?php } ?>
+
 @section('content')
-  
-    <div class=\"row\">
-            <div class=\"col-lg-12\">
-                    <ol class=\"breadcrumb\">
-                            <li class=\"active\">
-                                    <i class=\"fa fa-dashboard\"></i> " . $module->name . "
-                            </li>
-                    </ol>
+ 
+            <div class=\"app-page-title\">
+        <div class=\"page-title-wrapper\">
+            <div class=\"page-title-heading\">
+                <div class=\"page-title-icon\">
+                    <i class=\"pe-7s-car icon-gradient bg-mean-fruit\">
+                    </i>
+                </div>
+                <div>{{ $" . "moduledata->getName() }}
+                    <div class=\"page-title-subheading\">Some text</div>
+                </div>
             </div>
+            <div class=\"page-title-actions\">
+
+            </div>
+        </div>
     </div>
+    <ul class=\"nav nav-justified\">
+        <li class=\"nav-item\">
+            <a class=\"nav-link active\" href=\"<?= path('src/' . strtolower($" . "moduledata->getProject()) . '/' . $" . "moduledata->getName() . '') ?>\">
+                <i class=\"metismenu-icon\"></i> <span>Dashboard</span>
+            </a>
+        </li>
+        @foreach ($" . "moduledata->dvups_entity as $" . "entity)
+            <li class=\"nav-item\">
+                <a class=\"nav-link active\" href=\"<?= path('src/' . strtolower($" . "moduledata->getProject()) . '/' . $" . "moduledata->getName() . '/' . $" . "entity->getUrl() . '/index') ?>\">
+                    <i class=\"metismenu-icon\"></i> <span><?= $" . "entity->getLabel() ?></span>
+                </a>
+            </li>
+        @endforeach
+    </ul>
+    <hr>
+
+    @yield('layout_content')
+
+
+        @endsection
+        
+<?php function script(){ ?>
+
+<script src=\"<?= CLASSJS ?>devups.js\"></script>
+<script src=\"<?= CLASSJS ?>model.js\"></script>
+<script src=\"<?= CLASSJS ?>ddatatable.js\"></script>
+<?php foreach (Controller::$" . "jsfiles as $" . "jsfile){ ?>
+<script src=\"<?= $" . "jsfile ?>\"></script>
+<?php } ?>
+
+<?php } ?>
+
+	";
+
+        $layoutMod = fopen($_dir . 'layout.blade.php', 'w');
+
+        fputs($layoutMod, $layout);
+
+        fclose($layoutMod);
+
+        $overview = " @extends('layout')
+@section('title', 'List')
+
+@section('layout_content')
+
 	<div class=\"row\">
                   ";
         foreach ($module->listentity as $entity) {
             $name = strtolower($entity->name);
-            $layout .= "
+            $overview .= "
                             <?php //if($" . "moi->is_anable('" . $name . "')){ ?> 
             <div class=\"col-lg-3 col-md-6\">
                             <div class=\"panel panel-primary\">
@@ -63,24 +191,20 @@ class AdminTemplateGenerator extends DvAdmin {
 				";
         }
 
-        $layout .= " 
+        $overview .= " 
             </div>
-            
-        @endsection
-	";
+            @endsection 
+            ";
 
-        $layoutMod = fopen( $_dir . 'layout.blade.php', 'w');
+        $overviewMod = fopen($_dir . 'overview.blade.php', 'w');
 
-        if(!is_bool($layoutMod)){
+        fputs($overviewMod, $overview);
 
-            fputs($layoutMod, $layout);
-
-            fclose($layoutMod);
-        }
-        
+        fclose($overviewMod);
     }
 
-    static function viewsGenerator($listemodule, $entity, $_dir) {
+    static function viewsGenerator($listemodule, $entity, $_dir)
+    {
 
         $name = strtolower($entity->name);
 
@@ -91,171 +215,52 @@ class AdminTemplateGenerator extends DvAdmin {
 @extends('layout')
 @section('title', 'List')
 
-
-@section('cssimport')
-
-    <style></style>
-                
-@show
-
-@section('content')
+@section('layout_content')
 
 <div class=\"row\">
-    <div class=\"col-lg-3 col-md-6 \">
-        <div class=\"panel panel-primary\">
-            <div class=\"panel-heading\">
-                <div class=\"row\">
-                    <div class=\"col-xs-12 \">
-                        <h5>Manage " . ucfirst($name) . "</h5>
+        <div class=\"col-lg-12 col-md-12  stretch-card\">
+            <div class=\"card\">
+                <div class=\"card-header-tab card-header\">
+                    <div class=\"card-header-title\">
+                        <i class=\"header-icon lnr-rocket icon-gradient bg-tempting-azure\"> </i>
+                        {{ $"."title }}
                     </div>
+                    <div class=\"btn-actions-pane-right\">
+                        <div class=\"nav\">
+
+                        </div>
+                    </div>
+                </div>
+                <div class=\"card-body\">
+                    <?= $"."datatablehtml; ?>
                 </div>
             </div>
         </div>
     </div>
-    <div class=\"col-lg-9 col-md-6 text-right\">
-        <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
-    </div>
-</div>
-<hr>
 
-<div class=\"row\">
-        <div class=\"col-lg-12 col-md-12\">
-        
-    <div class=\"dataTables_wrapper container-fluid dt-bootstrap4 no-footer\">
-    <?= \DClass\devups\Datatable::buildtable($" . "lazyloading, " . $index . ")->render(); ?>
-        </div>
-        </div>
-</div>
-        
-<div class=\"modal fade\" id=\"" . $name . "modal\" tabindex=\"-1\" role=\"dialog\"
-     aria-labelledby=\"modallabel\">
-    <div  class=\"modal-dialog\" role=\"document\">
-        <div class=\"modal-content\">
+    <div id=\"{{ strtolower($"."entity) }}box\" class=\"swal2-container swal2-fade swal2-shown\" style=\"display:none; overflow-y: auto;\">
+        <div role=\"dialog\" aria-labelledby=\"swal2-title\" aria-describedby=\"swal2-content\" class=\"swal2-modal swal2-show dv_modal\" tabindex=\"1\"
+             style=\"\">
+            <div class=\"main-card mb-3 card  box-container\">
+                <div class=\"card-header\">Header
 
-            <div class=\"modal-header\">
-                <button type=\"button\" class=\"close\" data-dismiss=\"modal\"
-                        aria-label=\"Close\"><span aria-hidden=\"true\">&times;</span></button>
-                <h3 class=\"title\" id=\"modallabel\">Modal Label</h3>
-            </div>
-            <div class=\"modal-body panel generalinformation\"> </div>
-            <div class=\"modal-footer\">
-                <button data-dismiss=\"modal\" aria-label=\"Close\" type=\"button\" class=\"btn btn-danger\" >Close</button>
+                    <button onclick=\"model._dismissmodal()\" type=\"button\" class=\"swal2-close\" aria-label=\"Close this dialog\" style=\"display: block;\">×</button>
+                </div>
+                <div class=\"card-body\"></div>
             </div>
 
         </div>
-
     </div>
-</div>
         
 @endsection
 
-
-<?php function script(){ ?>
-
-<script src=\"<?= CLASSJS ?>model.js\"></script>
-<script src=\"<?= CLASSJS ?>ddatatable.js\"></script>
-
-<?php foreach (Controller::$"."jsfiles as $"."jsfile){ ?>
-<script src=\"<?= $"."jsfile ?>\"></script>
-<?php } ?>
-
-<?php } ?>
-@section('jsimport')
-@show ";
+";
 
         $view = fopen($_dir . 'index.blade.php', 'w');
         fputs($view, $layout);
         fclose($view);
 
         //----------------------------------
-        /* $layout = "
- @extends('layout')
- @section('title', 'Show')
-
-
- @section('content')
-
-                     <div class=\"row\">
-                             <div class=\"col-lg-12\">
-                                     <ol class=\"breadcrumb\">
-                                             <li class=\"active\">
-                                                     <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Detail
-                                             </li>
-                                     </ol>
-                             </div>
-     <div class=\"col-lg-12\">
-         <div class=\"row\">
-             <div class=\"col-lg-3 \">
-                 <div class=\"panel panel-primary\">
-                     <div class=\"panel-heading\">
-                         <div class=\"row\">
-                             <div class=\"col-xs-12 \">
-                                 <h5>Detail " . ucfirst($name) . "</h5>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
-             <div class=\" col-md-offset-6 col-lg-3\">
-                 <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
-             </div>
-         </div>
-     </div>
-                     </div>
-                     <div class=\"row\">
-                                             " . $show . "
-                     </div>
-
- @endsection";
-
-         $view = fopen($_dir . 'show.blade.php', 'w');
-         fputs($view, $layout);
-         fclose($view);
-
-         //----------------------------------
-         $layout = "
- @extends('layout')
- @section('title', 'Form')
-
-
- @section('content')
-
-                     <div class=\"row\">
-                             <div class=\"col-lg-12\">
-                                     <ol class=\"breadcrumb\">
-                                             <li class=\"active\">
-                                                     <i class=\"fa fa-dashboard\"></i> <?php echo CHEMINMODULE; ?>  > Formula
-                                             </li>
-                                     </ol>
-                             </div>
-     <div class=\"col-lg-12\">
-         <div class=\"row\">
-             <div class=\"col-lg-3 \">
-                 <div class=\"panel panel-primary\">
-                     <div class=\"panel-heading\">
-                         <div class=\"row\">
-                             <div class=\"col-xs-12 \">
-                                 <h5>Formula " . ucfirst($name) . "</h5>
-                             </div>
-                         </div>
-                     </div>
-                 </div>
-             </div>
-             <div class=\" col-md-offset-6 col-lg-3\">
-                 <?= Genesis::top_action(" . ucfirst($name) . "::class); ?>
-             </div>
-         </div>
-     </div>
-                     </div>
-                     <div class=\"row\">
-                                     " . $new_edit . "
-                     </div>
-
- @endsection";
-
-         $view = fopen($_dir . 'form.blade.php', 'w');
-         fputs($view, $layout);
-         fclose($view);*/
 
     }
 

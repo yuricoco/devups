@@ -57,6 +57,18 @@ var devups = {
         // or alternatively
         // return text.replace(urlRegex, '<a href="$1">$1</a>')
     },
+    routing: function (route, parameter) {
+        var getAttr = "";
+        if (parameter) {
+            var keys = Object.keys(parameter);
+            var values = Object.values(parameter);
+            for (var i = 0; i < keys.length; i++) {
+                getAttr += "&" + keys[i] + "=" + values[i];
+            }
+        }
+
+        return model.baseurl + "services.php?path=" + route + getAttr;
+    },
     upload: function  (file, url, onprogress, onload, oncomplete, _datatype, _postname, form) {
 
         if(!_postname)

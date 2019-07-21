@@ -46,9 +46,10 @@ class Controller {
             'detail' => '');
     }
 
-    public function lazyloading2($listEntity) {
+    public function lazyloading2($listEntity, $classname = "") {
 
         return array('success' => true, // pour le restservice
+            'classname' => strtolower($classname),
             'listEntity' => $listEntity,
             'nb_element' => count($listEntity),
             'per_page' => 100,
@@ -89,6 +90,10 @@ class Controller {
         $this->currentqb = $qb;
         $getparam = Request::$uri_get_param;
         foreach ($getparam as $key => $value) {
+
+            if(!$value)
+                continue;
+
             $attr = explode(":", $key);
             $join = explode("-", $attr[0]);
             if (isset($join[1])) {
@@ -146,6 +151,8 @@ class Controller {
     public static function initlazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = ""){
         return (new Controller())->lazyloading($entity, $next, $per_page, $qbcustom, $order);
     }
+
+    const maxpagination = 12;
     /**
      *
      * @param \stdClass $entity
@@ -240,12 +247,50 @@ class Controller {
             $per_page = $nb_element;
         }
 
+        $paginationcustom = [];
+        if($pagination >= self::maxpagination){
+            $middle = intval($pagination / 2);
+            $paginationcustom['firsts'] = [1, 2, 3];
+            $paginationcustom['lasts'] = [$pagination - 2, $pagination - 1, $pagination];
+
+            if($page > self::maxpagination / 2){
+
+                $paginationcustom['middleleft'] = intval($pagination / 4);
+                //$paginationcustom['firsts'] = [$page, 1 + $page + 1, 2 + $page + 2];
+
+                if($page + 3 >= $pagination){
+                    $paginationcustom['middleleft'] = intval($pagination / 4);
+                    $paginationcustom['lasts'] = [];
+                    $paginationcustom['middles'] = [$pagination - 5, $pagination - 4, $pagination - 3, $pagination - 2, $pagination - 1, $pagination];
+//                else{
+//                    $paginationcustom['middles'][] = $middle + $page + 2;
+//                    $paginationcustom['middles'][] = $middle + $page + 3;
+//                    $paginationcustom['middles'][] = $middle + $page + 4;
+                }else{
+                    $paginationcustom['middleright'] = intval($pagination * 3 / 4);
+                    $paginationcustom['middles'] = [$page - 1, $page, $page + 1];
+                }
+                //= [$page, $page + 1, $page + 2];
+            }else{
+
+                $paginationcustom['middles'] = [$middle - 1, $middle, $middle + 1];
+                $paginationcustom['middleright'] = intval($pagination * 3 / 4);
+                $paginationcustom['middleleft'] = intval($pagination / 4);
+
+                if( $page > 3 && $page < 8){
+                    $paginationcustom['firsts'] = [1, 2, 3, 4, 5, 6, 7];
+                }
+
+            }
+        }
+
         return array('success' => true, // pour le restservice
             'classname' => $classname,
             'listEntity' => $listEntity,
             'nb_element' => (int) $nb_element,
             'per_page' => $per_page,
             'pagination' => $pagination,
+            'paginationcustom' => $paginationcustom,
             'current_page' => $page,
             'next' => $next + 1,
             'previous' => (int) $page - 1,
@@ -429,6 +474,12 @@ class Controller {
                         $value2 = $reflect->newInstance();
 
                         if ($value['options'] && isset($_ENTITY_FORM[$key])) {
+
+                            if(!is_numeric($_ENTITY_FORM[$key])){
+                                $value2->setId(null);
+                                continue;
+                            }
+
                             $value2->setId($_ENTITY_FORM[$key]);
                             if (!method_exists($object, $currentfieldsetter)) {
                                 $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
@@ -481,18 +532,37 @@ class Controller {
     }
 
     protected $entitytarget = "";
+    protected $datatablemodel = [];
     protected $title = "View Title";
     public static $cssfiles = [];
+    public static $jsscript = "";
     public static $jsfiles = [];
 
-    public function renderListView($lazyloading, $datatablemodel) {
+    public function listView($next = 1, $per_page = 10)
+    {
 
-        Genesis::renderView('defaultindex',
+
+
+    }
+
+    public function renderListView($datatablehtml, $return = false, $lazyloading = [], $datatablemodel = "") {
+
+        if($return)
+            return array('success' => true, // pour le restservice
+            'title' => $this->title, // pour le web service
+            'entity' => $this->entitytarget, // pour le web service
+            'datatablehtml' => $datatablehtml, // pour le web service
+            'lazyloading' => $lazyloading, // pour le web service
+            'datatablemodel' => $datatablemodel, // pour le web service
+            'detail' => '');
+
+        Genesis::renderView('default.index',
             array('success' => true, // pour le restservice
             'title' => $this->title, // pour le web service
             'entity' => $this->entitytarget, // pour le web service
-            'lazyloading' => $lazyloading, // pour le web service
-            'datatablemodel' => $datatablemodel, // pour le web service
+            'datatablehtml' => $datatablehtml, // pour le web service
+//            'lazyloading' => $lazyloading, // pour le web service
+//            'datatablemodel' => $datatablemodel, // pour le web service
             'detail' => '')
         );
 

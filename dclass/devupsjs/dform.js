@@ -6,6 +6,9 @@ var entityid = 0;
 var dform = {
     binderror: function(error){
 
+        if(!error)
+            return 0;
+
         model.modalbody.find("#loader").remove();
         //console.log(response.error);
         var errorarray = [];
@@ -21,7 +24,7 @@ var dform = {
 
     },
     callbackcreate : function (response){
-        //console.log(response, "create");
+        console.log(response, "create");
 
         if(response.success){
             if(response.redirect)
@@ -30,7 +33,8 @@ var dform = {
             else if(response.reload)
                 window.location.reload();
 
-            $("#dv_table").find("tbody").prepend(response.tablerow);
+            ddatatable.addrow(response.tablerow);
+            //$("#dv_table").find("tbody").prepend(response.tablerow);
             model._dismissmodal();
             return;
         }
@@ -46,7 +50,8 @@ var dform = {
             else if(response.reload)
                 window.location.reload();
 
-            $("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
+            ddatatable.replacerow(dform.entityid, response.tablerow);
+            //$("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
             model._dismissmodal();
             return;
         }
@@ -56,12 +61,15 @@ var dform = {
     _submit: function(el, url){
         // var formserialize = $(this).serialize();
         // console.log(formserialize);
-        var actionarray = $(el).attr("action").split("/");
-        var action = actionarray[1];
-        var callback = function (response) { console.log(response); };
-        entityid = $(el).data("id");
+        if (! url){
+            var actionarray = $(el).attr("action").split("/");
+            url = actionarray[1];
+        }
 
-        if(entityid){
+        var callback = function (response) { console.log(response); };
+        dform.entityid = $(el).data("id");
+
+        if(dform.entityid){
             //action = actionarray[1];
             //action = "update&id="+entityid;
             callback = dform.callbackupdate;
@@ -70,13 +78,14 @@ var dform = {
         }
 
         var formdata = model._formdata($(el));
-        //model._post(action, formdata, callback);
-        console.log(url);
+        console.log(model.entity+'.'+url);
+        model._post(model.entity+'.'+url, formdata, callback);
+
         return false;
     }
 };
 
-// $("#"+model.entity+"-form").submit(function (e) {
-//     e.preventDefault();
-//     dform._submit(this)
-// });
+$("#"+model.entity+"-form").submit(function (e) {
+    e.preventDefault();
+    dform._submit(this, $(this).attr("action").split("/")[1])
+});

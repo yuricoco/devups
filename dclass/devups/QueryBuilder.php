@@ -39,10 +39,12 @@ class QueryBuilder extends \DBAL
         'not similar to', 'not ilike', '~~*', '!~~*',
     ];
 
+    public $tablecollection = [];
+
     public function __construct($entity = null)
     {
         $this->initwhereclause = false;
-        if ($entity)
+        if (is_object($entity))
             parent::__construct($entity);
 
 //        $this->table = strtolower(get_class($entity));
@@ -199,6 +201,21 @@ class QueryBuilder extends \DBAL
             $this->join();
         endif;
 
+        return $this;
+    }
+
+    /**
+     * @param bool $update
+     * @return $this
+     */
+    public function from($collection)
+    {
+
+//        $classname = [];
+//        foreach ($collection as $val)
+//            $classname[] = strtolower(get_class($val));
+
+        $this->tablecollection = implode("`, `", $collection);
         return $this;
     }
 
@@ -385,6 +402,36 @@ class QueryBuilder extends \DBAL
 //            $from = " from `" . $this->table . "` ";
         // on ".strtolower(get_class($entity)).".id = ".strtolower(get_class($entity_owner)).".".strtolower(get_class($entity))."_id
         $this->query .= $from . " left join `" . $this->join . "` on " . $this->join . ".id = " . strtolower($classnameon) . "." . $this->join . "_id";
+//        $this->query .= " left join `" . $this->join . "` ";
+        $this->sequence = '';
+
+        return $this;
+    }
+
+    /**
+     * rather than take relation.id = table.relation_id to create the link,
+     * it uses relation.table_id = table.id
+     *
+     * class
+     * @example get all the post in different timeline (timelineuser, timelinepage, timelinegroup, ...) timeline's got post_id
+     * but post doesn't have timeline's id. therefore to establish the relation, we need inverse the usual way. also we use left join
+     * because it support null value, again right join and inner join
+     * @param string $classname
+     * @param string $classnameon
+     * @return $this
+     */
+    public function leftjoinrecto($classname, $classnameon = "")
+    {
+        $this->join = strtolower($classname);
+
+        if (!$classnameon)
+            $classnameon = $this->objectName;
+
+        $from = '';
+//        if($this->sequence == 'delete')
+//            $from = " from `" . $this->table . "` ";
+        // on ".strtolower(get_class($entity)).".id = ".strtolower(get_class($entity_owner)).".".strtolower(get_class($entity))."_id
+        $this->query .= $from . " left join `" . $this->join . "` on " . $this->join . "." . strtolower($classnameon) . "_id = " . strtolower($classnameon) . ".id";
 //        $this->query .= " left join `" . $this->join . "` ";
         $this->sequence = '';
 
@@ -592,6 +639,9 @@ class QueryBuilder extends \DBAL
 
     private function initquery($columns)
     {
+        if($this->tablecollection)
+            return " select " . $columns . " from `" . $this->tablecollection . "` ";
+
         return " select " . $columns . " from `" . $this->table . "` ";
     }
 

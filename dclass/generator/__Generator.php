@@ -580,7 +580,8 @@ Usage:
 RewriteEngine On
 
 RewriteRule    ^/?$    index.php    [NC,L]
-RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]    # Process all products
+#RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]    # Process all products
+RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1/index    [NC,L]    # Process all products
 RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC,L]    # Process all products
 
 <IfModule mod_headers.c>
@@ -598,8 +599,16 @@ RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC
             //" . $module->name . "
         
         require '../../../admin/header.php';
-        global $" . "viewdir;
+        
+// move comment scope to enable authentication
+if (!isset($" . "_SESSION[ADMIN]) and $"."_GET['path']"." != 'connexion') {
+    header(\"location: \" . __env . 'admin/login.php');
+}
+
+        global $" . "viewdir, $" . "moduledata;
         $" . "viewdir[] = __DIR__ . '/Ressource/views';
+        
+$" . "moduledata = Dvups_module::init('" . $module->name . "');
                 \n\n";
 
         $contenu .= "
@@ -619,7 +628,7 @@ RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC
 switch (Request::get('path')) {
 
     case 'layout':
-        Genesis::renderView(\"layout\");
+        Genesis::renderView(\"overview\");
         break;
         ";
 
@@ -699,6 +708,9 @@ switch (Request::get('path')) {
 		
         require '../../../admin/header.php';
         
+// verification token
+//
+
         use Genesis as g;
         use Request as R;
         
@@ -719,13 +731,13 @@ switch (Request::get('path')) {
             $name = strtolower($entity->name);
             $contenu .= "
         case '" . $name . "._new':
-                g::json_encode(" . ucfirst($name) . "Form::render());
+                " . ucfirst($name) . "Form::render();
                 break;
         case '" . $name . ".create':
                 g::json_encode($" . $name . "Ctrl->createAction());
                 break;
         case '" . $name . "._edit':
-                g::json_encode(" . ucfirst($name) . "Form::render(R::get(\"id\")));
+                " . ucfirst($name) . "Form::render(R::get(\"id\"));
                 break;
         case '" . $name . ".update':
                 g::json_encode($" . $name . "Ctrl->updateAction(R::get(\"id\")));

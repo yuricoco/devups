@@ -4,13 +4,14 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
- */
-
-/**
+ *
  * Description of Model
  *
  * @author azankang atemkeng  <azankang.developer@gmail.com>
  */
+
+//namespace dclass\devups;
+
 abstract class Model extends \stdClass {
 
     public static $jsonmodel;
@@ -303,7 +304,7 @@ abstract class Model extends \stdClass {
      * return the entity
      * when recursif set to false, attribut as relation manyToOne has just their id hydrated
      * when recursif set to true, the DBAL does recursif request to hydrate the association entity and those of it.
-     * @param type $id the id of the entity
+     * @param integer $id the id of the entity
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
      * @return $this
      */
@@ -594,5 +595,18 @@ abstract class Model extends \stdClass {
         if( $id ) { $this->id = $id; }
 
     }
+
+    /**
+     * Get value of entity X in $_POST global variable from submited form
+     * @param string $formfeild
+     * @return mixed
+     */
+    // todo: implement namespace for model class
+//    public static function getvalue($formfeild){
+//
+//        $classname = strtolower(get_called_class());
+//        return $_POST[$classname."_form['$formfeild']"];
+//
+//    }
 
 }

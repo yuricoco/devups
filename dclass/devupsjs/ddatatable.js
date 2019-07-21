@@ -9,8 +9,13 @@ var ddatatable = {
     per_page : 10,
     searchparam : "",
     allchecked: false,
+
+    rowselect (el, id, callback){
+
+    },
+
     getcheckbox: function () {
-        return $("#dv_table").find('tbody').find("input[type=checkbox]");
+        return this.dtinstance.find("#dv_table").find('tbody').find("input[type=checkbox]");
     },
     getcheckboxchecked: function () {
         var $input = this.getcheckbox();
@@ -107,7 +112,7 @@ var ddatatable = {
     cancelsearch : function ($this) {
         this.searchparam = '';
         this.currentpage = 1;
-        $("#dcancel-search").hide();
+        this.dtinstance.find("#dcancel-search").hide();
         this.page(1);
         // $.get("services.php?path="+model.entity+".datatable&next=1&per_page="+this.per_page, function (response) {
         //     //console.log(response);
@@ -127,11 +132,11 @@ var ddatatable = {
         this.setloader();
         this.per_page = $("#dt_nbrow").val();
         this.order = "&"+param+" asc";
-        $.get(this.geturl(), function (response) {
+        $.get(this.geturl(), (response) => {
             console.log(response);
-            $("#dv_table").find("tbody").html(response.datatable.tablebody);
+            this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
             removeloader();
-        }, 'json').error (function(resultat, statut, erreur){
+        }, 'json').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
             $("#"+model.entity+"modal").modal("show");
             databinding.bindmodal(resultat.responseText);
@@ -142,9 +147,9 @@ var ddatatable = {
         this.setloader();
         this.per_page = $("#dt_nbrow").val();
         this.order = "&"+param+" desc";
-        $.get(this.geturl(), function (response) {
+        $.get(this.geturl(), (response) => {
             //console.log(response);
-            $("#dv_table").find("tbody").html(response.datatable.tablebody);
+            this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
             removeloader();
         }, 'json').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
@@ -156,63 +161,85 @@ var ddatatable = {
         this.currentpage -= 1;
         this.page(this.currentpage);
     },
+    firstpage: function () {
+        this.page(1);
+    },
     next: function () {
         this.currentpage += 1;
         this.page(this.currentpage);
     },
+    lastpage: function (last) {
+        this.page(last);
+    },
     setloader: function () {
-        $("#dv_table").prepend("<div class='loader'>loading</div>");
+        this.dtinstance.find("#dv_table").prepend("<div class='loader'>loading</div>");
     },
     removeloader: function () {
-        $("#dv_table").find(".loader").remove();
+        this.dtinstance.find("#dv_table").find(".loader").remove();
     },
     geturl: function(){
         if(!this.order)
             this.order = "";
 
-        return this.baseurl+"?path="+model.entity+".datatable&next="+this.currentpage+"&per_page="+this.per_page+this.searchparam+this.order;
+        return this.baseurl+"?path="+
+            this.entity+".datatable&next="+
+            this.currentpage+"&per_page="+
+            this.per_page+this.searchparam+
+            this.order + this.urlparam;
     },
+    _reload (){
+        this.page()
+    },
+    urlparam : "",
     page: function (index) {
         this.setloader();
-        this.per_page = $("#dt_nbrow").val();
+        this.per_page = this.dtinstance.find("#dt_nbrow").val();
         console.log(this.geturl());
-        $.get(this.geturl(), function (response) {
+        $.get(this.geturl(), (response) => {
             console.log(response);
-            $("#dv_table").find("tbody").html(response.datatable.tablebody);
-            $("#dv_pagination").replaceWith(response.datatable.tablepagination);
+            this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
+            this.dtinstance.find("#dv_pagination").replaceWith(response.datatable.tablepagination);
             removeloader();
         }, 'json').fail (function(resultat, statut, erreur){
             console.log(resultat);
-            $("#"+model.entity+"modal").show();
+            model._showmodal();
+            //$("#"+model.entity+"modal").show();
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
 
     },
+    findrow: function (entityid) {
+        return this.dtinstance.find("#dv_table").find("#"+entityid).length;
+    },
     replacerow: function (entityid, tablerow) {
-        $("#dv_table").find("#"+entityid).replaceWith(tablerow);
+        this.dtinstance.find("#dv_table").find("#"+entityid).replaceWith(tablerow);
     },
     removerow: function (entityid) {
-        $("#dv_table").find("#"+entityid).remove();
+        this.dtinstance.find("#dv_table").find("#"+entityid).remove();
     },
     addrow: function (tablerow) {
-        $("#dv_table").find("tbody").prepend(tablerow);
+        this.dtinstance.find("#dv_table").find("tbody").prepend(tablerow);
     },
-    init: function () {
-        console.log(typeof $);
+    getinstanceof(entity){
+        return $("#dv_"+entity+"_table");
+    },
+    init: function (entity) {
+
         if(typeof $ === 'undefined'){
-            console.log("not ready");
             return;
         }
 
-        console.log("ready");
+        console.log("#dv_"+entity+"_table");
+        this.dtinstance = $("#dv_"+entity+"_table");
+        this.entity = entity;
 
-        $("#dt_nbrow").change(function () {
+        this.dtinstance.find("#dt_nbrow").change(function () {
             console.log($(this).val());
             ddatatable.per_page = $(this).val();
             ddatatable.page(1);
         });
 
-        $("#datatable-form").submit(function (e) {
+        this.dtinstance.find("#datatable-form").submit(function (e) {
             e.preventDefault();
             ddatatable.search($(this));
         });
@@ -223,30 +250,43 @@ var ddatatable = {
             this.page(page);
         };
 
-        $("#deletegroup").click(function () {
+        this.dtinstance.find("#deletegroup").click(function () {
             ddatatable.groupdelete();
         });
-        $("#checkall").click(function () {
+        this.dtinstance.find("#checkall").click(function () {
             ddatatable.checkall();
         });
-        $(".dcheckbox").click(function () {
+        this.dtinstance.find(".dcheckbox").click(function () {
             ddatatable.uncheckall();
         });
 
-        ddatatable.baseurl = $("#dv_table").data('route')+"services.php";
+        ddatatable.baseurl = this.dtinstance.find("#dv_table").data('route')+"services.php";
+        //console.log(ddatatable.baseurl);
+        ddatatable.urlparam = this.dtinstance.find("#dv_table").data('filterparam');
+
+        return this;
 
     }
 };
 
 function removeloader(){
-    $("#dv_table").find(".loader").remove();
-    $('html,body').animate({scrollTop:$("#dbody").offset().top},500);
+    ddatatable.dtinstance.find("#dv_table").find(".loader").remove();
+    //$('html,body').animate({scrollTop:$("#dbody").offset().top},500);
 }
 
 
 setTimeout(function () {
 
-    ddatatable.init();
+    ddatatable.init(model.entity);
+    $("#dv_main_container").on('mouseenter', ".dv_datatable_container", function () {
+
+        model.baseurl = $(this).find("#dv_table").eq(0).data('route')+"services.php";
+        model.entity = $(this).find("#dv_table").eq(0).data('entity');
+
+        //model.init($(this).find("#dv_table"));
+        ddatatable.init(model.entity);
+
+    })
 
 }, 800)
 

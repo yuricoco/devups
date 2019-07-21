@@ -41,6 +41,19 @@ class Dvups_entity extends Model implements JsonSerializable {
      */
     public $dvups_right;
 
+    public static function getRigthOf($action)
+    {
+        $entity = Dvups_entity::select()->where('this.name', $action)->__getOne();
+        $drigths = $entity->__hasmany(Dvups_right::class);
+        $rights = [];
+
+        foreach ($drigths as $right){
+            $rights[] = $right->getName();
+        }
+
+        return $rights;
+    }
+
     /**
      * @return string
      */

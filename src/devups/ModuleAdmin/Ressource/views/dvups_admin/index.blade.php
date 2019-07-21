@@ -1,33 +1,27 @@
 @extends('layout')
 @section('title', 'List')
 
+@section('layout_content')
 
-@section('cssimport')
-
-    <style></style>
-
-@show
-
-@section('content')
-
-    <div class="row">
-        <div class="col-lg-3 col-md-6">
-            <div class="panel panel-primary">
-                <div class="panel-heading">
-                    <div class="row">
-                        <div class="col-xs-12 ">
-                            <h5>Manage Admin</h5>
-                        </div>
+    <div class="app-page-title">
+        <div class="page-title-wrapper">
+            <div class="page-title-heading">
+                <div class="page-title-icon">
+                    <i class="pe-7s-car icon-gradient bg-mean-fruit">
+                    </i>
+                </div>
+                <div>Manage Admin
+                    <div class="page-title-subheading">This is an example dashboard created using build-in elements and components.
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="col-lg-9 col-md-6 text-right">
+            <div class="page-title-actions">
 
-            <?php if(getadmin()->getLogin() == "dv_admin" ){ ?>
-            <label class="btn btn-info" onclick="updateprivilege(this)" >Update master admin privilage</label>
-            <?php } ?>
-            <?= Genesis::top_action(Dvups_admin::class); ?>
+                <?php if(getadmin()->getLogin() == "dv_admin" ){ ?>
+                <label class="btn btn-info" onclick="updateprivilege(this)" >Update master admin privilage</label>
+                <?php } ?>
+
+            </div>
         </div>
     </div>
     <hr>
@@ -81,7 +75,7 @@
 
         function updateprivilege(el) {
             $(el).html("... processing ")
-            $.get(model.baseurl+'services.php?path=dvups_:update', function (response) {
+            $.get(model.baseurl+'?path=dvups_:update', function (response) {
                 console.log(response);
                 $(el).html(response)
             }, 'text')

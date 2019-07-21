@@ -282,7 +282,7 @@ class FormFactory {
 //            $formaction = "<form id='" . $entitycore->name . "-form' action='index.php?path=" . $entitycore->name . "/" . $entitycore->formaction . "'  data-id='".$entitycore->entity->getId()."' enctype='multipart/form-data' method='post' >\n";
 //        }
         if ($entitycore->formaction) {//action='index.php?path=" . $entitycore->name . "/" . $entitycore->formaction . "'
-            $formaction = "<form id='" . $entitycore->name . "-form' onsubmit=\"return dform._submit(this, '" . $entitycore->name . "/" . $entitycore->formaction . "')\"  data-id='".$entitycore->entity->getId()."' enctype='multipart/form-data' method='post' >\n";
+            $formaction = "<form id='" . $entitycore->name . "-form' action='" . $entitycore->name . "/" . $entitycore->formaction . "' onsubmit=\"return dform._submit(this, '" . $entitycore->name . "/" . $entitycore->formaction . "')\"  data-id='".$entitycore->entity->getId()."' enctype='multipart/form-data' method='post' >\n";
         }
 
 

@@ -2,26 +2,21 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <!-- iso-8859-1  -->
+    <meta name="author" content="spacekola">
+    <title class="mdi mdi-sort-variant">Dashboard | Dvups Admin</title>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
-    <meta name="author" content="Sunhosting">
-    <title>app v3</title>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+    <meta name="description" content="This is an example dashboard created using build-in elements and components.">
+    <meta name="msapplication-tap-highlight" content="no">
+    <!-- inject:css -->
+    <link rel="stylesheet" href="<?= __env; ?>admin/main.css">
+    <link rel="stylesheet" href="<?= assets ?>plugins/sweetalert2/sweetalert2.min.css">
 
-    <!-- Bootstrap Core CSS -->
-    <link href="<?= VENDOR; ?>bootstrap/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- MetisMenu CSS -->
-    <link href="<?= VENDOR; ?>metisMenu/metisMenu.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="<?= assets; ?>../dist/css/sb-admin-2.css" rel="stylesheet">
-
-    <!-- Morris Charts CSS -->
-    <link href="<?= VENDOR; ?>morrisjs/morris.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
-    <link href="<?= VENDOR; ?>font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-
-    <link href="<?= assets; ?>css/css_add.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="<?= assets; ?>css/dv_style.css">
 
     @section('cssimport')
 
@@ -32,76 +27,90 @@
         style();
     ?>
 
+    <script>
+        var __env = '<?= __env ?>';
+        var __lang = '<?= __lang ?>';
+        var _t = <?= json_encode(translatecollection()) ?>;
+
+        var __name = "";
+        var __phone = "";
+        var __location = "";
+        var __bp = "";
+        var __rc = "";
+        var __contrib = "";
+        var __description = "";
+    </script>
 </head>
 
 <body>
 
-<div id="wrapper">
-
-    <!-- Navigation -->
-
-    <!-- Navigation -->
-    <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <span class="navbar-brand">
-                Devups Admin v{{ __v }} | Bonjour <b>{{ getadmin()->getName() }}</b>
-                <a href="{{ __env }}" target="__blank"></a>
-            </span>
-
-        </div>
-        <!-- /.navbar-header -->
+<div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
 
     @include("layout.navbartop")
-    <!-- /.navbar-top-links -->
 
-        <div class="navbar-default sidebar" role="navigation">
+    <div class="app-main">
         @include("layout.navbar")
-        <?php //include admin_dir . "views/navbar.blade.php"; ?>
-
-        <!-- /.sidebar-collapse -->
+        <div class="app-main__outer">
+            <div id="dv_main_container" class="app-main__inner">
+                @yield('content')
+            </div>
+            <div class="app-wrapper-footer">
+                <div class="app-footer">
+                    <div class="app-footer__inner">
+                        <div class="app-footer-left">
+                            <ul class="nav">
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" class="nav-link">
+                                        Footer Link 1
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" class="nav-link">
+                                        Footer Link 2
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="app-footer-right">
+                            <ul class="nav">
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" class="nav-link">
+                                        Footer Link 3
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="javascript:void(0);" class="nav-link">
+                                        <div class="badge badge-success mr-1 ml-0">
+                                            <small>NEW</small>
+                                        </div>
+                                        Footer Link 4
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <!-- /.navbar-static-side -->
-    </nav>
-
-    <div id="page-wrapper">
-
-        @yield('content')
-
     </div>
-    <!-- /#page-wrapper -->
-
 </div>
-<!-- /#wrapper -->
-<div id="log_erreur"></div>
 
-<!-- jQuery -->
-<script src="<?= VENDOR ?>jquery/jquery.min.js"></script>
+<script src="<?= assets; ?>scripts/main.js"></script>
+<!-- End custom js for this page-->
+<script src="<?= assets; ?>plugins/jquery/jquery.min.js"></script>
 
-<!-- Bootstrap Core JavaScript -->
-<script src="<?= VENDOR ?>bootstrap/js/bootstrap.min.js"></script>
+<!-- <script src="<?= node_modules ?>bootstrap/js/bootstrap.min.js"></script> -->
+{{----}}
 
-<!-- Metis Menu Plugin JavaScript -->
-<script src="<?= VENDOR ?>metisMenu/metisMenu.min.js"></script>
-
-<!-- Custom Theme JavaScript -->
-<script src="<?= assets ?>../dist/js/sb-admin-2.js"></script>
-
+<?php
+if (function_exists("modalview"))
+    modalview($entity);
+?>
 <?php
 if (function_exists("script"))
     script();
 ?>
 @section('jsimport')
-
-    <!-- Morris Charts JavaScript -->
-    <script src="<?= VENDOR ?>raphael/raphael.min.js"></script>
-    <script src="<?= VENDOR ?>morrisjs/morris.min.js"></script>
-    <script src="<?= assets ?>../data/morris-data.js"></script>
 
 @show
 

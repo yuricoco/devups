@@ -5,7 +5,8 @@
 var databinding = {
     bindmodal: function (data) {
         // console.log(model.entity);
-        model.modalbody.html(data);
+        // model.modalbody.html(data);
+        model.modalboxcontainer.html(data);
     },
     checkrenderform: function(response){
         //console.log(response);
@@ -30,22 +31,35 @@ var model = {
             }
         }
 
-        return this.baseurl + "?path=" + route + getAttr;
+        return route + getAttr;
+
     },
-    _showmodal: function(){
+    routing: function (route, parameter) {
+        return this.baseurl + "?path=" + this.url(route, parameter);
+    },
+    _showmodal: function(server = true){
         //set content loader
-        model.modalbody.html('<div style="height: 150px; text-align: center; padding: 5%">Loading ...</div>');
-        model.modal.modal("show");
+        // model.modalbody.html('<div style="height: 150px; text-align: center; padding: 5%">Loading ...</div>');
+        // model.modal.modal("show");
+        if(server)
+            model.modalboxcontainer.html('<div style="height: 150px; text-align: center; padding: 5%">Loading ...</div>');
+        model.modalbox.css('display',"inline-flex");
     },
-    _dismissmodal: function(){
-        model.modalbody.html("");
-        model.modal.modal("hide");
+    _dismissmodal: function(empty = true){
+        // model.modalbody.html("");
+        // model.modal.modal("hide");
+        if(empty)
+            model.modalboxcontainer.html('');
+        model.modalbox.css('display',"none");
+        this.init();
     },
     entity : null,
     _new: function (callback) {
         this._showmodal();
 
+        console.log(this.baseurl+"?path="+this.entity+"._new")
         $.get(this.baseurl+"?path="+this.entity+"._new", function (response) {
+            console.log(response)
             databinding.checkrenderform(response);
         }, 'json').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
@@ -56,6 +70,7 @@ var model = {
     _edit: function (id, callback) {
         var regex = /_/gi;
         //string..replace(regex, '-')
+        this._showmodal();
 
         console.log(this.baseurl+"?path="+this.entity+"._edit&id="+id)
         $.get(this.baseurl+"?path="+this.entity+"._edit&id="+id, function (response) {
@@ -161,20 +176,56 @@ var model = {
         model.formentity = formentity;
         return formdata;
     },
-    _get : function (action, callback) {
+    _get : function (action, data, callback) {
 
+        //console.log(typeof data)
+        if(!callback){
+            callback = data;
+            data = {};
+        }
+
+        console.log(this.baseurl+"?path="+action);
         $.ajax({
-            url: this.baseurl+"?path="+this.entity+"."+action,
-            //data: formdata,
+            url: this.baseurl+"?path="+action,
+            data: data,
             method: "GET",
             dataType: "json",
             success: callback,
             error: function (e) {
                 console.log(e);//responseText
-                model.modalbody.html(e.responseText);
+                if(e.status === 0){
+                    var event = document.createEvent('Event');
+                    event.initEvent("connectionLost", true, true);
+                    window.dispatchEvent(event);
+                }
             }
         });
     },
+    _apiget : function (action, data, callback) {
+
+        //console.log(typeof data)
+        if(!callback){
+            callback = data;
+            data = {};
+        }
+
+        $.ajax({
+            url: __env+'api/'+action,
+            data: data,
+            method: "GET",
+            dataType: "json",
+            success: callback,
+            error: function (e) {
+                console.log(e);//responseText
+                if(e.status === 0){
+                    var event = document.createEvent('Event');
+                    event.initEvent("connectionLost", true, true);
+                    window.dispatchEvent(event);
+                }
+            }
+        });
+    },
+
 
     _post : function (action, formdata, callback, fd = true) {
         // var formdata = this._formdata(form);
@@ -182,7 +233,7 @@ var model = {
         if(!fd){
 
             $.ajax({
-                url: this.baseurl+"?path="+this.entity+"."+action,
+                url: this.baseurl+"?path="+action,
                 data: formdata,
                 method: "POST",
                 dataType: "json",
@@ -196,12 +247,8 @@ var model = {
             return;
         }
 
-        console.log(typeof devups)
-        if(typeof devups === "object")
-            formdata.append("user_local_date", devups.formatDate());
-
         $.ajax({
-            url: this.baseurl+"?path="+this.entity+"."+action,
+            url: this.baseurl+"?path="+action,
             data: formdata,
             cache: false,
             contentType: false,
@@ -215,13 +262,50 @@ var model = {
             }
         });
     },
+
+    _apipost : function (action, formdata, callback, fd = true) {
+        // var formdata = this._formdata(form);
+        // model.modalbody.append('<div id="loader" style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
+        if(!fd){
+
+            $.ajax({
+                url: __env+'api/'+action,
+                data: formdata,
+                method: "POST",
+                dataType: "json",
+                success: callback,
+                error: function (e) {
+                    console.log(e);//responseText
+                    model.modalbody.html(e.responseText);
+                }
+            });
+
+            return;
+        }
+
+        $.ajax({
+            url: __env+action,
+            data: formdata,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: "POST",
+            dataType: "json",
+            success: callback,
+            error: function (e) {
+                console.log(e);//responseText
+                model.modalbody.html(e.responseText);
+            }
+        });
+    },
+
     getformvalue: function (field) {
         return this.formentity[this.entity+"_form["+field+"]"];
     },
     getformfield: function (field) {
         return $("input[name='"+this.entity+"_form["+field+"]']");
     },
-    init: function () {
+    init: function (dvdatatable) {
 
         console.log(typeof $);
         if(typeof $ === 'undefined'){
@@ -229,10 +313,16 @@ var model = {
             return;
         }
 
-        model.baseurl = $("#dv_table").data('route')+"services.php";
-        model.entity = $("#dv_table").data('entity');
+        model.baseurl = $(".dv_datatable").eq(0).data('route')+"services.php";
+        model.entity = $(".dv_datatable").eq(0).data('entity');
+
+        // model.baseurl = dvdatatable.eq(0).data('route')+"services.php";
+        // model.entity = dvdatatable.eq(0).data('entity');
+
         model.modal = $("#"+model.entity+"modal");
+        model.modalbox = $("#"+model.entity+"box");
         model.modalbody = $("#"+model.entity+"modal").find(".modal-body");
+        model.modalboxcontainer = $("#"+model.entity+"box").find(".box-container .card-body");
 
     }
 };

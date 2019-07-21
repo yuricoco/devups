@@ -25,7 +25,7 @@ switch ($path[ENTITY]) {
         break;
 
     default :
-        // inclusion du layout du site
+        // inclusion du layout du site 
         Genesis::render("404");
         break;
 }
