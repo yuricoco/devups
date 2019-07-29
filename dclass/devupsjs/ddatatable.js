@@ -195,7 +195,6 @@ var ddatatable = {
     urlparam : "",
     page: function (index) {
         this.setloader();
-        this.per_page = this.dtinstance.find("#dt_nbrow").val();
         console.log(this.geturl());
         $.get(this.geturl(), (response) => {
             console.log(response);
@@ -261,6 +260,8 @@ var ddatatable = {
         this.dtinstance.find(".dcheckbox").click(function () {
             ddatatable.uncheckall();
         });
+
+        ddatatable.per_page = this.dtinstance.find("#dv_table").data('perpage');
 
         ddatatable.baseurl = this.dtinstance.find("#dv_table").data('route')+"services.php";
         //console.log(ddatatable.baseurl);

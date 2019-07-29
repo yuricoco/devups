@@ -13,33 +13,27 @@ class AdminTemplateGenerator extends DvAdmin
     static function dt_btn_action($rowaction, $customrowactions, $actionDropdown)
     {
 
-//        self::$rowaction[] = [
-//            'type'=> 'btn',
-//            'content'=> '<i class="fa fa-eye" ></i> view',
-//            'class'=> ''.self::$btnview_class.'',
-//            'action'=> 'onclick="model._show(' . $id . ')"',
-//            'modal'=> 'data-toggle="modal" data-target="#' . $path . 'modal" ',
-//        ];
-        //
-
         $actionclass = ['edit' => "mb-2 mr-2 btn btn-warning",
             'show' => "mb-2 mr-2 btn btn-info", 'delete' => "mb-2 mr-2 btn btn-danger",];
 
         $act = "";
 
-        if (!$actionDropdown){
+        if (!$actionDropdown) {
 
             foreach ($customrowactions as $el) {
                 $act .= '' . $el . '';
             }
             foreach ($rowaction as $el) {
+                if (is_array($el)) {
 
-                if (isset($actionclass[$el["class"]]))
-                    $el["class"] = $actionclass[$el["class"]];
+                    if (isset($actionclass[$el["class"]]))
+                        $el["class"] = $actionclass[$el["class"]];
 
-                $act .= '<button type="button" class="' . $el["class"] . '" ' . $el["action"] . ' >' . $el["content"] . '</button>';
-//            $act .= '<li class="nav-item"><button '. $el["modal"] . '  class="'. $actionclass[$el["class"]] . ' btn-block" '. $el["action"] . ' >'. $el["content"] . '</button></li>';
+                    $act .= '<button type="button" class="' . $el["class"] . '" ' . $el["action"] . ' >' . $el["content"] . '</button>';
 
+                } else {
+                    $act .= $el;
+                }
             }
 
             return <<<EOF
@@ -52,18 +46,21 @@ EOF;
         }
         foreach ($rowaction as $el) {
 
-            if (isset($actionclass[$el["class"]]))
-                $el["class"] = $actionclass[$el["class"]];
+            if (is_array($el)) {
 
-            $act .= '<li class="nav-item"><button type="button" class="' . $el["class"] . ' btn-block" ' . $el["action"] . ' >' . $el["content"] . '</button></li>';
-//            $act .= '<li class="nav-item"><button '. $el["modal"] . '  class="'. $actionclass[$el["class"]] . ' btn-block" '. $el["action"] . ' >'. $el["content"] . '</button></li>';
+                if (isset($actionclass[$el["class"]]))
+                    $el["class"] = $actionclass[$el["class"]];
 
+                $act .= '<li class="nav-item"><button type="button" class="' . $el["class"] . ' btn-block" ' . $el["action"] . ' >' . $el["content"] . '</button></li>';
+
+            } else {
+                $act .= $el;
+            }
         }
 
         return <<<EOF
 <div class="d-inline-block dropdown">
     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" class="btn-shadow dropdown-toggle btn btn-light">
-        
         Actions
     </button>
     <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-131px, 33px, 0px);">
@@ -223,7 +220,7 @@ EOF;
                 <div class=\"card-header-tab card-header\">
                     <div class=\"card-header-title\">
                         <i class=\"header-icon lnr-rocket icon-gradient bg-tempting-azure\"> </i>
-                        {{ $"."title }}
+                        {{ $" . "title }}
                     </div>
                     <div class=\"btn-actions-pane-right\">
                         <div class=\"nav\">
@@ -232,13 +229,13 @@ EOF;
                     </div>
                 </div>
                 <div class=\"card-body\">
-                    <?= $"."datatablehtml; ?>
+                    <?= $" . "datatablehtml; ?>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id=\"{{ strtolower($"."entity) }}box\" class=\"swal2-container swal2-fade swal2-shown\" style=\"display:none; overflow-y: auto;\">
+    <div id=\"{{ strtolower($" . "entity) }}box\" class=\"swal2-container swal2-fade swal2-shown\" style=\"display:none; overflow-y: auto;\">
         <div role=\"dialog\" aria-labelledby=\"swal2-title\" aria-describedby=\"swal2-content\" class=\"swal2-modal swal2-show dv_modal\" tabindex=\"1\"
              style=\"\">
             <div class=\"main-card mb-3 card  box-container\">

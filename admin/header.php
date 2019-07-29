@@ -23,10 +23,19 @@ define('assets', __env. 'admin/assets/');
 define('_cssversion', '1');
 define('_jsversion', '1');
 
+
+// move comment scope to enable authentication 
+if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
+
+    header("location: " . __env . 'admin/login.php');
+    
+} 
+
+
 global $global_navigation, $viewdir;
 
 $viewdir = [admin_dir . "views"];
-$dvups_navigation = unserialize($_SESSION['navigation']);
+$dvups_navigation = unserialize($_SESSION[__project_id."_navigation"]);
 
 //$global_navigation = Core::buildOriginCore();
 

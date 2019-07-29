@@ -43,7 +43,7 @@
                         Dashboard
                     </a>
                 </li>
-                <li class="app-sidebar__heading">Modules</li>
+                <li class="app-sidebar__heading">UI Components</li>
 
                 @foreach ($dvups_navigation as $key => $module)
                     <li>

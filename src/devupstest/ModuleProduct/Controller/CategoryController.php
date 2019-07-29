@@ -13,21 +13,15 @@ class CategoryController extends Controller{
 
         $this->entitytarget = 'Category';
         $this->title = "Manage Category";
-        $datatablemodel = [
-['header' => 'Name', 'value' => 'name']
-];
         
-        $this->renderListView(
-            Datatable::buildtable($lazyloading, $datatablemodel)
-                ->render()
-        );
+        $this->renderListView(CategoryTable::init($lazyloading)->buildindextable()->render());
 
     }
 
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Category(), $next, $per_page);
         return ['success' => true,
-            'datatable' => Datatable::getTableRest($lazyloading),
+            'datatable' => CategoryTable::init($lazyloading)->buildindextable()->getTableRest(),
         ];
     }
 
@@ -47,7 +41,7 @@ class CategoryController extends Controller{
         $id = $category->__insert();
         return 	array(	'success' => true,
                         'category' => $category,
-                        'tablerow' => Datatable::getSingleRowRest($category),
+                        'tablerow' => CategoryTable::init()->buildindextable()->getSingleRowRest($category),
                         'detail' => '');
 
     }
@@ -68,7 +62,7 @@ class CategoryController extends Controller{
         $category->__update();
         return 	array(	'success' => true,
                         'category' => $category,
-                        'tablerow' => Datatable::getSingleRowRest($category),
+                        'tablerow' => CategoryTable::init()->buildindextable()->getSingleRowRest($category),
                         'detail' => '');
                         
     }
@@ -76,9 +70,8 @@ class CategoryController extends Controller{
     public function deleteAction($id){
       
             Category::delete($id);
-        return 	array(	'success' => true, // pour le restservice
-                        'redirect' => 'index', // pour le web service
-                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return 	array(	'success' => true, 
+                        'detail' => ''); 
     }
     
 
@@ -87,9 +80,8 @@ class CategoryController extends Controller{
 
         Category::delete()->where("id")->in($ids)->exec();
 
-        return array('success' => true, // pour le restservice
-                'redirect' => 'index', // pour le web service
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return array('success' => true,
+                'detail' => ''); 
 
     }
 

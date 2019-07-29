@@ -1,6 +1,7 @@
 <?php 
     require 'Entity/Category.php';
     require 'Form/CategoryForm.php';
+    require 'Datatable/CategoryTable.php';
     require 'Controller/CategoryController.php';
 
     require 'Entity/Product.php';

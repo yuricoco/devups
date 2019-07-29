@@ -251,7 +251,7 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => true]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => true]);
     }
 
     /**
@@ -273,18 +273,29 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => false, 'genes' => true, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => false, 'form' => false, 'genes' => true, 'views' => false]);
     }
 
     /**
      * 
      * @param type $namespace
      */
+    public static function table($namespace, $project) {
+
+        $ns = explode("\\", $namespace);
+        $entity = __Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => true, 'ctrl' => true, 'form' => false, 'genes' => false, 'views' => false]);
+    }
+
+    /**
+     *
+     * @param type $namespace
+     */
     public static function controller($namespace, $project) {
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => true, 'form' => false, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => true, 'form' => false, 'genes' => false, 'views' => false]);
     }
 
     /**
@@ -295,7 +306,7 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => true, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => false, 'form' => true, 'genes' => false, 'views' => false]);
     }
 
     /**
@@ -306,7 +317,7 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => false, 'formwidget' => true, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => false, 'form' => false, 'formwidget' => true, 'genes' => false, 'views' => false]);
     }
 
     /**
@@ -317,7 +328,7 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'dao' => false, 'ctrl' => false, 'form' => false, 'formwidget' => false, 'genes' => false, 'views' => false, 'detailwidget' => true]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => false, 'form' => false, 'formwidget' => false, 'genes' => false, 'views' => false, 'detailwidget' => true]);
     }
 
     /**
@@ -328,7 +339,7 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => true, 'dao' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => true, 'table' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
     }
 
     /**
@@ -369,7 +380,7 @@ Usage:
      * 
      * @param type $namespace
      */
-    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'ctrl' => true, 'form' => true, 'views' => false, 'detailwidget' => true]) {
+    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'table' => true, 'ctrl' => true, 'form' => true, 'views' => false, 'detailwidget' => true]) {
 
         $backend = new BackendGenerator();
         $frontend = new AdminTemplateGenerator();
@@ -388,6 +399,9 @@ Usage:
 
         if ($crud['ctrl'])
             $backend->controllerGenerator($entity, $project->listmodule);
+
+        if ($crud['table'])
+            $backend->tableGenerator($entity, $project->listmodule);
 
         if ($crud['form'])
             $backend->formGenerator($entity, $project->listmodule);
@@ -462,6 +476,12 @@ Usage:
             mkdir('Entity', 0777);
         }
 
+        /* TABLE */
+
+        if (!file_exists("Datatable")) {
+            mkdir('Datatable', 0777);
+        }
+
         /* ENTITYCORE */
 
         if (!file_exists("Core")) {
@@ -524,6 +544,7 @@ Usage:
             $package .= "
     require 'Entity/" . $name . ".php';$requiremanytomany
     require 'Form/" . $name . "Form.php';
+    require 'Datatable/" . $name . "Table.php';
     require 'Controller/" . $name . "Controller.php';\n";
 
         }

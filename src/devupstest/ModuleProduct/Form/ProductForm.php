@@ -33,6 +33,21 @@ use Genesis as g;
 			"type" => FORMTYPE_TEXTAREA, 
                 "value" => $product->getDescription(), 
             ];
+
+                $entitycore->field['category'] = [
+                    "type" => FORMTYPE_SELECT, 
+                    "value" => $product->getCategory()->getId(),
+                    "label" => 'Category',
+                    "options" => FormManager::Options_Helper('id', Category::allrows()),
+                ];
+
+                $entitycore->field['stock'] = [
+                    "type" => FORMTYPE_CHECKBOX, 
+                    "values" => FormManager::Options_Helper('id', $product->getStock()),
+                    "label" => 'Stock',
+                    "options" => FormManager::Options_ToCollect_Helper('id', new Stock(), $product->getStock()),
+                ];
+
             
             $entitycore->addDformjs($action);
             $entitycore->addjs(Product::classpath('Ressource/js/productForm'));
@@ -78,3 +93,4 @@ use Genesis as g;
         }
         
     }
+    

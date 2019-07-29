@@ -309,7 +309,7 @@ class BackendGenerator {
     /* 	CREATION DU CONTROLLER 	 */
 
     public function controllerGenerator($entity, $listmodule) {
-        $datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
+        //$datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
         $name = strtolower($entity->name);
 
         $classController = fopen('Controller/' . ucfirst($name) . 'Controller.php', 'w');
@@ -328,19 +328,15 @@ class " . ucfirst($name) . "Controller extends Controller{
 
         $" . "this->entitytarget = '" . ucfirst($name) . "';
         $" . "this->title = \"Manage " . ucfirst($name) . "\";
-        $" . "datatablemodel = $datatablemodel;
         
-        $" . "this->renderListView(
-            Datatable::buildtable($" . "lazyloading, $" . "datatablemodel)
-                ->render()
-        );
+        $" . "this->renderListView(" . ucfirst($name) . "Table::init($" . "lazyloading)->buildindextable()->render());
 
     }
 
     public function datatable($" . "next, $" . "per_page) {
         $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
         return ['success' => true,
-            'datatable' => Datatable::getTableRest($" . "lazyloading),
+            'datatable' => " . ucfirst($name) . "Table::init($" . "lazyloading)->buildindextable()->getTableRest(),
         ];
     }
 
@@ -397,7 +393,7 @@ class " . ucfirst($name) . "Controller extends Controller{
         $" . "id = $" . $name . "->__insert();
         return 	array(	'success' => true,
                         '" . $name . "' => $" . $name . ",
-                        'tablerow' => Datatable::getSingleRowRest($" . $name . "),
+                        'tablerow' => " . ucfirst($name) . "Table::init()->buildindextable()->getSingleRowRest($" . $name . "),
                         'detail' => '');
 
     }
@@ -427,7 +423,7 @@ class " . ucfirst($name) . "Controller extends Controller{
         $" . $name . "->__update();
         return 	array(	'success' => true,
                         '" . $name . "' => $" . $name . ",
-                        'tablerow' => Datatable::getSingleRowRest($" . $name . "),
+                        'tablerow' => " . ucfirst($name) . "Table::init()->buildindextable()->getSingleRowRest($" . $name . "),
                         'detail' => '');
                         
     }
@@ -449,9 +445,8 @@ class " . ucfirst($name) . "Controller extends Controller{
             " . ucfirst($name) . "::delete($" . "id);";
         endif;
         $contenu .= "
-        return 	array(	'success' => true, // pour le restservice
-                        'redirect' => 'index', // pour le web service
-                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return 	array(	'success' => true, 
+                        'detail' => ''); 
     }
     
 
@@ -460,9 +455,8 @@ class " . ucfirst($name) . "Controller extends Controller{
 
         " . ucfirst($name) . "::delete()->where(\"id\")->in($" . "ids)->exec();
 
-        return array('success' => true, // pour le restservice
-                'redirect' => 'index', // pour le web service
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return array('success' => true,
+                'detail' => ''); 
 
     }
 
@@ -472,6 +466,51 @@ class " . ucfirst($name) . "Controller extends Controller{
 
         fclose($classController);
     }
+
+    /* 	CREATION DU CONTROLLER 	 */
+
+    public function tableGenerator($entity, $listmodule)
+    {
+        $datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
+        $name = strtolower($entity->name);
+
+        $classController = fopen('Datatable/' . ucfirst($name) . 'Table.php', 'w');
+
+        $contenu = "<?php \n
+
+use DClass\devups\Datatable as Datatable;
+
+class " . ucfirst($name) . "Table extends Datatable{
+    
+    public $"."entity = \"" . $name . "\";
+
+    public $"."datatablemodel = $datatablemodel;
+
+    public function __construct($"."lazyloading = null, $"."datatablemodel = [])
+    {
+        parent::__construct($"."lazyloading, $"."datatablemodel);
+    }
+
+    public static function init($"."lazyloading = null){
+        $"."dt = new " . ucfirst($name) . "Table($"."lazyloading);
+        return $"."dt;
+    }
+
+    public function buildindextable(){
+
+        // TODO: overwrite datatable attribute for this view
+
+        return $"."this;
+    }
+
+}\n";
+        fputs($classController, $contenu);
+        //fputs($classController, "\n}\n");
+
+        fclose($classController);
+
+    }
+
 
     /* CREATION OF CORE */
 

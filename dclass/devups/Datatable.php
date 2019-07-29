@@ -84,7 +84,7 @@ class Datatable
 
     protected $pagejump = 10;
     protected $per_page = 10;
-    protected $paginationenabled = true;
+    protected $per_pageEnabled = false;
 
     protected $additionnalrow = [];
 
@@ -400,14 +400,14 @@ EOF;
         }
 
         $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
-        $html .= '<table id="dv_table" data-filterparam="' . $this->filterParam . '" data-route="' . path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
+        $html .= '<table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $this->filterParam . '" data-route="' . path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
             . '<thead>' . $theader['th'] . $theader['thf'] . '</thead>'
             . '<tbody>' . $tb . '</tbody>'
             . '<tfoot>' . $newrows . '</tfoot>'
             . '</table>';
 
         //$this->html .= self::renderListViewUI($this->lazyloading['listEntity'], $header, $action, $defaultaction, $searchaction);
-        if ($this->paginationenabled)
+        //if ($this->paginationenabled)
             $html .= $this->paginationbuilder();
 
         $html .= "";//</div> $this->closeform.
@@ -539,7 +539,8 @@ EOF;
 
     private function perpagebuilder()
     {
-        if (!is_numeric($this->pagejump) || !is_numeric($this->per_page))
+
+        if (!$this->per_pageEnabled)
             return "";
 
         $html = '                    
@@ -567,8 +568,8 @@ EOF;
             return '<div id="dv_pagination" class="col-lg-12"> no page</div>';
         }
 
-        if (!is_numeric($this->per_page))
-            return "<div id=\"dv_pagination\" class=\"col-lg-12\"></div>";
+//        if (!is_numeric($this->paginationnav))
+//            return "<div id=\"dv_pagination\" class=\"col-lg-12\"></div>";
 
         $html = '<div id="dv_pagination" class="col-lg-12"><div class="row">
             <div id="pagination-notice" data-notice="' . $this->pagination . '" class="col-lg-4 col-md-4">Showing ' . (($this->current_page - 1) * $this->per_page + 1) . ' to ' . $this->per_page * $this->current_page . ' of ' . $this->nb_element . '</div>

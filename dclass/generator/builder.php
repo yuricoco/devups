@@ -64,6 +64,11 @@ if (isset($argv[2])) {
             echo $argv[2] . ": Form generated with success";
             break;
 
+        case 'core:g:table':
+            __Generator::table($argv[2], $project); //,
+            echo $argv[2] . ": Form generated with success";
+            break;
+
         case 'core:g:formwidget':
             __Generator::formwidget($argv[2], $project); //,
             echo $argv[2] . ": Form widget generated with success";

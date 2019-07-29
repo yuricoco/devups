@@ -1,28 +1,18 @@
 <?php
 
-use DClass\devups\Datatable;
 
-/**
- * Created by PhpStorm.
- * User: ATEMKENG AZANKANG
- * Date: 26/07/2019
- * Time: 00:31
- */
+use DClass\devups\Datatable as Datatable;
 
-//namespace cashdesk\ModuleCatalog\datatable;
-
-
-class ProductTable extends \DClass\devups\Datatable
+class ProductTable extends Datatable
 {
 
-    //protected $dynamicpagination = "select";
-    public $entity = "product";
-    public $searchaction = true;
+    protected $entity = "product";
 
     public $datatablemodel = [
-        ['header' => '#', 'value' => 'id', "order" => true],
-        ['header' => 'Nom du produit', 'value' => 'name', "search" => true, "order" => true],
-        ['header' => 'Prix de vente', 'value' => 'price', "order" => true],
+        ['header' => 'Name', 'value' => 'name'],
+        ['header' => 'Price', 'value' => 'price'],
+        ['header' => 'Description', 'value' => 'description'],
+        ['header' => 'Category', 'value' => 'Category.id']
     ];
 
     public function __construct($lazyloading = null, $datatablemodel = [])
@@ -30,28 +20,18 @@ class ProductTable extends \DClass\devups\Datatable
         parent::__construct($lazyloading, $datatablemodel);
     }
 
-    public static function init($lazyloading = null){
+    public static function init($lazyloading = null)
+    {
         $dt = new ProductTable($lazyloading);
         return $dt;
     }
 
-    public function buildindextable(){
+    public function buildindextable()
+    {
 
-        //$this->createaction['content'] = "icil la";
-        //$this->dynamicpagination = "select";
-        $this->searchaction = true;
+        // TODO: overwrite datatable attribute for this view
 
-        return $this;
-    }
-
-    public function buildfronttable(){
-
-        $this->isFrontEnd = true;
-        //$this->dynamicpagination = "select";
-        $this->searchaction = true;
         $this->actionDropdown = false;
-        $this->defaultaction = false;
-
         return $this;
     }
 

@@ -1,6 +1,6 @@
 
 .dv_datatable th{position: relative;}
-.dv_datatable tr.th-filter th{padding: 0px !important;}
+/*.dv_datatable tr.th-filter th{padding: 0px !important;}*/
 .dv_datatable .torder{z-index: 3; position: absolute; top:0; right: 0; padding: 15px 12px}
 .dv_datatable .loader{
     position: absolute;

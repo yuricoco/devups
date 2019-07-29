@@ -13,21 +13,15 @@ class StockController extends Controller{
 
         $this->entitytarget = 'Stock';
         $this->title = "Manage Stock";
-        $datatablemodel = [
-['header' => 'Name', 'value' => 'name']
-];
         
-        $this->renderListView(
-            Datatable::buildtable($lazyloading, $datatablemodel)
-                ->render()
-        );
+        $this->renderListView(StockTable::init($lazyloading)->buildindextable()->render());
 
     }
 
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Stock(), $next, $per_page);
         return ['success' => true,
-            'datatable' => Datatable::getTableRest($lazyloading),
+            'datatable' => StockTable::init($lazyloading)->buildindextable()->getTableRest(),
         ];
     }
 
@@ -47,7 +41,7 @@ class StockController extends Controller{
         $id = $stock->__insert();
         return 	array(	'success' => true,
                         'stock' => $stock,
-                        'tablerow' => Datatable::getSingleRowRest($stock),
+                        'tablerow' => StockTable::init()->buildindextable()->getSingleRowRest($stock),
                         'detail' => '');
 
     }
@@ -68,7 +62,7 @@ class StockController extends Controller{
         $stock->__update();
         return 	array(	'success' => true,
                         'stock' => $stock,
-                        'tablerow' => Datatable::getSingleRowRest($stock),
+                        'tablerow' => StockTable::init()->buildindextable()->getSingleRowRest($stock),
                         'detail' => '');
                         
     }
@@ -76,9 +70,8 @@ class StockController extends Controller{
     public function deleteAction($id){
       
             Stock::delete($id);
-        return 	array(	'success' => true, // pour le restservice
-                        'redirect' => 'index', // pour le web service
-                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return 	array(	'success' => true, 
+                        'detail' => ''); 
     }
     
 
@@ -87,9 +80,8 @@ class StockController extends Controller{
 
         Stock::delete()->where("id")->in($ids)->exec();
 
-        return array('success' => true, // pour le restservice
-                'redirect' => 'index', // pour le web service
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return array('success' => true,
+                'detail' => ''); 
 
     }
 

@@ -9,10 +9,31 @@
 interface DatatableOverwrite
 {
 
+    /**
+     * overwrite the edit button either by changing one of the array parameter of devups default button send in parameter
+     * or design an custom html element.
+     *
+     * @param $btarray the array model of the devupsbutton
+     * @return mixed Array | string
+     */
     public function editAction($btarray);
 
+    /**
+     * overwrite the show button either by changing one of the array parameter of devups default button send in parameter
+     * or design an custom html element.
+     *
+     * @param $btarray the array model of the devupsbutton
+     * @return mixed Array | string
+     */
     public function showAction($btarray);
 
+    /**
+     * overwrite the delete button either by changing one of the array parameter of devups default button send in parameter
+     * or design an custom html element.
+     *
+     * @param $btarray the array model of the devupsbutton
+     * @return mixed Array | string
+     */
     public function deleteAction($btarray);
 
     // todo create DatatableOverwriteFront interface
