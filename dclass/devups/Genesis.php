@@ -26,8 +26,13 @@ class Genesis {
 
 //        if($action === 'product_storage')
 //            dv_dump($rigths);
-
-        if ($entityrigths) {
+        $uploadmethod = 'createAction';
+        $reflection = new ReflectionClass($action);
+        $entity = $reflection->newInstance();
+        if (method_exists($entity, $uploadmethod)) {
+            $top_action .= call_user_func(array($entity, $uploadmethod));
+        }
+        elseif ($entityrigths) {
             // first we check if create action is available for the entity
             if (in_array('create', $entityrigths)) {
                 // next we check if the user has create right for this entity

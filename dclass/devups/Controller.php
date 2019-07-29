@@ -470,45 +470,45 @@ class Controller {
                     }
                     else
                         if (isset($value['options']) && !isset($value['arrayoptions']) && class_exists($key)) {// && is_object ($value['options'][0])
-                        $reflect = new ReflectionClass($key);
-                        $value2 = $reflect->newInstance();
+                            $reflect = new ReflectionClass($key);
+                            $value2 = $reflect->newInstance();
 
-                        if ($value['options'] && isset($_ENTITY_FORM[$key])) {
+                            if ($value['options'] && isset($_ENTITY_FORM[$key])) {
 
-                            if(!is_numeric($_ENTITY_FORM[$key])){
-                                $value2->setId(null);
-                                continue;
+                                if(!is_numeric($_ENTITY_FORM[$key])){
+                                    $value2->setId(null);
+                                    continue;
+                                }
+
+                                $value2->setId($_ENTITY_FORM[$key]);
+                                if (!method_exists($object, $currentfieldsetter)) {
+                                    $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
+                                }
+                                elseif($error = call_user_func(array($object, $currentfieldsetter), $value2->__show(false)))
+                                    $this->error[$key] = $error;
+                            } else {
+                                if (!method_exists($object, $currentfieldsetter)) {
+                                    $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
+                                }
+                                elseif($error = call_user_func(array($object, $currentfieldsetter), $value2))
+                                    $this->error[$key] = $error;
                             }
-
-                            $value2->setId($_ENTITY_FORM[$key]);
-                            if (!method_exists($object, $currentfieldsetter)) {
-                                $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
-                            }
-                            elseif($error = call_user_func(array($object, $currentfieldsetter), $value2->__show(false)))
-                                $this->error[$key] = $error;
                         } else {
-                            if (!method_exists($object, $currentfieldsetter)) {
-                                $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                            }
-                            elseif($error = call_user_func(array($object, $currentfieldsetter), $value2))
-                                $this->error[$key] = $error;
-                        }
-                    } else {
 
-                        if (isset($_ENTITY_FORM[$key])){
-                            if(isset($value["type"]) && $value["type"] == "injection"){
+                            if (isset($_ENTITY_FORM[$key])){
+                                if(isset($value["type"]) && $value["type"] == "injection"){
 //                                $result = call_user_func(array($key."Controller", "createAction"));
 //                                if($error = call_user_func(array($object, $currentfieldsetter), $result[$key]))
 //                                    $this->error[$key] = $error;
+                                }
+                                elseif (!method_exists($object, $currentfieldsetter)) {
+                                    $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
+                                }
+                                elseif($error = call_user_func(array($object, $currentfieldsetter), $_ENTITY_FORM[$key]))
+                                    $this->error[$key] = $error;
                             }
-                            elseif (!method_exists($object, $currentfieldsetter)) {
-                                $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                            }
-                            elseif($error = call_user_func(array($object, $currentfieldsetter), $_ENTITY_FORM[$key]))
-                                $this->error[$key] = $error;
-                        }
 
-                    }
+                        }
                 }
 
             }
@@ -549,21 +549,21 @@ class Controller {
 
         if($return)
             return array('success' => true, // pour le restservice
-            'title' => $this->title, // pour le web service
-            'entity' => $this->entitytarget, // pour le web service
-            'datatablehtml' => $datatablehtml, // pour le web service
-            'lazyloading' => $lazyloading, // pour le web service
-            'datatablemodel' => $datatablemodel, // pour le web service
-            'detail' => '');
+                'title' => $this->title, // pour le web service
+                'entity' => $this->entitytarget, // pour le web service
+                'datatablehtml' => $datatablehtml, // pour le web service
+                'lazyloading' => $lazyloading, // pour le web service
+                'datatablemodel' => $datatablemodel, // pour le web service
+                'detail' => '');
 
         Genesis::renderView('default.index',
             array('success' => true, // pour le restservice
-            'title' => $this->title, // pour le web service
-            'entity' => $this->entitytarget, // pour le web service
-            'datatablehtml' => $datatablehtml, // pour le web service
+                'title' => $this->title, // pour le web service
+                'entity' => $this->entitytarget, // pour le web service
+                'datatablehtml' => $datatablehtml, // pour le web service
 //            'lazyloading' => $lazyloading, // pour le web service
 //            'datatablemodel' => $datatablemodel, // pour le web service
-            'detail' => '')
+                'detail' => '')
         );
 
     }

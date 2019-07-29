@@ -152,7 +152,7 @@ class Core extends stdClass {
                 foreach ($project->listmodule as $key => $module) {
                     
                     if(!is_object($module)){
-                        break;
+                        continue;
                     }
                     $modulename = ucfirst($module->name);
                     $qb = new QueryBuilder(new Dvups_module());

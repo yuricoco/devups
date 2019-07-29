@@ -17,9 +17,9 @@ class StockController extends Controller{
 ['header' => 'Name', 'value' => 'name']
 ];
         
-        return $this->renderListView(
+        $this->renderListView(
             Datatable::buildtable($lazyloading, $datatablemodel)
-                ->render(), true
+                ->render()
         );
 
     }

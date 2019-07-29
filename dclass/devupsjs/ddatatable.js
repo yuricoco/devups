@@ -162,13 +162,15 @@ var ddatatable = {
         this.page(this.currentpage);
     },
     firstpage: function () {
+        this.currentpage = 1;
         this.page(1);
     },
     next: function () {
-        this.currentpage += 1;
+        this.currentpage = parseInt(this.currentpage) + 1;
         this.page(this.currentpage);
     },
     lastpage: function (last) {
+        this.currentpage = last;
         this.page(last);
     },
     setloader: function () {

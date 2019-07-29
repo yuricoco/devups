@@ -2,51 +2,61 @@
     /**
      * @Entity @Table(name="product")
      * */
-    class Product extends \Model implements JsonSerializable{
+    class Product extends \Model implements JsonSerializable, DatatableOverwrite {
 
         /**
          * @Id @GeneratedValue @Column(type="integer")
          * @var int
          * */
         protected $id;
+
         /**
-         * @Column(name="name", type="string" , length=25 )
+         * @Column(name="name", type="string" , length=55 )
          * @var string
          **/
-        private $name;
+        protected $name;
+
         /**
-         * @Column(name="price", type="text"  )
+         * @Column(name="namecanonical", type="string" , length=55, nullable=true )
+         * @var string
+         **/
+        protected $namecanonical = "";
+
+        /**
+         * @Column(name="code", type="string" , length=25, nullable=true )
+         * @var string
+         **/
+        protected $code = "";
+        /**
+         * @Column(name="price", type="integer" , nullable=true )
+         * @var string
+         **/
+        protected $price = "";
+
+        /**
+         * @Column(name="description", type="text", nullable=true  )
          * @var text
          **/
-        private $price;
+        protected $description;
+
         /**
-         * @Column(name="description", type="text"  )
-         * @var text
-         **/
-        private $description; 
-        
-        /**
-         * @ManyToOne(targetEntity="\Category")
+         * @ManyToOne(targetEntity="\Category", cascade={"persist"})
          * , inversedBy="reporter"
          * @var \Category
          */
         public $category;
 
-        /**
-         * manyToMany
-         * @var \Stock
-         */
-        public $stock;
 
+        public function __construct($id = null)
+        {
 
-        
-        public function __construct($id = null){
-            
-                if( $id ) { $this->id = $id; }   
-                          
-	$this->category = new Category();
-			$this->stock = [];
-}
+            if ($id) {
+                $this->id = $id;
+            }
+
+            $this->category = new Category();
+            $this->stock = [];
+        }
 
         public function getId() {
             return $this->id;
@@ -119,5 +129,21 @@
                                 'stock' => $this->stock,
                 ];
         }
-        
-}
+
+        public function editAction($btarray){
+//            $btarray['content'] = 'moi meme';
+//            return $btarray;
+            //return '<button type="button" class="" > moi meme</button>';
+        }
+
+        public function showAction($btarray)
+        {
+            // TODO: Implement showAction() method.
+        }
+
+        public function deleteAction($btarray)
+        {
+            // TODO: Implement deleteAction() method.
+        }
+
+    }

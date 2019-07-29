@@ -11,7 +11,8 @@ use Genesis as g;
 
 switch (Request::get('path')) {
     case 'hello':
-        g::render('hello');
+        $lazyloading = Controller::i()->lazyloading(new Product());
+        g::render('hello', ["lazyloading" => $lazyloading]);
         break;
 
     //    case 'view1':

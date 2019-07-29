@@ -29,6 +29,7 @@ require __DIR__ . '/../dclass/devups/EntityCollection.php';
 require __DIR__ . '/../dclass/devups/Controller.php';
 require __DIR__ . '/../dclass/devups/Genesis.php';
 require __DIR__ . '/../dclass/devups/Datatable.php';
+require __DIR__ . '/../dclass/devups/DatatableOverwrite.php';
 require __DIR__ . '/../dclass/devups/System_prod.php';
 require __DIR__ . '/../dclass/devups/UploadFile.php';
 require __DIR__ . '/../dclass/devups/EntityCore.php';
