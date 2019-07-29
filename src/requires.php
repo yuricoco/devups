@@ -9,8 +9,8 @@
 require 'devups/ModuleAdmin/devups.moduleadmin.php';
 require 'devups/ModuleTranslate/devups.moduletranslate.php';
 
-require 'devupstest/ModuleStock/devupstest.modulestock.php';
-require 'devupstest/ModuleProduct/devupstest.moduleproduct.php';
+//require 'devupstest/ModuleStock/devupstest.modulestock.php';
+//require 'devupstest/ModuleProduct/devupstest.moduleproduct.php';
 
 //require 'eventspace/Moduleeventspace/eventspace.moduleeventspace.php';
 

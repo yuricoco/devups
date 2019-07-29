@@ -66,7 +66,7 @@ if (isset($argv[2])) {
 
         case 'core:g:table':
             __Generator::table($argv[2], $project); //,
-            echo $argv[2] . ": Form generated with success";
+            echo $argv[2] . ": Table generated with success";
             break;
 
         case 'core:g:formwidget':

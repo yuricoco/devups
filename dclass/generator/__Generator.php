@@ -284,7 +284,7 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => true, 'ctrl' => true, 'form' => false, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => true, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
     }
 
     /**

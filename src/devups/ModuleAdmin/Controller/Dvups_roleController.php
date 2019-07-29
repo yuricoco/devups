@@ -122,7 +122,9 @@ class Dvups_roleController extends Controller
         if ($id = $dvups_role->__insert()) {
             return array('success' => true, // pour le restservice
                 'dvups_role' => $dvups_role,
-                'tablerow' => Datatable::getSingleRowRest($dvups_role),
+                'tablerow' => Dvups_roleTable::init()
+                    ->buildindextable()
+                    ->getSingleRowRest($dvups_role),
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
             return array('success' => false, // pour le restservice
@@ -141,6 +143,9 @@ class Dvups_roleController extends Controller
         if ($dvups_role->__update()) {
             return array('success' => true, // pour le restservice
                 'dvups_role' => $dvups_role,
+                'tablerow' => Dvups_roleTable::init()
+                    ->buildindextable()
+                    ->getSingleRowRest($dvups_role),
                 'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
         } else {
             return array('success' => false, // pour le restservice

@@ -3,16 +3,14 @@
 
 use DClass\devups\Datatable as Datatable;
 
-class ProductTable extends Datatable
+class Dvups_moduleTable extends Datatable
 {
 
-    protected $entity = "product";
+    public $entity = "dvups_module";
 
     public $datatablemodel = [
         ['header' => 'Name', 'value' => 'name'],
-        ['header' => 'Price', 'value' => 'price'],
-        ['header' => 'Description', 'value' => 'description'],
-        ['header' => 'Category', 'value' => 'Category.id']
+        ['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
     ];
 
     public function __construct($lazyloading = null, $datatablemodel = [])
@@ -22,7 +20,7 @@ class ProductTable extends Datatable
 
     public static function init($lazyloading = null)
     {
-        $dt = new ProductTable($lazyloading);
+        $dt = new Dvups_moduleTable($lazyloading);
         return $dt;
     }
 
@@ -31,7 +29,6 @@ class ProductTable extends Datatable
 
         // TODO: overwrite datatable attribute for this view
 
-        $this->actionDropdown = false;
         return $this;
     }
 

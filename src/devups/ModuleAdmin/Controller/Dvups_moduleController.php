@@ -9,7 +9,6 @@ class Dvups_moduleController extends Controller
     public static function updatelabel($id, $label)
     {
 
-
         $dvups_module = new Dvups_module($id);
         $dvups_module->__update("dvups_module.label", $label)->exec();
 
@@ -50,8 +49,9 @@ class Dvups_moduleController extends Controller
     {
         $lazyloading = $this->lazyloading(new Dvups_module(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Datatable::getTableRest($lazyloading),
-            'tablepagination' => Datatable::pagination($lazyloading)
+            'datatable' => Dvups_moduleTable::init($lazyloading)
+                ->buildindextable()
+                ->getTableRest(),
         ];
     }
 
@@ -87,8 +87,9 @@ class Dvups_moduleController extends Controller
         if ($id = $dvups_module->__insert()) {
             return array('success' => true, // pour le restservice
                 'dvups_module' => $dvups_module,
-                'tablerow' => Datatable::getSingleRowRest($dvups_module),
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+                'tablerow' => Dvups_moduleTable::init()
+                    ->buildindextable()->getSingleRowRest($dvups_module),
+                'detail' => '');
         } else {
             return array('success' => false, // pour le restservice
                 'dvups_module' => $dvups_module,
@@ -108,9 +109,9 @@ class Dvups_moduleController extends Controller
         if ($dvups_module->__update()) {
             return array('success' => true, // pour le restservice
                 'dvups_module' => $dvups_module,
-                'tablerow' => Datatable::getSingleRowRest($dvups_module),
-                //'redirect' => 'index', // pour le web service
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+                'tablerow' => Dvups_moduleTable::init()
+                    ->buildindextable()->getSingleRowRest($dvups_module),
+                'detail' => '');
         } else {
             return array('success' => false, // pour le restservice
                 'dvups_module' => $dvups_module,
@@ -125,9 +126,8 @@ class Dvups_moduleController extends Controller
         Dvups_role_dvups_module::delete()->where("dvups_module_id", $id)->exec();
 
         Dvups_module::delete($id);
-        return array('success' => true, // pour le restservice
-            'redirect' => 'index', // pour le web service
-            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return array('success' => true,
+            'detail' => '');
     }
 
 
@@ -137,7 +137,6 @@ class Dvups_moduleController extends Controller
         Dvups_module::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true, // pour le restservice
-            'redirect' => 'index', // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
     }

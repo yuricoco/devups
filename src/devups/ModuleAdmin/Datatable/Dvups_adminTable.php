@@ -1,27 +1,31 @@
-<?php 
+<?php
 
 
 use DClass\devups\Datatable as Datatable;
 
-class CategoryTable extends Datatable{
-    
-    public $entity = "category";
+class Dvups_adminTable extends Datatable
+{
+
+    public $entity = "dvups_admin";
 
     public $datatablemodel = [
-['header' => 'Name', 'value' => 'name']
-];
+        ['header' => 'nom', 'value' => 'name'],
+        ['header' => 'login', 'value' => 'login'],
+    ];
 
     public function __construct($lazyloading = null, $datatablemodel = [])
     {
         parent::__construct($lazyloading, $datatablemodel);
     }
 
-    public static function init($lazyloading = null){
-        $dt = new CategoryTable($lazyloading);
+    public static function init($lazyloading = null)
+    {
+        $dt = new Dvups_adminTable($lazyloading);
         return $dt;
     }
 
-    public function buildindextable(){
+    public function buildindextable()
+    {
 
         // TODO: overwrite datatable attribute for this view
 

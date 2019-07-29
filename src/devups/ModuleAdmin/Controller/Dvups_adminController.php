@@ -17,9 +17,9 @@ class Dvups_adminController extends Controller {
             Dvups_adminForm::__renderFormWidget(new Dvups_admin(), 'create');
     }
 
-    public function resetcredential() {
+    public function resetcredential($id) {
 
-        $dvups_admin = Dvups_admin::find($_GET["id"]);
+        $dvups_admin = Dvups_admin::find($id);
         $password = $dvups_admin->generatePassword();
         $dvups_admin->setPassword(sha1($password));
 //        $dvups_admin->setLogin();
@@ -29,9 +29,10 @@ class Dvups_adminController extends Controller {
 
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
-            'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
+            //'redirect' => 'added&login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
+            'redirect' => Dvups_admin::classpath().'dvups-admin/added?login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-    //
+        //
     }
 
     public function changepwAction() {
@@ -67,7 +68,7 @@ class Dvups_adminController extends Controller {
         //dv_dump($login, $password, $admin);
         if (!$admin->getId())
             header("Location: " . __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
-            //return array('success' => false, "err" => 'Login ou mot de passe incorrect.');
+        //return array('success' => false, "err" => 'Login ou mot de passe incorrect.');
 
         //$admin->collectDvups_role();
 
@@ -135,7 +136,7 @@ class Dvups_adminController extends Controller {
 
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
-            'tablerow' => Datatable::getSingleRowRest($dvups_admin),
+            'tablerow' => Dvups_adminTable::init()->buildindextable()->getSingleRowRest($dvups_admin),
             'redirect' => Dvups_admin::classpath().'dvups-admin/added?login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
@@ -174,9 +175,9 @@ class Dvups_adminController extends Controller {
         $dvups_admin->__update();
 
         return array('success' => true, // pour le restservice
-                'dvups_admin' => $dvups_admin,
-                'tablerow' => Datatable::getSingleRowRest($dvups_admin),
-                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+            'dvups_admin' => $dvups_admin,
+            'tablerow' => Dvups_adminTable::init()->buildindextable()->getSingleRowRest($dvups_admin),
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
     }
 
@@ -203,11 +204,11 @@ class Dvups_adminController extends Controller {
     {
         $qb = Dvups_admin::select()
             ->where("login", "!=", "dv_admin");
-            //->andwhere("password", "!=", sha1("admin"));
+        //->andwhere("password", "!=", sha1("admin"));
 
         $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb,"dvups_admin.id desc");
         return ['success' => true,
-            'datatable' => Datatable::getTableRest($lazyloading),
+            'datatable' => Dvups_adminTable::init($lazyloading)->buildindextable()->getTableRest(),
         ];
     }
 
@@ -216,7 +217,7 @@ class Dvups_adminController extends Controller {
 
         $qb = Dvups_admin::select()
             ->where("login", "!=", "dv_admin");
-            //->andwhere("password", "!=", sha1("admin"));
+        //->andwhere("password", "!=", sha1("admin"));
 
         $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb, "dvups_admin.id desc");
 
@@ -239,13 +240,10 @@ class Dvups_adminController extends Controller {
 
         $this->entitytarget = 'dvups_admin';
         $this->title = "Manage Admin";
-        $datatablemodel = [
-            ['header' => 'nom', 'value' => 'name'],
-            ['header' => 'login', 'value' => 'login'],
-        ];
 
         $this->renderListView(
-            \DClass\devups\Datatable::buildtable($lazyloading, $datatablemodel)
+            Dvups_adminTable::init($lazyloading)
+                ->buildindextable()
                 ->addcustomaction("callbackbtn")
                 ->render()
         );

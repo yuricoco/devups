@@ -3,13 +3,15 @@
 
 use DClass\devups\Datatable as Datatable;
 
-class StockTable extends Datatable{
+class Dvups_entityTable extends Datatable{
     
-    public $entity = "stock";
+    public $entity = "dvups_entity";
 
     public $datatablemodel = [
-['header' => 'Name', 'value' => 'name']
-];
+        ['header' => 'Name', 'value' => 'name'],
+        ['header' => 'Dvups_module', 'value' => 'Dvups_module.name'],
+        ['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
+    ];
 
     public function __construct($lazyloading = null, $datatablemodel = [])
     {
@@ -17,7 +19,7 @@ class StockTable extends Datatable{
     }
 
     public static function init($lazyloading = null){
-        $dt = new StockTable($lazyloading);
+        $dt = new Dvups_entityTable($lazyloading);
         return $dt;
     }
 

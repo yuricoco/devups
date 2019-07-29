@@ -16,11 +16,9 @@
         <div class="col-lg-12 col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <?= \DClass\devups\Datatable::buildtable($lazyloading, [
-['header' => 'Name', 'value' => 'name'], 
-['header' => 'Dvups_module', 'value' => 'Dvups_module.name'],
-['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
-])->render(); ?>
+                    <?= Dvups_entityTable::init($lazyloading)
+                        ->buildindextable()
+                        ->render(); ?>
 
         </div>
         </div>
