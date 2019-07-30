@@ -560,9 +560,27 @@ class Controller {
             array('success' => true, // pour le restservice
                 'title' => $this->title, // pour le web service
                 'entity' => $this->entitytarget, // pour le web service
-                'datatablehtml' => $datatablehtml, // pour le web service
-//            'lazyloading' => $lazyloading, // pour le web service
-//            'datatablemodel' => $datatablemodel, // pour le web service
+                'datatablehtml' => $datatablehtml,
+                'detail' => '')
+        );
+
+    }
+
+    public function renderDetailView($datatablehtml, $return = false, $datatablemodel = "") {
+
+        if($return)
+            return array('success' => true, // pour le restservice
+                'title' => $this->title, // pour le web service
+                'entity' => $this->entitytarget, // pour le web service
+                'datatabledetailhtml' => $datatablehtml, // pour le web service
+                'datatablemodel' => $datatablemodel, // pour le web service
+                'detail' => '');
+
+        Genesis::renderView('default.detail',
+            array('success' => true, // pour le restservice
+                'title' => $this->title, // pour le web service
+                'entity' => $this->entitytarget, // pour le web service
+                'datatabledetailhtml' => $datatablehtml,
                 'detail' => '')
         );
 

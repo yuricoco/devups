@@ -3,7 +3,7 @@ RewriteEngine On
 	
 RewriteRule    ^/?$    index.php    [NC,L]
 
-RewriteRule    ^api/?$    dapi.php    [NC,L]
+RewriteRule    ^api/?$    services.php    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+)/?$    services.php?path=$1    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+).([A-Za-z0-9-]+)?$    services.php?path=$1.$2    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)?$    services.php?path=$1.$2    [NC,L]

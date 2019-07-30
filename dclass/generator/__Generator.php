@@ -380,7 +380,7 @@ Usage:
      * 
      * @param type $namespace
      */
-    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'table' => true, 'ctrl' => true, 'form' => true, 'views' => false, 'detailwidget' => true]) {
+    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'table' => true, 'ctrl' => true, 'form' => true, 'views' => false, 'detailwidget' => false]) {
 
         $backend = new BackendGenerator();
         $frontend = new AdminTemplateGenerator();
@@ -702,6 +702,7 @@ switch (Request::get('path')) {
         $package .= "
     require 'Entity/" . $name . ".php';$requiremanytomany
     require 'Form/" . $name . "Form.php';
+    require 'Datatable/" . $name . "Table.php';
     require 'Controller/" . $name . "Controller.php';\n";
         //}
 
@@ -764,7 +765,7 @@ switch (Request::get('path')) {
                 g::json_encode($" . $name . "Ctrl->updateAction(R::get(\"id\")));
                 break;
         case '" . $name . "._show':
-                " . ucfirst($name) . "Form::__renderDetailWidget(R::get(\"id\"));
+                " . ucfirst($name) . "Ctrl->detailView(R::get(\"id\"));
                 break;
         case '" . $name . "._delete':
                 g::json_encode($" . $name . "Ctrl->deleteAction(R::get(\"id\")));
@@ -779,7 +780,7 @@ switch (Request::get('path')) {
 
         $contenu .= "\n\t
         default:
-            echo json_encode(['success' => false, 'error' => ['message' => \"404 : action note found\", 'route' => R::get('path')]]);
+            g::json_encode(['success' => false, 'error' => ['message' => \"404 : action note found\", 'route' => R::get('path')]]);
             break;
      }
 

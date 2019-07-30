@@ -9,6 +9,58 @@
 class DvAdmin
 {
 
+    public static function builddetaildatatable($entity, $listmodule, $onetoone = true, $mother = false)
+    {
+        $field = '';
+        $traitement = new Traitement();
+        $name = strtolower($entity->name);
+        $listview = [];
+
+        if ($mother) {
+            $field .= "<?php $".$name." = $".$mother."->get".ucfirst($entity->name)."(); ?>";
+        }
+
+        foreach ($entity->attribut as $attribut) {
+            if ($attribut->formtype == 'image') {
+//                $listview[] = "'src:" . $attribut->name . "'";
+                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => 'src:" . $attribut->name . "']";
+//                        }elseif($entity->attribut[$i]->formtype == 'document'){
+//                        }elseif($entity->attribut[$i]->formtype == 'document'){
+//                        }elseif($entity->attribut[$i]->formtype == 'document'){
+                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
+            } else {
+                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
+//                $listview[] = "'" . $attribut->name . "'";
+            }
+        }
+
+        if (!empty($entity->relation)) {
+            foreach ($entity->relation as $relation) {
+
+                if ($relation->cardinality == 'manyToMany')
+                    break;
+
+                $entitylink = $traitement->relation($listmodule, $relation->entity);
+                if(is_null($entitylink))
+                    continue;
+
+                $entrel = ucfirst(strtolower($relation->entity));
+                $key = 0;
+                $entitylinkattrname = "id";
+                $entitylink->attribut = (array) $entitylink->attribut;
+                if (isset($entitylink->attribut[1])) {
+                    $key = 1;
+                    $entitylinkattrname = $entitylink->attribut[$key]->name;
+                }
+
+                $listview[] = "\n['label' => '" . $entrel . "', 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
+            }
+        }
+
+        return "[" . implode(', ', $listview) . "\n]";
+
+    }
+
     public static function buildindexdatatable($listemodule, $entity)
     {
         $traitement = new Traitement();

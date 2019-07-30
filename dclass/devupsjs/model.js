@@ -101,6 +101,8 @@ var model = {
     },
     _show: function (id, callback) {
 
+        this._showmodal();
+
         $.get(this.baseurl+"?path="+this.entity+"._show&id="+id, function (response) {
             databinding.bindmodal(response);
         }, 'html').fail (function(resultat, statut, erreur){

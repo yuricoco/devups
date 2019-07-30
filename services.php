@@ -10,10 +10,15 @@ use Request as R;
 
 header("Access-Control-Allow-Origin: *");
 
+$productCtrl = new ProductController();
+
 (new Request('hello'));
 
 switch (Request::get('path')) {
 
+    case 'product.list':
+        g::json_encode($productCtrl->listdata());
+        break;
 
     default :
         g::json_encode(["success" => false, "message" => "404 :".Request::get('path')." page note found"]);

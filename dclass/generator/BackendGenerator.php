@@ -428,6 +428,23 @@ class " . ucfirst($name) . "Controller extends Controller{
                         
     }
     
+
+    public function detailView($" . "id)
+    {
+
+        $" . "this->entitytarget = '" . ucfirst($name) . "';
+        $" . "this->title = \"Detail " . ucfirst($name) . "\";
+
+        $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+
+        $" . "this->renderDetailView(
+            " . ucfirst($name) . "Table::init()
+                ->builddetailtable()
+                ->renderentitydata($" . $name . ")
+        );
+
+    }
+    
     public function deleteAction($" . "id){
     ";
         //if ($otherattrib):
@@ -472,6 +489,8 @@ class " . ucfirst($name) . "Controller extends Controller{
     public function tableGenerator($entity, $listmodule)
     {
         $datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
+        $detailview = DvAdmin::builddetaildatatable($entity, $listmodule);
+
         $name = strtolower($entity->name);
 
         $classController = fopen('Datatable/' . ucfirst($name) . 'Table.php', 'w');
@@ -500,6 +519,13 @@ class " . ucfirst($name) . "Table extends Datatable{
 
         // TODO: overwrite datatable attribute for this view
 
+        return $"."this;
+    }
+    
+    public function builddetailtable()
+    {
+        $"."this->datatablemodel = $detailview;
+        // TODO: overwrite datatable attribute for this view
         return $"."this;
     }
 
@@ -873,61 +899,17 @@ use Genesis as g;
     /* CREATION DU FORM FIELD */
 
     private function detailwidget($entity, $listmodule, $onetoone = true, $mother = false){
-        $field = '';
-        $traitement = new Traitement();
+
         $name = strtolower($entity->name);
-        $listview = [];
-
-        if ($mother) {
-            $field .= "<?php $".$name." = $".$mother."->get".ucfirst($entity->name)."(); ?>";
-        }
-
-        foreach ($entity->attribut as $attribut) {
-            if ($attribut->formtype == 'image') {
-//                $listview[] = "'src:" . $attribut->name . "'";
-                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => 'src:" . $attribut->name . "']";
-//                        }elseif($entity->attribut[$i]->formtype == 'document'){
-//                        }elseif($entity->attribut[$i]->formtype == 'document'){
-//                        }elseif($entity->attribut[$i]->formtype == 'document'){
-                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
-            } else {
-                $listview[] = "\n['label' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
-//                $listview[] = "'" . $attribut->name . "'";
-            }
-        }
-
-        if (!empty($entity->relation)) {
-            foreach ($entity->relation as $relation) {
-
-                if ($relation->cardinality == 'manyToMany')
-                    break;
-
-                $entitylink = $traitement->relation($listmodule, $relation->entity);
-                if(is_null($entitylink))
-                    continue;
-
-                $entrel = ucfirst(strtolower($relation->entity));
-                $key = 0;
-                $entitylinkattrname = "id";
-                $entitylink->attribut = (array) $entitylink->attribut;
-                if (isset($entitylink->attribut[1])) {
-                    $key = 1;
-                    $entitylinkattrname = $entitylink->attribut[$key]->name;
-                }
-
-                $listview[] = "\n['label' => '" . $entrel . "', 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
-            }
-        }
-
+        //$detailview = DvAdmin::builddetaildatatable($entity, $listmodule, $onetoone, $mother);
         //return $field;
         return "
         <div class=\"col-lg-12 col-md-12\">
-                
-                    <?= \DClass\devups\Datatable::renderentitydata($" . $name.", [" . implode(', ', $listview) . "\n]); ?>
-
+                <?= " . ucfirst($name) . "Table::init()
+                ->builddetailtable()
+                ->renderentitydata($" . $name . "); ?>
         </div>
 			";
-        ;
 
     }
 
@@ -940,7 +922,8 @@ use Genesis as g;
         unset($entity->attribut[0]);
         $contenu = $this->detailwidget($entity, $listmodule);
 
-        $entityform = fopen('Form/' . ucfirst($name) . 'DetailWidget.php', 'w');
+        $entityform = fopen('Ressource/views/' . $name . '/detail.blade.php', 'w');
+        //$entityform = fopen('Form/' . ucfirst($name) . 'DetailWidget.php', 'w');
         fputs($entityform, $contenu);
 
         fclose($entityform);

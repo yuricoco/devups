@@ -19,7 +19,8 @@ class Datatable
     protected $btnview_class = "btn btn-info btn-sm";
     protected $btndelete_class = "btn btn-danger btn-sm";
     protected $btnsearch_class = "btn btn-primary";
-    protected $table_class = "table table-striped table-hover dataTable no-footer";
+    protected $table_class = "table table-bordered table-striped table-hover dataTable no-footer";
+    //table table-bordered table-hover table-striped
     protected $actionDropdown = true;
     protected $filterParam = "";
     protected $dynamicpagination = false;
@@ -271,17 +272,17 @@ class Datatable
 
     }
 
-    public static function renderentitydata($entity, $header)
+    public function renderentitydata($entity)//, $header
     {
-        $dt = new Datatable();
-        $dt->class = get_class($entity);
+//        $dt = new Datatable();
+//        $dt->class = get_class($entity);
 
-        if (!$header) {
+        if (!$this->datatablemodel) {
             $tb = [];
         } else
-            $tb = self::getTableEntityBody($entity, $header);
+            $tb = self::getTableEntityBody($entity, $this->datatablemodel);
 
-        return '<table data-entity="' . $dt->class . '"  class="table table-bordered table-hover table-striped" >'
+        return '<table data-entity="' . $this->class . '"  class="table table-bordered table-hover table-striped" >'
             //. '<thead><tr>' . implode(" ", $theader['th']) . '</tr><tr>' . implode(" ", $theader['thf']) . '</tr></thead>'
             . '<tbody>' . implode(" ", $tb) . '</tbody>'
             . '</table>';

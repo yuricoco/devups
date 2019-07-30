@@ -29,7 +29,7 @@
         /**
          * @var \Dvups_entity
          */
-        public $dvups_entity;
+        //public $dvups_entity;
 
         
         public function __construct($id = null){
