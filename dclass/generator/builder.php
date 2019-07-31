@@ -164,6 +164,12 @@ if (isset($argv[2])) {
     switch ($argv[1]) {
 
         case 'install':
+
+            if (!file_exists("admin/cache")) {
+                echo " > admin/cache folder created with success ...\n";
+                mkdir('admin/cache', 0777);
+            }
+
             RequestGenerator::databasecreate(dbname); //, 
              echo " > Creating Database.\n\n". dbname . ": created with success ...\n";
             $result = [];

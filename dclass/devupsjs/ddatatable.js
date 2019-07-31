@@ -130,23 +130,25 @@ var ddatatable = {
     orderasc:function (param) {
         console.log(param);
         this.setloader();
-        this.per_page = $("#dt_nbrow").val();
+        //this.per_page = $("#dt_nbrow").val();
         this.order = "&"+param+" asc";
+        console.log(this.geturl());
         $.get(this.geturl(), (response) => {
             console.log(response);
             this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
             removeloader();
         }, 'json').fail (function(resultat, statut, erreur){
             console.log(statut, erreur);
-            $("#"+model.entity+"modal").modal("show");
+            //$("#"+model.entity+"modal").modal("show");
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
     },
     orderdesc:function (param) {
         console.log(param);
         this.setloader();
-        this.per_page = $("#dt_nbrow").val();
+        //this.per_page = $("#dt_nbrow").val();
         this.order = "&"+param+" desc";
+        console.log(this.geturl());
         $.get(this.geturl(), (response) => {
             //console.log(response);
             this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);

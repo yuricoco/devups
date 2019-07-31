@@ -754,8 +754,13 @@ class QueryBuilder extends \DBAL
         return $this->__findOne($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
-    public function __countEl($recursif = true)
+    public function __countEl($recursif = true, $defaultjoin = false)
     {
+        //$this->setCollect($collect);
+        if ($defaultjoin):
+            $this->join();
+        endif;
+
         return $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 

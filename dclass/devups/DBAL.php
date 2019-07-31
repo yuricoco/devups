@@ -177,6 +177,9 @@ class DBAL extends Database {
             $association = true;
             foreach ($listentity as $entity) {
 
+                if(! is_object($entity))
+                    continue;
+
                 if (!$entity->getId())
                     break;
                 /**

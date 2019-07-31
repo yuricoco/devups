@@ -723,22 +723,24 @@ EOF;
             $thfvalue = '';
             $join = explode(".", $value);
             if (isset($join[1])) {
-                $thisfield = str_replace(".", "-", $value) . ":attr";
+                //$thisfield = str_replace(".", "-", $value) . ":opt";
+                $thisfield = $value . ":opt";
                 if (!$this->searchaction) {
                 } elseif (isset($valuetd["search"])) {
                     if (is_string($valuetd["search"])) {
                         $thfvalue = call_user_func(array($this->class, $valuetd["search"] . 'Search'), $thisfield);
                     } else
                         $thfvalue = '<input name="' . $thisfield . '" value="" placeholder="' . $valuetd['header'] . '" class="form-control" >';
-                } else {
                 }
+//                else {
+//                }
 
                 if ($valuetd["order"]) {
                     $thforder = '<div class="torder"><i onclick="ddatatable.orderasc(\'orderjoin=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'orderjoin=' . $value . '\')" class="fa fa-angle-down"></i></div>';
                 }
                 //$fields[] = str_replace(".", "-", $value) . ":join";
             } else {
-                $thisfield = $value . ":attr";
+                $thisfield = $value . ":opt";
                 if (!$this->searchaction) {
                 } elseif (isset($valuetd["search"])) {
                     if (is_string($valuetd["search"])) {

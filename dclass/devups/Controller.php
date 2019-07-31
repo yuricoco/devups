@@ -78,6 +78,23 @@ class Controller {
             case "lt":
                 $this->currentqb->andwhere($attr, "<", $value);
                 break;
+            case "get":
+                $this->currentqb->andwhere($attr, ">=", $value);
+                break;
+            case "let":
+                $this->currentqb->andwhere($attr, "<=", $value);
+                break;
+            case "lkr":
+                $this->currentqb->andwhere($attr)->like_($value);
+                break;
+            case "lkl":
+                $this->currentqb->andwhere($attr)->_like($value);
+                break;
+            case "btw":
+                // todo : add constraint of integrity
+                $btw = explode('_', $value);
+                $this->currentqb->where($attr)->between($btw[0], $btw[1]);
+                break;
             default:
                 $this->currentqb->andwhere($attr)->like($value);
                 break;
@@ -95,57 +112,18 @@ class Controller {
                 continue;
 
             $attr = explode(":", $key);
-            $join = explode("-", $attr[0]);
+            $join = explode(".", $attr[0]);
             if (isset($join[1])) {
-                $this->filterswicher($attr[1], $join[0] . "." . $join[1], $value);
+                $this->filterswicher($attr[1], $attr[0], $value);
             } else if ($this->currentqb->hasrelation && isset($attr[1]))
                 $this->filterswicher($attr[1], get_class($entity) . "." . $join[0], $value);
             elseif (isset($attr[1]))
                 $this->filterswicher($attr[1], $join[0], $value);
+//            else
+//                $this->filterswicher("", $join[0], $value);
 
         }
         return $this->currentqb;
-    }
-
-    private function filterold(\stdClass $entity, \QueryBuilder $qb) {
-
-        $fieldarray = explode(",", Request::get('dfilters'));
-
-        foreach ($fieldarray as $fieldwithtype) {
-            $arrayfieldtype = explode(":", $fieldwithtype);
-
-            if (Request::get($arrayfieldtype[0])) {
-                if ($arrayfieldtype[1] == "attr") {
-                    if($qb->hasrelation)
-                        $qb->andwhere(get_class($entity) .".".$arrayfieldtype[0])->like(Request::get($arrayfieldtype[0]));
-                    else
-                        $qb->andwhere($arrayfieldtype[0])->like(Request::get($arrayfieldtype[0]));
-                } elseif ($arrayfieldtype[1] == "join") {
-
-                    $join = explode("-", $arrayfieldtype[0]);
-
-                    if($join[1] == "id"){
-                        $qb->andwhere($join[0] . "_id", "=", Request::get($arrayfieldtype[0]));
-                    }else{
-                        $qb->andwhere($join[0] . "_id")
-                            ->in(
-                                $qb->addselect("id", new $join[0], false)
-                                    ->where($join[1])
-                                    ->like(Request::get($arrayfieldtype[0]))
-                                    ->close()
-                            );
-                    }
-
-                }
-//                elseif ($_GET[$arrayfieldtype[1]] == "collect") {
-//
-//                    $join = explode("-", $arrayfieldtype[0]);
-//                    $qb->andwhere("id")->in($qb->addselect("id", new $join[0])->where($column)->like($value)->close());
-//                }
-            }
-        }
-
-        return $qb;
     }
 
     public static function initlazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = ""){
@@ -181,12 +159,12 @@ class Controller {
             if (Request::get("dfilters"))
                 $qbcustom = $this->filter($entity, $qbcustom);
 
-            $nb_element = $qbcustom->__countEl(false);
+            $nb_element = $qbcustom->__countEl(false, true); //false
         } else {
 
             if (Request::get("dfilters")) {
                 $qbcustom = $this->filter($entity, $qb);
-                $nb_element = $qbcustom->__countEl(false);
+                $nb_element = $qbcustom->__countEl(false, true);
             } else {
                 $nb_element = $qb->selectcount()->__countEl(false);
             }
@@ -285,6 +263,7 @@ class Controller {
         }
 
         return array('success' => true, // pour le restservice
+            //'sqlquery' => $qbcustom->getSqlQuery(),
             'classname' => $classname,
             'listEntity' => $listEntity,
             'nb_element' => (int) $nb_element,

@@ -155,4 +155,10 @@
         {
             // TODO: Implement deleteAction() method.
         }
+
+        public static function nameSearch($attr)
+        {
+            return $attr;
+        }
+
     }
