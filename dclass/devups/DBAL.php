@@ -989,7 +989,7 @@ class DBAL extends Database {
             $association = array_keys($this->classmetadata->associationMappings);
             if(!$this->tableExists($this->table)){
                 if($metadata = $em->getClassMetadata("\\" . $this->objectName)){
-                    $this->table = $metadata->table['name'];
+                    $this->table = strtolower($metadata->table['name']);
                 }
 
             }

@@ -38,4 +38,3 @@ class Dvups_adminForm extends FormManager
     }
 
 }
-    

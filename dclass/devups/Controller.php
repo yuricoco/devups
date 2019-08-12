@@ -11,6 +11,7 @@ class Controller {
 
     protected $error = [];
     protected $error_exist = false;
+    protected $entity = null;
 
     /**
      * @return $this
@@ -106,6 +107,7 @@ class Controller {
     {
         $this->currentqb = $qb;
         $getparam = Request::$uri_get_param;
+
         foreach ($getparam as $key => $value) {
 
             if(!$value)
@@ -116,7 +118,7 @@ class Controller {
             if (isset($join[1])) {
                 $this->filterswicher($attr[1], $attr[0], $value);
             } else if ($this->currentqb->hasrelation && isset($attr[1]))
-                $this->filterswicher($attr[1], get_class($entity) . "." . $join[0], $value);
+                $this->filterswicher($attr[1], strtolower(get_class($entity)) . "." . $join[0], $value);
             elseif (isset($attr[1]))
                 $this->filterswicher($attr[1], $join[0], $value);
 //            else
@@ -159,7 +161,7 @@ class Controller {
             if (Request::get("dfilters"))
                 $qbcustom = $this->filter($entity, $qbcustom);
 
-            $nb_element = $qbcustom->__countEl(false, true); //false
+            $nb_element = $qbcustom->__countEl(false, false); //false
         } else {
 
             if (Request::get("dfilters")) {
@@ -354,6 +356,8 @@ class Controller {
 //            if($jsondata){
 //                $object_array = Controller::formWithJson ($object, $jsondata, $change_collection_adresse);
 //            }else{
+        $this->entity = $object;
+
         return $this->formWithPost($object, $entityform);
 //            }
 
@@ -383,6 +387,9 @@ class Controller {
             foreach ($_ENTITY_FORM as $key_form => $value_form) {
 
                 if ($key_form == $key) {
+
+                    if(!is_string($value["setter"]))
+                        continue;
 
                     $currentfieldsetter = 'set' . ucfirst($value["setter"]);
 
@@ -472,7 +479,8 @@ class Controller {
                                 elseif($error = call_user_func(array($object, $currentfieldsetter), $value2))
                                     $this->error[$key] = $error;
                             }
-                        } else {
+                        }
+                        else {
 
                             if (isset($_ENTITY_FORM[$key])){
                                 if(isset($value["type"]) && $value["type"] == "injection"){

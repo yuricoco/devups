@@ -197,4 +197,12 @@ class Dvups_role extends Model implements JsonSerializable {
         ];
     }
 
+    public function is($role)
+    {
+        if($this->name == $role)
+            return true;
+
+        return false;
+    }
+
 }

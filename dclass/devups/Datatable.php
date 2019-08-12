@@ -73,13 +73,14 @@ class Datatable
         'modal' => 'data-toggle="modal" ',
     ];
     protected $customaction = [];
+    protected $customactions = [];
     protected $rowaction = [];
     protected $groupaction = false;
     protected $groupactioncore = [];
     protected $searchaction = false;
     protected $openform = "";
     protected $closeform = "";
-    protected $defaultgroupaction = '<button id="deletegroup" class="btn btn-danger">delete</button>';
+    protected $defaultgroupaction = "";// '<button id="deletegroup" class="btn btn-danger">delete</button>';
 
     public $base_url = "";
 
@@ -153,7 +154,7 @@ class Datatable
                 else
                     $top_action .= '<button type="button" class="' . $this->createaction["class"] . '" ' . $this->createaction["action"] . ' >' . $this->createaction["content"] . '</button>';
             } else {
-                $top_action .= "<span class='alert alert-info' >not rigth contact the administrator</span>";
+                $top_action .= "<span class='alert alert-info' ></span>";
             }
         }
 

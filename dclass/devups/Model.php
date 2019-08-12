@@ -12,20 +12,24 @@
 
 //namespace dclass\devups;
 
-abstract class Model extends \stdClass {
+abstract class Model extends \stdClass
+{
 
     public static $jsonmodel;
     public $dvfetched = false;
     public $dvinrelation = false;
 
-    public function inrelation(){
+    //public $dverrormessage = "";
+
+    public function inrelation()
+    {
 
         global $em;
         $this->classmetadata = $em->getClassMetadata("\\" . get_class($this));
 
-        $objecarray = (array) $this;
+        $objecarray = (array)$this;
         $association = array_keys($this->classmetadata->associationMappings);
-        if(count($association))
+        if (count($association))
             return true;
 
         return false;
@@ -44,29 +48,32 @@ abstract class Model extends \stdClass {
      * static method gives the path of the module where the entity is/
      * @return string the path of the module where the class is.
      */
-    public static function classpath($src = "", $route = __env){
+    public static function classpath($src = "", $route = __env)
+    {
         //return get_called_class();
         $reflector = new ReflectionClass(get_called_class());
         $fn = $reflector->getFileName();
         $dirname = explode("src", dirname($fn));
         $dirname = str_replace("Entity", "", $dirname[1]);
-        return $route."src".$dirname.$src;
+        return $route . "src" . $dirname . $src;
     }
 
-    public static function classroot($src){
+    public static function classroot($src)
+    {
         $reflector = new ReflectionClass(get_called_class());
         $fn = $reflector->getFileName();
         $dirname = explode("src", dirname($fn));
         $dirname = str_replace("Entity", "", $dirname[1]);
-        return ROOT."src".$dirname.$src;
+        return ROOT . "src" . $dirname . $src;
     }
 
     /**
      * static method gives the directory of the module where the entity is/
      * @return classroot the directory of the module where the class is.
      */
-    public static function classdir(){
-        return ROOT.self::classpath();
+    public static function classdir()
+    {
+        return ROOT . self::classpath();
     }
 
     /**
@@ -76,28 +83,29 @@ abstract class Model extends \stdClass {
      * @param type $lang
      * @return \Dvups_lang
      */
-    public function __inittranslate($column, $content, $lang = __lang) {
-        if(!$this->id || !$content)
+    public function __inittranslate($column, $content, $lang = __lang)
+    {
+        if (!$this->id || !$content)
             return;
 
         $table = strtolower(get_class($this));
-        $ref = $table . "_".$this->id . "_" . $column;
+        $ref = $table . "_" . $this->id . "_" . $column;
 
         $dvlang = Dvups_lang::select()->where("ref", $ref)->__getOne();
         $dvcontentlang = new Dvups_contentlang();
 
-        if($dvlang->getId()){
+        if ($dvlang->getId()) {
             $dvcontentlang = Dvups_contentlang::select()
                 ->where("dvups_lang.ref", $dvlang->getRef())
                 ->andwhere("lang", $lang)
                 ->__getOne();
-            if(!$dvcontentlang->getId()){
+            if (!$dvcontentlang->getId()) {
                 $dvcontentlang = new Dvups_contentlang();
 
                 $dvcontentlang->setDvups_lang($dvlang);
                 $dvcontentlang->setLang($lang);
             }
-        }else{
+        } else {
             $dvlang = new Dvups_lang();
             $dvlang->setRef($ref);
             $dvlang->set_table($table);
@@ -113,20 +121,21 @@ abstract class Model extends \stdClass {
 
     }
 
-    public function __gettranslate($column, $lang = null) {
-        if(!$this->id)
+    public function __gettranslate($column, $lang = null)
+    {
+        if (!$this->id)
             return "";
 
-        if(!$lang)
+        if (!$lang)
             $lang = local();
         //$lang = __lang;
         $table = strtolower(get_class($this));
-        $ref = $table . "_".$this->id . "_" . $column;
+        $ref = $table . "_" . $this->id . "_" . $column;
 
         $dvcontentlang = Dvups_contentlang::select()
             ->where("dvups_lang.ref", $ref)
             ->andwhere("lang", $lang)->__getOne();
-        if($dvcontentlang->getId())
+        if ($dvcontentlang->getId())
             return $dvcontentlang->getContent();
 
         return $this->$column;
@@ -137,7 +146,8 @@ abstract class Model extends \stdClass {
      * @param type $param
      * @return \Dfile
      */
-    public static function Dfile($fileparam) {
+    public static function Dfile($fileparam)
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
@@ -149,23 +159,26 @@ abstract class Model extends \stdClass {
      * @param $file
      * @return bool
      */
-    public function uploadfile($file) {
+    public function uploadfile($file)
+    {
 
         $uploadmethod = 'set' . ucfirst($file);
         if (!method_exists($this, $uploadmethod)) {
-            var_dump(" You may create method " . $uploadmethod . " to set the file. ");
+            Genesis::json_encode(["success" => false,
+                "error" => ["method not exist" => " You may create method " . $uploadmethod . " to update the file. "]]);
             die;
         }
 
         $dfile = new Dfile($file, $this);
 
-        if($dfile->error)
+        if ($dfile->error)
             return false;
 
         if ($this->id) {
             $getcurrentfile = 'get' . ucfirst($file);
             if (!method_exists($this, $getcurrentfile)) {
-                var_dump(" You may create method " . $getcurrentfile . " to update the file. ");
+                Genesis::json_encode(["success" => false,
+                    "error" => ["method not exist" => " You may create method " . $getcurrentfile . " to update the file. "]]);
                 die;
             }
 
@@ -177,12 +190,18 @@ abstract class Model extends \stdClass {
         $url = $dfile->sanitize()->upload();
 
         if (!$url['success']) {
+            Genesis::json_encode($url);
+            die;
             return false;
         }
 
-        call_user_func(array($this, $uploadmethod), $url["file"]["hashname"]);
+        $return = call_user_func(array($this, $uploadmethod), $url["file"]["hashname"]);
 
-        return true;
+        if ($return) {
+            Genesis::json_encode(["success" => false,
+                "error" => ["method not exist" => " You may create method " . $getcurrentfile . " to update the file. "]]);
+            die;
+        }
     }
 
     /**
@@ -191,16 +210,17 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function count($parameter  = null, $value = null) {
+    public static function count($parameter = null, $value = null)
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if(is_null($parameter))
+        if (is_null($parameter))
             return $qb->select()->__countEl();
 
-        if(is_object($parameter))
+        if (is_object($parameter))
             return $qb->select()->where($parameter)->__countEl(false);
 
         return $qb->select()->where($parameter, "=", $value)->__countEl(false);
@@ -214,7 +234,8 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function first($recursif = true, $collect = []) {
+    public static function first($recursif = true, $collect = [])
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
@@ -229,13 +250,14 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function last($recursif = true, $collect = []) {
+    public static function last($recursif = true, $collect = [])
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->orderby($qb->getTable().".id desc")->limit(1)->__getOne($recursif, $collect);
+        return $qb->select()->orderby($qb->getTable() . ".id desc")->limit(1)->__getOne($recursif, $collect);
     }
 
     /**
@@ -244,7 +266,8 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function lastrow() {
+    public static function lastrow()
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
@@ -259,12 +282,21 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function get($index = 1, $recursif = true, $collect = []) {
+    public static function index($index = 1, $recursif = true, $collect = []) {
         $i = (int) $index;
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
+        if($i < 0){
+            $nbel = $qb->__countEl();
+            if(!$nbel)
+                return $entity;
+
+            $i += $nbel;
+            return $qb->select()->limit($i - 1, $i)->__getOne($recursif, $collect);
+        }
+
         return $qb->select()->limit($i - 1, $i)->__getOne($recursif, $collect);
     }
 
@@ -275,13 +307,30 @@ abstract class Model extends \stdClass {
      * @param int $id
      * @return $this
      */
-    public static function getattribut($attribut, $id) {
+    public static function getattribut($attribut, $id)
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
         return $qb->select($attribut)->where("this.id", $id)->exec(DBAL::$FETCH)[0];
+    }
+    /**
+     * return the attribut as design in the database
+     * @example http://easyprod.spacekola.com description
+     * @param string $attribut
+     * @param string $value
+     * @return $this
+     */
+    public static function getbyattribut($attribut, $value)
+    {
+
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        return $qb->select()->where($attribut, $value)->__getOne();
     }
 
     /**
@@ -290,7 +339,8 @@ abstract class Model extends \stdClass {
      * @param type $id
      * @return $this
      */
-    public static function findrow($id) {
+    public static function findrow($id)
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
@@ -308,7 +358,8 @@ abstract class Model extends \stdClass {
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
      * @return $this
      */
-    public static function find($id, $recursif = true, $collect = []) {
+    public static function find($id, $recursif = true, $collect = [])
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
@@ -327,17 +378,18 @@ abstract class Model extends \stdClass {
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
      * @return \QueryBuilder
      */
-    public static function delete($id = null) {
+    public static function delete($id = null)
+    {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
-        if($id){
+        if ($id) {
             $entity->setId($id);
 
             $dbal = new DBAL();
             return $dbal->deleteDbal($entity);
-        }else{
+        } else {
             $qb = new QueryBuilder($entity);
             return $qb->delete();
         }
@@ -350,7 +402,8 @@ abstract class Model extends \stdClass {
      * @param type $order
      * @return type
      */
-    public static function all($sort = 'id', $order = "asc") {
+    public static function all($sort = 'id', $order = "asc")
+    {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
@@ -368,7 +421,8 @@ abstract class Model extends \stdClass {
      * @param String $order the ordering model ( ASC default, DESC, RAND() )
      * @return Array
      */
-    public static function allrows($sort = 'id', $order = "") {
+    public static function allrows($sort = 'id', $order = "")
+    {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
@@ -385,7 +439,8 @@ abstract class Model extends \stdClass {
      * @param string $columns
      * @return \QueryBuilder
      */
-    public static function select($columns = '*') {
+    public static function select($columns = '*')
+    {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
@@ -401,7 +456,8 @@ abstract class Model extends \stdClass {
      * @param Mixed $case id
      * @return \QueryBuilder
      */
-    public static function update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true) {
+    public static function update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true)
+    {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
         if ($seton != null && is_array($arrayvalues) || $case != null && !is_array($case))
@@ -417,12 +473,13 @@ abstract class Model extends \stdClass {
      * @return mixed
      * @throws ReflectionException
      */
-    public static function dclone($id = null, $update = null){
+    public static function dclone($id = null, $update = null)
+    {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if($id)
+        if ($id)
             return $qb->__dclone($update)->where("this.id", $id)->exec(DBAL::$INSERT);
 
         return $qb->__dclone($update);
@@ -432,7 +489,8 @@ abstract class Model extends \stdClass {
      * create a new entry
      * @return integer
      */
-    public function __insert() {
+    public function __insert()
+    {
         $dbal = new DBAL();
         return $dbal->createDbal($this);
     }
@@ -441,7 +499,8 @@ abstract class Model extends \stdClass {
      * @param array $update
      * @return integer
      */
-    public function __dclone($update = []) {
+    public function __dclone($update = [])
+    {
         $qb = new QueryBuilder($this);
         return $qb->__dclone($update)->where("this.id", $this->getId())->exec(DBAL::$INSERT);
     }
@@ -454,7 +513,8 @@ abstract class Model extends \stdClass {
      * @param Mixed $case
      * @return boolean | \QueryBuilder
      */
-    public function __update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true) {
+    public function __update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true)
+    {
         $dbal = new DBAL();
         if (!$arrayvalues) {
             return $dbal->updateDbal($this);
@@ -464,7 +524,8 @@ abstract class Model extends \stdClass {
         }
     }
 
-    public function __save() {
+    public function __save()
+    {
 
         $dbal = new DBAL();
         if ($this->getId())
@@ -473,7 +534,8 @@ abstract class Model extends \stdClass {
             return $dbal->createDbal($this);
     }
 
-    public function __show($recursif = false) {
+    public function __show($recursif = false)
+    {
         if ($this->dvfetched) {
             return $this;
         }
@@ -482,12 +544,14 @@ abstract class Model extends \stdClass {
         return $dbal->findByIdDbal($this, $recursif);
     }
 
-    public function __findrow() {
+    public function __findrow()
+    {
         $qb = new QueryBuilder($this);
         return $qb->select()->where("id", "=", $this->id)->__getOneRow();
     }
 
-    public function __delete($exec = true) {
+    public function __delete($exec = true)
+    {
         if ($exec) {
             $dbal = new DBAL();
             return $dbal->deleteDbal($this);
@@ -498,7 +562,8 @@ abstract class Model extends \stdClass {
         }
     }
 
-    public function __getall($att = 'id', $order = "asc") {
+    public function __getall($att = 'id', $order = "asc")
+    {
         $qb = new QueryBuilder($this);
         if ($att == 'id')
             $att = $qb->getTable() . "." . $att;
@@ -506,7 +571,8 @@ abstract class Model extends \stdClass {
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }
 
-    public function __all($att = 'id', $order = "") {
+    public function __all($att = 'id', $order = "")
+    {
         $qb = new QueryBuilder($this);
         if ($att == 'id')
             $att = $qb->getTable() . "." . $att;
@@ -514,7 +580,8 @@ abstract class Model extends \stdClass {
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }
 
-    public function __hasmany($collection, $exec = true, $incollectionof = null, $recursif = false) {
+    public function __hasmany($collection, $exec = true, $incollectionof = null, $recursif = false)
+    {
         if (!is_object($collection)) {
             $reflection = new ReflectionClass($collection);
             $collection = $reflection->newInstance();
@@ -522,8 +589,7 @@ abstract class Model extends \stdClass {
         if ($this->getId()) {
             $dbal = new DBAL();
             return $dbal->hasmany($this, $collection, $exec, $incollectionof, $recursif);
-        }
-        elseif (!$exec)
+        } elseif (!$exec)
             return new QueryBuilder($this);
         else {
             return [];
@@ -536,9 +602,10 @@ abstract class Model extends \stdClass {
      * @return $this
      * @throws ReflectionException
      */
-    public function __belongto($relation) {
+    public function __belongto($relation)
+    {
 
-        if(is_object($relation) && ($relation->dvfetched || !$relation->dvinrelation))
+        if (is_object($relation) && ($relation->dvfetched || !$relation->dvinrelation))
             return $relation;
 
         if (!$this->getId()) {
@@ -548,7 +615,7 @@ abstract class Model extends \stdClass {
                 $reflection = new ReflectionClass($relation);
                 return $reflection->newInstance();
             endif;
-        }else{
+        } else {
             $reflection = new ReflectionClass($relation);
             $relation = $reflection->newInstance();
         }
@@ -563,7 +630,8 @@ abstract class Model extends \stdClass {
      * @return $this
      * @throws ReflectionException
      */
-    public function __hasone($relation, $recursif = false) {
+    public function __hasone($relation, $recursif = false)
+    {
         if (!is_object($relation)) :
             $reflection = new ReflectionClass($relation);
             $relation = $reflection->newInstance();
@@ -573,26 +641,33 @@ abstract class Model extends \stdClass {
         return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
     }
 
-    public function __get($attribut) {
+    public function __get($attribut)
+    {
         $qb = new QueryBuilder($this);
         return $qb->select($attribut)->where("this.id", $this->getId())->exec(DBAL::$FETCH)[0];
     }
 
-    public function getId() {
-        return  (int) $this->id;
+    public function getId()
+    {
+        return (int)$this->id;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
-    public function scan_entity_core() {
+    public function scan_entity_core()
+    {
         return Core::__extract($this);
     }
 
-    public function __construct($id = null){
+    public function __construct($id = null)
+    {
 
-        if( $id ) { $this->id = $id; }
+        if ($id) {
+            $this->id = $id;
+        }
 
     }
 

@@ -266,7 +266,7 @@ var ddatatable = {
         ddatatable.per_page = this.dtinstance.find("#dv_table").data('perpage');
 
         ddatatable.baseurl = this.dtinstance.find("#dv_table").data('route')+"services.php";
-        //console.log(ddatatable.baseurl);
+        //
         ddatatable.urlparam = this.dtinstance.find("#dv_table").data('filterparam');
 
         return this;

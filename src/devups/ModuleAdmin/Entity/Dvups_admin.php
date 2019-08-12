@@ -3,7 +3,8 @@
 /**
  * @Entity @Table(name="dvups_admin")
  * */
-class Dvups_admin extends Model implements JsonSerializable {
+class Dvups_admin extends Model implements JsonSerializable
+{
 
     /**
      * @Id @GeneratedValue @Column(type="integer")
@@ -41,7 +42,8 @@ class Dvups_admin extends Model implements JsonSerializable {
      */
     public $dvups_role;
 
-    private function wd_remove_accents($str, $charset = 'utf-8') {
+    private function wd_remove_accents($str, $charset = 'utf-8')
+    {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);
 
         $str = preg_replace('#&([A-za-z])(?:acute|cedil|caron|circ|grave|orn|ring|slash|th|tilde|uml);#', '\1', $str);
@@ -53,9 +55,10 @@ class Dvups_admin extends Model implements JsonSerializable {
     /**
      * @param mixed $login
      */
-    public function generateLogin() {//on envoi une liste de login
+    public function generateLogin()
+    {//on envoi une liste de login
         $list = "1234567890";
-        mt_srand((double) microtime() * 10000);
+        mt_srand((double)microtime() * 10000);
         $generate = "";
         while (strlen($generate) < 4) {
             $generate .= $list[mt_rand(0, strlen($list) - 1)];
@@ -74,9 +77,10 @@ class Dvups_admin extends Model implements JsonSerializable {
     /**
      * @param mixed
      */
-    public function generatePassword() {
+    public function generatePassword()
+    {
         $list = "0123456789abcdefghijklmnopqrstvwxyz";
-        mt_srand((double) microtime() * 1000000);
+        mt_srand((double)microtime() * 1000000);
         $password = "";
         while (strlen($password) < 8) {
             $password .= $list[mt_rand(0, strlen($list) - 1)];
@@ -84,7 +88,8 @@ class Dvups_admin extends Model implements JsonSerializable {
         return $password;
     }
 
-    public function __construct($id = null) {
+    public function __construct($id = null)
+    {
 
         if ($id) {
             $this->id = $id;
@@ -94,11 +99,13 @@ class Dvups_admin extends Model implements JsonSerializable {
         $this->dvups_role = new Dvups_role();
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
@@ -118,58 +125,71 @@ class Dvups_admin extends Model implements JsonSerializable {
         $this->lastlogin_at = $lastlogin_at;
     }
 
-    function getName() {
+    function getName()
+    {
         return $this->name;
     }
 
-    function setName($name) {
-        if(!$name)
+    function setName($name)
+    {
+        if (!$name)
             return "name empty";
 
         $this->name = $name;
     }
 
-    public function getLogin() {
+    public function getLogin()
+    {
         return $this->login;
     }
 
-    public function setLogin($login) {
+    public function setLogin($login)
+    {
         $this->login = $login;
     }
 
-    public function getPassword() {
+    public function getPassword()
+    {
         return $this->password;
     }
 
-    public function setPassword($password) {
+    public function setPassword($password)
+    {
         $this->password = $password;
     }
-    function setDvups_role($dvups_role) {
+
+    function setDvups_role($dvups_role)
+    {
         $this->dvups_role = $dvups_role;
     }
 
     /**
      *  manyToMany
-     * 	@return \Dvups_role
+     * @return \Dvups_role
      */
-    function getDvups_role() {
+    function getDvups_role()
+    {
         return $this->dvups_role;
     }
 
-    function collectDvups_role() {
+    function collectDvups_role()
+    {
         $this->dvups_role = $this->__hasmany('dvups_role');
         return $this->dvups_role;
     }
 
-    function addDvups_role(\Dvups_role $dvups_role) {
+    function addDvups_role(\Dvups_role $dvups_role)
+    {
         $this->dvups_role[] = $dvups_role;
     }
 
-    function dropDvups_roleCollection() {
+    function dropDvups_roleCollection()
+    {
         $this->dvups_role = EntityCollection::entity_collection('dvups_role');
     }
 
-    function availableentityright($action) {
+    function availableentityright($action)
+    {
         if (isset($this->manageentity[$action])) {
             $entity = $this->manageentity[$action];
             return $entity->availableright();
@@ -177,11 +197,28 @@ class Dvups_admin extends Model implements JsonSerializable {
         return [];
     }
 
-    function callbackbtnAction(){
-        return "<a class='btn btn-default' href='dvups-admin/resetcredential&id=".$this->getId()."'>reset password</a>";
+    function callbackbtnAction()
+    {
+        return "<a class='btn btn-default' href='dvups-admin/resetcredential&id=" . $this->getId() . "'>reset password</a>";
     }
 
-    public function jsonSerialize() {
+    function resetCredential()
+    {
+        $password = $this->generatePassword();
+        $this->setPassword(sha1($password));
+//        $dvups_admin->setLogin();
+        $this->generateLogin($this->getName());
+
+        $this->__save();
+        return $password;
+//        return [
+//            "login" => $this->login,
+//            "password" => $this->password,
+//        ];
+    }
+
+    public function jsonSerialize()
+    {
         return [
             'login' => $this->login,
             'password' => $this->password,

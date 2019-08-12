@@ -9,7 +9,8 @@ var dform = {
         if(!error)
             return 0;
 
-        model.modalbody.find("#loader").remove();
+        //model.modalbody.find("#loader").remove();
+        //model.modalboxcontainer.find("#loader").remove();
         //console.log(response.error);
         var errorarray = [];
         var keys = Object.keys(error);
@@ -17,7 +18,7 @@ var dform = {
         for (var i = 0; i < keys.length; i++) {
             errorarray.push( "<b>" + keys[i] + "</b> : " + values[i]+ "");
         }
-        model.modalbody.prepend('<div class="alert alert-danger alert-dismissable">\n' +
+        model.modalboxcontainer.prepend('<div class="alert alert-danger alert-dismissable">\n' +
             '                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>\n' +
             '                                '+ errorarray.join("<br>") +'.\n' +
             '                            </div>');
@@ -82,7 +83,78 @@ var dform = {
         model._post(model.entity+'.'+url, formdata, callback);
 
         return false;
-    }
+    },
+    findsuggestion(e) {
+
+        $("input[name='product_form[name]']").val(this.productname);
+        if (e.keyCode === 13 ) { //|| product.id
+            return;
+        }
+
+        if (this.productname.length >= 3) {
+
+            //$("#box-loader").show();
+            var self = this;
+            self.showlist = true;
+            if (this.productdatas.length) {
+                this.products = this.filterrow(this.productname, this.productdatas);
+                //return;
+            }
+            // else
+            console.log(this.productname, this.lastquery)
+            if(this.productname.length === 3 && this.productname !== this.lastquery){
+                this.lastquery = this.productname;
+                model._apiget(model.entity+".list", {search: devups.escapeHtml(this.productname)},
+                    (response) => {
+                        console.log(response);
+                        //self.showlist = true;
+                        self.products = response.products;
+                        self.productdatas = response.products;
+                    })
+            }
+        } else {
+            $("#productselected").html("");
+            this.products = [];
+            //this.productdatas = [];
+            this.showlist = false;
+        }
+    },
+    showliststatus(status) {
+        setTimeout(() => {
+            this.showlist = status;
+        }, 500)
+    },
+    setproduct: function (product, idx) {
+        console.log(product);
+        if (!product.category)
+            product.category = {};
+
+        this.lastquery = "";
+        this.products = [];
+        this.productname = product.name;
+        $("input[name='product_form[name]']").val(product.name);
+        //productformvue.setProduct(product);
+        this.$emit('selectproduct', product);
+
+    },
+    close() {
+
+    },
+
+    filterrow(value, dataarray) {
+        var filter, filtered = [], tr, td, i, data;
+
+        console.log(dataarray);
+        filter = value.toUpperCase();
+
+        for (i = 0; i < dataarray.length; i++) {
+            data = dataarray[i];
+            if (data.name.toUpperCase().indexOf(filter) > -1) {
+                filtered.push(data);
+            }
+        }
+        return filtered;
+    },
 };
 
 $("#"+model.entity+"-form").submit(function (e) {

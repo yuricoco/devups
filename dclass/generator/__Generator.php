@@ -765,7 +765,7 @@ switch (Request::get('path')) {
                 g::json_encode($" . $name . "Ctrl->updateAction(R::get(\"id\")));
                 break;
         case '" . $name . "._show':
-                " . ucfirst($name) . "Ctrl->detailView(R::get(\"id\"));
+                $" . $name . "Ctrl->detailView(R::get(\"id\"));
                 break;
         case '" . $name . "._delete':
                 g::json_encode($" . $name . "Ctrl->deleteAction(R::get(\"id\")));
