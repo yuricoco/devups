@@ -9,8 +9,12 @@
 require 'devups/ModuleAdmin/devups.moduleadmin.php';
 require 'devups/ModuleTranslate/devups.moduletranslate.php';
 
-require 'devupstest/ModuleStock/devupstest.modulestock.php';
-require 'devupstest/ModuleProduct/devupstest.moduleproduct.php';
+require 'devupstuto/ModuleStock/devupstuto.modulestock.php';
+require 'devupstuto/ModuleProduct/devupstuto.moduleproduct.php';
+//
+//require 'prettycash/ModuleListe_tache/prettycash.moduleliste_tache.php';
+//require 'prettycash/ModuleTransactions/prettycash.moduletransactions.php';
+//require 'prettycash/ModuleUtilisateurs/prettycash.moduleutilisateurs.php';
 
 //require 'eventspace/Moduleeventspace/eventspace.moduleeventspace.php';
 

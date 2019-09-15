@@ -2,6 +2,10 @@
 /uploads/
 /admin/cache/
 /node_modules/
+/src/devupstuto/
+/src/devupstest/
+/src/eventspace/
+/src/prettycash/
 /vendor/
 /.idea/
 /*.zip/

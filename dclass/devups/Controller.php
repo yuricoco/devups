@@ -133,13 +133,14 @@ class Controller {
     }
 
     const maxpagination = 12;
-    /**
-     *
-     * @param \stdClass $entity
-     * @param type $next
-     * @param type $per_page
-     * @param \QueryBuilder $qbcustom
-     * @return type
+
+    /***
+     * @param stdClass $entity the instance of the entity
+     * @param int $next the page to print within the datatable by default it's 0
+     * @param int $per_page the number of element per page
+     * @param QueryBuilder|null $qbcustom if the developer want to customise the request
+     * @param string $order
+     * @return array
      */
     public function lazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = "") {//
         $remain = true;

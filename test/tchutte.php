@@ -82,7 +82,7 @@ $storage = new Storage();
 //$storages = Product::find(1)->__hasmany('storage');
 
 //$category = Product::find(1)->__belongto('category');
-//$products = Category::find(1)->__hasmany('product');
+$products = Category::find(1)->__hasmany('product');
 
 //$storage = Storage::find(1);
 //$storage = Storage::findrow(1);

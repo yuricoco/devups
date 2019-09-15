@@ -228,7 +228,6 @@ var model = {
         });
     },
 
-
     _post : function (action, formdata, callback, fd = true) {
         // var formdata = this._formdata(form);
         // model.modalbody.append('<div id="loader" style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
@@ -299,6 +298,36 @@ var model = {
                 model.modalbody.html(e.responseText);
             }
         });
+    },
+
+    getform: function (fm, entity, attribs) {
+        this._formdata(fm);
+        var keys = Object.keys(this.formentity);
+        var values = Object.values(this.formentity);
+        var form = [];
+        var fd = new FormData();
+        attribs.forEach((attr)=>{
+            for (var i = 0; i < keys.length; i++) {
+
+                if(keys[i] === entity+"_form["+attr+"]"){
+                    form[attr] = values[i];
+                    console.log(typeof values[i]);
+                    if(typeof values[i] === 'string')
+                        fd.append(keys[i], values[i]);
+                    else
+                        fd.append(keys[i], values[i].value);
+
+                    break;
+                }
+
+            }
+        });
+
+        //form['dvups_form['+entity+']'] = this.formentity['dvups_form['+entity+']'];
+        form[entity] = this.formentity['dvups_form['+entity+']'];
+        fd.append('dvups_form['+entity+']', this.formentity['dvups_form['+entity+']']);
+        form.fd = fd;
+        return form;
     },
 
     getformvalue: function (field) {

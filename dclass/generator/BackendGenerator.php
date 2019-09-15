@@ -214,6 +214,24 @@ class BackendGenerator {
                 if (in_array($attribut->formtype, ['document', 'image', 'music', 'video'])) {
                     $construt .= "
                         
+        public function upload" . ucfirst($attribut->name) . "($"."file = '" . $attribut->name . "') {
+            $"."dfile = self::Dfile($"."file);
+            if(!$"."dfile->errornofile){
+            
+                $"."filedir = '" . $attribut->name . "/';
+                $"."url = $"."dfile
+                    ->hashname()
+                    ->moveto($"."filedir);
+    
+                if (!$"."url['success']) {
+                    return 	array(	'success' => false,
+                        'error' => $"."url);
+                }
+    
+                $"."this->" . $attribut->name . " = $"."url['file']['hashname'];            
+            }
+        }     
+             
         public function show" . ucfirst($attribut->name) . "() {
             $"."url = Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
             return Dfile::fileadapter($"."url, $"."this->" . $attribut->name . ");
@@ -371,7 +389,7 @@ class " . ucfirst($name) . "Controller extends Controller{
             if (in_array($attribut->formtype, ['document', 'music', 'video', 'image'])){
                 $otherattrib = true;
                 $contenu .= "
-        $".$name ."->uploadfile('" . $attribut->name . "');\n";
+        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
             }
 
             if (in_array($attribut->datatype, ['date', 'datetime', 'time']) && isset($attribut->defaultvalue)){
@@ -408,8 +426,8 @@ class " . ucfirst($name) . "Controller extends Controller{
             foreach ($entity->attribut as $attribut) {
 //                            for($i = 1; $i < count($entity->attribut); $i++){
                 if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
-                    $contenu .= " 
-                        $".$name ."->uploadfile('" . $attribut->name . "');\n";
+                    $contenu .= "
+                        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
             }
         endif;
         $contenu .= "        
@@ -701,7 +719,7 @@ class " . ucfirst($name) . "Table extends Datatable{
                     \"type\" => FORMTYPE_INJECTION, 
                     FH_REQUIRE => true,
                     \"label\" => '" . ucfirst($relation->entity) . "',
-                    \"imbricate\" => " . ucfirst($relation->entity) . "Form::__renderForm($" . $name . "->get" . ucfirst($relation->entity) . "()),
+                    \"imbricate\" => " . ucfirst($relation->entity) . "Form::__renderForm(" . ucfirst($relation->entity) . "::getFormData($" . $name . "->" . $relation->entity . "->getId(), false)),
                 ];\n";
                 } elseif ($relation->cardinality == 'manyToMany') {
                     $field .= "
@@ -733,7 +751,7 @@ use Genesis as g;
                 
             " . $field . "
             
-            $" . "entitycore->addDformjs($" . "action);
+            $" . "entitycore->addDformjs($" . "button);
             $" . "entitycore->addjs(" . ucfirst($name) . "::classpath('Ressource/js/".$name."Form'));
             
             return $" . "entitycore;
@@ -939,9 +957,9 @@ use Genesis as g;
         $field = $this->formwidget($entity, $listmodule);
 
         $contenu = "
-    <?php //Form::addcss(' . ucfirst($name) . '::classpath('Ressource/js/".$name."')) ?>
+    <?php //Form::addcss(" . ucfirst($name) . " ::classpath('Ressource/js/".$name."')) ?>
     
-    <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action_form\", \"method\"=> \"post\"]) ?>
+    <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action\", \"method\"=> \"post\"]) ?>
 
      " . $field . "
        
@@ -950,10 +968,10 @@ use Genesis as g;
     <?= Form::close() ?>
     
     <?= Form::addDformjs() ?>    
-    <?= Form::addjs(' . ucfirst($name) . '::classpath('Ressource/js/".$name."Form')) ?>
+    <?= Form::addjs(" . ucfirst($name) . "::classpath('Ressource/js/".$name."Form')) ?>
     ";
 
-        $entityform = fopen('Form/' . ucfirst($name) . 'FormWidget.php', 'w');
+        $entityform = fopen('Ressource/views/' . $name . '/formWidget.blade.php', 'w');
         fputs($entityform, $contenu);
 
         fclose($entityform);
