@@ -76,9 +76,6 @@
                 <div class="title m-b-md">                    
                     Hello Devups.  Waitting for your front-end template. Do your best :)
                 </div>
-                <div class="body m-b-md">
-                   <?= ProductTable::init($lazyloading)->buildfronttable()->render() ?>
-                </div>
 
                 <div class="links">
                     <a href="#">Documentation</a>
