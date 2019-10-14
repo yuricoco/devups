@@ -384,13 +384,17 @@ class Controller {
             $entitycore->field = json_decode($_POST["dvups_form"][strtolower(get_class($object))], true);
         }
 
+        //Genesis::json_encode($_POST["dvups_form"]);
+
         foreach ($entitycore->field as $key => $value) {
             foreach ($_ENTITY_FORM as $key_form => $value_form) {
 
                 if ($key_form == $key) {
 
-                    if(!is_string($value["setter"]))
-                        continue;
+//                    if(!is_string($value["setter"]))
+//                        continue;
+                    if(!isset($value["setter"]))
+                        $value["setter"] = $key;
 
                     $currentfieldsetter = 'set' . ucfirst($value["setter"]);
 
@@ -460,7 +464,7 @@ class Controller {
                             $reflect = new ReflectionClass($key);
                             $value2 = $reflect->newInstance();
 
-                            if ($value['options'] && isset($_ENTITY_FORM[$key])) {
+                            if (is_array($value['options']) && isset($_ENTITY_FORM[$key])) {
 
                                 if(!is_numeric($_ENTITY_FORM[$key])){
                                     $value2->setId(null);

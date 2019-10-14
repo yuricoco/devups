@@ -34,6 +34,7 @@ var dform = {
             else if(response.reload)
                 window.location.reload();
 
+            $.notify("Nouvelle ligne ajoutée avec succès!", "success");
             ddatatable.addrow(response.tablerow);
             //$("#dv_table").find("tbody").prepend(response.tablerow);
             model._dismissmodal();
@@ -51,6 +52,7 @@ var dform = {
             else if(response.reload)
                 window.location.reload();
 
+            $.notify("Nouvelle ligne mise à jour avec succès!", "success");
             ddatatable.replacerow(dform.entityid, response.tablerow);
             //$("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
             model._dismissmodal();
@@ -59,7 +61,9 @@ var dform = {
 
         dform.binderror(response.error);
     },
-    _submit: function(el, url){
+    callback:null,
+    formdata:null,
+    _submit: function(el, url, next){
         // var formserialize = $(this).serialize();
         // console.log(formserialize);
         if (! url){
@@ -67,20 +71,24 @@ var dform = {
             url = actionarray[1];
         }
 
-        var callback = function (response) { console.log(response); };
+        this.callback = function (response) { console.log(response); };
         dform.entityid = $(el).data("id");
 
         if(dform.entityid){
             //action = actionarray[1];
             //action = "update&id="+entityid;
-            callback = dform.callbackupdate;
+            this.callback = dform.callbackupdate;
         }else{
-            callback = dform.callbackcreate;
+            this.callback = dform.callbackcreate;
         }
 
-        var formdata = model._formdata($(el));
+        this.formdata = model._formdata($(el));
         console.log(model.entity+'.'+url);
-        model._post(model.entity+'.'+url, formdata, callback);
+        // if(next){
+        //     next(model.entity+'.'+url);
+        //     return 0;
+        // }
+        model._post(model.entity+'.'+url, this.formdata, this.callback);
 
         return false;
     },

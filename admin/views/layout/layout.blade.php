@@ -98,6 +98,7 @@
 <script src="<?= assets; ?>scripts/main.js"></script>
 <!-- End custom js for this page-->
 <script src="<?= assets; ?>plugins/jquery/jquery.min.js"></script>
+<script src="<?= assets; ?>plugins/notify.min.js"></script>
 
 <!-- <script src="<?= node_modules ?>bootstrap/js/bootstrap.min.js"></script> -->
 {{----}}

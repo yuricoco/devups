@@ -37,6 +37,8 @@ require __DIR__ . '/../dclass/devups/FormFactory.php';
 require __DIR__ . '/../dclass/devups/FormManager.php';
 require __DIR__ . '/../dclass/devups/Form.php';
 require __DIR__ . '/../dclass/devups/Request.php';
+require __DIR__ . '/../dclass/devups/Response.php';
+require __DIR__ . '/../dclass/devups/model/Dbutton.php';
 
 require __DIR__ . '/../dclass/generator/template/Templatedependences.php';
 

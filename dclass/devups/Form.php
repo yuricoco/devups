@@ -35,8 +35,7 @@ class Form extends FormFactory{
         }
 
         //return "<form id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
-        //onsubmit=\"return dform._submit(this, '".Form::$name."/$action' )\"
-
+        // onsubmit=\"return dform._submit(this, '".Form::$name."/$action' )\"
         return "<form action='" . Form::$name . "/" . $action . "' id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
 
     }
@@ -46,23 +45,23 @@ class Form extends FormFactory{
     }
 
     public static function close() {
-        
+
 //        $_SESSION[Form::$name ] = Form::$fields;
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
         $dvups_form = "<textarea style='display:none;' name='dvups_form[".Form::$name."]' >".json_encode(Form::$fields)."</textarea>";
         return $dvups_form."</form>";
     }
-    
+
     public static function imbricate($enitty) {
         Form::$savestate = [Form::$name, Form::$fields];
         //Form::$fields = [];
         Form::$name = strtolower(get_class($enitty));
     }
-    
+
     public static function closeimbricate() {
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
         $dvups_form = "<textarea style='display: none' name='dvups_form[".Form::$name."]' >".json_encode(Form::$fields)."</textarea>";
-        
+
         Form::$name = Form::$savestate[0];
         //Form::$fields = Form::$savestate[1];
 
@@ -74,7 +73,7 @@ class Form extends FormFactory{
     }
 
     public static function addjs($js){
-            return "<script src='".$js.".js?v="._jsversion."' ></script>";
+        return "<script src='".$js.".js?v="._jsversion."' ></script>";
     }
 
     public static function addcss($css){
@@ -91,65 +90,65 @@ class Form extends FormFactory{
 
     public static function reset($name = "reset", $directive = []) {
         return "<input ".Form::serialysedirective($directive)." type='reset' value='".$name."' >";
-       
+
     }
-                
+
     public static function radio($name, $options, $value, $directive = [], $setter = "") {
-        
+
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["options"] = $options;
         $field["value"] = $value;
-        
+
         Form::optionsfield($name, $value, $options, $setter);
-        
+
         return Form::__radio("", $field, Form::serialysedirective($directive));
-        
+
     }
-    
+
     public static function checkbox($name, $options, $values, $directive = [], $setter = "", $callback = null) {
-        
+
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["options"] = $options;
         $field["values"] = $values;
-        
+
         Form::collectionfield($name, $values, $options, $setter);
-        
+
         if($callback == null){
-            return Form::__checkbox("", $field, Form::serialysedirective($directive));            
+            return Form::__checkbox("", $field, Form::serialysedirective($directive));
         }
         return Form::__checkboxinput($field, Form::serialysedirective($directive), $callback);
-        
+
     }
-    
+
     public static function textarea($name, $value, $directive = [], $setter = "") {
-        
+
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["value"] = $value;
-        
+
         Form::inputfield($name, $value, $setter);
-        
+
         return Form::__textarea("", $field, Form::serialysedirective($directive));
-        
+
     }
-    
+
     public static function select($name, $options, $value, $directive = [], $setter = "") {
-                
+
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["options"] = $options;
         $field["value"] = $value;
-        
+
         if(isset($directive['placeholder'])){
             $field["placeholder"] = $directive['placeholder'];
         }
-        
+
         Form::optionsfield($name, $value, $options, $setter);
-        
+
         return Form::__select("", $field, Form::serialysedirective($directive));
-        
+
     }
 
     public static function file($name, $value, $directive = [], $filetype = "image", $setter = "") {
@@ -204,16 +203,16 @@ class Form extends FormFactory{
     }
 
     public static function input($name, $value, $directive = [], $type = FORMTYPE_TEXT, $setter = "") {
-                 
+
         FormFactory::$fieldname = Form::fieldnamesanitize($name);
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["value"] = $value;
         $field["type"] = $type;
-        
+
         Form::inputfield($name, $value, $setter);
-        
+
         return Form::__input("", $field, Form::serialysedirective($directive));
-        
+
     }
 
     /**
@@ -223,45 +222,45 @@ class Form extends FormFactory{
     {
         return self::input($name, $value, $directive, FORMTYPE_NUMBER, $setter);
     }
-    
+
     public static function email($name, $value, $directive = [], $setter = "") {
-                 
+
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["value"] = $value;
         $field["type"] = FORMTYPE_EMAIL;
-        
+
         Form::inputfield($name, $value, $setter);
-        
+
         return Form::__input("", $field, Form::serialysedirective($directive));
-        
+
     }
-    
+
     public static function password($name, $value, $directive = [], $setter = "") {
-                 
+
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["value"] = $value;
         $field["type"] = FORMTYPE_PASSWORD;
-        
+
         Form::inputfield($name, $value, $setter);
-        
+
         return Form::__input("", $field, Form::serialysedirective($directive));
-        
+
     }
-    
+
     private static function inputfield($name, $value, $setter) {
 
         if(!$setter)
             $setter = $name;
 
         Form::$fields[$name] = [
-            "value" => $value,
+            //"value" => $value,
             "setter" => $setter
         ];
-        
+
     }
-    
+
     private static function optionsfield($name, $value, $options, $setter) {
 
         if(!$setter)
@@ -273,7 +272,7 @@ class Form extends FormFactory{
             "setter" => $setter
         ];
     }
-    
+
     private static function collectionfield($name, $values, $options, $setter) {
 
         if(!$setter)
@@ -285,5 +284,5 @@ class Form extends FormFactory{
             "setter" => $setter
         ];
     }
-    
+
 }

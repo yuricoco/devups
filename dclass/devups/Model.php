@@ -73,7 +73,7 @@ abstract class Model extends \stdClass
      */
     public static function classdir()
     {
-        return ROOT . self::classpath();
+        return ROOT .'..'. self::classpath();
     }
 
     /**

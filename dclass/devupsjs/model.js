@@ -129,12 +129,15 @@ var model = {
         return formentity
 
     },
-    _formdata : function (form) {
+    _formdata : function (form, formdata) {
         var $inputs = form.find('input');
         var $textareas = form.find('textarea');
         var $selects = form.find('select');
         var formentity = {};
-        var formdata = new FormData();
+
+        if (!formdata)
+            formdata = new FormData();
+
         $.each($inputs, function (i, input) {
 
             if($(input).attr('type') === "file" && input.files[0]){
@@ -172,7 +175,10 @@ var model = {
         });
         $.each($selects, function (i, select) {
             formdata.append($(select).attr('name'), $(select).val());
-            formentity[$(select).attr('name')] = $(select).val();
+            formentity[$(select).attr('name')] = {
+                value: $(select).val(),
+                option: $(select).find(":selected").text(),
+            }
         });
 
         model.formentity = formentity;
@@ -227,6 +233,7 @@ var model = {
             }
         });
     },
+
 
     _post : function (action, formdata, callback, fd = true) {
         // var formdata = this._formdata(form);
@@ -285,7 +292,7 @@ var model = {
         }
 
         $.ajax({
-            url: __env+action,
+            url: __env+'api/'+action,
             data: formdata,
             cache: false,
             contentType: false,
@@ -300,6 +307,9 @@ var model = {
         });
     },
 
+    getformvalue: function (field) {
+        return this.formentity[this.entity+"_form["+field+"]"];
+    },
     getform: function (fm, entity, attribs) {
         this._formdata(fm);
         var keys = Object.keys(this.formentity);
@@ -325,13 +335,46 @@ var model = {
 
         //form['dvups_form['+entity+']'] = this.formentity['dvups_form['+entity+']'];
         form[entity] = this.formentity['dvups_form['+entity+']'];
+        console.log(JSON.parse(form[entity]));
         fd.append('dvups_form['+entity+']', this.formentity['dvups_form['+entity+']']);
         form.fd = fd;
         return form;
     },
+    entitytoformdata (entity, entityformmodel){
+        var fd = new FormData();
+        this.formentity = {};
+        var keys = Object.keys(entity);
+        var values = Object.values(entity);
 
-    getformvalue: function (field) {
-        return this.formentity[this.entity+"_form["+field+"]"];
+        for (var i = 0; i < keys.length; i++) {
+            if (typeof values[i] === 'object' && values[i] !== null)
+                fd.append(entityformmodel.name+`_form[${keys[i]}]`, values[i].id)
+            else
+                fd.append(entityformmodel.name+`_form[${keys[i]}]`, values[i])
+        }
+        fd.append('dvups_form['+entityformmodel.name+']', JSON.stringify(entityformmodel.field));
+
+        return fd;
+    },
+    entitytoformentity (entity, entityformmodel){
+
+        var formentity = {};
+        var keys = Object.keys(entity);
+        var values = Object.values(entity);
+
+        for (var i = 0; i < keys.length; i++) {
+            if (typeof values[i] === 'object' && values[i] !== null){
+                console.log(values[i]);
+                formentity[keys[i]] = values[i].id;
+                //formentity[entityformmodel.name+`_form[${keys[i]}]`] = values[i].id;
+            }
+            else
+                formentity[keys[i]] = values[i]
+            // formentity[entityformmodel.name+`_form[${keys[i]}]`] = values[i]
+        }
+        //this.formentity['dvups_form['+entityformmodel.name+']'] = entityformmodel.field;
+
+        return formentity;
     },
     getformfield: function (field) {
         return $("input[name='"+this.entity+"_form["+field+"]']");

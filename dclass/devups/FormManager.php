@@ -47,6 +47,14 @@ abstract class FormManager {
     //put your code here
 //    abstract function __renderForm($entity = null) ;
 
+    public static function  printHtmlForm($entitycore, $rootdir){
+
+        $fichier = fopen($rootdir.'/Ressource/html/' . ucfirst($entitycore->name) . '.html', 'w');
+        fputs($fichier, FormFactory::__renderForm($entitycore));
+        fclose($fichier);
+
+    }
+
     public static function addjs($js){
         $reflection = new ReflectionClass(get_called_class());
         $filename = explode("\src", str_replace(get_called_class().".php", "", $reflection->getFilename()));

@@ -11,7 +11,14 @@ namespace DClass\lib;
 class Util
 {
 
-    public static function nicecomponent(string $component): string
+    public static function handleSessionLost($redirect = "admin/"){
+
+        if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
+            header("location: " . __env . $redirect);
+        }
+    }
+
+    public static function nicecomponent($component)
     {
         return str_replace("-", "_", $component);
     }

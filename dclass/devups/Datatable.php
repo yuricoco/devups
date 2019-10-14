@@ -72,6 +72,15 @@ class Datatable
         'habit' => 'stateless',
         'modal' => 'data-toggle="modal" ',
     ];
+    protected $topactions = [];
+    const button = [
+        //'type' => 'btn',
+        'content' => '<i class="fa fa-plus" ></i> create',
+        'class' => 'btn btn-success',
+        'action' => '',
+        'habit' => 'stateless',
+        'modal' => 'data-toggle="modal" ',
+    ];
     protected $customaction = [];
     protected $customactions = [];
     protected $rowaction = [];
@@ -89,6 +98,9 @@ class Datatable
     protected $per_pageEnabled = false;
 
     protected $additionnalrow = [];
+    protected $enablepagination = true;
+    protected $enabletopaction = true;
+    protected $enablecolumnaction = true;
 
     public function __construct($lazyloading, $datatablemodel = [])
     {
@@ -137,7 +149,7 @@ class Datatable
             if (in_array('create', $entityrigths)) {
                 // next we check if the user has create right for this entity
                 //if (in_array('create', $rigths)){
-                    //if (in_array('create', $_SESSION['action'])){
+                //if (in_array('create', $_SESSION['action'])){
                 $top_action .= '<button type="button" class="' . $this->createaction["class"] . '" ' . $this->createaction["action"] . ' >' . $this->createaction["content"] . '</button>';
 //                    if(!$statefull)
 //                        $top_action .= '<button data-toggle="modal" data-target="#'.$action.'modal" id="model_new" onclick="model._new()"  class="btn btn-success" ><i class="fa fa-plus"></i> add</button>';
@@ -160,7 +172,7 @@ class Datatable
 
         $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" ><i class="fa fa-download"></i> Reload</button>';
 
-        return $top_action;
+        return implode('', $this->topactions) . $top_action;
 
     }
 
@@ -193,8 +205,13 @@ class Datatable
             if (in_array('update', $entityrigths)) {
                 if (in_array('update', $_SESSION[dv_role_permission])) {
                     $method = 'editAction';
-                    if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["edit"]))
-                        $this->defaultaction["edit"] = $result;
+                    if (method_exists($entity, $method)){
+                        $result = call_user_func(array($entity, $method), $this->defaultaction["edit"]);
+                        if (!is_null($result))
+                            $this->defaultaction["edit"] = $result;
+                        else
+                            $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
+                    }
                     else
                         $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
 
@@ -237,8 +254,13 @@ class Datatable
 
                 if (in_array('update', $_SESSION[dv_role_permission])) {
                     $method = 'editAction';
-                    if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["edit"]))
-                        $this->defaultaction["edit"] = $result;
+                    if (method_exists($entity, $method)){
+                        $result = call_user_func(array($entity, $method), $this->defaultaction["edit"]);
+                        if (!is_null($result))
+                            $this->defaultaction["edit"] = $result;
+                        else
+                            $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
+                    }
                     else
                         $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
 
@@ -257,8 +279,13 @@ class Datatable
 
                 if (in_array('delete', $_SESSION[dv_role_permission])){
                     $method = 'deleteAction';
-                    if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["delete"]))
-                        $this->defaultaction["delete"] = $result;
+                    if (method_exists($entity, $method)){
+                        $result = call_user_func(array($entity, $method), $this->defaultaction["delete"]);
+                        if (!is_null($result))
+                            $this->defaultaction["delete"] = $result;
+                        else
+                            $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
+                    }
                     else
                         $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
 
@@ -368,7 +395,9 @@ class Datatable
             $this->closeform = '</form>';
         }
 
-        $headaction = $this->top_action();
+        $headaction = "";
+        if($this->enabletopaction)
+            $headaction = $this->top_action();
 
         $html = <<<EOF
  <div class="col-lg-12 col-md-12">
@@ -409,7 +438,7 @@ EOF;
             . '</table>';
 
         //$this->html .= self::renderListViewUI($this->lazyloading['listEntity'], $header, $action, $defaultaction, $searchaction);
-        //if ($this->paginationenabled)
+        if ($this->enablepagination)
             $html .= $this->paginationbuilder();
 
         $html .= "";//</div> $this->closeform.
@@ -604,35 +633,10 @@ EOF;
         }
         else
             if ($this->dynamicpagination)
-        {
+            {
 
-            //dv_dump($this->paginationcustom);
-            foreach ($this->paginationcustom['firsts'] as $key => $page) {
-                if ($page == $this->current_page) {
-                    $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
-                } else {
-                    $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
-                }
-            }
-
-            if ($this->current_page < 3 || $this->current_page >= 7)
-                $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleleft'] . ');" data-next="' . $this->paginationcustom['middleleft'] . '" >...</a></li>';
-
-            foreach ($this->paginationcustom['middles'] as $key => $page) {
-                //for ($page = 1; $page <= count($this->paginationcustom['middles']); $page++) {
-                if ($page == $this->current_page) {
-                    $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
-                } else {
-                    $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
-                }
-            }
-
-            if ($this->paginationcustom['lasts']) {
-
-                $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleright'] . ');" data-next="' . $this->paginationcustom['middleright'] . '" >...</a></li>';
-
-                foreach ($this->paginationcustom['lasts'] as $key => $page) {
-                    //for ($page = 1; $page <= count($this->paginationcustom['lasts']); $page++) {
+                //dv_dump($this->paginationcustom);
+                foreach ($this->paginationcustom['firsts'] as $key => $page) {
                     if ($page == $this->current_page) {
                         $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                     } else {
@@ -640,18 +644,43 @@ EOF;
                     }
                 }
 
-            }
+                if ($this->current_page < 3 || $this->current_page >= 7)
+                    $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleleft'] . ');" data-next="' . $this->paginationcustom['middleleft'] . '" >...</a></li>';
 
-        }
+                foreach ($this->paginationcustom['middles'] as $key => $page) {
+                    //for ($page = 1; $page <= count($this->paginationcustom['middles']); $page++) {
+                    if ($page == $this->current_page) {
+                        $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                    } else {
+                        $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                    }
+                }
+
+                if ($this->paginationcustom['lasts']) {
+
+                    $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleright'] . ');" data-next="' . $this->paginationcustom['middleright'] . '" >...</a></li>';
+
+                    foreach ($this->paginationcustom['lasts'] as $key => $page) {
+                        //for ($page = 1; $page <= count($this->paginationcustom['lasts']); $page++) {
+                        if ($page == $this->current_page) {
+                            $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        } else {
+                            $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        }
+                    }
+
+                }
+
+            }
 
             else
-            for ($page = 1; $page <= $this->pagination; $page++) {
-                if ($page == $this->current_page) {
-                    $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
-                } else {
-                    $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                for ($page = 1; $page <= $this->pagination; $page++) {
+                    if ($page == $this->current_page) {
+                        $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                    } else {
+                        $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                    }
                 }
-            }
 
         if ($this->remain) {
             $html .= '<li class="paginate_button next"><a href="javascript:ddatatable.next();" ><i class="fa fa-angle-right" ></i></a></li>';
@@ -761,12 +790,14 @@ EOF;
 
         }
 
-        $th[] = '<th>Action</th>';
+        if ($this->enablecolumnaction)
+            $th[] = '<th>Action</th>';
 
         if ($this->searchaction) {
-            $thf[] = '<th>'//<input name="path" value="' . $_GET['path'] . '" hidden >
-                . '<input name="dfilters" value="on" hidden >' //' . implode(",", $fields) . '
-                . '<button onclick="ddatatable.search(this)" class="' . $this->btnsearch_class . '" >search</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
+            if ($this->enablecolumnaction)
+                $thf[] = '<th>'//<input name="path" value="' . $_GET['path'] . '" hidden >
+                    . '<input name="dfilters" value="on" hidden >' //' . implode(",", $fields) . '
+                    . '<button onclick="ddatatable.search(this)" class="' . $this->btnsearch_class . '" >search</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
 
             return ["th" => '<tr>' . implode(" ", $th) . '</tr>',
                 "thf" => '<tr class="th-filter">' . implode(" ", $thf) . '</tr>'];
@@ -859,33 +890,36 @@ EOF;
             $this->rowaction = [];
             $customrowaction = [];
             // the user may write the method in the entity for better code practice
-            if (!empty($this->customactions)) {
-                foreach ($this->customactions as $customaction) {
-                    $resactions = call_user_func(array($entity, $customaction . 'Action'));
-                    if (is_array($resactions)) {
-                        foreach ($resactions as $action) {
-                            if (is_string($action)) {
-                                $customrowaction[] = $action;
-                            } else
-                                $this->rowaction[] = $action;
-                        }
 
-                    } elseif (is_string($resactions)) {
-                        $customrowaction[] = $resactions;
+            if ($this->enablecolumnaction){
+
+                if (!empty($this->customactions)) {
+                    foreach ($this->customactions as $customaction) {
+                        $resactions = call_user_func(array($entity, $customaction . 'Action'));
+                        if (is_array($resactions)) {
+                            foreach ($resactions as $action) {
+                                if (is_string($action)) {
+                                    $customrowaction[] = $action;
+                                } else
+                                    $this->rowaction[] = $action;
+                            }
+
+                        } elseif (is_string($resactions)) {
+                            $customrowaction[] = $resactions;
+                        }
                     }
+
                 }
 
-            }
+                if ($this->defaultaction) {
 
-            if ($this->defaultaction) {
+                    $actionbutton = self::actionListView($entity);
 
-                $actionbutton = self::actionListView($entity);
+                }
 
-            }
+                if ($actionbutton) {
 
-            if ($actionbutton) {
-
-                $actionbutton = \AdminTemplateGenerator::dt_btn_action($this->rowaction, $customrowaction, $this->actionDropdown);
+                    $actionbutton = \AdminTemplateGenerator::dt_btn_action($this->rowaction, $customrowaction, $this->actionDropdown);
 
 //                foreach ($this->rowaction as $action)
 //                    $act .= '<li>'. $action . '</li>';
@@ -901,11 +935,13 @@ EOF;
 //        <!-- /.dropdown-messages -->
 //    </div>
 //EOD;
-            } else {
-                $actionbutton = "<span class='alert alert-info' >not rigth</span>";
-            }
+                } else {
+                    $actionbutton = "<span class='alert alert-info' >not rigth</span>";
+                }
 
-            $tr[] = '<td>' . $actionbutton . '</td>';
+                $tr[] = '<td>' . $actionbutton . '</td>';
+
+            }
 
             // onclick="ddatatable.rowselect(this, ' . $entity->getId() . ')"
             $tb[] = '<tr id="' . $entity->getId() . '" >' . implode(" ", $tr) . '</tr>';
@@ -948,7 +984,7 @@ EOF;
          */
         //$this->rowaction[] = call_user_func(array($this->entity, $action.'Action'));
         if (is_string($action))
-            $this->customaction[] = $action;
+            $this->customactions[] = $action;
         return $this;
     }
 
