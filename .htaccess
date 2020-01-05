@@ -1,12 +1,27 @@
 
+
 RewriteEngine On
-	
-RewriteRule    ^/?$    index.php    [NC,L]
+#
 
 RewriteRule    ^api/?$    services.php    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+)/?$    services.php?path=$1    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+).([A-Za-z0-9-]+)?$    services.php?path=$1.$2    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)?$    services.php?path=$1.$2    [NC,L]
 
-RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]
+RewriteRule    ^/?$    index.php    [NC,L]
+#RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]    # Process all products
+RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1   [NC,L]    # Process all products
+RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC,L]    # Process all products
+#
+#<IfModule mod_headers.c>
+#    Header always set X-FRAME-OPTIONS "DENY"
+#</IfModule>
 
+#<IfModule mod_rewrite.c>
+#  RewriteEngine On
+#  RewriteBase /
+#  RewriteRule ^index\.php$ - [L]
+#  RewriteCond %{REQUEST_FILENAME} !-f
+#  RewriteCond %{REQUEST_FILENAME} !-d
+#  RewriteRule . /index.php [L]
+#</IfModule>

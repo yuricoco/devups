@@ -287,11 +287,25 @@ Usage:
         __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => true, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
     }
 
+    public static $ctrltype = '';
     /**
      *
      * @param type $namespace
      */
     public static function controller($namespace, $project) {
+        self::$ctrltype = "both";
+        //self::$ctrltype = "default";
+
+        $ns = explode("\\", $namespace);
+        $entity = __Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => true, 'form' => false, 'genes' => false, 'views' => false]);
+    }
+    /**
+     *
+     * @param type $namespace
+     */
+    public static function frontcontroller($namespace, $project) {
+        self::$ctrltype = "front";
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
@@ -545,7 +559,8 @@ Usage:
     require 'Entity/" . $name . ".php';$requiremanytomany
     require 'Form/" . $name . "Form.php';
     require 'Datatable/" . $name . "Table.php';
-    require 'Controller/" . $name . "Controller.php';\n";
+    require 'Controller/" . $name . "Controller.php';
+    require 'Controller/" . $name . "FrontController.php';\n";
 
         }
 

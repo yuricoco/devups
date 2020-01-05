@@ -77,6 +77,10 @@
                     Hello Devups.  Waitting for your front-end template. Do your best :)
                 </div>
 
+                <div class="">
+                    <?= ProductTable::init($lazyloading)->buildindextable()->render() ?>
+                </div>
+
                 <div class="links">
                     <a href="#">Documentation</a>
                     <a href="#">Contribut</a>

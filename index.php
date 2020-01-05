@@ -1,33 +1,27 @@
 <?php
+//
 
 require 'header.php';
 
-use Genesis as g;
-
-//instanciation des controllers
-
+$productCtrl =  new ProductController();
 
 (new Request('hello'));
 
+dv_dump($_SERVER);
+
 switch (Request::get('path')) {
+
     case 'hello':
-        g::render('hello', []);
+        Genesis::render("hello", ["lazyloading"=> $productCtrl->lazyloading(new Product(), 1, 10) ]);
         break;
 
-    //    case 'view1':
-    //        g::render( 'view1', $Ctrl->Action() );
-    //        break;
-    //    
-    //    ...
-    //    
-    //    case 'view2':
-    //        g::render( 'view2', [$Ctrl->Action(), $Ctrl2->Action(), ... , $Ctrln->Action()] );
-    //        break;
+    case 'home':
+        Genesis::render("layout", ["lazyloading"=> $productCtrl->lazyloading(new Product(), 1, 10) ]);
+        break;
 
-
-    default :
-        // inclusion du layout du site 
-        g::render('404');
+    default:
+        Genesis::render('404', ['page' => Request::get('path')]);
         break;
 }
-                        
+    
+    

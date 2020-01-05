@@ -12,6 +12,18 @@ model.convertphparraytojson =  function (el) {
 
 }
 
+model.savenodemoduledata =  function () {
+
+    model.baseurl = __env+"src/devups/ModuleTranslate/services.php";
+    model.entity = "generalinfo";
+    model._get("generalinfo.savenodemoduledata", function (response) {
+        console.log(response);
+        alert("well generated");
+    });
+
+    return false;
+}
+
 model.saveinfo =  function (el) {
 
     this._formdatacustom($(el).find("tbody"));

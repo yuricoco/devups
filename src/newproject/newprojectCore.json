@@ -1,0 +1,361 @@
+{
+  "name": "newproject",
+  "template": "adminv2",
+  "listmodule": [
+    {
+      "id": 1,
+      "name": "ModuleName",
+      "project": "newproject",
+      "nbent": 3,
+      "listentity": [
+        {
+          "id": 2,
+          "name": "subcategory",
+          "module": {
+            "id": 1
+          },
+          "ref": null,
+          "attribut": [
+            {
+              "name": "id",
+              "visibility": "",
+              "datatype": "integer",
+              "size": "",
+              "nullable": "not",
+              "formtype": ""
+            }
+          ],
+          "relation": [
+            {
+              "entity": "category",
+              "cardinality": "manyToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            }
+          ],
+          "apidoc": [
+            {
+              "name": "Create subcategory",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"subcategory\":{\"id\":\"\",\"category.id\":\"\"}}"
+                },
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/subcategory.create",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "subcategory.create"
+                  ]
+                },
+                "description": "Create subcategory"
+              },
+              "response": []
+            },
+            {
+              "name": "Get subcategory",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/subcategory.detail?id=",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "subcategory.detail"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                },
+                "description": "Get subcategory"
+              },
+              "response": []
+            },
+            {
+              "name": "Update subcategory",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"subcategory\":{\"id\":\"\",\"category.id\":\"\"}}"
+                },
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/subcategory.update?id=",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "subcategory.update"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                },
+                "description": "Update subcategory"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete subcategory",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/subcategory.delete?id=",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "subcategory.delete"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                },
+                "description": "Delete subcategory"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "test",
+          "module": {
+            "id": 1
+          },
+          "ref": null,
+          "attribut": [
+            {
+              "name": "id",
+              "designation": "",
+              "visibility": "",
+              "datatype": "integer",
+              "size": "",
+              "nullable": "not",
+              "formtype": "",
+              "comment": ""
+            },
+            {
+              "name": "name",
+              "designation": "",
+              "visibility": "",
+              "datatype": "string",
+              "size": "12",
+              "nullable": "not",
+              "formtype": "",
+              "comment": ""
+            },
+            {
+              "name": "description",
+              "designation": "",
+              "visibility": "",
+              "datatype": "text",
+              "size": "",
+              "nullable": "not",
+              "formtype": "",
+              "comment": ""
+            },
+            {
+              "name": "attrib22",
+              "designation": "",
+              "visibility": "",
+              "datatype": "string",
+              "size": "13",
+              "nullable": "not",
+              "formtype": "",
+              "comment": ""
+            }
+          ],
+          "relation": [],
+          "apidoc": [
+            {
+              "name": "Create test",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"test\":{\"id\":\"\",\"name\":\"\",\"description\":\"\",\"attrib22\":\"\"}}"
+                },
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/test.create",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "test.create"
+                  ]
+                },
+                "description": "Create test"
+              },
+              "response": []
+            },
+            {
+              "name": "Get test",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/test.detail?id=",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "test.detail"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                },
+                "description": "Get test"
+              },
+              "response": []
+            },
+            {
+              "name": "Update test",
+              "request": {
+                "method": "PUT",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\"test\":{\"id\":\"\",\"name\":\"\",\"description\":\"\",\"attrib22\":\"\"}}"
+                },
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/test.update?id=",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "test.update"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                },
+                "description": "Update test"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete test",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "http:\/\/127.0.0.1\/newproject\/api\/test.delete?id=",
+                  "protocol": "http",
+                  "host": [
+                    "127",
+                    "0",
+                    "0",
+                    "1"
+                  ],
+                  "path": [
+                    "newproject",
+                    "api",
+                    "test.delete"
+                  ],
+                  "query": [
+                    {
+                      "key": "id",
+                      "value": ""
+                    }
+                  ]
+                },
+                "description": "Delete test"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "id": 6,
+          "name": "entityinmodule2",
+          "module": {
+            "id": 1
+          },
+          "ref": null,
+          "attribut": [
+            {
+              "name": "id",
+              "designation": "",
+              "visibility": "",
+              "datatype": "integer",
+              "size": "",
+              "nullable": "not",
+              "formtype": "",
+              "comment": ""
+            }
+          ],
+          "relation": []
+        }
+      ]
+    }
+  ]
+}

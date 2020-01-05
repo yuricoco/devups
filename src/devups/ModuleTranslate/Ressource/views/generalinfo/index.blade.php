@@ -34,7 +34,8 @@
                     </div>
                 </div>
                 <div class=" col-md-6 col-lg-9 text-right">
-                    <?php if($admin->getLogin() == "dv_admin" ){ ?>
+                    <button onclick="model.savenodemoduledata()" type="button" class="btn btn-success pull-right" >GenerateModule Lang</button>
+                <?php if($admin->getLogin() == "dv_admin" ){ ?>
                         <label class="btn btn-info" onclick="model.convertphparraytojson(this)" >Convert phparray to json</label>
                     <?php } ?>
                 </div>

@@ -449,6 +449,16 @@ abstract class Model extends \stdClass
     }
 
     /**
+     * @param $column
+     * @param null $operator
+     * @param null $value
+     * @return QueryBuilder
+     */
+    public static function where($column, $operator = null, $value = null){
+        return self::select()->where($column, $operator, $value);
+    }
+
+    /**
      * update a part or an entire entity
      * @example http://easyprod.spacekola.com description
      * @param Mixed $arrayvalues

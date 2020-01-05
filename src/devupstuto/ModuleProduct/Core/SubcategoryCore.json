@@ -1,1 +1,0 @@
-{"name":"subcategory","attribut":{"1":{"name":"name","datatype":"string","size":"255","nullable":"not","formtype":"text"}},"relation":[{"entity":"category","cardinality":"manyToOne","nullable":"not","ondelete":"cascade","onupdate":"cascade"}]}

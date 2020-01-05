@@ -26,8 +26,11 @@ class Dvups_adminTable extends Datatable
 
     public function buildindextable()
     {
-
-        // TODO: overwrite datatable attribute for this view
+//        $this->datatablemodel = [
+//            ['header' => 'nom', 'value' => 'name'],
+//            ['header' => 'login', 'value' => 'login'],
+//            ['header' => 'password', 'value' => 'password'],
+//        ];
 
         return $this;
     }

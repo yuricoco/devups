@@ -66,6 +66,15 @@ class Request {
             return false;
     }
 
+    public static function raw($format = "json") {
+        $rawdata = file_get_contents("php://input");
+        //die($rawdata);
+        if ($format == "json")
+            return json_decode($rawdata, true);
+        else
+            return $rawdata;
+    }
+
     public static function set($key, $value)
     {
         Request::$uri_get_param[$key] = $value;

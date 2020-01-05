@@ -6,5 +6,5 @@
  * and open the template in the editor.
  */
 
-require '../header.php';
+var_dump((new DateTime('2016-12-13'))->format('Y-m-d_H.i.s'));
 ?>

@@ -100,12 +100,8 @@ function d_url($path, $id = "", $title = "") {
     return __env . $path . $mode;
 }
 
-function dv_dump(){
-    echo "<pre>";
-    //var_dump($argv[0]);
-    array_map(function ($x) {
-        var_dump($x);
-    }, func_get_args());
+function dv_dump(... $args){
+    echo json_encode($args);
 
     die(1);
 }

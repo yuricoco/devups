@@ -10,14 +10,14 @@ use Request as R;
 
 header("Access-Control-Allow-Origin: *");
 
-$productCtrl = new ProductController();
+$storageCtrl = new StorageFrontController();
 
 (new Request('hello'));
 
 switch (Request::get('path')) {
 
-    case 'product.list':
-        g::json_encode($productCtrl->listdata());
+    case 'test.webservice': // test.webservice
+        g::json_encode($storageCtrl->testwebservice());
         break;
 
     default :

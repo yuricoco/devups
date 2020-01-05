@@ -325,22 +325,11 @@ class BackendGenerator {
     }
 
     /* 	CREATION DU CONTROLLER 	 */
+    private function defaultCtrlContent($name, $entity){
 
-    public function controllerGenerator($entity, $listmodule) {
-        //$datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
-        $name = strtolower($entity->name);
+        $contenu = "public function listView($" . "next = 1, $" . "per_page = 10){
 
-        $classController = fopen('Controller/' . ucfirst($name) . 'Controller.php', 'w');
-
-        $contenu = "<?php \n
-
-use DClass\devups\Datatable as Datatable;
-
-class " . ucfirst($name) . "Controller extends Controller{
-
-    public function listView($" . "next = 1, $" . "per_page = 10){
-
-        $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+            $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
 
         self::$" . "jsfiles[] = " . ucfirst($name) . "::classpath('Ressource/js/" . $name . "Ctrl.js');
 
@@ -367,7 +356,7 @@ class " . ucfirst($name) . "Controller extends Controller{
         $mtmedit = [];
         $iter = 0;
         if (!empty($entity->relation)) {
-            //relation sera l'entité 
+            //relation sera l'entité
             foreach ($entity->relation as $relation) {
 
                 if ($relation->cardinality == "oneToOne") {
@@ -493,13 +482,152 @@ class " . ucfirst($name) . "Controller extends Controller{
         return array('success' => true,
                 'detail' => ''); 
 
+    }";
+
+        return $contenu;
+
     }
 
-}\n";
-        fputs($classController, $contenu);
-        //fputs($classController, "\n}\n");
+    private function frontCtrlContent($name, $entity){
+        $contenu = "public function ll($" . "next = 1, $" . "per_page = 10){
 
-        fclose($classController);
+            return $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+
+    }
+
+    public function createAction($" . $name . "_form = null){
+        $" . "rawdata = \Request::raw();
+        $" . $name . " = $" . "this->hydrateWithJson(new " . ucfirst($name) . "(), $" . "rawdata[\"$name\"]);\n ";
+        // gestion des relations many to many dans le controller
+        $mtm = [];
+        $mtmedit = [];
+        $iter = 0;
+        if (!empty($entity->relation)) {
+            //relation sera l'entité
+            foreach ($entity->relation as $relation) {
+
+                if ($relation->cardinality == "oneToOne") {
+                    $contenu .= "
+                    
+        $" . $relation->entity . " = $" . "this->hydrateWithJson(new " . ucfirst($relation->entity) . "(), $" . "rawdata[\"" . $relation->entity . "\"]);
+        $" . $relation->entity . "->__insert();
+        $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . "); ";
+                }
+            }
+        }
+        $contenu .= "\n" . implode($mtm, "\n");
+        $otherattrib = false;
+//        if (isset($entity->attribut[1])) {
+//            $otherattrib = true;
+        foreach ($entity->attribut as $attribut) {
+//			for($i = 1; $i < count($entity->attribut); $i++){
+            if (in_array($attribut->formtype, ['document', 'music', 'video', 'image'])){
+                $otherattrib = true;
+                $contenu .= "
+        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
+            }
+
+            if (in_array($attribut->datatype, ['date', 'datetime', 'time']) && isset($attribut->defaultvalue)){
+                $contenu .= "
+        $".$name ."->set" . ucfirst($attribut->name) . "(new DateTime());\n";
+            }
+
+        }
+//        }
+
+        $contenu .= "
+        
+        $" . "id = $" . $name . "->__insert();
+        return 	array(	'success' => true,
+                        '" . $name . "' => $" . $name . ",
+                        'detail' => '');
+
+    }
+
+    public function updateAction($" . "id, $" . $name . "_form = null){
+        $" . "rawdata = \Request::raw();
+            
+        $" . $name . " = $" . "this->hydrateWithJson(new " . ucfirst($name) . "($" . "id), $" . "rawdata[\"$name\"]);
+
+            "; //.implode($mtmedit, "\n")
+        if ($otherattrib):
+            foreach ($entity->attribut as $attribut) {
+//                            for($i = 1; $i < count($entity->attribut); $i++){
+                if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
+                    $contenu .= "
+                        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
+            }
+        endif;
+        $contenu .= "      
+        
+        $" . $name . "->__update();
+        return 	array(	'success' => true,
+                        '" . $name . "' => $" . $name . ",
+                        'detail' => '');
+                        
+    }
+    
+
+    public function detailAction($" . "id)
+    {
+
+        $" . $name . " = " . ucfirst($name) . "::find($" . "id);
+
+        return 	array(	'success' => true,
+                        '" . $name . "' => $" . $name . ",
+                        'detail' => '');
+          
+}       
+";
+
+        return $contenu;
+
+    }
+
+    public function controllerGenerator($entity, $listmodule) {
+        //$datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
+        $name = strtolower($entity->name);
+
+        //if(__Generator::$ctrltype == 'front' || __Generator::$ctrltype == 'both'){
+            $ctrlname = '' . ucfirst($name) . 'FrontController';
+            $classController = fopen('Controller/' . $ctrlname . '.php', 'w');
+            $extend = ucfirst($name) . 'Controller';
+            $content = $this->frontCtrlContent($name, $entity);
+
+            $contenu = "<?php \n
+
+class " . $ctrlname . " extends $extend{
+
+    $content
+
+}\n";
+            fputs($classController, $contenu);
+            //fputs($classController, "\n}\n");
+            fclose($classController);
+
+        //}
+
+        //if(__Generator::$ctrltype == 'both'){
+            $ctrlname = '' . ucfirst($name) . 'Controller';
+            $classController = fopen('Controller/' . $ctrlname . '.php', 'w');
+            $extend = 'Controller';
+            $content = $this->defaultCtrlContent($name, $entity);
+
+            $contenu = "<?php \n
+
+use DClass\devups\Datatable as Datatable;
+
+class " . $ctrlname . " extends $extend{
+
+    $content
+
+}\n";
+            fputs($classController, $contenu);
+            //fputs($classController, "\n}\n");
+            fclose($classController);
+
+       // }
+
     }
 
     /* 	CREATION DU CONTROLLER 	 */
@@ -623,6 +751,9 @@ class " . ucfirst($name) . "Table extends Datatable{
         unset($entity->attribut[0]);
 
         foreach ($entity->attribut as $attribut) {
+
+            if($attribut->formtype == "none")
+                continue;
 
             $field .= "
             $" . "entitycore->field['" . $attribut->name . "'] = [
@@ -810,6 +941,9 @@ use Genesis as g;
         $name = strtolower($entity->name);
 
         foreach ($entity->attribut as $attribut) {
+
+            if($attribut->formtype == "none")
+                continue;
 
             $field .= "<div class='form-group'>\n<label for='" . $attribut->name . "'>" . ucfirst($attribut->name) . "</label>\n";
 

@@ -340,6 +340,13 @@ class Controller {
         return $this->form_fillingentity($object, $data, $entityform, $deeper);
     }
 
+    /**
+     * @param $object
+     * @param null $data
+     * @param null $entityform
+     * @param bool $deeper
+     * @return mixed
+     */
     public function form_fillingentity($object, $data = null, $entityform = null, $deeper = false) {
         if (!is_object($object))
             throw new InvalidArgumentException('$object must be an object.');
@@ -364,6 +371,12 @@ class Controller {
 
     }
 
+    /**
+     * @param $object
+     * @param $entityform
+     * @return mixed
+     * @throws ReflectionException
+     */
     private function formWithPost($object, $entityform) {
         global $_ENTITY_FORM;
         global $_ENTITY_COLLECTION;
@@ -516,6 +529,128 @@ class Controller {
 
         return $object;
     }
+
+
+    /**
+     * @param $object
+     * @param $jsonform
+     * @param bool $deeper
+     * @return null
+     */
+    public function hydrateWithJson($object, $jsonform, $deeper= false)
+    {
+
+        if ($object->getId()) {
+            $object = $object->__show($deeper);
+        }
+
+        $this->entity = $object;
+
+        foreach ($jsonform as $field => $value) {
+
+            if(!is_string($value) && !is_numeric($value) )
+                continue;
+
+            $meta = explode(":", $field);
+
+            $imbricate = explode(".", $meta[0]);
+
+            $this->hydrateEntity($field, $value, $meta, $imbricate);
+
+        }
+
+        return $this->entity;
+
+    }
+
+    private function hydrateEntity($field, $value, $meta, $imbricate){
+        if (isset($meta[1]))
+            $setter = "set" . ucfirst($meta[1]);
+        else
+            $setter = "set" . ucfirst($meta[0]);
+
+        if(is_array($value)){
+            dv_dump($value);
+            $setter = "add" . ucfirst($meta[0]);
+            if (!method_exists($this->entity, $setter)) {
+                $this->error[$field] = " You may create method " . $setter . " in entity. ";
+            } elseif ($error = call_user_func(array($this->entity, $setter), $value))
+                $this->error[$field] = $error;
+        }
+
+        // $imbricate[0]: represent the name of the attribute of the imbricated entity in its owner
+        // $imbricate[1]: represent the name of the attribute of the imbricated entity. by default it's id
+        else if (isset($imbricate[1])) {
+            if ($imbricate[1] !== "id") // if the default value have changed to may be other_name, then it will call a method as setOther_name() in the owner class
+                $setter = "set" . ucfirst($imbricate[1]);
+            else // if the default value is still id, then it will call a method setAttributename() in the owner class
+                $setter = "set" . ucfirst($imbricate[0]);
+
+            $reflect = new ReflectionClass($imbricate[0]);
+            $entityimbricate = $reflect->newInstance();
+            if (!is_numeric($value)) {
+                $entityimbricate->setId(null);
+                return;
+            }
+
+            $entityimbricate->setId($value);
+            if (!method_exists($this->entity, $setter)) {
+                $this->error[$field] = " You may create method " . $setter . " in entity ";
+            } elseif ($error = call_user_func(array($this->entity, $setter), $entityimbricate->__show(false)))
+                $this->error[$field] = $error;
+
+        } else {
+            if (!method_exists($this->entity, $setter)) {
+                $this->error[$field] = " You may create method " . $setter . " in entity. ";
+            } elseif ($error = call_user_func(array($this->entity, $setter), $value))
+                $this->error[$field] = $error;
+        }
+    }
+
+    /**
+     * @param $object
+     * @param $jsonform
+     * @param bool $deeper
+     * @return null
+     */
+    public function hydrateWithFormData($object, $postdata, $deeper= false)
+    {
+        $classname = strtolower(get_class($object));
+
+        $this->entity = $object;
+        //$object = $this->form_fillingentity($object, $jsonform);
+
+        if ($object->getId()) {
+            $object = $object->__show($deeper);
+        }
+
+        $this->entity = $object;
+
+        //$fields = json_decode($jsonform, true);
+
+        foreach ($postdata as $key => $value) {
+
+            if (!preg_match_all("/$classname"."_/", $key)){
+                //var_dump($key);
+                continue;
+            }
+                //continue;
+
+            $field = str_replace($classname."_", "", $key);
+            $meta = explode(":", $field);
+
+            $imbricate = explode(">", $meta[0]);
+
+            $this->hydrateEntity($field, $value, $meta, $imbricate);
+
+            unset($_POST[$key]);
+
+        }
+
+        return $this->entity;
+
+    }
+
 
     public static function renderController($view, $resultCtrl) {
 

@@ -59,6 +59,11 @@ if (isset($argv[2])) {
             echo $argv[2] . ": Controller generated with success";
             break;
 
+        case 'core:g:frontcontroller':
+            __Generator::frontcontroller($argv[2], $project); //,
+            echo $argv[2] . ": Front Controller generated with success";
+            break;
+
         case 'core:g:form':
             __Generator::form($argv[2], $project); //, 
             echo $argv[2] . ": Form generated with success";
