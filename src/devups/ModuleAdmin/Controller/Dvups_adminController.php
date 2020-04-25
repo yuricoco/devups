@@ -1,6 +1,7 @@
 <?php
 
-use DClass\devups\Datatable as Datatable;
+
+use dclass\devups\Controller\Controller;
 
 class Dvups_adminController extends Controller {
 
@@ -75,6 +76,7 @@ class Dvups_adminController extends Controller {
         Dvups_roleController::getNavigationAction($admin);
 
         $_SESSION[ADMIN] = serialize($admin);
+        $_SESSION[LANG] = $_POST['lang'];
 
         $admin->setLastloginAt(date("Y-m-d H:i:s"));
         $admin->__update("lastlogin_at", date("Y-m-d H:i:s"))->exec();

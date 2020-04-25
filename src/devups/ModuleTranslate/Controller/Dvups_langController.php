@@ -1,141 +1,105 @@
-<?php 
+<?php
 
 
-use DClass\devups\Datatable as Datatable;
+use dclass\devups\Controller\Controller;
 
 class Dvups_langController extends Controller{
 
+    public function listView($next = 1, $per_page = 10){
 
-    public static function renderFormWidget($id = null) {
-        if($id)
-            Dvups_langForm::__renderFormWidget(Dvups_lang::find($id), 'update');
-        else
-            Dvups_langForm::__renderFormWidget(new Dvups_lang(), 'create');
-    }
+            $lazyloading = $this->lazyloading(new Dvups_lang(), $next, $per_page);
 
-    public static function renderDetail($id) {
-        Dvups_langForm::__renderDetailWidget(Dvups_lang::find($id));
-    }
+        self::$jsfiles[] = Dvups_lang::classpath('Ressource/js/dvups_langCtrl.js');
 
-    public static function renderForm($id = null, $action = "create") {
-        $dvups_lang = new Dvups_lang();
-        if($id){
-            $action = "update&id=".$id;
-            $dvups_lang = Dvups_lang::find($id);
-            //$dvups_lang->collectStorage();
-        }
+        $this->entitytarget = 'Dvups_lang';
+        $this->title = "Manage Dvups_lang";
+        
+        $this->renderListView(Dvups_langTable::init($lazyloading)->buildindextable()->render());
 
-        return ['success' => true,
-            'form' => Dvups_langForm::__renderForm($dvups_lang, $action, true),
-        ];
     }
 
     public function datatable($next, $per_page) {
         $lazyloading = $this->lazyloading(new Dvups_lang(), $next, $per_page);
         return ['success' => true,
-            'tablebody' => Datatable::getTableRest($lazyloading),
-            'tablepagination' => Datatable::pagination($lazyloading)
+            'datatable' => Dvups_langTable::init($lazyloading)->buildindextable()->getTableRest(),
         ];
     }
 
-            public function listAction($next = 1, $per_page = 10){
+    public function createAction($dvups_lang_form = null){
+        extract($_POST);
 
-                $lazyloading = $this->lazyloading(new Dvups_lang(), $next, $per_page);
-
-                return array('success' => true, // pour le restservice
-                    'lazyloading' => $lazyloading, // pour le web service
-                    'detail' => '');
-
-            }
-            
-            public  function showAction($id){
-
-                    $dvups_lang = Dvups_lang::find($id);
-
-                    return array( 'success' => true, 
-                                    'dvups_lang' => $dvups_lang,
-                                    'detail' => 'detail de l\'action.');
-
-            }
-
-            public function createAction(){
-                    extract($_POST);
-                    $this->err = array();
-
-                    $dvups_lang = $this->form_generat(new Dvups_lang(), $dvups_lang_form);
+        $dvups_lang = $this->form_fillingentity(new Dvups_lang(), $dvups_lang_form);
  
 
-                    if ( $id = $dvups_lang->__insert()) {
-                            return 	array(	'success' => true, // pour le restservice
-                                            'dvups_lang' => $dvups_lang,
-                                            'redirect' => 'index', // pour le web service
-                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-                    } else {
-                            return 	array(	'success' => false, // pour le restservice
-                                            'dvups_lang' => $dvups_lang,
-                                            'action_form' => 'create', // pour le web service
-                                            'detail' => 'error data not persisted'); //Detail de l'action ou message d'erreur ou de succes
-                    }
+        if ( $this->error ) {
+            return 	array(	'success' => false,
+                            'dvups_lang' => $dvups_lang,
+                            'action' => 'create', 
+                            'error' => $this->error);
+        }
+        
+        $id = $dvups_lang->__insert();
+        return 	array(	'success' => true,
+                        'dvups_lang' => $dvups_lang,
+                        'tablerow' => Dvups_langTable::init()->buildindextable()->getSingleRowRest($dvups_lang),
+                        'detail' => '');
 
-            }
+    }
 
-            public function updateAction($id){
-                    extract($_POST);
-                        
-                    $dvups_lang = $this->form_generat(new Dvups_lang($id), $dvups_lang_form);
+    public function updateAction($id, $dvups_lang_form = null){
+        extract($_POST);
+            
+        $dvups_lang = $this->form_fillingentity(new Dvups_lang($id), $dvups_lang_form);
 
                     
-                    if ($dvups_lang->__update()) {
-                            return 	array('success' => true, // pour le restservice
-                                            'dvups_lang' => $dvups_lang,
-                                            'redirect' => 'index', // pour le web service
-                                            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-                    } else {
-                            return 	array('success' => false, // pour le restservice
-                                            'dvups_lang' => $dvups_lang,
-                                            'action_form' => 'update&id='.$id, // pour le web service
-                                            'detail' => 'error data not updated'); //Detail de l'action ou message d'erreur ou de succes
-                    }
-            }
-            
-            public function deleteAction($id){
-			  
+        if ( $this->error ) {
+            return 	array(	'success' => false,
+                            'dvups_lang' => $dvups_lang,
+                            'action_form' => 'update&id='.$id,
+                            'error' => $this->error);
+        }
+        
+        $dvups_lang->__update();
+        return 	array(	'success' => true,
+                        'dvups_lang' => $dvups_lang,
+                        'tablerow' => Dvups_langTable::init()->buildindextable()->getSingleRowRest($dvups_lang),
+                        'detail' => '');
+                        
+    }
+    
+
+    public function detailView($id)
+    {
+
+        $this->entitytarget = 'Dvups_lang';
+        $this->title = "Detail Dvups_lang";
+
+        $dvups_lang = Dvups_lang::find($id);
+
+        $this->renderDetailView(
+            Dvups_langTable::init()
+                ->builddetailtable()
+                ->renderentitydata($dvups_lang)
+        );
+
+    }
+    
+    public function deleteAction($id){
+      
             Dvups_lang::delete($id);
-                return 	array(	'success' => true, // pour le restservice
-                                'redirect' => 'index', // pour le web service
-                                'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-            }
-            
+        return 	array(	'success' => true, 
+                        'detail' => ''); 
+    }
+    
 
-            public function deletegroupAction($ids)
-            {
-        
-                Dvups_lang::delete()->where("id")->in($ids)->exec();
-        
-                return array('success' => true, // pour le restservice
-                        'redirect' => 'index', // pour le web service
-                        'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-        
-            }
+    public function deletegroupAction($ids)
+    {
 
-            public function __newAction(){
+        Dvups_lang::delete()->where("id")->in($ids)->exec();
 
-                    return 	array(	'success' => true, // pour le restservice
-                                    'dvups_lang' => new Dvups_lang(),
-                                    'action_form' => 'create', // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+        return array('success' => true,
+                'detail' => ''); 
 
-            }
+    }
 
-            public function __editAction($id){
-
-                   $dvups_lang = Dvups_lang::find($id);
-
-                    return array('success' => true, // pour le restservice
-                                    'dvups_lang' => $dvups_lang,
-                                    'action_form' => 'update&id='.$id, // pour le web service
-                                    'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-
-            }
-
-	}
+}

@@ -29,6 +29,11 @@ class Dvups_moduleForm extends FormManager
             "type" => FORMTYPE_TEXT,
             "value" => $dvups_module->getLabel(),
         ];
+        $entitycore->field['favicon'] = [
+            "label" => 'Favicon',
+            "type" => FORMTYPE_TEXT,
+            "value" => $dvups_module->getFavicon(),
+        ];
 
 
         $entitycore->addDformjs();

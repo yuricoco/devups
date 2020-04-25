@@ -3,7 +3,7 @@
 /**
  * @Entity @Table(name="dvups_module")
  * */
-    class Dvups_module extends Model implements JsonSerializable{
+    class Dvups_module extends Model implements JsonSerializable {
 
     /**
      * @Id @GeneratedValue @Column(type="integer")
@@ -15,6 +15,11 @@
      * @var string
      * */
         private $name;
+    /**
+     * @Column(name="favicon", type="string" , length=255, nullable=true )
+     * @var string
+     * */
+        private $favicon = "fas fa-fw fa-cog";
     /**
      * @Column(name="label", type="string" , length=125, nullable=true )
      * @var string
@@ -84,6 +89,29 @@
             $this->label = $label;
         }
 
+        /**
+         * @return string
+         */
+        public function getFavicon()
+        {
+            return $this->favicon;
+        }
+        /**
+         * @return string
+         */
+        public function getPrinticon()
+        {
+            return '<i class="'.$this->favicon.'"></i>';
+        }
+
+        /**
+         * @param string $favicon
+         */
+        public function setFavicon($favicon)
+        {
+            $this->favicon = $favicon;
+        }
+
         public function getId() {
             return $this->id;
         }
@@ -113,5 +141,11 @@
                                 'label' => $this->label,
                 ];
         }
-        
+
+//        public function dvupsTranslate()
+//        {
+//            // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
+//            $this->__inittranslate("label", $this->label, "en");
+//            $this->__inittranslate("label", $this->label, "fr");
+//        }
 }

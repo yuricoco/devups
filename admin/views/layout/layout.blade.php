@@ -30,7 +30,7 @@
     <script>
         var __env = '<?= __env ?>';
         var __lang = '<?= __lang ?>';
-        var _t = <?= json_encode(translatecollection()) ?>;
+        var _t = <?= json_encode([]) ?>;
 
         var __name = "";
         var __phone = "";

@@ -1,11 +1,6 @@
 @extends('layout')
 @section('title', 'List')
 
-
-@section('cssimport')
-
-@show
-
 @section('content')
 
     <style>
@@ -36,7 +31,7 @@
                 <div class=" col-md-6 col-lg-9 text-right">
                     <button onclick="model.savenodemoduledata()" type="button" class="btn btn-success pull-right" >GenerateModule Lang</button>
                 <?php if($admin->getLogin() == "dv_admin" ){ ?>
-                        <label class="btn btn-info" onclick="model.convertphparraytojson(this)" >Convert phparray to json</label>
+                        <label class="btn btn-info" onclick="model.collectfromsession(this)" >Collect from session</label>
                     <?php } ?>
                 </div>
             </div>
@@ -89,14 +84,3 @@
 
 
 @endsection
-
-
-<?php function script(){ ?>
-
-<script src="<?= CLASSJS ?>model.js"></script>
-<script src="<?= CLASSJS ?>ddatatable.js"></script>
-<script src="<?= Generalinfo::classpath('Ressource/js/generalinfoCtrl.js') ?>"></script>
-
-<?php } ?>
-@section('jsimport')
-@show 

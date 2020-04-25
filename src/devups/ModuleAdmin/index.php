@@ -49,8 +49,8 @@ switch (Request::get('path')) {
         break;
 
     case 'dvups-module/index':
-        //$dvups_moduleCtrl->listView();
-        Genesis::renderView('dvups_module.index',  $dvups_moduleCtrl->listAction());
+        $dvups_moduleCtrl->listView();
+        //Genesis::renderView('dvups_module.index',  $dvups_moduleCtrl->listAction());
         break;
 
     case 'dvups-right/index':

@@ -3,6 +3,8 @@
 namespace dclass\devups\Controller;
 
 use Genesis as g;
+use QueryBuilder;
+use Request;
 
 /**
  * class Controller 1.0
@@ -75,6 +77,9 @@ class Controller {
             case "eq":
                 $this->currentqb->andwhere($attr, "=", $value);
                 break;
+            case "oreq":
+                $this->currentqb->orwhere($attr, "=", $value);
+                break;
             case "gt":
                 $this->currentqb->andwhere($attr, ">", $value);
                 break;
@@ -105,7 +110,7 @@ class Controller {
 
     }
 
-    private function filter(\stdClass $entity, \QueryBuilder $qb)
+    private function filter(\stdClass $entity, QueryBuilder $qb)
     {
         $this->currentqb = $qb;
         $getparam = Request::$uri_get_param;

@@ -3,7 +3,8 @@
 /**
  * @Entity @Table(name="dvups_entity")
  * */
-class Dvups_entity extends Model implements JsonSerializable {
+class Dvups_entity extends Model implements JsonSerializable
+{
 
     /**
      * @Id @GeneratedValue @Column(type="integer")
@@ -193,4 +194,10 @@ class Dvups_entity extends Model implements JsonSerializable {
         ];
     }
 
+//    public function dvupsTranslate()
+//    {
+//        // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
+//        $this->__inittranslate("label", $this->label, "en");
+//        $this->__inittranslate("label", $this->label, "fr");
+//    }
 }

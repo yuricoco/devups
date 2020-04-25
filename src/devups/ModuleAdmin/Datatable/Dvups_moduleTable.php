@@ -1,7 +1,7 @@
 <?php
 
 
-use DClass\devups\Datatable as Datatable;
+use dclass\devups\Datatable\Datatable;
 
 class Dvups_moduleTable extends Datatable
 {
@@ -9,6 +9,7 @@ class Dvups_moduleTable extends Datatable
     public $entity = "dvups_module";
 
     public $datatablemodel = [
+        ['header' => 'Favicon', 'value' => 'printicon'],
         ['header' => 'Name', 'value' => 'name'],
         ['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
     ];

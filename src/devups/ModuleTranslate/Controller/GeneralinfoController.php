@@ -1,4 +1,7 @@
 <?php
+
+use dclass\devups\Controller\Controller;
+
 /**
  * Created by PhpStorm.
  * User: Aurelien Atemkeng
@@ -6,7 +9,7 @@
  * Time: 5:38 PM
  */
 
-class GeneralinfoController
+class GeneralinfoController extends Controller
 {
 
     private static $path = ROOT."config/generalinfo.json";
@@ -16,7 +19,7 @@ class GeneralinfoController
     {
         global $lang;
 
-        $contenu = json_encode($lang, 512);
+        $contenu = json_encode($lang, 1024);
 
         $entityrooting = fopen(self::$path, 'w');
         fputs($entityrooting, $contenu);
@@ -26,8 +29,45 @@ class GeneralinfoController
 
     }
 
+    public static function newdatafromentitycorecollection()
+    {
+
+        if (!isset($_SESSION[LANG . "_collection"]) || !count($_SESSION[LANG . "_collection"]))
+            return ["success" => false, "message" => "no data to collect"];
+
+        $content = file_get_contents(self::$path);
+        $info = json_decode($content, true);
+    }
+
+    public static function newdatafromsessioncollection()
+    {
+
+        if(!isset($_SESSION[LANG."_collection"]) || !count($_SESSION[LANG."_collection"]))
+            return ["success" => false, "message"=>"no data to collect"];
+
+        $content = file_get_contents(self::$path);
+        $info = json_decode($content, true);
+
+        foreach ($_SESSION[LANG."_collection"] as $default){
+            $info[$default] = ["en"=>$default, "fr"=>$default];
+        }
+
+        $contenu = json_encode($info, 1024);
+
+        $entityrooting = fopen(self::$path, 'w');
+        fputs($entityrooting, $contenu);
+        fclose($entityrooting);
+
+        $_SESSION[LANG."_collection"] = [];
+
+        return ["success" => true];
+
+    }
+
     public static function getdata()
     {
+
+        self::$jsfiles[] = Generalinfo::classpath('Ressource/js/generalinfoCtrl.js');
         $content = file_get_contents(self::$path);
         $info = json_decode($content, true);
 

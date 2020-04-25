@@ -262,6 +262,11 @@ var ddatatable = {
         this.dtinstance.find(".dcheckbox").click(function () {
             ddatatable.uncheckall();
         });
+        this.dtinstance.find(".search-field").keyup(function (event) {
+            var key = event.keyCode;
+            if(key === 13)
+                ddatatable.search(this)
+        });
 
         ddatatable.per_page = this.dtinstance.find("#dv_table").data('perpage');
 

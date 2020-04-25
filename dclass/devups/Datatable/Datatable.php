@@ -8,19 +8,24 @@ namespace dclass\devups\Datatable;
  * and open the template in the editor.
  */
 
-// use dclass\devups\model\TableRow;
-use admin\generator\TableTemplateRender;
+use dclass\devups\Datatable\TableRow;
 
 /**
  * Description of Datatable
  *
  * @author Aurelien Atemkeng
  */
-class Datatable extends TableTemplateRender
+class Datatable
 {
+    protected $btnedit_class = "btn btn-warning btn-sm";
+    protected $btnview_class = "btn btn-info btn-sm";
+    protected $btndelete_class = "btn btn-danger btn-sm";
+    protected $btnsearch_class = "btn btn-primary";
+    protected $table_class = "table table-bordered table-striped table-hover dataTable no-footer";
     //table table-bordered table-hover table-striped
     protected $actionDropdown = true;
     protected $filterParam = [];
+    protected $defaultroute = "";
     protected $dynamicpagination = false;
     protected $isFrontEnd = false;
 
@@ -36,7 +41,49 @@ class Datatable extends TableTemplateRender
     protected $header = []; // describe the model of the table (available column and metadata of row)
     protected $tablebody = "";
 
+    protected $defaultaction = [
+        "edit" => [
+            //'type' => 'btn',
+            'content' => '<i class="fa fa-edit" ></i> edit',
+            'class' => 'edit',
+            'action' => '',
+            'habit' => 'stateless',
+            'modal' => 'data-toggle="modal" ',
+        ],
+        "show" => [
+            //'type' => 'btn',
+            'content' => '<i class="fa fa-eye" ></i> show',
+            'class' => 'show',
+            'action' => '',
+            'habit' => 'stateless',
+            'modal' => 'data-toggle="modal" ',
+        ],
+        "delete" => [
+            //'type' => 'btn',
+            'content' => '<i class="fa fa-close" ></i> delete',
+            'class' => 'delete',
+            'action' => '',
+            'habit' => 'stateless',
+            'modal' => 'data-toggle="modal" ',
+        ],
+    ];
+    protected $createaction = [
+        //'type' => 'btn',
+        'content' => '<i class="fa fa-plus" ></i> create',
+        'class' => 'btn btn-success',
+        'action' => 'onclick="model._new()"',
+        'habit' => 'stateless',
+        'modal' => 'data-toggle="modal" ',
+    ];
     protected $topactions = [];
+    const button = [
+        //'type' => 'btn',
+        'content' => '<i class="fa fa-plus" ></i> create',
+        'class' => 'btn btn-success',
+        'action' => '',
+        'habit' => 'stateless',
+        'modal' => 'data-toggle="modal" ',
+    ];
     protected $customaction = [];
     protected $customactions = [];
     protected $rowaction = [];
@@ -57,6 +104,7 @@ class Datatable extends TableTemplateRender
     protected $enablepagination = true;
     protected $enabletopaction = true;
     protected $enablecolumnaction = true;
+    protected $responsive = "";
 
     public function __construct($lazyloading, $datatablemodel = [])
     {
@@ -96,12 +144,25 @@ class Datatable extends TableTemplateRender
 
     public function top_action() {
 
+        $top_action = '';
+        foreach ($this->topactions as $topaction){
+
+            if (method_exists($this->class, $topaction."Action") && $result = call_user_func(array($this->class, $topaction."Action")))
+            {
+                if(is_array($result))
+                    $top_action .= implode('', $result);
+                else
+                    $top_action .= $result;
+            }
+            else
+                $top_action .= $topaction;
+
+        }
         //$rigths = getadmin()->availableentityright($action);
         if(!$this->defaultaction)
-            return implode('', $this->topactions);
+            return $top_action;
 
         $entityrigths = \Dvups_entity::getRigthOf($this->class);
-        $top_action = '';
 
         if ($entityrigths) {
             // first we check if create action is available for the entity
@@ -131,7 +192,7 @@ class Datatable extends TableTemplateRender
 
         $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" ><i class="fa fa-retweet"></i> Reload</button>';
 
-        return implode('', $this->topactions) . $top_action;
+        return $top_action;
 
     }
 
@@ -350,6 +411,7 @@ class Datatable extends TableTemplateRender
     public function disableColumnAction()
     {
         $this->columnaction = false;
+        $this->enablecolumnaction = false;
         return $this;
     }
 
@@ -398,12 +460,18 @@ EOF;
 
         $filterParam = "";
         if (!empty($this->filterParam)) {
-            $filterParam = implode("&", $this->filterParam);
+            $filterParam = "&". implode("&", $this->filterParam);
         }
 
         $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
-        $html .= '<div class="card-body">
-        <table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
+        if($this->defaultroute)
+            $route = $this->defaultroute;
+        else
+            $route = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') ;
+
+        // data-route="' . $route . '" data-entityurl="' . str_replace("_", "-", $this->class) . '"
+        $html .= '<div class="card-body ' . $this->responsive . '">
+        <table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . $route . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
             . '<thead>' . $theader['th'] . $theader['thf'] . '</thead>'
             . '<tbody>' . $tb . '</tbody>'
             . '<tfoot>' . $newrows . '</tfoot>'
@@ -511,8 +579,8 @@ EOF;
 
     public function disablepagination()
     {
-        $this->paginationenabled = false;
-        $this->per_page = "no";
+        $this->enablepagination = false;
+        //$this->per_page = "all";
         return $this;
     }
 
@@ -731,7 +799,7 @@ EOF;
                     if (is_string($valuetd["search"])) {
                         $thfvalue = call_user_func(array($this->class, $valuetd["search"] . 'Search'), $thisfield);
                     } else
-                        $thfvalue = '<input name="' . $thisfield . '" placeholder="' . $valuetd['header'] . '" value="" class="form-control" >';
+                        $thfvalue = '<input name="' . $thisfield . '" placeholder="' . $valuetd['header'] . '" value="" class="search-field form-control" >';
 
                 }
                 if ($valuetd["order"])
@@ -823,6 +891,10 @@ EOF;
 
                         $tdcontent = call_user_func(array($entity, 'show' . ucfirst($src[1])), $param);
                         //$td = "<td>" . $file . "</td>";
+                    } elseif (isset($valuetd["param"])){
+                        $param = $valuetd["param"];
+                        $tdcontent = call_user_func_array(array($entity, 'get' . ucfirst($value)), $param);
+                        //dv_dump($param);
                     } else {
                         if (is_object(call_user_func(array($entity, 'get' . ucfirst($value)))) && get_class(call_user_func(array($entity, 'get' . ucfirst($value)))) == "DateTime") {
                             $tdcontent = call_user_func(array($entity, 'get' . ucfirst($value)), $param)->format('d M Y');

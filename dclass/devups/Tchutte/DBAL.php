@@ -101,12 +101,12 @@ class DBAL extends Database {
             if (is_object($project)) {
                 foreach ($project->listmodule as $key => $module) {
                     if (is_object($module)) {
-                        if(file_exists($rep = __DIR__ . "/../../src/" . $project->name . "/" . $module->name . "/Entity")){
+                        if(file_exists($rep = ROOT . "src/" . $project->name . "/" . $module->name . "/Entity")){
                             $enittyfoldes[] = $rep;
                             foreach ($module->listentity as $key => $entity) {
                                 if(is_object($entity))
                                     //var_dump($entity);
-                                    $enittycollection[strtolower($entity->name)] = __DIR__ . "/../../src/" . $project->name . "/" . $module->name;
+                                    $enittycollection[strtolower($entity->name)] = ROOT . "src/" . $project->name . "/" . $module->name;
                             }
                         }
                     }

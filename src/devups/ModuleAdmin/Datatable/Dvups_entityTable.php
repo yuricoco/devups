@@ -1,7 +1,7 @@
-<?php 
+<?php
 
 
-use DClass\devups\Datatable as Datatable;
+use dclass\devups\Datatable\Datatable;
 
 class Dvups_entityTable extends Datatable{
     

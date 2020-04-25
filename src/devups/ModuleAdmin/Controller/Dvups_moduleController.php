@@ -1,7 +1,7 @@
 <?php
 
 
-use DClass\devups\Datatable as Datatable;
+use dclass\devups\Controller\Controller;
 
 class Dvups_moduleController extends Controller
 {
@@ -53,6 +53,24 @@ class Dvups_moduleController extends Controller
                 ->buildindextable()
                 ->getTableRest(),
         ];
+    }
+
+    public function listView($next = 1, $per_page = 10)
+    {
+
+        $lazyloading = $this->lazyloading(new Dvups_module(), $next, $per_page);
+
+        //self::$jsfiles[] = Client::classpath('Ressource/js/dvups_roleCtrl.js');
+
+        $this->entitytarget = 'dvups_module';
+        $this->title = "Manage Module";
+
+        $this->renderListView(
+            Dvups_moduleTable::init($lazyloading)
+                ->buildindextable()
+                ->render()
+        );
+
     }
 
     public function listAction($next = 1, $per_page = 10)

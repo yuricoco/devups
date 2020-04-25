@@ -8,6 +8,8 @@
 
 namespace DClass\lib;
 
+use Request;
+
 class Util
 {
 
@@ -57,6 +59,21 @@ class Util
     public static function quantity($quantity)
     {
         return number_format($quantity, 2, ',', ' ');
+    }
+
+    public static function local() {
+        if (Request::get('lang')) {
+            return Request::get('lang');
+        }elseif (isset($_SESSION[LANG]))
+            return $_SESSION[LANG];
+
+        return __lang;
+    }
+
+    public static function log($root, $file, $content) {
+        $moddepend = fopen($root.'/'.$file, "a+");
+        fputs($moddepend, "  ". $content."\n");
+        fclose($moddepend);
     }
 
 }

@@ -8,15 +8,26 @@
 
 global $lang;
 
-function gettranslation($ref, $local = null, $default = "no translation found"){
+function t($ref, $default = "", $local = null ){
 
     $lang = GeneralinfoController::getdata()["info"];
 
-    if($local != "fr" && $local != "en")
-        $local = local();
+    if($local != "fr" && $local != "en"){
+        $local = DClass\lib\Util::local();
+    }
 
-    if(!isset($lang[$ref]))
-        return $ref;
+    if(!$default)
+        $default = $ref;
+
+    $ref = strtolower($ref);
+
+    if(!isset($lang[$ref])){
+        if(!isset($_SESSION[LANG."_collection"]))
+            $_SESSION[LANG."_collection"] = [];
+
+        $_SESSION[LANG."_collection"][$ref] = $default;
+        return $default;
+    }
 
     if(!isset($lang[$ref][$local]))
         return $default;
@@ -25,18 +36,18 @@ function gettranslation($ref, $local = null, $default = "no translation found"){
 
 }
 
-
-function translatecollection($local = null){
-
-    $lang = GeneralinfoController::getdata()["info"];
-    $contentcollection = [];
+function gettranslation($ref, $local = null, $default = "no translation found"){
+    global $lang;
 
     if($local != "fr" && $local != "en")
-        $local = local();
+        $local = \DClass\lib\Util::local();
 
-    foreach ($lang as $ref => $translate){
-        $contentcollection[str_replace(".", "_", $ref)] = $translate[$local];
-    }
+    if(!isset($lang[$ref]))
+        return "reference: <b>".$ref."</b> not found!";
 
-    return $contentcollection;
+    if(!isset($lang[$ref][$local]))
+        return $default;
+
+    return $lang[$ref][$local];
+
 }

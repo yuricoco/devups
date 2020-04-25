@@ -16,6 +16,9 @@ $dvups_contentlangCtrl = new Dvups_contentlangController();
 
 switch (Request::get('path')) {
 
+    case 'generalinfo.collectfromsession':
+        g::json_encode(GeneralinfoController::newdatafromsessioncollection());
+        break;
     case 'generalinfo.convertphparraytojson':
         g::json_encode(GeneralinfoController::parsedatalangphparraytojson());
         break;
@@ -24,15 +27,11 @@ switch (Request::get('path')) {
         break;
 
     case 'dvups_lang._new':
-        g::json_encode(Dvups_langController::renderForm());
+        Dvups_langForm::render();
         break;
 
     case 'dvups_lang._edit':
-        g::json_encode(Dvups_langController::renderForm(R::get("id")));
-        break;
-
-    case 'dvups_lang._show':
-        g::json_encode(Dvups_langController::renderDetail(R::get("id")));
+        Dvups_langForm::render(R::get("id"));
         break;
 
     case 'dvups_lang._delete':
@@ -48,17 +47,19 @@ switch (Request::get('path')) {
         break;
 
     case 'dvups_contentlang._new':
-        g::json_encode(Dvups_contentlangController::renderForm());
+        Dvups_contentlangForm::render();
         break;
 
     case 'dvups_contentlang._edit':
-        g::json_encode(Dvups_contentlangController::renderForm(R::get("id")));
+        Dvups_contentlangForm::render(R::get("id"));
         break;
 
-    case 'dvups_contentlang._show':
-        g::json_encode(Dvups_contentlangController::renderDetail(R::get("id")));
+    case 'dvups_contentlang.create':
+        g::json_encode($dvups_contentlangCtrl->createAction());
         break;
-
+    case 'dvups_contentlang.update':
+        g::json_encode($dvups_contentlangCtrl->updateAction(R::get("id")));
+        break;
     case 'dvups_contentlang._delete':
         g::json_encode($dvups_contentlangCtrl->deleteAction(R::get("id")));
         break;

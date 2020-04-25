@@ -1,7 +1,7 @@
 <?php
 
 
-use DClass\devups\Datatable as Datatable;
+use dclass\devups\Controller\Controller;
 
 class Dvups_roleController extends Controller
 {

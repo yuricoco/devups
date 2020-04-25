@@ -6,6 +6,8 @@
  * and open the template in the editor.
  */
 
+use dclass\devups\Controller\Controller;
+
 /**
  * Description of System_prod
  *

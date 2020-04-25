@@ -15,7 +15,6 @@ require __DIR__ . '/Database.php';
 require __DIR__ . '/dvups_functions.php';
 
 require __DIR__ . '/../dclass/lib/lib_dependances.php';
-require __DIR__ . '/../dclass/extends/extends_dependances.php';
 
 require __DIR__ . '/../admin/generator/TableTemplateRender.php';
 
@@ -42,6 +41,7 @@ require __DIR__ . '/../dclass/devups/Form/Form.php';
 require __DIR__ . '/../dclass/devups/Http/Request.php';
 require __DIR__ . '/../dclass/devups/Http/Response.php';
 
+require __DIR__ . '/../dclass/extends/extends_dependances.php';
 require __DIR__ . '/../dclass/generator/template/Templatedependences.php';
 
 global $enittycollection;

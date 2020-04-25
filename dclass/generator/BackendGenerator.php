@@ -13,7 +13,7 @@ class BackendGenerator {
         $fichier = fopen('Entity/' . ucfirst($name) . '.php', 'w');
 
         fputs($fichier, "<?php 
-        user \dclass\devups\model\Model;
+        // user \dclass\devups\model\Model;
     /**
      * @Entity @Table(name=\"" . $name . "\")
      * */
@@ -615,8 +615,8 @@ class " . $ctrlname . " extends $extend{
             $content = $this->defaultCtrlContent($name, $entity);
 
             $contenu = "<?php \n
-
-use DClass\devups\Datatable as Datatable;
+            
+use dclass\devups\Controller\Controller;
 
 class " . $ctrlname . " extends $extend{
 
@@ -650,8 +650,6 @@ class " . ucfirst($name) . "Table extends Datatable{
     
     public $"."entity = \"" . $name . "\";
 
-    public $"."datatablemodel = $datatablemodel;
-
     public function __construct($"."lazyloading = null, $"."datatablemodel = [])
     {
         parent::__construct($"."lazyloading, $"."datatablemodel);
@@ -664,7 +662,7 @@ class " . ucfirst($name) . "Table extends Datatable{
 
     public function buildindextable(){
 
-        // TODO: overwrite datatable attribute for this view
+        $"."this->datatablemodel = $datatablemodel;
 
         return $"."this;
     }

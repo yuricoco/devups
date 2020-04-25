@@ -27,7 +27,11 @@ class Request {
             foreach ($param as $el) {
                 $kv = explode("=", $el);
                 if (isset($kv[1])) {
-                    Request::$uri_get_param[$kv[0]] = $kv[1];
+                    $defaulthttpgetkey = str_replace(".", "_", $kv[0]);
+                    if(isset($_GET[$defaulthttpgetkey]))
+                        Request::$uri_get_param[$kv[0]] = $_GET[$defaulthttpgetkey];
+                    else
+                        Request::$uri_get_param[$kv[0]] = $kv[1];
                 }
             }
         }
@@ -43,6 +47,7 @@ class Request {
                 Request::$uri_post_param[$key] = $value;
             }
         }
+
     }
 
     public static function classroot($key) {

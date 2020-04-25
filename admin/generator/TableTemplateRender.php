@@ -53,4 +53,5 @@ class TableTemplateRender
         'habit' => 'stateless',
         'modal' => 'data-toggle="modal" ',
     ];
+
 }

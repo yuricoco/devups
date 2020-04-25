@@ -1,5 +1,17 @@
 
 
+model.collectfromsession =  function (el) {
+
+    if(!confirm("This action will overwrite the whole file of lang! \n\nContinue?")) return false;
+    model.baseurl = __env+"src/devups/ModuleTranslate/services.php";
+    model.entity = "generalinfo";
+    model._get("generalinfo.collectfromsession", function (response) {
+        console.log(response);
+        alert("well saved");
+    })
+
+}
+
 model.convertphparraytojson =  function (el) {
 
     if(!confirm("This action will overwrite the whole file of lang! \n\nContinue?")) return false;
@@ -34,7 +46,7 @@ model.saveinfo =  function (el) {
 
     model.baseurl = __env+"src/devups/ModuleTranslate/services.php";
     model.entity = "generalinfo";
-    model._post("save", fd, function (response) {
+    model._post("generalinfo.save", fd, function (response) {
         console.log(response);
         alert("well saved");
 

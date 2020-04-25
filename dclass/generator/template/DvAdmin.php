@@ -68,10 +68,10 @@ class DvAdmin
 
         foreach ($entity->attribut as $attribut) {
             if ($attribut->formtype == 'image') {
-                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => 'src:" . $attribut->name . "']";
-                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
+                $listview[] = "\n['header' => t('" . $entity->name . "." . $attribut->name . "', '" . ucfirst($attribut->name) . "'), 'value' => 'src:" . $attribut->name . "']";
+                $listview[] = "\n['header' => t('" . $entity->name . "." . $attribut->name . "', '" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
             } else {
-                $listview[] = "\n['header' => '" . ucfirst($attribut->name) . "', 'value' => '" . $attribut->name . "']";
+                $listview[] = "\n['header' => t('" . $entity->name . "." . $attribut->name . "', '" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
             }
         }
 
