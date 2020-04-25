@@ -13,10 +13,11 @@ class BackendGenerator {
         $fichier = fopen('Entity/' . ucfirst($name) . '.php', 'w');
 
         fputs($fichier, "<?php 
+        user \dclass\devups\model\Model;
     /**
      * @Entity @Table(name=\"" . $name . "\")
      * */
-    class " . ucfirst($name) . " extends \Model implements JsonSerializable{\n");
+    class " . ucfirst($name) . " extends Model implements JsonSerializable{\n");
         $method = "";
         $construteur = "
         public function __construct($" . "id = null){
@@ -643,7 +644,7 @@ class " . $ctrlname . " extends $extend{
 
         $contenu = "<?php \n
 
-use DClass\devups\Datatable as Datatable;
+use dclass\devups\Datatable\Datatable as Datatable;
 
 class " . ucfirst($name) . "Table extends Datatable{
     
@@ -1091,6 +1092,7 @@ use Genesis as g;
         $field = $this->formwidget($entity, $listmodule);
 
         $contenu = "
+    <?php use dclass\devups\Form\Form; ?>
     <?php //Form::addcss(" . ucfirst($name) . " ::classpath('Ressource/js/".$name."')) ?>
     
     <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action\", \"method\"=> \"post\"]) ?>

@@ -17,28 +17,30 @@ require __DIR__ . '/dvups_functions.php';
 require __DIR__ . '/../dclass/lib/lib_dependances.php';
 require __DIR__ . '/../dclass/extends/extends_dependances.php';
 
-require __DIR__ . '/../dclass/devups/Bugmanager.php';
+require __DIR__ . '/../admin/generator/TableTemplateRender.php';
+
+require __DIR__ . '/../dclass/devups/Tchutte/Bugmanager.php';
 require __DIR__ . '/../dclass/devups/Core.php';
-require __DIR__ . '/../dclass/devups/DBAL.php';
-require __DIR__ . '/../dclass/devups/QueryBuilder.php';
+require __DIR__ . '/../dclass/devups/Tchutte/DBAL.php';
+require __DIR__ . '/../dclass/devups/Tchutte/QueryBuilder.php';
 require __DIR__ . '/../dclass/devups/Dfile.php';
 require __DIR__ . '/../dclass/devups/ScanDir.php';
-require __DIR__ . '/../dclass/devups/Model.php';
+require __DIR__ . '/../dclass/devups/model/Model.php';
 require __DIR__ . '/../dclass/devups/DvupsTranslation.php';
-require __DIR__ . '/../dclass/devups/EntityCollection.php';
-require __DIR__ . '/../dclass/devups/Controller.php';
+require __DIR__ . '/../dclass/devups/model/EntityCollection.php';
+require __DIR__ . '/../dclass/devups/Controller/Controller.php';
 require __DIR__ . '/../dclass/devups/Genesis.php';
-require __DIR__ . '/../dclass/devups/Datatable.php';
-require __DIR__ . '/../dclass/devups/DatatableOverwrite.php';
+require __DIR__ . '/../dclass/devups/Datatable/Datatable.php';
+require __DIR__ . '/../dclass/devups/Datatable/DatatableOverwrite.php';
+require __DIR__ . '/../dclass/devups/Datatable/Dbutton.php';
 require __DIR__ . '/../dclass/devups/System_prod.php';
 require __DIR__ . '/../dclass/devups/UploadFile.php';
-require __DIR__ . '/../dclass/devups/EntityCore.php';
-require __DIR__ . '/../dclass/devups/FormFactory.php';
-require __DIR__ . '/../dclass/devups/FormManager.php';
-require __DIR__ . '/../dclass/devups/Form.php';
-require __DIR__ . '/../dclass/devups/Request.php';
-require __DIR__ . '/../dclass/devups/Response.php';
-require __DIR__ . '/../dclass/devups/model/Dbutton.php';
+require __DIR__ . '/../dclass/devups/model/EntityCore.php';
+require __DIR__ . '/../dclass/devups/Form/FormFactory.php';
+require __DIR__ . '/../dclass/devups/Form/FormManager.php';
+require __DIR__ . '/../dclass/devups/Form/Form.php';
+require __DIR__ . '/../dclass/devups/Http/Request.php';
+require __DIR__ . '/../dclass/devups/Http/Response.php';
 
 require __DIR__ . '/../dclass/generator/template/Templatedependences.php';
 

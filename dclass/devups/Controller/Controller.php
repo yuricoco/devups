@@ -1,5 +1,7 @@
 <?php
 
+namespace dclass\devups\Controller;
+
 use Genesis as g;
 
 /**
@@ -15,10 +17,10 @@ class Controller {
 
     /**
      * @return $this
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     public static function i() {
-        $reflection = new ReflectionClass(get_called_class());
+        $reflection = new \ReflectionClass(get_called_class());
         return $reflection->newInstance();
     }
 
@@ -135,10 +137,10 @@ class Controller {
     const maxpagination = 12;
 
     /***
-     * @param stdClass $entity the instance of the entity
+     * @param \stdClass $entity the instance of the entity
      * @param int $next the page to print within the datatable by default it's 0
      * @param int $per_page the number of element per page
-     * @param QueryBuilder|null $qbcustom if the developer want to customise the request
+     * @param \QueryBuilder|null $qbcustom if the developer want to customise the request
      * @param string $order
      * @return array
      */
@@ -349,7 +351,7 @@ class Controller {
      */
     public function form_fillingentity($object, $data = null, $entityform = null, $deeper = false) {
         if (!is_object($object))
-            throw new InvalidArgumentException('$object must be an object.');
+            throw new \InvalidArgumentException('$object must be an object.');
 
         if(!$data)
             return $object->__show($deeper);
@@ -375,7 +377,7 @@ class Controller {
      * @param $object
      * @param $entityform
      * @return mixed
-     * @throws ReflectionException
+     * @throws \ReflectionException
      */
     private function formWithPost($object, $entityform) {
         global $_ENTITY_FORM;
@@ -393,7 +395,7 @@ class Controller {
         if ($entityform)
             $entitycore = $entityform::formBuilder($object);
         else {
-            $entitycore = new stdClass();
+            $entitycore = new \stdClass();
             $entitycore->field = json_decode($_POST["dvups_form"][strtolower(get_class($object))], true);
         }
 
@@ -423,7 +425,7 @@ class Controller {
                         if ($_ENTITY_FORM[$key]) {
                             foreach ($_ENTITY_FORM[$key] as $val) {
 
-                                $reflect = new ReflectionClass($key);
+                                $reflect = new \ReflectionClass($key);
                                 $value2 = $reflect->newInstance();
                                 $value2->setId($val);
                                 $collection[] = $value2;
@@ -437,7 +439,7 @@ class Controller {
 
                             foreach ($value['values']['list'] as $ky => $val) {
 
-                                $reflect = new ReflectionClass($key);
+                                $reflect = new \ReflectionClass($key);
                                 $value2 = $reflect->newInstance();
                                 $value2->setId($ky);
                                 $oldselection[] = $value2;
@@ -446,17 +448,17 @@ class Controller {
 
                             foreach ($value['values'] as $ky => $val) {
 
-                                $reflect = new ReflectionClass($key);
+                                $reflect = new \ReflectionClass($key);
                                 $value2 = $reflect->newInstance();
                                 $value2->setId($ky);
                                 $oldselection[] = $value2;
                             }
                         }
 
-                        $intersect = EntityCollection::intersection($oldselection, $collection);
+                        $intersect = \EntityCollection::intersection($oldselection, $collection);
 
-                        $toadd = EntityCollection::diff($collection, $intersect);
-                        $todrop = EntityCollection::diff($oldselection, $intersect);
+                        $toadd = \EntityCollection::diff($collection, $intersect);
+                        $todrop = \EntityCollection::diff($oldselection, $intersect);
 
                         if ($toadd)
                             $_ENTITY_COLLECTION[]["toadd"] = true;
@@ -474,7 +476,7 @@ class Controller {
                     }
                     else
                         if (isset($value['options']) && !isset($value['arrayoptions']) && class_exists($key)) {// && is_object ($value['options'][0])
-                            $reflect = new ReflectionClass($key);
+                            $reflect = new \ReflectionClass($key);
                             $value2 = $reflect->newInstance();
 
                             if (is_array($value['options']) && isset($_ENTITY_FORM[$key])) {
@@ -586,7 +588,7 @@ class Controller {
             else // if the default value is still id, then it will call a method setAttributename() in the owner class
                 $setter = "set" . ucfirst($imbricate[0]);
 
-            $reflect = new ReflectionClass($imbricate[0]);
+            $reflect = new \ReflectionClass($imbricate[0]);
             $entityimbricate = $reflect->newInstance();
             if (!is_numeric($value)) {
                 $entityimbricate->setId(null);
@@ -683,7 +685,7 @@ class Controller {
                 'datatablemodel' => $datatablemodel, // pour le web service
                 'detail' => '');
 
-        Genesis::renderView('default.index',
+        \Genesis::renderView('default.index',
             array('success' => true, // pour le restservice
                 'title' => $this->title, // pour le web service
                 'entity' => $this->entitytarget, // pour le web service
@@ -703,7 +705,7 @@ class Controller {
                 'datatablemodel' => $datatablemodel, // pour le web service
                 'detail' => '');
 
-        Genesis::renderView('default.detail',
+        \Genesis::renderView('default.detail',
             array('success' => true, // pour le restservice
                 'title' => $this->title, // pour le web service
                 'entity' => $this->entitytarget, // pour le web service

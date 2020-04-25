@@ -648,7 +648,7 @@ abstract class Model extends \stdClass
         endif;
 
         $qb = new QueryBuilder($relation);
-        return $qb->select()->where(strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
+        return $qb->select()->where("this.".strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
     }
 
     public function __get($attribut)

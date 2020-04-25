@@ -1,6 +1,6 @@
 <?php
 
-namespace DClass\devups;
+namespace dclass\devups\Datatable;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -8,21 +8,19 @@ namespace DClass\devups;
  * and open the template in the editor.
  */
 
+// use dclass\devups\model\TableRow;
+use admin\generator\TableTemplateRender;
+
 /**
  * Description of Datatable
  *
  * @author Aurelien Atemkeng
  */
-class Datatable
+class Datatable extends TableTemplateRender
 {
-    protected $btnedit_class = "btn btn-warning btn-sm";
-    protected $btnview_class = "btn btn-info btn-sm";
-    protected $btndelete_class = "btn btn-danger btn-sm";
-    protected $btnsearch_class = "btn btn-primary";
-    protected $table_class = "table table-bordered table-striped table-hover dataTable no-footer";
     //table table-bordered table-hover table-striped
     protected $actionDropdown = true;
-    protected $filterParam = "";
+    protected $filterParam = [];
     protected $dynamicpagination = false;
     protected $isFrontEnd = false;
 
@@ -38,49 +36,7 @@ class Datatable
     protected $header = []; // describe the model of the table (available column and metadata of row)
     protected $tablebody = "";
 
-    protected $defaultaction = [
-        "edit" => [
-            //'type' => 'btn',
-            'content' => '<i class="fa fa-edit" ></i> edit',
-            'class' => 'edit',
-            'action' => '',
-            'habit' => 'stateless',
-            'modal' => 'data-toggle="modal" ',
-        ],
-        "show" => [
-            //'type' => 'btn',
-            'content' => '<i class="fa fa-eye" ></i> show',
-            'class' => 'show',
-            'action' => '',
-            'habit' => 'stateless',
-            'modal' => 'data-toggle="modal" ',
-        ],
-        "delete" => [
-            //'type' => 'btn',
-            'content' => '<i class="fa fa-close" ></i> delete',
-            'class' => 'delete',
-            'action' => '',
-            'habit' => 'stateless',
-            'modal' => 'data-toggle="modal" ',
-        ],
-    ];
-    protected $createaction = [
-        //'type' => 'btn',
-        'content' => '<i class="fa fa-plus" ></i> create',
-        'class' => 'btn btn-success',
-        'action' => 'onclick="model._new()"',
-        'habit' => 'stateless',
-        'modal' => 'data-toggle="modal" ',
-    ];
     protected $topactions = [];
-    const button = [
-        //'type' => 'btn',
-        'content' => '<i class="fa fa-plus" ></i> create',
-        'class' => 'btn btn-success',
-        'action' => '',
-        'habit' => 'stateless',
-        'modal' => 'data-toggle="modal" ',
-    ];
     protected $customaction = [];
     protected $customactions = [];
     protected $rowaction = [];
@@ -141,6 +97,9 @@ class Datatable
     public function top_action() {
 
         //$rigths = getadmin()->availableentityright($action);
+        if(!$this->defaultaction)
+            return implode('', $this->topactions);
+
         $entityrigths = \Dvups_entity::getRigthOf($this->class);
         $top_action = '';
 
@@ -170,7 +129,7 @@ class Datatable
             }
         }
 
-        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" ><i class="fa fa-download"></i> Reload</button>';
+        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" ><i class="fa fa-retweet"></i> Reload</button>';
 
         return implode('', $this->topactions) . $top_action;
 
@@ -310,9 +269,16 @@ class Datatable
         } else
             $tb = self::getTableEntityBody($entity, $this->datatablemodel);
 
+
+        $newrows = "";
+        if (!empty($this->additionnalrow)) {
+            $newrows = $this->rowbuilder();
+        }
+
         return '<table data-entity="' . $this->class . '"  class="table table-bordered table-hover table-striped" >'
             //. '<thead><tr>' . implode(" ", $theader['th']) . '</tr><tr>' . implode(" ", $theader['thf']) . '</tr></thead>'
             . '<tbody>' . implode(" ", $tb) . '</tbody>'
+            . '<tfoot>' . $newrows. '</tfoot>'
             . '</table>';
 
     }
@@ -400,7 +366,7 @@ class Datatable
             $headaction = $this->top_action();
 
         $html = <<<EOF
- <div class="col-lg-12 col-md-12">
+ <div class="">
 <div class="card-header-tab card-header">
                         <div class="card-header-title">
                             <i class="header-icon lnr-rocket icon-gradient bg-tempting-azure"> </i>
@@ -430,25 +396,31 @@ EOF;
             $newrows = $this->rowbuilder();
         }
 
+        $filterParam = "";
+        if (!empty($this->filterParam)) {
+            $filterParam = implode("&", $this->filterParam);
+        }
+
         $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
-        $html .= '<table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $this->filterParam . '" data-route="' . path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
+        $html .= '<div class="card-body">
+        <table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
             . '<thead>' . $theader['th'] . $theader['thf'] . '</thead>'
             . '<tbody>' . $tb . '</tbody>'
             . '<tfoot>' . $newrows . '</tfoot>'
-            . '</table>';
+            . '</table></div>';
 
         //$this->html .= self::renderListViewUI($this->lazyloading['listEntity'], $header, $action, $defaultaction, $searchaction);
         if ($this->enablepagination)
-            $html .= $this->paginationbuilder();
+            $html .= '<div class="card-footer">'.$this->paginationbuilder(). '</div>';
 
         $html .= "";//</div> $this->closeform.
 
-        return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container" >' . $html . '</div>';
+        return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dataTables_wrapper dt-bootstrap4" >' . $html . '</div>';
     }
 
-    public function addFilterParam($param)
+    public function addFilterParam($param, $value)
     {
-        $this->filterParam = $param;
+        $this->filterParam[] = $param."=".$value;
         return $this;
     }
 
@@ -485,7 +457,7 @@ EOF;
         return $this;
     }
 
-    public function addrow($row)
+    public function addrow(TableRow $row)
     {
         $this->additionnalrow[] = $row;
         return $this;
@@ -495,25 +467,7 @@ EOF;
     {
         $tr = [];
         foreach ($this->additionnalrow as $row) {
-            $td = "";
-            if ($this->groupaction)
-                $td .= "<td ></td>";
-
-            foreach ($row["data"] as $data) {
-                $directive = "";
-
-                if (isset($data["directive"]))
-                    $directive = \Form::serialysedirective($data["directive"]);
-
-                $td .= "<td $directive >" . $data["value"] . "</td>";
-
-            }
-
-            $directive = "";
-            if (isset($row["directive"]))
-                $directive = \Form::serialysedirective($row["directive"]);
-
-            $tr[] = "<tr $directive >" . $td . "<td ></td></tr>";
+            $tr[] = $row->getHtml($this->groupaction);
         }
 
         return implode("", $tr);
@@ -596,27 +550,28 @@ EOF;
     {
 
         if (!$this->listentity) {
-            return '<div id="dv_pagination" class="col-lg-12"> no page</div>';
+            return '<div id="dv_pagination" > no page</div>';
         }
 
 //        if (!is_numeric($this->paginationnav))
 //            return "<div id=\"dv_pagination\" class=\"col-lg-12\"></div>";
 
-        $html = '<div id="dv_pagination" class="col-lg-12"><div class="row">
+        $html = '<div id="dv_pagination" >
+<div class="row">
             <div id="pagination-notice" data-notice="' . $this->pagination . '" class="col-lg-4 col-md-4">Showing ' . (($this->current_page - 1) * $this->per_page + 1) . ' to ' . $this->per_page * $this->current_page . ' of ' . $this->nb_element . '</div>
             ';
 
 
         $html .= '<div class="col-lg-8 col-md-8">
-                <div class="dataTables_paginate paging_simple_numbers text-right">
+                <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
                     <ul class="pagination">';
         if ($this->previous > 0) {
-            $html .= '<li class="paginate_button previous"><a href="javascript:ddatatable.firstpage()" ><i class="fa fa-angle-double-left" ></i></a></li>';
-            $html .= '<li class="paginate_button previous"><a href="javascript:ddatatable.previous()" ><i class="fa fa-angle-left" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item previous"><a class="page-link" href="javascript:ddatatable.firstpage()" ><i class="fa fa-angle-double-left" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item previous"><a class="page-link" href="javascript:ddatatable.previous()" ><i class="fa fa-angle-left" ></i></a></li>';
         }//' . $url . '&next=' . $previous . '&per_page=' . $per_page . '
         else {
-            $html .= '<li class="paginate_button previous disabled"><a href="#" ><i class="fa fa-angle-double-left" ></i></a></li>';
-            $html .= '<li class="paginate_button previous disabled"><a href="#" ><i class="fa fa-angle-left" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item previous disabled"><a class="page-link" href="#" ><i class="fa fa-angle-double-left" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item previous disabled"><a class="page-link" href="#" ><i class="fa fa-angle-left" ></i></a></li>';
 
         }
 
@@ -629,7 +584,7 @@ EOF;
                     $options .= '<option value="' . $page . '" >' . $page . '</option>';
                 }
             }
-            $html .= '<select class="" onchange="ddatatable.pagination(this.value)">'.$options.'</select>';
+            $html .= '<select class=" paginate_button page-item" onchange="ddatatable.pagination(this.value)">'.$options.'</select>';
         }
         else
             if ($this->dynamicpagination)
@@ -638,34 +593,34 @@ EOF;
                 //dv_dump($this->paginationcustom);
                 foreach ($this->paginationcustom['firsts'] as $key => $page) {
                     if ($page == $this->current_page) {
-                        $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        $html .= '<li class="paginate_button page-item  active "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                     } else {
-                        $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        $html .= '<li class="paginate_button page-item "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                     }
                 }
 
                 if ($this->current_page < 3 || $this->current_page >= 7)
-                    $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleleft'] . ');" data-next="' . $this->paginationcustom['middleleft'] . '" >...</a></li>';
+                    $html .= '<li class="paginate_button page-item "><a class="page-link" href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleleft'] . ');" data-next="' . $this->paginationcustom['middleleft'] . '" >...</a></li>';
 
                 foreach ($this->paginationcustom['middles'] as $key => $page) {
                     //for ($page = 1; $page <= count($this->paginationcustom['middles']); $page++) {
                     if ($page == $this->current_page) {
-                        $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        $html .= '<li class="paginate_button page-item active "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                     } else {
-                        $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        $html .= '<li class="paginate_button page-item "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                     }
                 }
 
                 if ($this->paginationcustom['lasts']) {
 
-                    $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleright'] . ');" data-next="' . $this->paginationcustom['middleright'] . '" >...</a></li>';
+                    $html .= '<li class="paginate_button page-item "><a class="page-link" href="javascript:ddatatable.pagination(' . $this->paginationcustom['middleright'] . ');" data-next="' . $this->paginationcustom['middleright'] . '" >...</a></li>';
 
                     foreach ($this->paginationcustom['lasts'] as $key => $page) {
                         //for ($page = 1; $page <= count($this->paginationcustom['lasts']); $page++) {
                         if ($page == $this->current_page) {
-                            $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                            $html .= '<li class="paginate_button page-item active "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                         } else {
-                            $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                            $html .= '<li class="paginate_button page-item "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                         }
                     }
 
@@ -676,18 +631,18 @@ EOF;
             else
                 for ($page = 1; $page <= $this->pagination; $page++) {
                     if ($page == $this->current_page) {
-                        $html .= '<li class="paginate_button active "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        $html .= '<li class="paginate_button page-item active "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                     } else {
-                        $html .= '<li class="paginate_button "><a href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
+                        $html .= '<li class="paginate_button page-item "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
                     }
                 }
 
         if ($this->remain) {
-            $html .= '<li class="paginate_button next"><a href="javascript:ddatatable.next();" ><i class="fa fa-angle-right" ></i></a></li>';
-            $html .= '<li class="paginate_button next"><a href="javascript:ddatatable.lastpage(' . $this->pagination . ');" ><i class="fa fa-angle-double-right" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item next"><a class="page-link" href="javascript:ddatatable.next();" ><i class="fa fa-angle-right" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item next"><a class="page-link" href="javascript:ddatatable.lastpage(' . $this->pagination . ');" ><i class="fa fa-angle-double-right" ></i></a></li>';
         } else {
-            $html .= '<li class="paginate_button next disabled"><a href="#" ><i class="fa fa-angle-right" ></i></a></li>';
-            $html .= '<li class="paginate_button next disabled"><a href="#" ><i class="fa fa-angle-double-right" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item next disabled"><a class="page-link" href="#" ><i class="fa fa-angle-right" ></i></a></li>';
+            $html .= '<li class="paginate_button page-item next disabled"><a class="page-link" href="#" ><i class="fa fa-angle-double-right" ></i></a></li>';
         }
 
         $html .= " </ul>
@@ -939,7 +894,7 @@ EOF;
                     $actionbutton = "<span class='alert alert-info' >not rigth</span>";
                 }
 
-                $tr[] = '<td>' . $actionbutton . '</td>';
+                $tr[] = '<td style="padding: .3rem;" >' . $actionbutton . '</td>';
 
             }
 
