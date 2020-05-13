@@ -32,6 +32,7 @@ class Dvups_adminTable extends Datatable
 //            ['header' => 'password', 'value' => 'password'],
 //        ];
 
+        $this->addcustomaction("callbackbtn");
         return $this;
     }
 

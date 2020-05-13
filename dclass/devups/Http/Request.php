@@ -23,13 +23,16 @@ class Request {
         $uri = explode('?', $_SERVER['REQUEST_URI']);
 
         if (isset($uri[1])) {
-            $param = explode('&', $uri[1]);
+            $param = explode('&', str_replace("%20", " ",$uri[1]));
+            //$param = explode('&', $uri[1]);
             foreach ($param as $el) {
                 $kv = explode("=", $el);
                 if (isset($kv[1])) {
                     $defaulthttpgetkey = str_replace(".", "_", $kv[0]);
-                    if(isset($_GET[$defaulthttpgetkey]))
+                    if(isset($_GET[$defaulthttpgetkey])){
                         Request::$uri_get_param[$kv[0]] = $_GET[$defaulthttpgetkey];
+                        unset($_GET[$defaulthttpgetkey]);
+                    }
                     else
                         Request::$uri_get_param[$kv[0]] = $kv[1];
                 }
@@ -73,9 +76,11 @@ class Request {
 
     public static function raw($format = "json") {
         $rawdata = file_get_contents("php://input");
-        //die($rawdata);
-        if ($format == "json")
-            return json_decode($rawdata, true);
+
+        if ($format == "json"){
+            self::$uri_raw_param = json_decode($rawdata, true);
+            return self::$uri_raw_param;
+        }
         else
             return $rawdata;
     }

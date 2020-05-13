@@ -3,22 +3,10 @@
 @section('title', 'New admin')
 
 
-@section('content')
-
-
-    <div class="row">
-        <div class="col-lg-12">
-            <ol class="breadcrumb">
-                <li class="active">
-                    <i class="fa fa-dashboard"></i> <?php echo CHEMINMODULE; ?>  > Liste
-                </li>
-            </ol>
-        </div>
-
-    </div>
+@section('layout_content')
 
     <div class="row">
-        <div class="col-md-4 col-md-offset-4">
+        <div class="col-md-4 col-md-offset-4 auto">
             <div class="login-panel panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Change password <?php echo $detail; ?></h3>

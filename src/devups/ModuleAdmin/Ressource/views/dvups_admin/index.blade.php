@@ -19,7 +19,7 @@
 
                 <?php if(getadmin()->getLogin() == "dv_admin" ){ ?>
                 <label class="btn btn-info" onclick="updateprivilege(this)" >Update master admin privilage</label>
-                <?php } ?>
+                <?php } ;?>
 
             </div>
         </div>
@@ -31,7 +31,7 @@
             <div class="card">
             <div class="card-body">
 
-                <?= \DClass\devups\Datatable::buildtable($lazyloading, [
+                <?= dclass\devups\Datatable\Datatable::buildtable($lazyloading, [
                     ['header' => 'nom', 'value' => 'name', 'search' => true],
                     ['header' => 'login', 'value' => 'login'],
                 ])

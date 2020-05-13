@@ -212,6 +212,7 @@ class FormFactory {
             FormFactory::$fieldname = $entitycore->name . "_form[" . $key . ']';
             FormFactory::$fieldid = $entitycore->name . "-" . $key . '';
 
+            $directive = [];
             $require = 'required';
             $etoil = '';
             $class = "";

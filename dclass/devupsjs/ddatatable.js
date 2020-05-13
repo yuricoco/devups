@@ -200,12 +200,14 @@ var ddatatable = {
         console.log(this.geturl());
         $.get(this.geturl(), (response) => {
             console.log(response);
+            removeloader();
             this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
             this.dtinstance.find("#dv_pagination").replaceWith(response.datatable.tablepagination);
-            removeloader();
+
         }, 'json').fail (function(resultat, statut, erreur){
             console.log(resultat);
             model._showmodal();
+            removeloader();
             //$("#"+model.entity+"modal").show();
             databinding.bindmodal(resultat.responseText);
         });//, 'json'

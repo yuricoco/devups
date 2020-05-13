@@ -2,6 +2,7 @@
 
 
 use dclass\devups\Controller\Controller;
+use dclass\devups\Datatable\Datatable;
 
 class Dvups_entityController extends Controller
 {

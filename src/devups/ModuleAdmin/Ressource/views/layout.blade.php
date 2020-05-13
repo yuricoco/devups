@@ -3,11 +3,11 @@
 
 <?php function style(){ ?>
 
-<?php foreach (Controller::$cssfiles as $cssfile){ ?>
+<?php foreach (dclass\devups\Controller\Controller::$cssfiles as $cssfile){ ?>
 <link href="<?= $cssfile ?>" rel="stylesheet">
 <?php } ?>
 
-<?php } ?>
+<?php };?>
 
 @section('content')
 
@@ -36,7 +36,7 @@
 <script src="<?= CLASSJS ?>devups.js"></script>
 <script src="<?= CLASSJS ?>model.js"></script>
 <script src="<?= CLASSJS ?>ddatatable.js"></script>
-<?php foreach (Controller::$jsfiles as $jsfile){ ?>
+<?php foreach (dclass\devups\Controller\Controller::$jsfiles as $jsfile){ ?>
 <script src="<?= $jsfile ?>"></script>
 <?php } ?>
 

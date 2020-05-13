@@ -11,7 +11,7 @@ class Dvups_contentlangTable extends Datatable
     public $datatablemodel = [
         ['header' => 'Content', 'value' => 'content', 'search' => true],
         ['header' => 'Lang', 'value' => 'lang', "search"=>true],
-        ['header' => 'Dvups_lang', 'value' => 'Dvups_lang.ref']//, "search"=>true
+        ['header' => 'Dvups_lang', 'value' => 'Dvups_lang.ref', "search"=>true]
     ];
 
     public function __construct($lazyloading = null, $datatablemodel = [])

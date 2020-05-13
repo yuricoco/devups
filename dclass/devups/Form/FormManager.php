@@ -164,6 +164,14 @@ abstract class FormManager {
             return $key_value;
         
     }
-    
-    
+
+    public static function key_as_value(array $array)
+    {
+        $key_value = [];
+        foreach ($array as $item){
+            $key_value[$item] = $item;
+        }
+        return $key_value;
+    }
+
 }

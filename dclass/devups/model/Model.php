@@ -76,6 +76,17 @@ abstract class Model extends \stdClass
         return ROOT .'..'. self::classpath();
     }
 
+    public static function post($attribute, $default = null)
+    {
+
+        $class = strtolower(get_called_class());
+        if(isset($_POST[$class."_form"][$attribute]))
+            return $_POST[$class."_form"][$attribute];
+        else
+            return $default;
+
+    }
+
     /**
      *
      * @param type $lable
@@ -290,7 +301,7 @@ abstract class Model extends \stdClass
         $qb = new QueryBuilder($entity);
         if($i < 0){
             $nbel = $qb->__countEl();
-            if(!$nbel)
+            if($nbel == 1)
                 return $entity;
 
             $i += $nbel;

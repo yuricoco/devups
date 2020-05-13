@@ -645,7 +645,7 @@ class DBAL extends Database {
         $query = $this->link->prepare($sql);
         $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $query->errorInfo()));
 
-        return $query->fetchColumn();
+        return (int) $query->fetchColumn();
     }
 
     private function dbrow($flowBD){

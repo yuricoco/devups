@@ -50,52 +50,19 @@ class QueryBuilder extends \DBAL
 //        $this->table = strtolower(get_class($entity));
     }
 
-    /**
-     * Prepare the value and operator for a where clause.
-     *
-     * @param  string $value
-     * @param  string $operator
-     * @param  bool $useDefault
-     * @return array
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function prepareValueAndOperator($value, $operator, $useDefault = false)
-    {
-        if ($useDefault) {
-            return [$operator, '='];
-        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
-            throw new InvalidArgumentException('Illegal operator and value combination.');
+    public function __index($index = 1, $recursif = true, $collect = []) {
+        $i = (int) $index;
+
+        if($i < 0){
+            $nbel = (int) $this->__countEl();
+            if($nbel == 1)
+                return $this->object;
+
+            $i += $nbel;
+            return $this->limit($i - 1, $i)->__getOne($recursif, $collect);
         }
 
-        return [$value, $operator];
-    }
-
-    /**
-     * Determine if the given operator and value combination is legal.
-     *
-     * Prevents using Null values with invalid operators.
-     *
-     * @param  string $operator
-     * @param  mixed $value
-     * @return bool
-     */
-    protected function invalidOperatorAndValue($operator, $value)
-    {
-        return is_null($value) && in_array($operator, $this->operators) &&
-            !in_array($operator, ['=', '<>', '!=']);
-    }
-
-    /**
-     * Determine if the given operator is supported.
-     *
-     * @param  string $operator
-     * @return bool
-     */
-    protected function invalidOperator($operator)
-    {
-        return !in_array(strtolower($operator), $this->operators, true) &&
-            !in_array(strtolower($operator), $this->grammar->getOperators(), true);
+        return $this->limit($i - 1, $i)->__getOne($recursif, $collect);
     }
 
     /**

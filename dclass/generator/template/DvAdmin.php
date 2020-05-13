@@ -95,7 +95,7 @@ class DvAdmin
                     $entitylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $listview[] = "\n['header' => '" . $entrel . "', 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
+                $listview[] = "\n['header' => t('entity." . $relation->entity . "', '" . $entrel . "') , 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
             }
         }
 

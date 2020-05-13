@@ -118,14 +118,14 @@ class Genesis {
         global $viewdir, $moduledata;
 
         if ($redirect && isset($data['redirect'])) {
-            $classroot = Request::classroot("path");
-            header('location: index.php?path=' . $classroot . '/' . $data['redirect']);
+            header('location: ' . $data['redirect']);
         }
 
         $data["moduledata"] = $moduledata;//Genesis::top_action($action, $classroot);
 
         $blade = new Blade($viewdir, admin_dir . "cache");
         echo $blade->view()->make($view, $data)->render();
+
     }
 
 

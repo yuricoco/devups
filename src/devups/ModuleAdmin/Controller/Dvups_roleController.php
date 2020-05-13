@@ -2,6 +2,7 @@
 
 
 use dclass\devups\Controller\Controller;
+use dclass\devups\Datatable\Datatable;
 
 class Dvups_roleController extends Controller
 {
@@ -95,7 +96,7 @@ class Dvups_roleController extends Controller
         ];
 
         $this->renderListView(
-            \DClass\devups\Datatable::buildtable($lazyloading, $datatablemodel)
+            Datatable::buildtable($lazyloading, $datatablemodel)
                 ->render()
         );
 

@@ -22,7 +22,7 @@ switch (Request::get('path')) {
         break;
 
     case 'generalinfo/index':
-        Genesis::renderView('generalinfo.index',  GeneralinfoController::getdata());
+        Genesis::renderView('generalinfo.index',  GeneralinfoController::getdataView());
         break;
 
     case 'dvups-lang/changelang':

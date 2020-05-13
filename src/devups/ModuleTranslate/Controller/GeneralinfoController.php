@@ -67,7 +67,6 @@ class GeneralinfoController extends Controller
     public static function getdata()
     {
 
-        self::$jsfiles[] = Generalinfo::classpath('Ressource/js/generalinfoCtrl.js');
         $content = file_get_contents(self::$path);
         $info = json_decode($content, true);
 
@@ -75,6 +74,14 @@ class GeneralinfoController extends Controller
             "admin" => getadmin(),
             "info" => $info
         ];
+    }
+
+    public static function getdataView()
+    {
+
+        self::$jsfiles[] = Generalinfo::classpath('Ressource/js/generalinfoCtrl.js');
+        return self::getdata();
+
     }
 
     public static function savedata()

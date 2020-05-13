@@ -77,6 +77,9 @@ class Controller {
             case "eq":
                 $this->currentqb->andwhere($attr, "=", $value);
                 break;
+            case "neq":
+                $this->currentqb->andwhere($attr, "!=", $value);
+                break;
             case "oreq":
                 $this->currentqb->orwhere($attr, "=", $value);
                 break;
@@ -288,50 +291,6 @@ class Controller {
     }
 
     /**
-     * 24/10/2016
-     *
-     * @param \stdClass $Dao
-     * @param int $par_page
-     * @param type $next
-     * @return type
-     */
-    public function scrollloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null) {
-        $remain = true;
-        if (isset($_GET['next']) && isset($_GET['per_page']))
-            extract($_GET);
-
-        if ($next > 0) {
-            $page = $next;
-            $next = (intval($next) - 1) * $per_page;
-        } else {
-            $page = 1;
-        }
-
-        if ($qbcustom != null) {
-            $listEntity = $qbcustom->limit($next, $per_page)->__getAll();
-        } else {
-            $qb = new QueryBuilder($entity);
-            $listEntity = $qb->select()->limit($next, $per_page)->__getAll();
-        }
-
-        if (count($listEntity) < $per_page) {
-            $next = $page - 1;
-            $remain = false;
-        } else {
-            $next = $page;
-        }
-
-        return array('success' => true, // pour le restservice
-            'listEntity' => $listEntity,
-            'per_page' => $per_page,
-            'current_page' => $page,
-            'next' => $next + 1,
-            'previous' => $page - 1,
-            'remain' => $remain,
-            'detail' => '');
-    }
-
-    /**
      * Hydrate l'entité passé en parametre sur la base de la variable post ou dans le cas des requete
      * asynchrone, d'une chaine formater en json ou alors les arrays.
      *
@@ -407,6 +366,17 @@ class Controller {
         //Genesis::json_encode($_POST["dvups_form"]);
 
         foreach ($entitycore->field as $key => $value) {
+
+            if (isset($value["filetype"])) {
+
+                if (!method_exists($object, "upload" . ucfirst($key)))
+                    $this->error[$key] = " You may create method " . "upload" . ucfirst($key) . " in entity. ";
+                else if ($error = call_user_func(array($object, "upload" . ucfirst($key))))
+                    $this->error[$key] = $error;
+
+                continue;
+            }
+
             foreach ($_ENTITY_FORM as $key_form => $value_form) {
 
                 if ($key_form == $key) {
@@ -415,6 +385,10 @@ class Controller {
 //                        continue;
                     if(!isset($value["setter"]))
                         $value["setter"] = $key;
+
+                    if (isset($value["persist"]) && $value["persist"] == false){
+                        continue;
+                    }
 
                     $currentfieldsetter = 'set' . ucfirst($value["setter"]);
 

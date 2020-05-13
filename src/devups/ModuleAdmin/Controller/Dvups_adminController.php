@@ -43,7 +43,7 @@ class Dvups_adminController extends Controller {
         if (sha1($oldpwd) == $dvups_admin->getPassword()) {
             $dvups_admin->__update("password", sha1($newpwd))->exec();
             return array('success' => true, // pour le restservice
-                'redirect' => 'profile&detail=password updated successfully', // pour le web service
+                'redirect' => Dvups_admin::classpath().'dvups-admin/profile?detail=password updated successfully', // pour le web service
                 'detail' => '');
         } else {
             return array('success' => false, // pour le restservice
@@ -55,6 +55,8 @@ class Dvups_adminController extends Controller {
 
         $_SESSION[ADMIN] = array();
         unset($_SESSION[ADMIN]);
+        unset($_SESSION[dv_role_permission]);
+        unset($_SESSION[dv_role_navigation]);
         //session_destroy();
         header("location: " . path('admin/login.php'));
     }
@@ -246,7 +248,6 @@ class Dvups_adminController extends Controller {
         $this->renderListView(
             Dvups_adminTable::init($lazyloading)
                 ->buildindextable()
-                ->addcustomaction("callbackbtn")
                 ->render()
         );
 

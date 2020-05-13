@@ -105,6 +105,7 @@ class Datatable
     protected $enabletopaction = true;
     protected $enablecolumnaction = true;
     protected $responsive = "";
+    protected $isRadio = false;
 
     public function __construct($lazyloading, $datatablemodel = [])
     {
@@ -470,7 +471,7 @@ EOF;
             $route = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') ;
 
         // data-route="' . $route . '" data-entityurl="' . str_replace("_", "-", $this->class) . '"
-        $html .= '<div class="card-body ' . $this->responsive . '">
+        $html .= '<div class="  ' . $this->responsive . '">
         <table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . $route . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
             . '<thead>' . $theader['th'] . $theader['thf'] . '</thead>'
             . '<tbody>' . $tb . '</tbody>'
@@ -762,7 +763,11 @@ EOF;
         $th = [];
         $fields = [];
         if ($this->groupaction) {
-            $th[] = '<th><input id="checkall" name="all" type="checkbox" class="" ></th>';
+            if(!$this->isRadio)
+                $th[] = '<th><input id="checkall" name="all" type="checkbox" class="" ></th>';
+            else
+                $th[] = '<th></th>';
+
             $thf[] = '<th></th>';
         }
 
@@ -843,7 +848,9 @@ EOF;
                         $tr[] = '<td><input name="id[]" value="'.$entity->getId().'" type="checkbox" class="dcheckbox" ></td>';
                     else
                         $tr[] = '<td></td>';
-                }else
+                }elseif($this->isRadio)
+                    $tr[] = '<td><input name="id" value="'.$entity->getId().'" type="radio" class="dcheckbox" ></td>';
+                else
                     $tr[] = '<td><input name="id[]" value="'.$entity->getId().'" type="checkbox" class="dcheckbox" ></td>';
 
             }
