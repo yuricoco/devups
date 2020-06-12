@@ -28,16 +28,6 @@ class Dvups_admin extends Model implements JsonSerializable
      * @var string
      * */
     private $name;
-    /**
-     * @Column(name="phonenumber", type="string" , length=55 )
-     * @var string
-     * */
-    private $phonenumber;
-    /**
-     * @Column(name="email", type="string" , length=55 )
-     * @var string
-     * */
-    private $email;
 
     /**
      * @Column(name="login", type="string" , length=255 )
@@ -142,30 +132,6 @@ class Dvups_admin extends Model implements JsonSerializable
     }
 
     /**
-     * @return string
-     */
-    public function getCentername()
-    {
-        return $this->getApprovedCenter()->getName();
-    }
-
-    /**
-     * @return Approved_center
-     */
-    public function getApprovedCenter()
-    {
-        return $this->approved_center;
-    }
-
-    /**
-     * @param string $approved_center_id
-     */
-    public function setApproved_center($approved_center)
-    {
-        $this->approved_center = $approved_center;
-    }
-
-    /**
      *  manyToMany
      * @return \Dvups_role
      */
@@ -217,53 +183,6 @@ class Dvups_admin extends Model implements JsonSerializable
 //            "login" => $this->login,
 //            "password" => $this->password,
 //        ];
-    }
-
-    /**
-     * @return string
-     */
-    public function getPhonenumber()
-    {
-        return $this->phonenumber;
-    }
-
-    /**
-     * @param string $phonenumber
-     */
-    public function setPhonenumber($phonenumber)
-    {
-
-        if($error = \DClass\lib\Util::validation($phonenumber))
-            return $error;
-
-        $entity = self::where("this.phonenumber", $phonenumber)->__getOne();
-        if ($entity->getId() && $entity->getId() != $this->id) {
-            return t("Un admin avec ce phonenumber existe deja");
-        }
-
-        $this->phonenumber = $phonenumber;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    /**
-     * @param string $email
-     */
-    public function setEmail($email)
-    {
-
-        $entity = self::where("this.email", $email)->__getOne();
-        if ($entity->getId() && $entity->getId() != $this->id) {
-            return t("Un admin avec cet email existe deja");
-        }
-
-        $this->email = $email;
     }
 
     public function jsonSerialize()

@@ -11,13 +11,6 @@ class Dvups_adminController extends Controller {
         $this->err = array();
     }
 
-    public static function renderFormWidget($id = null) {
-        if($id)
-            Dvups_adminForm::__renderFormWidget(Dvups_admin::find($id), "update&id=".$id);
-        else
-            Dvups_adminForm::__renderFormWidget(new Dvups_admin(), 'create');
-    }
-
     public function resetcredential($id) {
 
         $dvups_admin = Dvups_admin::find($id);
@@ -79,7 +72,7 @@ class Dvups_adminController extends Controller {
         Dvups_roleController::getNavigationAction($admin);
 
         $_SESSION[ADMIN] = serialize($admin);
-        $_SESSION[LANG] = $_POST['lang'];
+        //$_SESSION[LANG] = $_POST['lang'];
 
         Local_contentController::buildlocalcachesinglelang($_POST['lang']);
 
@@ -142,28 +135,13 @@ class Dvups_adminController extends Controller {
         $id = $dvups_admin->__insert();
 
         // create curl resource
-        $this->sendmail($password, $dvups_admin);
+        // $this->sendmail($password, $dvups_admin);
 
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
             'tablerow' => Dvups_adminTable::init()->buildindextable()->getSingleRowRest($dvups_admin),
             'redirect' => Dvups_admin::classpath().'dvups-admin/added?login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-
-    }
-
-    private function sendmail($password, \Dvups_admin $dvups_admin){
-
-        include Dvups_admin::classroot('/Ressource/emailtemplate/mail.php') ;
-
-        $message_html = getmailtemplate($password, $dvups_admin);
-
-        $message_alt = 'Bonjour, ' . $dvups_admin->getName() . '
-							Bien vouloir utiliser ces parametres pour vous connecter sur '.PROJECT_NAME.':
-							Login: [' . $dvups_admin->getLogin() . ']; pwd: ['.$password.']';
-
-        \DClass\lib\SendMailContoller::sendmail($dvups_admin->getEmail(), $dvups_admin->getName(),
-            $message_html, t("Crédit de connexion"), $message_alt);
 
     }
 
