@@ -8,7 +8,7 @@ class Dvups_entityTable extends Datatable{
     public $entity = "dvups_entity";
 
     public $datatablemodel = [
-        ['header' => 'Name', 'value' => 'name'],
+        ['header' => 'Name', 'value' => 'name','search' => true],
         ['header' => 'Dvups_module', 'value' => 'Dvups_module.name'],
         ['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
     ];
@@ -26,6 +26,8 @@ class Dvups_entityTable extends Datatable{
     public function buildindextable(){
 
         // TODO: overwrite datatable attribute for this view
+        
+    $this->enablefilter();
 
         return $this;
     }

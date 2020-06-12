@@ -10,29 +10,19 @@ global $lang;
 
 function t($ref, $default = "", $local = null ){
 
-    $lang = GeneralinfoController::getdata()["info"];
-
-    if($local != "fr" && $local != "en"){
-        $local = DClass\lib\Util::local();
-    }
+    $lang = Local_contentController::getdata();
 
     if(!$default)
         $default = $ref;
 
-    $ref = strtolower($ref);
+    $ref = Local_content_key::key_sanitise($ref);
 
     if(!isset($lang[$ref])){
-        if(!isset($_SESSION[LANG."_collection"]))
-            $_SESSION[LANG."_collection"] = [];
-
-        $_SESSION[LANG."_collection"][$ref] = $default;
+        Local_contentController::newdatacollection($ref, $default);
         return $default;
     }
 
-    if(!isset($lang[$ref][$local]))
-        return $default;
-
-    return $lang[$ref][$local];
+    return $lang[$ref];
 
 }
 
@@ -50,4 +40,20 @@ function gettranslation($ref, $local = null, $default = "no translation found"){
 
     return $lang[$ref][$local];
 
+}
+
+function translatecollection(){
+
+    return Local_contentController::getdata();
+    $lang = GeneralinfoController::getdata()["info"];
+    $contentcollection = [];
+
+    if($local != "fr" && $local != "en")
+        $local = \DClass\lib\Util::local();
+
+    foreach ($lang as $ref => $translate){
+        $contentcollection[$ref] = $translate[$local];
+    }
+
+    return $contentcollection;
 }

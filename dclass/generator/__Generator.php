@@ -150,7 +150,11 @@ Usage:
      * @param type $namespace
      */
     public static function module($project, $namespace) {
-        $ns = str_replace("\\", "/", $namespace);
+        global $separator, $isWindows;
+        if($isWindows)
+            $ns = str_replace($separator, "/", $namespace);
+        else $ns = $namespace;
+        
         $mn = explode("/", $ns);
         
         $module = json_decode(file_get_contents(__DIR__ . "/../../src/" . $ns . "/" . strtolower($mn[1]) . "Core.json"));
@@ -173,7 +177,11 @@ Usage:
      */
     public static function __moduleendless($project, $namespace) {
 
-       $ns = str_replace("\\", "/", $namespace);
+       global $separator, $isWindows;
+        if($isWindows)
+            $ns = str_replace($separator, "/", $namespace);
+        else $ns = $namespace;
+
         $mn = explode("/", $ns);
         $module = __Generator::findmodule($project, $mn[1]);
 //        die(var_dump($module));
@@ -190,7 +198,10 @@ Usage:
      */
     public static function __index($project, $namespace) {
 
-       $ns = str_replace("\\", "/", $namespace);
+       global $separator, $isWindows;
+        if($isWindows)
+            $ns = str_replace($separator, "/", $namespace);
+        else $ns = $namespace;
         $mn = explode("/", $ns);
         $module = __Generator::findmodule($project, $mn[1]);
 
@@ -204,7 +215,10 @@ Usage:
      */
     public static function __dependencies($project, $namespace) {
 
-        $ns = str_replace("\\", "/", $namespace);
+        global $separator, $isWindows;
+        if($isWindows)
+            $ns = str_replace($separator, "/", $namespace);
+        else $ns = $namespace;
         $mn = explode("/", $ns);
         $module = __Generator::findmodule($project, $mn[1]);
 
@@ -220,7 +234,10 @@ Usage:
      */
     public static function __services($project, $namespace) {
 
-        $ns = str_replace("\\", "/", $namespace);
+        global $separator, $isWindows;
+        if($isWindows)
+            $ns = str_replace($separator, "/", $namespace);
+        else $ns = $namespace;
         $mn = explode("/", $ns);
         $module = __Generator::findmodule($project, $mn[1]);
 
@@ -234,7 +251,10 @@ Usage:
      */
     public static function __ressources($project, $namespace) {
 
-        $ns = str_replace("\\", "/", $namespace);
+        global $separator, $isWindows;
+        if($isWindows)
+            $ns = str_replace($separator, "/", $namespace);
+        else $ns = $namespace;
         $mn = explode("/", $ns);
         $module = __Generator::findmodule($project, $mn[1]);
         __Generator::$projectcore = $project;

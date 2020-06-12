@@ -68,7 +68,7 @@ class QueryBuilder extends \DBAL
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed $columns
+     * @param array|mixed $columns
      * @return $this
      */
     public function addselect($columns = "*", $object = null, $defaultjoin = true)
@@ -128,7 +128,7 @@ class QueryBuilder extends \DBAL
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed $columns
+     * @param array|mixed $columns
      * @return $this
      */
     public function join()
@@ -148,6 +148,7 @@ class QueryBuilder extends \DBAL
      * @example name, description, category
      * @param  array|mixed $columns
      * @return $this
+     * @example name, description, category
      */
     public function select($columns = '*', $object = null, $defaultjoin = true)
     {
@@ -307,7 +308,7 @@ class QueryBuilder extends \DBAL
     /**
      * Set the columns to be selected.
      *
-     * @param  array|mixed $columns
+     * @param array|mixed $columns
      * @return $this
      */
     public function selectcount($object = null)
@@ -413,12 +414,29 @@ class QueryBuilder extends \DBAL
         return $this;
     }
 
+    public $softdeletehandled = false;
+
+    public function handlesoftdelete()
+    {
+
+        $this->softdeletehandled = true;
+        if ($this->softdelete) {
+            if ($this->hasrelation)
+                $this->query .= ' where ' . $this->table . '.deleted_at is null ';
+            else
+                $this->query .= ' where deleted_at is null ';
+        }
+
+        return $this;
+
+    }
+
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|array|\Closure $column
-     * @param  string|null $operator
-     * @param  mixed $value
+     * @param string|array|\Closure $column
+     * @param string|null $operator
+     * @param mixed $value
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $link = "where")
@@ -428,6 +446,17 @@ class QueryBuilder extends \DBAL
 //            
 //        }
 //        $this->columns = is_array($columns) ? $columns : func_get_args();
+
+        if ($this->softdelete && $link == "where") {
+//            if($pos = strpos($sql, " where "))
+//                $sql .= ' and ' . $this->table . '.deleted_at is null ';
+//            else
+
+            if(!$this->softdeletehandled)
+                $this->query .= ' where ' . $this->table . '.deleted_at is null ';
+
+            $link = "and";
+        }
 
         if (is_object($column)) {
 
@@ -463,17 +492,17 @@ class QueryBuilder extends \DBAL
             }
         } else {
             $keymap = explode(".", $column);
-            if(count($keymap) == 2){
+            if (count($keymap) == 2) {
                 $this->query .= " " . $link . " " . $column;
-            }else{
+            } else {
                 $keymapattr = explode(" ", $column);
-                if(count($keymapattr) >= 2){
+                if (count($keymapattr) >= 2) {
                     $column = $keymapattr[0];
                     unset($keymapattr[0]);
                     $extra = implode(" ", $keymapattr);
-                    $this->query .= " " . $link .' `'.$column."` ".$extra;
-                }else
-                    $this->query .= " " . $link .' `'.$column."` ";
+                    $this->query .= " " . $link . ' `' . $column . "` " . $extra;
+                } else
+                    $this->query .= " " . $link . ' `' . $column . "` ";
             }
             //$this->query .= " " . $link . " " . $column;
             if ($operator) {
@@ -606,7 +635,7 @@ class QueryBuilder extends \DBAL
 
     private function initquery($columns)
     {
-        if($this->tablecollection)
+        if ($this->tablecollection)
             return " select " . $columns . " from `" . $this->tablecollection . "` ";
 
         return " select " . $columns . " from `" . $this->table . "` ";
@@ -662,7 +691,7 @@ class QueryBuilder extends \DBAL
 
     public function __getFirst($recursif = true, $collect = [])
     {
-        if(is_numeric($recursif))
+        if (is_numeric($recursif))
             $this->limit_iteration = $recursif;
 
         $this->setCollect($collect);
@@ -671,7 +700,7 @@ class QueryBuilder extends \DBAL
 
     public function __getLast($recursif = true, $collect = [])
     {
-        if(is_numeric($recursif))
+        if (is_numeric($recursif))
             $this->limit_iteration = $recursif;
 
         $this->setCollect($collect);
@@ -680,7 +709,7 @@ class QueryBuilder extends \DBAL
 
     public function __getIndex($index, $recursif = true, $collect = [])
     {
-        if(is_numeric($recursif))
+        if (is_numeric($recursif))
             $this->limit_iteration = $recursif;
 
         $this->setCollect($collect);
@@ -699,7 +728,7 @@ class QueryBuilder extends \DBAL
     public function __getAll($recursif = true, $collect = [])
     {
 
-        if(is_numeric($recursif))
+        if (is_numeric($recursif))
             $this->limit_iteration = $recursif;
 
         $this->setCollect($collect);
@@ -714,7 +743,7 @@ class QueryBuilder extends \DBAL
     public function __getOne($recursif = true, $collect = [])
     {
 
-        if(is_numeric($recursif))
+        if (is_numeric($recursif))
             $this->limit_iteration = $recursif;
 
         $this->setCollect($collect);

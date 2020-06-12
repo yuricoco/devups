@@ -3,9 +3,26 @@
 
 class Response
 {
+    static  function varName( $v ) {
+        $trace = debug_backtrace();
+        $vLine = file( __FILE__ );
+        $fLine = $vLine[ $trace[0]['line'] - 1 ];
+        preg_match( "#\\$(\w+)#", $fLine, $match );
+        return $match [1];
+    }
     public static $data = ["success" => true];
-    public static function set($key, $value){
+    public static function set($key, $value = ""){
+        if(!$value){
+            $value = $key;
+            $key = self::varName($key);
+        }
         self::$data[$key] = $value;
+    }
+    public static function fail($key = "", $value = ""){
+        self::$data["success"] = false;
+        if($key && $value){
+            self::$data[$key] = $value;
+        }
     }
     public static function json_response($options = 0, $depth = 512){
         global $_start;

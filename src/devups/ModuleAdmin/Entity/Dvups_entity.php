@@ -3,7 +3,7 @@
 /**
  * @Entity @Table(name="dvups_entity")
  * */
-class Dvups_entity extends Model implements JsonSerializable
+class Dvups_entity extends Model implements JsonSerializable, DvupsTranslation
 {
 
     /**
@@ -48,7 +48,7 @@ class Dvups_entity extends Model implements JsonSerializable
         $drigths = $entity->__hasmany(Dvups_right::class);
         $rights = [];
 
-        foreach ($drigths as $right){
+        foreach ($drigths as $right) {
             $rights[] = $right->getName();
         }
 
@@ -60,10 +60,21 @@ class Dvups_entity extends Model implements JsonSerializable
      */
     public function getLabel()
     {
-        if(!$this->label)
+        if (!$this->label)
             return $this->name;
 
-        return $this->label;
+        $ref =  "dvups_entitt_" . $this->id . "_label";
+
+//        $dvcontentlang = Dvups_contentlang::select()
+//            ->where("dvups_lang.ref", $ref)
+//            ->andwhere("lang", "en")->__getOne();
+//
+//        if ($dvcontentlang->getId())
+//            return $dvcontentlang->getContent();
+
+        //return $this->label;
+        return self::gettranslate($this, "label", $this->label);
+
     }
 
     function getLabelform()
@@ -86,7 +97,8 @@ class Dvups_entity extends Model implements JsonSerializable
         $this->label = $label;
     }
 
-    public function __construct($id = null) {
+    public function __construct($id = null)
+    {
 
         if ($id) {
             $this->id = $id;
@@ -96,19 +108,23 @@ class Dvups_entity extends Model implements JsonSerializable
         $this->dvups_right = EntityCollection::entity_collection('dvups_right');
     }
 
-    public function getId() {
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
@@ -117,7 +133,7 @@ class Dvups_entity extends Model implements JsonSerializable
      */
     public function getUrl()
     {
-        if(!$this->url)
+        if (!$this->url)
             return strtolower(str_replace('_', '-', $this->name));
 
         return $this->url;
@@ -128,7 +144,7 @@ class Dvups_entity extends Model implements JsonSerializable
      */
     public function setUrl($url)
     {
-        if(!$url)
+        if (!$url)
             $url = $this->name;
 
         $nameseo = str_replace('_', '-', $url); // supprime les autres caractères
@@ -139,33 +155,40 @@ class Dvups_entity extends Model implements JsonSerializable
 
     /**
      *  manyToOne
-     * 	@return \Dvups_module
+     * @return \Dvups_module
      */
-    function getDvups_module() {
+    function getDvups_module()
+    {
         return $this->dvups_module;
     }
 
-    function setDvups_module($dvups_module) {
+    function setDvups_module($dvups_module)
+    {
         $this->dvups_module = $dvups_module;
     }
-    function setDvups_right($dvups_right) {
+
+    function setDvups_right($dvups_right)
+    {
         $this->dvups_right = $dvups_right;
     }
 
-        /**
+    /**
      *  manyToMany
-     * 	@return \Dvups_right
+     * @return \Dvups_right
      */
-    function getDvups_right() {
+    function getDvups_right()
+    {
         return $this->dvups_right;
     }
 
-    function collectDvups_right() {
+    function collectDvups_right()
+    {
         $this->dvups_right = $this->__hasmany('dvups_right');
         return $this->dvups_right;
     }
 
-    function availableright() {
+    function availableright()
+    {
         $this->dvups_right = $this->__hasmany('dvups_right');
         if ($this->dvups_right) {
             foreach ($this->dvups_right as $right) {
@@ -177,15 +200,18 @@ class Dvups_entity extends Model implements JsonSerializable
         return [];
     }
 
-    function addDvups_right(\Dvups_right $dvups_right) {
+    function addDvups_right(\Dvups_right $dvups_right)
+    {
         $this->dvups_right[] = $dvups_right;
     }
 
-    function dropDvups_rightCollection() {
+    function dropDvups_rightCollection()
+    {
         $this->dvups_right = EntityCollection::entity_collection('dvups_right');
     }
 
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
             'name' => $this->name,
             'label' => $this->label,
@@ -194,10 +220,16 @@ class Dvups_entity extends Model implements JsonSerializable
         ];
     }
 
-//    public function dvupsTranslate()
-//    {
-//        // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
-//        $this->__inittranslate("label", $this->label, "en");
-//        $this->__inittranslate("label", $this->label, "fr");
-//    }
+    public function __delete($exec = true)
+    {
+        return parent::__delete($exec); // TODO: Change the autogenerated stub
+    }
+
+    public function dvupsTranslate()
+    {
+        // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
+        self::inittranslate($this,"label", $this->label, "en");
+        self::inittranslate($this,"label", $this->label, "fr");
+    }
+
 }

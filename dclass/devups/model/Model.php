@@ -17,7 +17,25 @@ abstract class Model extends \stdClass
 
     public static $jsonmodel;
     public $dvfetched = false;
+    public $dvsoftdelete = false;
     public $dvinrelation = false;
+
+
+    /**
+     * @Column(name="created_at", type="datetime" , nullable=true )
+     * @var string
+     **/
+    protected $created_at;
+    /**
+     * @Column(name="updated_at", type="datetime" , nullable=true )
+     * @var string
+     **/
+    protected $updated_at;
+    /**
+     * @Column(name="deleted_at", type="datetime" , nullable=true )
+     * @var string
+     **/
+    protected $deleted_at;
 
     //public $dverrormessage = "";
 
@@ -73,17 +91,63 @@ abstract class Model extends \stdClass
      */
     public static function classdir()
     {
-        return ROOT .'..'. self::classpath();
+        return ROOT . '..' . self::classpath();
     }
 
     public static function post($attribute, $default = null)
     {
 
         $class = strtolower(get_called_class());
-        if(isset($_POST[$class."_form"][$attribute]))
-            return $_POST[$class."_form"][$attribute];
+        if (isset($_POST[$class . "_form"][$attribute]))
+            return $_POST[$class . "_form"][$attribute];
         else
             return $default;
+
+    }
+
+    /**
+     *
+     * @param type $lable
+     * @param type $content
+     * @param type $lang
+     * @return \Dvups_lang
+     */
+    public static function inittranslate($entity, $column, $content, $lang = __lang)
+    {
+        $id = $entity->getId();
+        if (!$id || !$content)
+            return;
+
+        $table = strtolower(get_class($entity));
+        $ref = $table . "_" . $id . "_" . $column;
+
+        $dvlang = Dvups_lang::select()->where("ref", $ref)->__getOne();
+        $dvcontentlang = new Dvups_contentlang();
+
+        if ($dvlang->getId()) {
+            $dvcontentlang = Dvups_contentlang::select()
+                ->where("dvups_lang.ref", $dvlang->getRef())
+                ->andwhere("lang", $lang)
+                ->__getOne();
+            if (!$dvcontentlang->getId()) {
+                $dvcontentlang = new Dvups_contentlang();
+
+                $dvcontentlang->setDvups_lang($dvlang);
+                $dvcontentlang->setLang($lang);
+            }
+        } else {
+            $dvlang = new Dvups_lang();
+            $dvlang->setRef($ref);
+            $dvlang->set_table($table);
+            $dvlang->set_row($id);
+            $dvlang->set_column($column);
+            $dvlang->__save();
+
+            $dvcontentlang->setDvups_lang($dvlang);
+            $dvcontentlang->setLang($lang);
+        }
+        $dvcontentlang->setContent($content);
+        $dvcontentlang->__save();
 
     }
 
@@ -132,24 +196,50 @@ abstract class Model extends \stdClass
 
     }
 
-    public function __gettranslate($column, $lang = null)
+    public static function gettranslate($entity, $column, $default = null)
     {
-        if (!$this->id)
+        $id = $entity->getId();
+
+        if (!$id)
             return "";
 
-        if (!$lang)
-            $lang = local();
+        $lang = local();
         //$lang = __lang;
-        $table = strtolower(get_class($this));
-        $ref = $table . "_" . $this->id . "_" . $column;
+        $table = strtolower(get_class($entity));
+        $ref = $table . "_" . $id . "_" . $column;
 
         $dvcontentlang = Dvups_contentlang::select()
             ->where("dvups_lang.ref", $ref)
             ->andwhere("lang", $lang)->__getOne();
+
+        //dv_dump( $dvcontentlang->getId());
         if ($dvcontentlang->getId())
             return $dvcontentlang->getContent();
 
-        return $this->$column;
+        return $default;
+    }
+
+    public function __gettranslate($column, $default = null)
+    {
+        $id = $this->id;
+
+        if (!$id)
+            return "";
+
+        $lang = local();
+        //$lang = __lang;
+        $table = strtolower(get_class($this));
+        $ref = $table . "_" . $id . "_" . $column;
+
+        $dvcontentlang = Dvups_contentlang::select()
+            ->where("dvups_lang.ref", $ref)
+            ->andwhere("lang", $lang)->__getOne();
+
+        //dv_dump( $dvcontentlang->getId());
+        if ($dvcontentlang->getId())
+            return $dvcontentlang->getContent();
+
+        return $default;
     }
 
     /**
@@ -327,6 +417,7 @@ abstract class Model extends \stdClass
         $qb = new QueryBuilder($entity);
         return $qb->select($attribut)->where("this.id", $id)->exec(DBAL::$FETCH)[0];
     }
+
     /**
      * return the attribut as design in the database
      * @example http://easyprod.spacekola.com description
@@ -422,7 +513,8 @@ abstract class Model extends \stdClass
         if ($sort == 'id')
             $sort = $qb->getTable() . "." . $sort;
 
-        return $qb->select()->orderby($sort . " " . $order)->__getAll();
+        return $qb->select()->handlesoftdelete()->orderby($sort . " " . $order)->__getAll();
+
     }
 
     /**
@@ -441,14 +533,14 @@ abstract class Model extends \stdClass
         if ($sort == 'id')
             $sort = $qb->getTable() . "." . $sort;
 
-        return $qb->select()->orderby($sort . " " . $order)->__getAllRow();
+        return $qb->select()->handlesoftdelete()->orderby($sort . " " . $order)->__getAllRow();
     }
 
     /**
      * return instance of \QueryBuilder white the select request sequence.
-     * @example name, description, category if none has been set, all will be take.
      * @param string $columns
      * @return \QueryBuilder
+     * @example name, description, category if none has been set, all will be take.
      */
     public static function select($columns = '*')
     {
@@ -465,7 +557,8 @@ abstract class Model extends \stdClass
      * @param null $value
      * @return QueryBuilder
      */
-    public static function where($column, $operator = null, $value = null){
+    public static function where($column, $operator = null, $value = null)
+    {
         return self::select()->where($column, $operator, $value);
     }
 
@@ -512,6 +605,7 @@ abstract class Model extends \stdClass
      */
     public function __insert()
     {
+        $this->created_at = date(\DClass\lib\Util::dateformat);
         $dbal = new DBAL();
         return $dbal->createDbal($this);
     }
@@ -536,6 +630,7 @@ abstract class Model extends \stdClass
      */
     public function __update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true)
     {
+        $this->updated_at = date(\DClass\lib\Util::dateformat);
         $dbal = new DBAL();
         if (!$arrayvalues) {
             return $dbal->updateDbal($this);
@@ -648,10 +743,10 @@ abstract class Model extends \stdClass
     /**
      * @param $relation
      * @param bool $recursif
-     * @return $this
+     * @return $this | QueryBuilder
      * @throws ReflectionException
      */
-    public function __hasone($relation, $recursif = false)
+    public function __hasone($relation, $recursif = false, $get = true)
     {
         if (!is_object($relation)) :
             $reflection = new ReflectionClass($relation);
@@ -659,7 +754,10 @@ abstract class Model extends \stdClass
         endif;
 
         $qb = new QueryBuilder($relation);
-        return $qb->select()->where("this.".strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
+        if ($get)
+            return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
+
+        return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId());
     }
 
     public function __get($attribut)
@@ -693,6 +791,57 @@ abstract class Model extends \stdClass
     }
 
     /**
+     * @return string
+     */
+    public function getCreatedAt($format = "")
+    {
+        if(!$format)
+            return $this->created_at;
+
+        return  date($format, strtotime($this->created_at));
+    }
+
+    /**
+     * @param string $created_at
+     */
+    public function setCreatedAt($created_at)
+    {
+        $this->created_at = $created_at;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUpdatedAt()
+    {
+        return $this->updated_at;
+    }
+
+    /**
+     * @param string $updated_at
+     */
+    public function setUpdatedAt($updated_at)
+    {
+        $this->updated_at = $updated_at;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDeletedAt()
+    {
+        return $this->deleted_at;
+    }
+
+    /**
+     * @param string $deleted_at
+     */
+    public function setDeletedAt($deleted_at)
+    {
+        $this->deleted_at = $deleted_at;
+    }
+
+    /**
      * Get value of entity X in $_POST global variable from submited form
      * @param string $formfeild
      * @return mixed
@@ -704,5 +853,17 @@ abstract class Model extends \stdClass
 //        return $_POST[$classname."_form['$formfeild']"];
 //
 //    }
+
+    /**
+     * @inheritDoc
+     */
+    public function jsonSerialize()
+    {
+        return [
+            "created_at" => $this->created_at,
+            "updated_at" => $this->updated_at,
+            "deleted_at" => $this->deleted_at,
+        ];
+    }
 
 }

@@ -12,8 +12,8 @@ if (file_exists(__DIR__ . '/../vendor')) {
 
 require __DIR__ . '/constante.php';
 require __DIR__ . '/Database.php';
-require __DIR__ . '/dvups_functions.php';
 
+require __DIR__ . '/../dclass/dvups_functions.php';
 require __DIR__ . '/../dclass/lib/lib_dependances.php';
 
 require __DIR__ . '/../admin/generator/TableTemplateRender.php';

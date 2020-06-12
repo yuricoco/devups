@@ -15,6 +15,7 @@ class Request {
 
     public static $uri_get_param = [];
     public static $uri_post_param = [];
+    private static $uri_raw_param = [];
 
     function __construct($default_path = 'hello') {
 

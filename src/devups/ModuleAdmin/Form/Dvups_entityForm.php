@@ -10,12 +10,24 @@ class Dvups_entityForm extends FormManager
         $entitycore->formaction = $action;
         $entitycore->formbutton = $button;
 
+        if($dvups_entity->getId()){
 
-        $entitycore->field['name'] = [
-            "label" => 'Name',
-            "type" => FORMTYPE_TEXT,
-            "value" => $dvups_entity->getName(),
-        ];
+            $entitycore->field['name'] = [
+                "label" => 'Name',
+                "type" => FORMTYPE_TEXT,
+                "directive" => ["readonly"=>true],
+                "value" => $dvups_entity->getName(),
+            ];
+
+        }else{
+
+            $entitycore->field['name'] = [
+                "label" => 'Name',
+                "type" => FORMTYPE_TEXT,
+                "value" => $dvups_entity->getName(),
+            ];
+
+        }
 
         $entitycore->field['label'] = [
             "label" => 'Label',

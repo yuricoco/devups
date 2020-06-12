@@ -3,6 +3,7 @@
 	require 'Form/Dvups_adminForm.php';
 	require 'Datatable/Dvups_adminTable.php';
 	require 'Controller/Dvups_adminController.php';
+	require 'Controller/Dvups_adminFrontController.php';
 
 	require 'Entity/Dvups_module.php';
 	require 'Form/Dvups_moduleForm.php';

@@ -27,7 +27,7 @@ class Dvups_roleTable extends Datatable
     public function buildindextable()
     {
 
-        // TODO: overwrite datatable attribute for this view
+        $this->topactions[] = "updateprivilege";
 
         return $this;
     }

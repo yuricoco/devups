@@ -205,4 +205,20 @@ class Dvups_role extends Model implements JsonSerializable {
         return false;
     }
 
+    public function isIn($roles)
+    {
+        if(in_array($this->name,  $roles))
+            return true;
+
+        return false;
+    }
+
+    public static function updateprivilegeAction(){
+
+        $admin = getadmin();
+        if($admin->dvups_role->is("admin"))
+            return '<button onclick="model.updateprivilege()"  class=\'btn btn-info\'> '.t("Update Privilege").' </button>';
+
+    }
+
 }

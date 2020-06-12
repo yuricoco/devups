@@ -87,7 +87,7 @@ class BackendGenerator {
         }
         
                         ";
-                } elseif ($relation->cardinality == 'oneToOne' or $relation->nullable == 'DEFAULT') {
+                } elseif ($relation->cardinality == 'oneToOne' ) { // or $relation->nullable == 'DEFAULT'
 
                     $construteur .= "\n\t$" . "this->" . $relation->entity . " = new " . ucfirst($relation->entity) . "();";
 

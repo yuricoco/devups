@@ -6,4 +6,3 @@
  * and open the template in the editor.
  */
 
-//require __DIR__ . '/Imagemodel.php';

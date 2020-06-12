@@ -561,7 +561,7 @@ class Dfile {
     /**
      * delete the file named $image
      *
-     * @param type $name_file the name of the file you want to delete
+     * @param string $name_file the name of the file you want to delete
      * @return boolean true if file delete an array if the file doesn't exist
      */
     public static function deleteFile($name_file, $path = '', $absolute = false) {

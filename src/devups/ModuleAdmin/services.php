@@ -147,10 +147,7 @@ switch (Request::get('path')) {
         break;
 
     case 'dvups_:update':
-        if (Core::updateDvupsTable())
-            echo "Data admin updated with success";
-        else
-            echo "Data admin already uptodate";
+        g::json_encode($dvups_roleCtrl->privilegeUpdate());
         break;
 
     default:

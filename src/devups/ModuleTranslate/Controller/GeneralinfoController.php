@@ -8,12 +8,11 @@ use dclass\devups\Controller\Controller;
  * Date: 13/03/2019
  * Time: 5:38 PM
  */
-
 class GeneralinfoController extends Controller
 {
 
-    private static $path = ROOT."config/generalinfo.json";
-    const pathmodule = ROOT."web/app3/frontend1/src/devupsjs/";
+    private static $path = ROOT . "config/generalinfo.json";
+    const pathmodule = ROOT . "web/app3/frontend1/src/devupsjs/";
 
     public static function parsedatalangphparraytojson()
     {
@@ -32,7 +31,7 @@ class GeneralinfoController extends Controller
     public static function newdatafromentitycorecollection()
     {
 
-        if (!isset($_SESSION[LANG . "_collection"]) || !count($_SESSION[LANG . "_collection"]))
+        if (!isset($_SESSION[dv_lang_collection]) || !count($_SESSION[dv_lang_collection]))
             return ["success" => false, "message" => "no data to collect"];
 
         $content = file_get_contents(self::$path);
@@ -42,25 +41,30 @@ class GeneralinfoController extends Controller
     public static function newdatafromsessioncollection()
     {
 
-        if(!isset($_SESSION[LANG."_collection"]) || !count($_SESSION[LANG."_collection"]))
-            return ["success" => false, "message"=>"no data to collect"];
+        if (!isset($_SESSION[dv_lang_collection]) || !count($_SESSION[dv_lang_collection]))
+            return ["success" => false, "message" => "no data to collect"];
 
         $content = file_get_contents(self::$path);
         $info = json_decode($content, true);
 
-        foreach ($_SESSION[LANG."_collection"] as $default){
-            $info[$default] = ["en"=>$default, "fr"=>$default];
+        foreach ($_SESSION[dv_lang_collection] as $ref => $default) {
+            $info[$ref] = ["en" => $default, "fr" => $default];
         }
 
-        $contenu = json_encode($info, 1024);
 
-        $entityrooting = fopen(self::$path, 'w');
-        fputs($entityrooting, $contenu);
-        fclose($entityrooting);
+        if ($info) {
+            $contenu = json_encode($info, 1024);
 
-        $_SESSION[LANG."_collection"] = [];
+            $entityrooting = fopen(self::$path, 'w');
+            fputs($entityrooting, $contenu);
+            fclose($entityrooting);
 
-        return ["success" => true];
+            // $_SESSION[LANG."_collection"] = [];
+
+            return ["success" => true, "data" => $info];
+        }
+
+        return ["success" => false, "data" => $info];
 
     }
 
@@ -106,20 +110,20 @@ class GeneralinfoController extends Controller
 
         $keyfamilly = [];
         $contentcollection = [];
-        foreach ($lang as $ref => $translate){
+        foreach ($lang as $ref => $translate) {
             $familly = explode('.', $ref);
 
-            if(!in_array($familly[0], $keyfamilly)){
+            if (!in_array($familly[0], $keyfamilly)) {
                 $keyfamilly[] = $familly[0];
                 $collection["en"][$familly[0]] = [];
                 $collection["fr"][$familly[0]] = [];
             }
 //            $keyfamilly[] = explode('.', $ref);
             //if (preg_match_all("/$familly[0]"."./", $ref)){
-            if(!isset($familly[1]) ){ //&& !isset($collection["en"][$familly[0]])
+            if (!isset($familly[1])) { //&& !isset($collection["en"][$familly[0]])
                 $collection["en"][$familly[0]] = $translate["en"];
                 $collection["fr"][$familly[0]] = $translate["fr"];
-            }else{
+            } else {
                 $collection["en"][$familly[0]][$familly[1]] = $translate["en"];
                 $collection["fr"][$familly[0]][$familly[1]] = $translate["fr"];
             }
@@ -138,9 +142,9 @@ class GeneralinfoController extends Controller
 //            $contentcollection[str_replace(".", "_", $ref)] = $translate["fr"];
 //        }
 
-        $entityrooting = fopen(self::pathmodule."lang.js", 'w');
+        $entityrooting = fopen(self::pathmodule . "lang.js", 'w');
         //fputs($entityrooting, json_encode($collection));
-        fputs($entityrooting, "export default ". json_encode($collection));
+        fputs($entityrooting, "export default " . json_encode($collection));
         fclose($entityrooting);
 
         return ["success" => true];

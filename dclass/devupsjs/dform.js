@@ -4,6 +4,19 @@
 
 var entityid = 0;
 var dform = {
+    geterror(error){
+        var errorarray = [];
+        var keys = Object.keys(error);
+        var values = Object.values(error);
+        for (var i = 0; i < keys.length; i++) {
+            errorarray.push( "<b>" + keys[i] + "</b> : " + values[i]+ "");
+        }
+
+        return  '<div class="alert alert-danger alert-dismissable">\n' +
+            '                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>\n' +
+            '                                '+ errorarray.join("<br>") +'.\n' +
+            '                            </div>';
+    },
     binderror: function(error){
 
         if(!error)
@@ -12,16 +25,13 @@ var dform = {
         //model.modalbody.find("#loader").remove();
         //model.modalboxcontainer.find("#loader").remove();
         //console.log(response.error);
-        var errorarray = [];
-        var keys = Object.keys(error);
-        var values = Object.values(error);
-        for (var i = 0; i < keys.length; i++) {
-            errorarray.push( "<b>" + keys[i] + "</b> : " + values[i]+ "");
+
+        if($("#form-error").length){
+            $("#form-error").html(this.geterror(error));
+            return ;
         }
-        model.modalboxcontainer.prepend('<div class="alert alert-danger alert-dismissable">\n' +
-            '                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>\n' +
-            '                                '+ errorarray.join("<br>") +'.\n' +
-            '                            </div>');
+
+        model.modalboxcontainer.append(this.geterror(error));
 
     },
     callbackcreate : function (response){
@@ -63,7 +73,52 @@ var dform = {
     },
     callback:null,
     formdata:null,
+    currentform:null,
     _submit: function(el, url, next){
+        // var formserialize = $(this).serialize();
+        // console.log(formserialize);
+        if (! url){
+            var actionarray = $(el).attr("action").split("/");
+            url = actionarray[1];
+        }
+
+        this.currentform = $(el);
+        this.currentbtnsubmit = $(el).find("button[type=submit]");
+
+        this.currentbtnsubmit.attr("disabled", true);
+        this.currentbtnsubmit.prepend('<span class="spinner-border spinner-border-sm mr-2" role="status"></span>');
+
+        this.callback = function (response) { console.log(response); };
+        dform.entityid = $(el).data("id");
+
+        if(dform.entityid){
+            //action = actionarray[1];
+            //action = "update&id="+entityid;
+            this.callback = dform.callbackupdate;
+        }else{
+            this.callback = dform.callbackcreate;
+        }
+
+        this.formdata = model._formdata($(el));
+        console.log(model.entity+'.'+url);
+        // if(next){
+        //     next(model.entity+'.'+url);
+        //     return 0;
+        // }
+        //return ;
+
+        model._post(model.entity+'.'+url, this.formdata, (response)=> {
+
+            this.currentbtnsubmit.attr("disabled", false);
+            this.currentbtnsubmit.find(".spinner-border").remove();
+
+            this.callback(response);
+
+        });
+
+        return false;
+    },
+    _apisubmit: function(el, url, next){
         // var formserialize = $(this).serialize();
         // console.log(formserialize);
         if (! url){
@@ -83,12 +138,12 @@ var dform = {
         }
 
         this.formdata = model._formdata($(el));
-        console.log(model.entity+'.'+url);
+        console.log(url);
         // if(next){
         //     next(model.entity+'.'+url);
         //     return 0;
         // }
-        model._post(model.entity+'.'+url, this.formdata, this.callback);
+        model._apipost(url, this.formdata, this.callback);
 
         return false;
     },

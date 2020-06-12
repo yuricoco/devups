@@ -86,7 +86,7 @@ class Dvups_roleController extends Controller
 
         $lazyloading = $this->lazyloading(new Dvups_role(), $next, $per_page);
 
-        //self::$jsfiles[] = Client::classpath('Ressource/js/dvups_roleCtrl.js');
+        self::$jsfiles[] = Dvups_role::classpath('Ressource/js/dvups_roleCtrl.js');
 
         $this->entitytarget = 'dvups_role';
         $this->title = "Manage Role";
@@ -96,9 +96,12 @@ class Dvups_roleController extends Controller
         ];
 
         $this->renderListView(
-            Datatable::buildtable($lazyloading, $datatablemodel)
-                ->render()
+            Dvups_roleTable::init($lazyloading)->buildindextable()->render()
         );
+//        $this->renderListView(
+//            Datatable::buildtable($lazyloading, $datatablemodel)
+//                ->render()
+//        );
 
     }
 
@@ -196,6 +199,19 @@ class Dvups_roleController extends Controller
             'dvups_role' => $dvups_role,
             'action_form' => 'update&id=' . $id, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+    }
+
+    public function privilegeUpdate(){
+        $result = Core::updateDvupsTable();
+        if ($result)
+            $message = "Data admin updated with success";
+        else
+            $message = "Data admin already uptodate";
+
+        return array('success' => true,
+            'message' => $message,
+            'detail' => '');
 
     }
 

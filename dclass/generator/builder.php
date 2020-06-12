@@ -12,21 +12,34 @@ require __DIR__ . '/__Generator.php';
 require __DIR__ . '/android/__Generatorjava.php';
 
 
+global $separator, $isWindows;
+$isWindows = false;
+$separator = '/';
+
+//If the first three characters PHP_OS are equal to "WIN",
+//then PHP is running on a Windows operating system.
+if(strcasecmp(substr(PHP_OS, 0, 3), 'WIN') == 0){
+    $isWindows = true;
+    $separator = '\\';
+}
+
 $module_entities = [];
 
 function getproject($namespace) {
+    global $separator;
     // get all components building the global project
     $components = Core::buildOriginCore();
 
-    $ns = explode("\\", $namespace);
+    $ns = explode($separator, $namespace);
     return __Generator::findproject($components, $ns[0]);
 }
 
 function getcomponent($namespace) {
+    global $separator;
     // get all components building the global project
     $components = Core::getComponentCore();
 
-    $ns = explode("\\", $namespace);
+    $ns = explode($separator, $namespace);
     return __Generator::findproject($components, $ns[0]);
 
 }
@@ -170,9 +183,11 @@ if (isset($argv[2])) {
 
         case 'install':
 
-            if (!file_exists("admin/cache")) {
-                echo " > admin/cache folder created with success ...\n";
-                mkdir('admin/cache', 0777);
+            if (!file_exists("cache")) {
+                echo " > /cache folders created with success ...\n";
+                mkdir('cache', 0777);
+                mkdir('cache/blade', 0777);
+                mkdir('cache/lang', 0777);
             }
 
             RequestGenerator::databasecreate(dbname); //, 

@@ -1,0 +1,80 @@
+[26-Apr-2020 09:46:10 Europe/Paris] PHP Fatal error:  Uncaught Error: Class 'DClass\devups\Datatable' not found in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php:98
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/index.php(62): Dvups_roleController->listView()
+#1 {main}
+  thrown in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php on line 98
+[26-Apr-2020 09:46:11 Europe/Paris] PHP Fatal error:  Uncaught Error: Class 'DClass\devups\Datatable' not found in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php:98
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/index.php(62): Dvups_roleController->listView()
+#1 {main}
+  thrown in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php on line 98
+[26-Apr-2020 09:46:18 Europe/Paris] PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\FatalThrowableError: Class 'Controller' not found in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php:5
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0d70869e566000342c608374575a01b898be4408.php(44): style()
+#1 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/PhpEngine.php(43): include('/home/spacesad/...')
+#2 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/spacesad/...', Array)
+#3 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/spacesad/...', Array)
+#4 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(125): Illuminate\View\View->getContents()
+#5 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(90): Illuminate\View\View->renderConte in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php on line 5
+[26-Apr-2020 09:46:18 Europe/Paris] PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\FatalThrowableError: Class 'Controller' not found in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php:5
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0d70869e566000342c608374575a01b898be4408.php(44): style()
+#1 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/PhpEngine.php(43): include('/home/spacesad/...')
+#2 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/spacesad/...', Array)
+#3 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/spacesad/...', Array)
+#4 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(125): Illuminate\View\View->getContents()
+#5 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(90): Illuminate\View\View->renderConte in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php on line 5
+[26-Apr-2020 09:46:31 Europe/Paris] PHP Fatal error:  Uncaught Error: Class 'DClass\devups\Datatable' not found in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php:98
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/index.php(62): Dvups_roleController->listView()
+#1 {main}
+  thrown in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php on line 98
+[26-Apr-2020 09:46:32 Europe/Paris] PHP Fatal error:  Uncaught Error: Class 'DClass\devups\Datatable' not found in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php:98
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/index.php(62): Dvups_roleController->listView()
+#1 {main}
+  thrown in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php on line 98
+[26-Apr-2020 09:46:35 Europe/Paris] PHP Fatal error:  Uncaught Error: Class 'DClass\devups\Datatable' not found in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php:98
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/index.php(62): Dvups_roleController->listView()
+#1 {main}
+  thrown in /home/spacesad/virtualdoctor.spacekola.com/src/devups/ModuleAdmin/Controller/Dvups_roleController.php on line 98
+[26-Apr-2020 09:46:37 Europe/Paris] PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\FatalThrowableError: Class 'Controller' not found in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php:5
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0d70869e566000342c608374575a01b898be4408.php(44): style()
+#1 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/PhpEngine.php(43): include('/home/spacesad/...')
+#2 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/spacesad/...', Array)
+#3 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/spacesad/...', Array)
+#4 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(125): Illuminate\View\View->getContents()
+#5 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(90): Illuminate\View\View->renderConte in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php on line 5
+[26-Apr-2020 09:46:37 Europe/Paris] PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\FatalThrowableError: Class 'Controller' not found in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php:5
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0d70869e566000342c608374575a01b898be4408.php(44): style()
+#1 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/PhpEngine.php(43): include('/home/spacesad/...')
+#2 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/spacesad/...', Array)
+#3 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/spacesad/...', Array)
+#4 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(125): Illuminate\View\View->getContents()
+#5 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(90): Illuminate\View\View->renderConte in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php on line 5
+[26-Apr-2020 09:46:41 Europe/Paris] PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\FatalThrowableError: Class 'Controller' not found in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php:5
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0d70869e566000342c608374575a01b898be4408.php(44): style()
+#1 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/PhpEngine.php(43): include('/home/spacesad/...')
+#2 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/spacesad/...', Array)
+#3 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/spacesad/...', Array)
+#4 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(125): Illuminate\View\View->getContents()
+#5 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(90): Illuminate\View\View->renderConte in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php on line 5
+[26-Apr-2020 09:46:42 Europe/Paris] PHP Fatal error:  Uncaught Symfony\Component\Debug\Exception\FatalThrowableError: Class 'Controller' not found in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php:5
+Stack trace:
+#0 /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0d70869e566000342c608374575a01b898be4408.php(44): style()
+#1 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/PhpEngine.php(43): include('/home/spacesad/...')
+#2 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/Engines/CompilerEngine.php(59): Illuminate\View\Engines\PhpEngine->evaluatePath('/home/spacesad/...', Array)
+#3 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(142): Illuminate\View\Engines\CompilerEngine->get('/home/spacesad/...', Array)
+#4 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(125): Illuminate\View\View->getContents()
+#5 /home/spacesad/virtualdoctor.spacekola.com/vendor/illuminate/view/View.php(90): Illuminate\View\View->renderConte in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/0eb790ad7e0918b638ff6970c48ec9b084292575.php on line 5
+[26-Apr-2020 09:53:54 Europe/Paris] PHP Warning:  strtolower() expects parameter 1 to be string, object given in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/155958c2087c78f2c0f3bd5bb5f2336849284743.php on line 45
+[26-Apr-2020 14:47:24 Europe/Paris] PHP Warning:  strtolower() expects parameter 1 to be string, object given in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/155958c2087c78f2c0f3bd5bb5f2336849284743.php on line 45
+[26-Apr-2020 14:47:25 Europe/Paris] PHP Warning:  strtolower() expects parameter 1 to be string, object given in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/155958c2087c78f2c0f3bd5bb5f2336849284743.php on line 45
+[26-Apr-2020 14:47:28 Europe/Paris] PHP Warning:  strtolower() expects parameter 1 to be string, object given in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/155958c2087c78f2c0f3bd5bb5f2336849284743.php on line 45
+[26-Apr-2020 14:47:30 Europe/Paris] PHP Warning:  strtolower() expects parameter 1 to be string, object given in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/155958c2087c78f2c0f3bd5bb5f2336849284743.php on line 45
+[26-Apr-2020 14:51:19 Europe/Paris] PHP Warning:  strtolower() expects parameter 1 to be string, object given in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/155958c2087c78f2c0f3bd5bb5f2336849284743.php on line 45
+[26-Apr-2020 14:51:20 Europe/Paris] PHP Warning:  strtolower() expects parameter 1 to be string, object given in /home/spacesad/virtualdoctor.spacekola.com/admin/cache/155958c2087c78f2c0f3bd5bb5f2336849284743.php on line 45

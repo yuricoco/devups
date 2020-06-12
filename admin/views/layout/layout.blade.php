@@ -31,14 +31,6 @@
         var __env = '<?= __env ?>';
         var __lang = '<?= __lang ?>';
         var _t = <?= json_encode([]) ?>;
-
-        var __name = "";
-        var __phone = "";
-        var __location = "";
-        var __bp = "";
-        var __rc = "";
-        var __contrib = "";
-        var __description = "";
     </script>
 </head>
 

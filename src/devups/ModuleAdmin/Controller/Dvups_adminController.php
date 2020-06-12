@@ -54,6 +54,7 @@ class Dvups_adminController extends Controller {
     public function deconnexionAction() {
 
         $_SESSION[ADMIN] = array();
+        unset($_SESSION[LANG]);
         unset($_SESSION[ADMIN]);
         unset($_SESSION[dv_role_permission]);
         unset($_SESSION[dv_role_navigation]);
@@ -79,6 +80,8 @@ class Dvups_adminController extends Controller {
 
         $_SESSION[ADMIN] = serialize($admin);
         $_SESSION[LANG] = $_POST['lang'];
+
+        Local_contentController::buildlocalcachesinglelang($_POST['lang']);
 
         $admin->setLastloginAt(date("Y-m-d H:i:s"));
         $admin->__update("lastlogin_at", date("Y-m-d H:i:s"))->exec();
@@ -127,7 +130,7 @@ class Dvups_adminController extends Controller {
 
         if ( $this->error ) {
             return 	array(	'success' => false,
-                'testentity' => $dvups_admin,
+                'dvups_admin' => $dvups_admin,
                 'action_form' => 'create',
                 'error' => $this->error);
         }
@@ -138,11 +141,29 @@ class Dvups_adminController extends Controller {
 
         $id = $dvups_admin->__insert();
 
+        // create curl resource
+        $this->sendmail($password, $dvups_admin);
+
         return array('success' => true, // pour le restservice
             'dvups_admin' => $dvups_admin,
             'tablerow' => Dvups_adminTable::init()->buildindextable()->getSingleRowRest($dvups_admin),
             'redirect' => Dvups_admin::classpath().'dvups-admin/added?login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+
+    }
+
+    private function sendmail($password, \Dvups_admin $dvups_admin){
+
+        include Dvups_admin::classroot('/Ressource/emailtemplate/mail.php') ;
+
+        $message_html = getmailtemplate($password, $dvups_admin);
+
+        $message_alt = 'Bonjour, ' . $dvups_admin->getName() . '
+							Bien vouloir utiliser ces parametres pour vous connecter sur '.PROJECT_NAME.':
+							Login: [' . $dvups_admin->getLogin() . ']; pwd: ['.$password.']';
+
+        \DClass\lib\SendMailContoller::sendmail($dvups_admin->getEmail(), $dvups_admin->getName(),
+            $message_html, t("Crédit de connexion"), $message_alt);
 
     }
 
@@ -206,29 +227,20 @@ class Dvups_adminController extends Controller {
 
     public function datatable($next, $per_page)
     {
+
         $qb = Dvups_admin::select()
             ->where("login", "!=", "dv_admin");
         //->andwhere("password", "!=", sha1("admin"));
+
+        $admin = getadmin();
+        $approved_centre = $admin->getApprovedCenter();
+        if ($approved_centre->getId())
+            $qb = $qb->andwhere($approved_centre);
 
         $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb,"dvups_admin.id desc");
         return ['success' => true,
             'datatable' => Dvups_adminTable::init($lazyloading)->buildindextable()->getTableRest(),
         ];
-    }
-
-    public function listAction($next = 1, $per_page = 10)
-    {
-
-        $qb = Dvups_admin::select()
-            ->where("login", "!=", "dv_admin");
-        //->andwhere("password", "!=", sha1("admin"));
-
-        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb, "dvups_admin.id desc");
-
-        return array('success' => true, // pour le restservice
-            'lazyloading' => $lazyloading, // pour le web service
-            'detail' => '');
-
     }
 
     public function listView($next = 1, $per_page = 10)
@@ -237,6 +249,11 @@ class Dvups_adminController extends Controller {
         $qb = Dvups_admin::select()
             ->where("login", "!=", "dv_admin");
         //->andwhere("password", "!=", sha1("admin"));
+
+        $admin = getadmin();
+        $approved_centre = $admin->getApprovedCenter();
+        if ($approved_centre->getId())
+            $qb = $qb->andwhere($approved_centre);
 
         $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb, "dvups_admin.id desc");
 
@@ -251,6 +268,13 @@ class Dvups_adminController extends Controller {
                 ->render()
         );
 
+    }
+
+    public function deleteAction($id)
+    {
+        $admin = Dvups_admin::find($id);
+        $admin->__delete();
+        return ["success"=>true];
     }
 
 }

@@ -201,11 +201,7 @@ var model = {
             success: callback,
             error: function (e) {
                 console.log(e);//responseText
-                if(e.status === 0){
-                    var event = document.createEvent('Event');
-                    event.initEvent("connectionLost", true, true);
-                    window.dispatchEvent(event);
-                }
+                callback(e.responseText)
             }
         });
     },

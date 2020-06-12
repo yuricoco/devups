@@ -10,7 +10,7 @@ class Dvups_moduleTable extends Datatable
 
     public $datatablemodel = [
         ['header' => 'Favicon', 'value' => 'printicon'],
-        ['header' => 'Name', 'value' => 'name'],
+        ['header' => 'Name', 'value' => 'name', 'search' => true],
         ['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
     ];
 

@@ -118,6 +118,7 @@ class Controller {
         $this->currentqb = $qb;
         $getparam = Request::$uri_get_param;
 
+        $this->currentqb->handlesoftdelete();
         foreach ($getparam as $key => $value) {
 
             if(!$value)
@@ -176,10 +177,12 @@ class Controller {
         } else {
 
             if (Request::get("dfilters")) {
+
                 $qbcustom = $this->filter($entity, $qb);
                 $nb_element = $qbcustom->__countEl(false, true);
             } else {
-                $nb_element = $qb->selectcount()->__countEl(false);
+                //$qb->handlesoftdelete();
+                $nb_element = $qb->selectcount()->handlesoftdelete()->__countEl(false);
             }
         }
 
@@ -206,9 +209,9 @@ class Controller {
 
             } else {
                 if ($order)
-                    $listEntity = $qb->select()->orderby($order)->limit($next, $per_page)->__getAll();
+                    $listEntity = $qb->select()->handlesoftdelete()->orderby($order)->limit($next, $per_page)->__getAll();
                 else
-                    $listEntity = $qb->select()->limit($next, $per_page)->__getAll();
+                    $listEntity = $qb->select()->handlesoftdelete()->limit($next, $per_page)->__getAll();
 
             }
 
@@ -229,10 +232,11 @@ class Controller {
                     $listEntity = $qbcustom->__getAll();
                 }
             }else{
+                //$qb->handlesoftdelete();
                 if ($order) {
-                    $listEntity = $qb->select()->orderby($order)->__getAll();
+                    $listEntity = $qb->select()->handlesoftdelete()->orderby($order)->__getAll();
                 } else {
-                    $listEntity = $qb->select()->__getAll();
+                    $listEntity = $qb->select()->handlesoftdelete()->__getAll();
                 }
             }
             $per_page = $nb_element;
@@ -314,6 +318,7 @@ class Controller {
      * @return mixed
      */
     public function form_fillingentity($object, $data = null, $entityform = null, $deeper = false) {
+        $this->error = [];
         if (!is_object($object))
             throw new \InvalidArgumentException('$object must be an object.');
 

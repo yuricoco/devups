@@ -125,7 +125,6 @@ class Genesis {
 
         $blade = new Blade($viewdir, admin_dir . "cache");
         echo $blade->view()->make($view, $data)->render();
-
     }
 
 

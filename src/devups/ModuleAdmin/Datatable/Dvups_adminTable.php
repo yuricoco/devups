@@ -8,11 +8,6 @@ class Dvups_adminTable extends Datatable
 
     public $entity = "dvups_admin";
 
-    public $datatablemodel = [
-        ['header' => 'nom', 'value' => 'name'],
-        ['header' => 'login', 'value' => 'login'],
-    ];
-
     public function __construct($lazyloading = null, $datatablemodel = [])
     {
         parent::__construct($lazyloading, $datatablemodel);
@@ -26,11 +21,14 @@ class Dvups_adminTable extends Datatable
 
     public function buildindextable()
     {
-//        $this->datatablemodel = [
-//            ['header' => 'nom', 'value' => 'name'],
-//            ['header' => 'login', 'value' => 'login'],
-//            ['header' => 'password', 'value' => 'password'],
-//        ];
+        $this->datatablemodel = [
+            ['header' => 'nom', 'value' => 'name', 'search' => true],
+            ['header' => t('phonenumber'), 'value' => 'phonenumber', 'search' => true],
+            ['header' => 'Email', 'value' => 'email', 'search' => true],
+            ['header' => 'login', 'value' => 'login', 'search' => true],
+            ['header' => 'Role', 'value' => 'dvups_role.name'],
+            ['header' => 'Of center', 'value' => 'centername'],
+        ];
 
         $this->addcustomaction("callbackbtn");
         return $this;

@@ -65,6 +65,11 @@ class DBAL extends Database {
      *
      * @var type
      */
+    protected $softdelete = false;
+    /**
+     *
+     * @var type
+     */
     private $select;
 
     /**
@@ -488,7 +493,10 @@ class DBAL extends Database {
     public function executeDbal($sql, $values = [], $action = 0) {
 
         $query = $this->link->prepare($sql);
-        $return = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
+        $return = $query->execute($values) or die (Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
+
+//        if(!$return["success"])
+//            return $return;
 
         if ($action ==  self::$NOTHING) {
             // nothing
@@ -623,6 +631,8 @@ class DBAL extends Database {
         }
 //        var_dump( $this->objectVar);
         $sql .= ' where ' . $this->table . '.' . $this->objectVar[0] . ' = ? ';
+        if($this->softdelete)
+            $sql .= ' and ' . $this->table . '.deleted_at is null ';
 
         return $this->__findOne($sql, array($this->objectValue[0]), $collection, $recursif);
     }
@@ -633,7 +643,10 @@ class DBAL extends Database {
             $this->instanciateVariable($object);
         endif;
 
-        $sql = "delete from " . $this->table . " where " . $this->objectVar[0] . " = ?";
+        if($this->softdelete)
+            $sql = "update " . $this->table . " set deleted_at = NOW() where " . $this->objectVar[0] . " = ?";
+        else
+            $sql = "delete from " . $this->table . " where " . $this->objectVar[0] . " = ?";
         $query = $this->link->prepare($sql);
         $retour = $query->execute(array($this->objectValue[0])) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo()));
 
@@ -645,7 +658,7 @@ class DBAL extends Database {
         $query = $this->link->prepare($sql);
         $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $query->errorInfo()));
 
-        return (int) $query->fetchColumn();
+        return $query->fetchColumn();
     }
 
     private function dbrow($flowBD){
@@ -970,6 +983,10 @@ class DBAL extends Database {
             $objecarray = (array) $object;
             if (isset($objecarray["dvfetched"])) {
                 unset($objecarray["dvfetched"]);
+            }
+            if (isset($objecarray["dvsoftdelete"])) {
+                $this->softdelete = $objecarray["dvsoftdelete"];
+                unset($objecarray["dvsoftdelete"]);
             }
             if (isset($objecarray["dvinrelation"])) {
                 unset($objecarray["dvinrelation"]);
