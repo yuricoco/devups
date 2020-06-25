@@ -21,6 +21,7 @@ require __DIR__ . '/../admin/generator/TableTemplateRender.php';
 require __DIR__ . '/../dclass/devups/Tchutte/Bugmanager.php';
 require __DIR__ . '/../dclass/devups/Core.php';
 require __DIR__ . '/../dclass/devups/Tchutte/DBAL.php';
+require __DIR__ . '/../dclass/devups/Tchutte/DB_dumper.php';
 require __DIR__ . '/../dclass/devups/Tchutte/QueryBuilder.php';
 require __DIR__ . '/../dclass/devups/Dfile.php';
 require __DIR__ . '/../dclass/devups/ScanDir.php';
@@ -48,3 +49,6 @@ global $enittycollection;
 global $em;
 $em = DBAL::getEntityManager();
 
+
+$db_dump = new \dclass\devups\Tchutte\DB_dumper();
+$db_dump->dump();

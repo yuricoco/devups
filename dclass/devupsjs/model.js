@@ -352,20 +352,28 @@ var model = {
 
         return fd;
     },
-    entitytoformentity (entity, entityformmodel){
+    entitytoformentity(entity, persistance = []) {
 
         var formentity = {};
         var keys = Object.keys(entity);
         var values = Object.values(entity);
 
         for (var i = 0; i < keys.length; i++) {
-            if (typeof values[i] === 'object' && values[i] !== null){
-                console.log(values[i]);
-                formentity[keys[i]] = values[i].id;
-                //formentity[entityformmodel.name+`_form[${keys[i]}]`] = values[i].id;
+            if (persistance.length) {
+                if (persistance.includes(keys[i])) {
+                    if (typeof values[i] === 'object' && values[i] !== null) {
+                        formentity[keys[i] + ".id"] = values[i].id;
+                        //formentity[entityformmodel.name+`_form[${keys[i]}]`] = values[i].id;
+                    } else
+                        formentity[keys[i]] = values[i]
+                }
+            } else {
+                if (typeof values[i] === 'object' && values[i] !== null) {
+                    formentity[keys[i] + ".id"] = values[i].id;
+                    //formentity[entityformmodel.name+`_form[${keys[i]}]`] = values[i].id;
+                } else
+                    formentity[keys[i]] = values[i]
             }
-            else
-                formentity[keys[i]] = values[i]
             // formentity[entityformmodel.name+`_form[${keys[i]}]`] = values[i]
         }
         //this.formentity['dvups_form['+entityformmodel.name+']'] = entityformmodel.field;

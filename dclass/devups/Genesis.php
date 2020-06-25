@@ -37,7 +37,7 @@ class Genesis {
             if (in_array('create', $entityrigths)) {
                 // next we check if the user has create right for this entity
                 if (in_array('create', $rigths)){
-                //if (in_array('create', $_SESSION['action'])){
+                    //if (in_array('create', $_SESSION['action'])){
                     if(!$statefull)
                         $top_action .= '<button data-toggle="modal" data-target="#'.$action.'modal" id="model_new" onclick="model._new()"  class="btn btn-success" ><i class="fa fa-plus"></i> add</button>';
                     else
@@ -89,7 +89,7 @@ class Genesis {
             $data["__navigation"] = "";//Genesis::top_action($action, $path[ENTITY]);
         }
 
-        $blade = new Blade([$views, admin_dir . 'views'], admin_dir . "cache");
+        $blade = new Blade([$views, admin_dir . 'views'], ROOT . "cache/views");
         echo $blade->view()->make($view, $data)->render();
     }
 
@@ -108,7 +108,7 @@ class Genesis {
             }
         }
 
-        $blade = new Blade([web_dir . "views", admin_dir . 'views'], admin_dir . "cache");
+        $blade = new Blade([web_dir . "views", admin_dir . 'views'], ROOT . "cache/views");
         echo $blade->view()->make($view, $compilate)->render();
         //die;
     }
@@ -123,7 +123,7 @@ class Genesis {
 
         $data["moduledata"] = $moduledata;//Genesis::top_action($action, $classroot);
 
-        $blade = new Blade($viewdir, admin_dir . "cache");
+        $blade = new Blade($viewdir, ROOT . "cache/views");
         echo $blade->view()->make($view, $data)->render();
     }
 

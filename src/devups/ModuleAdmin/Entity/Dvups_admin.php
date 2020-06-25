@@ -5,13 +5,6 @@
  * */
 class Dvups_admin extends Model implements JsonSerializable
 {
-
-    const role_admin_approved_center = "admin_approved_center";
-    const role_agent_approved_center = "agent_approved_center";
-    const role_admin_center = "admin_center";
-    const role_agent_center = "agent_center";
-    const role_administrator = "administrator";
-
     /**
      * @Id @GeneratedValue @Column(type="integer")
      * @var int
@@ -47,13 +40,6 @@ class Dvups_admin extends Model implements JsonSerializable
      */
     public $dvups_role;
 
-    /**
-     * @ManyToOne(targetEntity="\Approved_center")
-     * @var \Approved_center
-     */
-    public $approved_center;
-
-
     public function __construct($id = null)
     {
         $this->dvsoftdelete = true;
@@ -63,7 +49,6 @@ class Dvups_admin extends Model implements JsonSerializable
         }
 
         $this->dvups_role = new Dvups_role();
-        $this->approved_center = new Approved_center();
 
     }
 

@@ -419,7 +419,9 @@ class QueryBuilder extends \DBAL
     public function handlesoftdelete()
     {
 
-        $this->softdeletehandled = true;
+        if($this->softdeletehandled)
+            return $this;
+
         if ($this->softdelete) {
             if ($this->hasrelation)
                 $this->query .= ' where ' . $this->table . '.deleted_at is null ';
@@ -427,6 +429,7 @@ class QueryBuilder extends \DBAL
                 $this->query .= ' where deleted_at is null ';
         }
 
+        $this->softdeletehandled = true;
         return $this;
 
     }
@@ -453,7 +456,7 @@ class QueryBuilder extends \DBAL
 //            else
 
             if(!$this->softdeletehandled)
-                $this->query .= ' where ' . $this->table . '.deleted_at is null ';
+                $this->handlesoftdelete();
 
             $link = "and";
         }

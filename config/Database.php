@@ -41,5 +41,12 @@ class Database {
         }
         
     }
-    
+
+    /**
+     * @return PDO
+     */
+    public function link(){
+        return $this->link;
+    }
+
 }
