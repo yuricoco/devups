@@ -1,3 +1,13 @@
+
+function _t(key) {
+    var lang =  _local_content[key];
+
+    if(lang)
+        return lang;
+
+    return  key;
+}
+
 var devups = {
     el: "",
     togglemore(el){

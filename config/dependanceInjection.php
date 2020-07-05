@@ -30,6 +30,7 @@ require __DIR__ . '/../dclass/devups/DvupsTranslation.php';
 require __DIR__ . '/../dclass/devups/model/EntityCollection.php';
 require __DIR__ . '/../dclass/devups/Controller/Controller.php';
 require __DIR__ . '/../dclass/devups/Genesis.php';
+require __DIR__ . '/../dclass/devups/Datatable/Lazyloading.php';
 require __DIR__ . '/../dclass/devups/Datatable/Datatable.php';
 require __DIR__ . '/../dclass/devups/Datatable/DatatableOverwrite.php';
 require __DIR__ . '/../dclass/devups/Datatable/Dbutton.php';
@@ -49,6 +50,7 @@ global $enittycollection;
 global $em;
 $em = DBAL::getEntityManager();
 
-
-$db_dump = new \dclass\devups\Tchutte\DB_dumper();
-$db_dump->dump();
+if (dbdumper) {
+    $db_dump = new \dclass\devups\Tchutte\DB_dumper();
+    $db_dump->dump();
+}

@@ -49,7 +49,11 @@ if ($argv[1] === 'schema:update') {
     $result = [];
     exec("bin\doctrine orm:schema:update --dump-sql", $result);
 
-    switch ($argv[2]) {
+    $action = "--dump-sql";
+    if(isset($argv[2]))
+        $action = $argv[2];
+
+    switch ($action) {
         case '--dump-sql':
 
             echo implode("\n ", $result);
@@ -67,7 +71,7 @@ if ($argv[1] === 'schema:update') {
                 $query = $result[$i];
                 if ($query){
                     $dbal->executeDbal($query);
-                    \dclass\devups\DB_dumper::migration($query);
+                    \dclass\devups\Tchutte\DB_dumper::migration($query);
                 }
             }
             echo "\n \e[42m \e[1m\e[30m \n[OK] Database schema updated successfully!\n ";

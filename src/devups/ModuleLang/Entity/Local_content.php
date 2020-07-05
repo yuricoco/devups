@@ -113,5 +113,9 @@ class Local_content extends Model implements JsonSerializable
         ];
     }
 
+    public static function generatecacheAction()
+    {
+        return '<button onclick="model.regeneratecache()" class="btn btn-info">'.t("Regenerate Cache").'</button>';
+    }
 
 }

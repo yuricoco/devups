@@ -1,11 +1,14 @@
 <?php 
 
+use \dclass\devups\Datatable\Lazyloading;
 
 class Local_contentFrontController extends Local_contentController{
 
     public function ll($next = 1, $per_page = 10){
 
-            return $this->lazyloading(new Local_content(), $next, $per_page);
+        $ll = new Lazyloading();
+        $ll->lazyloading(new Local_content());
+        return $ll;
 
     }
 

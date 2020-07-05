@@ -18,13 +18,13 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    <?= $datatablehtml; ?>
+                    <?= $datatable->render(); ?>
                 </div>
             </div>
         </div>
     </div>
 
-    <div id="{{ strtolower($entity) }}box" class="swal2-container swal2-fade swal2-shown" style="display:none; overflow-y: auto;">
+    <div id="{{ strtolower($entitytarget) }}box" class="swal2-container swal2-fade swal2-shown" style="display:none; overflow-y: auto;">
         <div role="dialog" aria-labelledby="swal2-title" aria-describedby="swal2-content" class="swal2-modal swal2-show dv_modal" tabindex="1"
              style="">
             <div class="main-card mb-3 card  box-container">
@@ -40,9 +40,9 @@
 
 @endsection
 
-<?php function modalview($entity){ ?>
+<?php function modalview($entitytarget){ ?>
 
-<div class="modal fade" id="{{ strtolower($entity) }}modal" tabindex="-1" role="dialog" aria-labelledby="modallabel">
+<div class="modal fade" id="{{ strtolower($entitytarget) }}modal" tabindex="-1" role="dialog" aria-labelledby="modallabel">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">

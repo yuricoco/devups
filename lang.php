@@ -11,9 +11,13 @@ global $lang;
 function t($ref, $default = "", $local = null ){
 
     $lang = Local_contentController::getdata();
-
-    if(!$default)
+    $matcher = [];
+    if(is_array($default)){
+        $matcher = $default;
         $default = $ref;
+    }else if(!$default){
+        $default = $ref;
+    }
 
     $ref = Local_content_key::key_sanitise($ref);
 
@@ -22,7 +26,17 @@ function t($ref, $default = "", $local = null ){
         return $default;
     }
 
-    return $lang[$ref];
+    if(empty($matcher))
+        return $lang[$ref];
+
+    $translate = $lang[$ref];
+
+    foreach ($matcher as $search => $value){
+        $translate = str_replace(":".$search, $value, $translate);
+
+    }
+    //dd($translate);
+    return $translate;
 
 }
 
@@ -40,20 +54,4 @@ function gettranslation($ref, $local = null, $default = "no translation found"){
 
     return $lang[$ref][$local];
 
-}
-
-function translatecollection(){
-
-    return Local_contentController::getdata();
-    $lang = GeneralinfoController::getdata()["info"];
-    $contentcollection = [];
-
-    if($local != "fr" && $local != "en")
-        $local = \DClass\lib\Util::local();
-
-    foreach ($lang as $ref => $translate){
-        $contentcollection[$ref] = $translate[$local];
-    }
-
-    return $contentcollection;
 }

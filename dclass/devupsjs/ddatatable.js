@@ -296,7 +296,7 @@ setTimeout(function () {
         model.entity = $(this).find("#dv_table").eq(0).data('entity');
 
         //model.init($(this).find("#dv_table"));
-        ddatatable.init(model.entity);
+        // ddatatable.init(model.entity);
 
     })
 

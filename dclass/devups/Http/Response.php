@@ -35,4 +35,24 @@ class Response
         echo json_encode($value, $options, $depth);
         die;
     }
+
+    /**
+     * @return Response
+     */
+    public static function success()
+    {
+        $response = new Response();
+        $response->success = true;
+        return $response;
+    }
+    public function message($content){
+        $this->message = $content;
+        return $this;
+    }
+    public function json(){
+        $data = (Array) $this;
+        self::$data += $data;
+        self::json_response();
+    }
+
 }

@@ -38,8 +38,8 @@ $action = 'index.php?path=connexion';
                             <div class="login-panel panel panel-default">
                                 <div class="panel-heading">
                                     <h3 class="panel-title">Please Sign In </h3>
-                                    <?php if ($err = Request::get("err")){ ?>
-                                    <div class="alert alert-warning"><?= $err ?></div>
+                                    <?php if (isset($_GET["err"])){ ?>
+                                    <div class="alert alert-warning"><?= $_GET["err"] ?></div>
                                     <?php } ?>
                                 </div>
                                 <div class="panel-body">

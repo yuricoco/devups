@@ -9,27 +9,25 @@ class Local_contentController extends Controller
     private static $path = ROOT . "cache/local/";
     const pathmodule = ROOT . "web/app3/frontend1/src/devupsjs/";
 
-    public function listView($next = 1, $per_page = 25)
-    {
+    public function listView($next = 1, $per_page = 10){
 
-        $lazyloading = $this->lazyloading(new Local_content(), $next, $per_page);
+        $this->datatable = Local_contentTable::init()->buildindextable();
 
         self::$jsfiles[] = Local_content::classpath('Ressource/js/local_contentCtrl.js');
 
         $this->entitytarget = 'Local_content';
         $this->title = "Manage Local_content";
 
-        $this->renderListView(Local_contentTable::init($lazyloading)->buildindextable()->render());
+        $this->renderListView();
 
     }
 
-    public function datatable($next, $per_page)
-    {
-        $lazyloading = $this->lazyloading(new Local_content(), $next, $per_page);
+    public function datatable($next, $per_page) {
         return ['success' => true,
-            'datatable' => Local_contentTable::init($lazyloading)->buildindextable()->getTableRest(),
+            'datatable' => Local_contentTable::init($next, $per_page)->buildindextable()->getTableRest(),
         ];
     }
+
 
     public function createAction($local_content_form = null)
     {
@@ -132,6 +130,16 @@ class Local_contentController extends Controller
         }
 
     }
+
+    public function regeneratecacheAction(){
+        // self::buildlocalcache();
+
+        Response::success()
+            ->message(t("local cache regenerated with success"))
+            ->json();
+
+    }
+
     public static function buildlocalcache()
     {
 
@@ -187,11 +195,25 @@ class Local_contentController extends Controller
         $lang = DClass\lib\Util::local();
 
         if (!file_exists(self::$path . $lang . ".json")) {
+            writein(self::$path . $lang . ".json", "");
             self::buildlocalcache();
         }
 
         $content = file_get_contents(self::$path . $lang . ".json");
         return json_decode($content, true);
+
+    }
+
+    public static function getdatajs()
+    {
+
+        $lang = DClass\lib\Util::local();
+
+        if (!file_exists(self::$path . $lang . ".json")) {
+            self::buildlocalcache();
+        }
+
+        return file_get_contents(self::$path . $lang . ".json");
 
     }
 

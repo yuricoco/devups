@@ -3,25 +3,28 @@
 namespace dclass\devups\Controller;
 
 use Genesis as g;
-use QueryBuilder;
-use Request;
+use Philo\Blade\Blade;
 
 /**
  * class Controller 1.0
  *
  * @author yuri coco
  */
-class Controller {
+abstract class Controller
+{
 
     protected $error = [];
     protected $error_exist = false;
     protected $entity = null;
+    public $indexView = "default.index";
+
 
     /**
      * @return $this
      * @throws \ReflectionException
      */
-    public static function i() {
+    public static function i()
+    {
         $reflection = new \ReflectionClass(get_called_class());
         return $reflection->newInstance();
     }
@@ -30,7 +33,8 @@ class Controller {
      *
      * @param type $resultCtrl controller method
      */
-    public static function renderTemplate($view, $data) {
+    public static function renderTemplate($view, $data)
+    {
         g::render($view, $data);
     }
 
@@ -42,255 +46,13 @@ class Controller {
      * @param type $next
      * @return type
      */
-    public static function lastpersistance($entity) {
+    public static function lastpersistance($entity)
+    {
         $classname = strtolower(get_class($entity));
 
         return array('success' => true, // pour le restservice
             'classname' => $classname,
             'listEntity' => [$entity],
-            'detail' => '');
-    }
-
-    public function lazyloading2($listEntity, $classname = "") {
-
-        return array('success' => true, // pour le restservice
-            'classname' => strtolower($classname),
-            'listEntity' => $listEntity,
-            'nb_element' => count($listEntity),
-            'per_page' => 100,
-            'pagination' => 1,
-            'current_page' => 1,
-            'next' => 1,
-            'previous' => 0,
-            'remain' => 1,
-            'detail' => '');
-    }
-
-    /**
-     * @var \QueryBuilder $currentqb
-     */
-    private $currentqb;
-
-    private function filterswicher($opt, $attr, $value)
-    {
-        switch ($opt) {
-            case "eq":
-                $this->currentqb->andwhere($attr, "=", $value);
-                break;
-            case "neq":
-                $this->currentqb->andwhere($attr, "!=", $value);
-                break;
-            case "oreq":
-                $this->currentqb->orwhere($attr, "=", $value);
-                break;
-            case "gt":
-                $this->currentqb->andwhere($attr, ">", $value);
-                break;
-            case "lt":
-                $this->currentqb->andwhere($attr, "<", $value);
-                break;
-            case "get":
-                $this->currentqb->andwhere($attr, ">=", $value);
-                break;
-            case "let":
-                $this->currentqb->andwhere($attr, "<=", $value);
-                break;
-            case "lkr":
-                $this->currentqb->andwhere($attr)->like_($value);
-                break;
-            case "lkl":
-                $this->currentqb->andwhere($attr)->_like($value);
-                break;
-            case "btw":
-                // todo : add constraint of integrity
-                $btw = explode('_', $value);
-                $this->currentqb->where($attr)->between($btw[0], $btw[1]);
-                break;
-            default:
-                $this->currentqb->andwhere($attr)->like($value);
-                break;
-        }
-
-    }
-
-    private function filter(\stdClass $entity, QueryBuilder $qb)
-    {
-        $this->currentqb = $qb;
-        $getparam = Request::$uri_get_param;
-
-        $this->currentqb->handlesoftdelete();
-        foreach ($getparam as $key => $value) {
-
-            if(!$value)
-                continue;
-
-            $attr = explode(":", $key);
-            $join = explode(".", $attr[0]);
-            if (isset($join[1])) {
-                $this->filterswicher($attr[1], $attr[0], $value);
-            } else if ($this->currentqb->hasrelation && isset($attr[1]))
-                $this->filterswicher($attr[1], strtolower(get_class($entity)) . "." . $join[0], $value);
-            elseif (isset($attr[1]))
-                $this->filterswicher($attr[1], $join[0], $value);
-//            else
-//                $this->filterswicher("", $join[0], $value);
-
-        }
-        return $this->currentqb;
-    }
-
-    public static function initlazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = ""){
-        return (new Controller())->lazyloading($entity, $next, $per_page, $qbcustom, $order);
-    }
-
-    const maxpagination = 12;
-
-    /***
-     * @param \stdClass $entity the instance of the entity
-     * @param int $next the page to print within the datatable by default it's 0
-     * @param int $per_page the number of element per page
-     * @param \QueryBuilder|null $qbcustom if the developer want to customise the request
-     * @param string $order
-     * @return array
-     */
-    public function lazyloading(\stdClass $entity, $next = 0, $per_page = 10, \QueryBuilder $qbcustom = null, $order = "") {//
-        $remain = true;
-        $qb = new QueryBuilder($entity);
-        $classname = strtolower(get_class($entity));
-        if (Request::get("next") && Request::get('per_page'))
-            extract(Request::$uri_get_param);
-
-        if(Request::get('order')){
-            $order = Request::get('order');
-            if($entity->inrelation())
-                $order = $classname.".".$order;//$_GET['order'];
-        }elseif(Request::get('orderjoin'))
-            $order = strtolower(Request::get('orderjoin'));
-
-
-        if ($qbcustom != null) {
-
-            if (Request::get("dfilters"))
-                $qbcustom = $this->filter($entity, $qbcustom);
-
-            $nb_element = $qbcustom->__countEl(false, false); //false
-        } else {
-
-            if (Request::get("dfilters")) {
-
-                $qbcustom = $this->filter($entity, $qb);
-                $nb_element = $qbcustom->__countEl(false, true);
-            } else {
-                //$qb->handlesoftdelete();
-                $nb_element = $qb->selectcount()->handlesoftdelete()->__countEl(false);
-            }
-        }
-
-        if ($per_page != "all") {
-            if (!($nb_element % $per_page)) {
-                $pagination = $nb_element / $per_page;
-            } else {
-                $pagination = intval($nb_element / $per_page) + 1;
-            }
-
-            if ($next > 0) {
-                $page = $next;
-                $next = (intval($next) - 1) * $per_page;
-            } else {
-                $page = 1;
-            }
-
-            if ($qbcustom != null) {
-
-                if ($order) {
-                    $listEntity = $qbcustom->orderby($order)->limit($next, $per_page)->__getAll();
-                } else
-                    $listEntity = $qbcustom->limit($next, $per_page)->__getAll();
-
-            } else {
-                if ($order)
-                    $listEntity = $qb->select()->handlesoftdelete()->orderby($order)->limit($next, $per_page)->__getAll();
-                else
-                    $listEntity = $qb->select()->handlesoftdelete()->limit($next, $per_page)->__getAll();
-
-            }
-
-            if ($page == $pagination) {
-                $next = $page - 1;
-                $remain = false;
-            } else {
-                $next = $page;
-            }
-        } else {
-            $pagination = 0;
-            $page = 1;
-            $remain = 0;
-            if($qbcustom != null){
-                if ($order) {
-                    $listEntity = $qbcustom->orderby($order)->__getAll();
-                } else {
-                    $listEntity = $qbcustom->__getAll();
-                }
-            }else{
-                //$qb->handlesoftdelete();
-                if ($order) {
-                    $listEntity = $qb->select()->handlesoftdelete()->orderby($order)->__getAll();
-                } else {
-                    $listEntity = $qb->select()->handlesoftdelete()->__getAll();
-                }
-            }
-            $per_page = $nb_element;
-        }
-
-        $paginationcustom = [];
-        if($pagination >= self::maxpagination){
-            $middle = intval($pagination / 2);
-            $paginationcustom['firsts'] = [1, 2, 3];
-            $paginationcustom['lasts'] = [$pagination - 2, $pagination - 1, $pagination];
-
-            if($page > self::maxpagination / 2){
-
-                $paginationcustom['middleleft'] = intval($pagination / 4);
-                //$paginationcustom['firsts'] = [$page, 1 + $page + 1, 2 + $page + 2];
-
-                if($page + 3 >= $pagination){
-                    $paginationcustom['middleleft'] = intval($pagination / 4);
-                    $paginationcustom['lasts'] = [];
-                    $paginationcustom['middles'] = [$pagination - 5, $pagination - 4, $pagination - 3, $pagination - 2, $pagination - 1, $pagination];
-//                else{
-//                    $paginationcustom['middles'][] = $middle + $page + 2;
-//                    $paginationcustom['middles'][] = $middle + $page + 3;
-//                    $paginationcustom['middles'][] = $middle + $page + 4;
-                }else{
-                    $paginationcustom['middleright'] = intval($pagination * 3 / 4);
-                    $paginationcustom['middles'] = [$page - 1, $page, $page + 1];
-                }
-                //= [$page, $page + 1, $page + 2];
-            }else{
-
-                $paginationcustom['middles'] = [$middle - 1, $middle, $middle + 1];
-                $paginationcustom['middleright'] = intval($pagination * 3 / 4);
-                $paginationcustom['middleleft'] = intval($pagination / 4);
-
-                if( $page > 3 && $page < 8){
-                    $paginationcustom['firsts'] = [1, 2, 3, 4, 5, 6, 7];
-                }
-
-            }
-        }
-
-        return array('success' => true, // pour le restservice
-            //'sqlquery' => $qbcustom->getSqlQuery(),
-            'classname' => $classname,
-            'listEntity' => $listEntity,
-            'nb_element' => (int) $nb_element,
-            'per_page' => $per_page,
-            'pagination' => $pagination,
-            'paginationcustom' => $paginationcustom,
-            'current_page' => $page,
-            'next' => $next + 1,
-            'previous' => (int) $page - 1,
-            'remain' => (int) $remain,
             'detail' => '');
     }
 
@@ -306,7 +68,8 @@ class Controller {
      * @return type
      * @throws InvalidArgumentException
      */
-    public function form_generat($object, $data = null, $entityform = null, $deeper = false) {
+    public function form_generat($object, $data = null, $entityform = null, $deeper = false)
+    {
         return $this->form_fillingentity($object, $data, $entityform, $deeper);
     }
 
@@ -317,13 +80,18 @@ class Controller {
      * @param bool $deeper
      * @return mixed
      */
-    public function form_fillingentity($object, $data = null, $entityform = null, $deeper = false) {
+    public function form_fillingentity($object, $data = null, $entityform = null, $deeper = false)
+    {
         $this->error = [];
         if (!is_object($object))
             throw new \InvalidArgumentException('$object must be an object.');
 
-        if(!$data)
-            return $object->__show($deeper);
+        if (!$data) {
+            if (isset($_FILES[strtolower(get_class($object)) . '_form']))
+                $data = $_FILES[strtolower(get_class($object)) . '_form'];
+            else
+                return $object->__show($deeper);
+        }
 
         global $_ENTITY_FORM;
         $_ENTITY_FORM = $data;
@@ -348,7 +116,8 @@ class Controller {
      * @return mixed
      * @throws \ReflectionException
      */
-    private function formWithPost($object, $entityform) {
+    private function formWithPost($object, $entityform)
+    {
         global $_ENTITY_FORM;
         global $_ENTITY_COLLECTION;
         global $__controller_traitment;
@@ -388,10 +157,10 @@ class Controller {
 
 //                    if(!is_string($value["setter"]))
 //                        continue;
-                    if(!isset($value["setter"]))
+                    if (!isset($value["setter"]))
                         $value["setter"] = $key;
 
-                    if (isset($value["persist"]) && $value["persist"] == false){
+                    if (isset($value["persist"]) && $value["persist"] == false) {
                         continue;
                     }
 
@@ -453,19 +222,17 @@ class Controller {
 
                         if (!method_exists($object, $currentfieldsetter)) {
                             $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                        }
-                        elseif($error = call_user_func(array($object, $currentfieldsetter), $toadd))
+                        } elseif ($error = call_user_func(array($object, $currentfieldsetter), $toadd))
                             $this->error[$key] = $error;
 
-                    }
-                    else
+                    } else
                         if (isset($value['options']) && !isset($value['arrayoptions']) && class_exists($key)) {// && is_object ($value['options'][0])
                             $reflect = new \ReflectionClass($key);
                             $value2 = $reflect->newInstance();
 
                             if (is_array($value['options']) && isset($_ENTITY_FORM[$key])) {
 
-                                if(!is_numeric($_ENTITY_FORM[$key])){
+                                if (!is_numeric($_ENTITY_FORM[$key])) {
                                     $value2->setId(null);
                                     continue;
                                 }
@@ -473,29 +240,24 @@ class Controller {
                                 $value2->setId($_ENTITY_FORM[$key]);
                                 if (!method_exists($object, $currentfieldsetter)) {
                                     $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
-                                }
-                                elseif($error = call_user_func(array($object, $currentfieldsetter), $value2->__show(false)))
+                                } elseif ($error = call_user_func(array($object, $currentfieldsetter), $value2->__show(false)))
                                     $this->error[$key] = $error;
                             } else {
                                 if (!method_exists($object, $currentfieldsetter)) {
                                     $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                                }
-                                elseif($error = call_user_func(array($object, $currentfieldsetter), $value2))
+                                } elseif ($error = call_user_func(array($object, $currentfieldsetter), $value2))
                                     $this->error[$key] = $error;
                             }
-                        }
-                        else {
+                        } else {
 
-                            if (isset($_ENTITY_FORM[$key])){
-                                if(isset($value["type"]) && $value["type"] == "injection"){
+                            if (isset($_ENTITY_FORM[$key])) {
+                                if (isset($value["type"]) && $value["type"] == "injection") {
 //                                $result = call_user_func(array($key."Controller", "createAction"));
 //                                if($error = call_user_func(array($object, $currentfieldsetter), $result[$key]))
 //                                    $this->error[$key] = $error;
-                                }
-                                elseif (!method_exists($object, $currentfieldsetter)) {
+                                } elseif (!method_exists($object, $currentfieldsetter)) {
                                     $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                                }
-                                elseif($error = call_user_func(array($object, $currentfieldsetter), $_ENTITY_FORM[$key]))
+                                } elseif ($error = call_user_func(array($object, $currentfieldsetter), $_ENTITY_FORM[$key]))
                                     $this->error[$key] = $error;
                             }
 
@@ -523,7 +285,7 @@ class Controller {
      * @param bool $deeper
      * @return null
      */
-    public function hydrateWithJson($object, $jsonform, $deeper= false)
+    public function hydrateWithJson($object, $jsonform, $deeper = false)
     {
 
         if ($object->getId()) {
@@ -534,7 +296,7 @@ class Controller {
 
         foreach ($jsonform as $field => $value) {
 
-            if(!is_string($value) && !is_numeric($value) )
+            if (!is_string($value) && !is_numeric($value))
                 continue;
 
             $meta = explode(":", $field);
@@ -549,13 +311,14 @@ class Controller {
 
     }
 
-    private function hydrateEntity($field, $value, $meta, $imbricate){
+    private function hydrateEntity($field, $value, $meta, $imbricate)
+    {
         if (isset($meta[1]))
             $setter = "set" . ucfirst($meta[1]);
         else
             $setter = "set" . ucfirst($meta[0]);
 
-        if(is_array($value)){
+        if (is_array($value)) {
             dv_dump($value);
             $setter = "add" . ucfirst($meta[0]);
             if (!method_exists($this->entity, $setter)) {
@@ -599,7 +362,7 @@ class Controller {
      * @param bool $deeper
      * @return null
      */
-    public function hydrateWithFormData($object, $postdata, $deeper= false)
+    public function hydrateWithFormData($object, $postdata, $deeper = false)
     {
         $classname = strtolower(get_class($object));
 
@@ -616,13 +379,13 @@ class Controller {
 
         foreach ($postdata as $key => $value) {
 
-            if (!preg_match_all("/$classname"."_/", $key)){
+            if (!preg_match_all("/$classname" . "_/", $key)) {
                 //var_dump($key);
                 continue;
             }
-                //continue;
+            //continue;
 
-            $field = str_replace($classname."_", "", $key);
+            $field = str_replace($classname . "_", "", $key);
             $meta = explode(":", $field);
 
             $imbricate = explode(">", $meta[0]);
@@ -638,7 +401,8 @@ class Controller {
     }
 
 
-    public static function renderController($view, $resultCtrl) {
+    public static function renderController($view, $resultCtrl)
+    {
 
         extract($resultCtrl);
         include __DIR__ . "/../../" . $view;
@@ -651,37 +415,27 @@ class Controller {
     public static $jsscript = "";
     public static $jsfiles = [];
 
-    public function listView($next = 1, $per_page = 10)
+    public abstract function listView($next = 1, $per_page = 10);
+
+    public function renderListView($data = [])
     {
 
+        if (!$data) {
+            foreach ($this as $key => $value) {
+                \Response::set($key, $value);
+            }
+        }
 
-
-    }
-
-    public function renderListView($datatablehtml, $return = false, $lazyloading = [], $datatablemodel = "") {
-
-        if($return)
-            return array('success' => true, // pour le restservice
-                'title' => $this->title, // pour le web service
-                'entity' => $this->entitytarget, // pour le web service
-                'datatablehtml' => $datatablehtml, // pour le web service
-                'lazyloading' => $lazyloading, // pour le web service
-                'datatablemodel' => $datatablemodel, // pour le web service
-                'detail' => '');
-
-        \Genesis::renderView('default.index',
-            array('success' => true, // pour le restservice
-                'title' => $this->title, // pour le web service
-                'entity' => $this->entitytarget, // pour le web service
-                'datatablehtml' => $datatablehtml,
-                'detail' => '')
+        \Genesis::renderView($this->indexView,
+            \Response::$data + $data
         );
-
+        die;
     }
 
-    public function renderDetailView($datatablehtml, $return = false, $datatablemodel = "") {
+    public function renderDetailView($datatablehtml, $return = false, $datatablemodel = "")
+    {
 
-        if($return)
+        if ($return)
             return array('success' => true, // pour le restservice
                 'title' => $this->title, // pour le web service
                 'entity' => $this->entitytarget, // pour le web service
@@ -697,6 +451,60 @@ class Controller {
                 'detail' => '')
         );
 
+    }
+
+    public static function renderBladeView($view, $data = [], $action = "list", $redirect = false)
+    {
+
+        global $path;
+        global $views;
+
+        if ($redirect && $data['success']) {
+            header('location: index.php?path=' . $path[ENTITY] . '/' . $data['redirect']);
+        }
+
+        if ($data) {
+            $data["__navigation"] = "";//Genesis::top_action($action, $path[ENTITY]);
+        }
+
+        $blade = new Blade([$views, admin_dir . 'views'], ROOT . "cache/views");
+        echo $blade->view()->make($view, $data)->render();
+    }
+
+    public static function render($view, $data = [])
+    {
+
+        $compilate = [];
+        if ($data) {
+            if (key_exists(0, $data)) {
+                foreach ($data as $el) {
+                    foreach ($el as $key => $value) {
+                        $compilate[$key] = $value;
+                    }
+                }
+            } else {
+                $compilate = $data;
+            }
+        }
+
+        $blade = new Blade([web_dir . "views", admin_dir . 'views'], ROOT . "cache/views");
+        echo $blade->view()->make($view, $compilate)->render();
+        //die;
+    }
+
+    public static function renderView($view, $data = [], $redirect = false)
+    {
+
+        global $viewdir, $moduledata;
+
+        if ($redirect && isset($data['redirect'])) {
+            header('location: ' . $data['redirect']);
+        }
+
+        $data["moduledata"] = $moduledata;//Genesis::top_action($action, $classroot);
+
+        $blade = new Blade($viewdir, ROOT . "cache/views");
+        echo $blade->view()->make($view, $data)->render();
     }
 
 }

@@ -10,7 +10,8 @@ use Doctrine\ORM\EntityManager;
  *
  * @author Atemkeng Azankang
  */
-class DBAL extends Database {
+class DBAL extends Database
+{
 
     protected $collect = [];
     /**
@@ -34,6 +35,7 @@ class DBAL extends Database {
     {
         return $this->table;
     }
+
     protected $instanceid;
 
     /**
@@ -86,7 +88,8 @@ class DBAL extends Database {
     private $iterat;
     private $update = false;
 
-    public function __construct($object = null) {
+    public function __construct($object = null)
+    {
         parent::__construct();
 //        global $em;
 //        $this->em = $em;
@@ -95,7 +98,8 @@ class DBAL extends Database {
     }
 
 //    public static function getEntityManager() {
-    public static function getEntityManager() {
+    public static function getEntityManager()
+    {
         global $enittycollection;
 
         $global_navigation = Core::buildOriginCore();
@@ -106,10 +110,10 @@ class DBAL extends Database {
             if (is_object($project)) {
                 foreach ($project->listmodule as $key => $module) {
                     if (is_object($module)) {
-                        if(file_exists($rep = ROOT . "src/" . $project->name . "/" . $module->name . "/Entity")){
+                        if (file_exists($rep = ROOT . "src/" . $project->name . "/" . $module->name . "/Entity")) {
                             $enittyfoldes[] = $rep;
                             foreach ($module->listentity as $key => $entity) {
-                                if(is_object($entity))
+                                if (is_object($entity))
                                     //var_dump($entity);
                                     $enittycollection[strtolower($entity->name)] = ROOT . "src/" . $project->name . "/" . $module->name;
                             }
@@ -142,20 +146,22 @@ class DBAL extends Database {
 
     public function setCollect(array $collect)
     {
-        foreach ($collect as $el){
-            $this->collect[] = str_replace("this.", $this->table.".", $el);
+        foreach ($collect as $el) {
+            $this->collect[] = str_replace("this.", $this->table . ".", $el);
         }
         //$this->collect = $collect;
     }
 
     protected $em;
 
-    public function is_doctrine_entity($className) {
+    public function is_doctrine_entity($className)
+    {
 //        $this->em = $this->getEntityManager();
         return !$this->em->getMetadataFactory()->isTransient("\\" . $className);
     }
 
-    public function getDoctrineMetadata($className) {
+    public function getDoctrineMetadata($className)
+    {
 
         if ($this->is_doctrine_entity($className))
             return $this->em->getClassMetadata("\\" . $className);
@@ -169,7 +175,8 @@ class DBAL extends Database {
      * @param integer $id l'id de l'entité proprietère de la relation
      * @return
      */
-    private function manyToManyAdd($id, $update = false, $change_collection = []) {
+    private function manyToManyAdd($id, $update = false, $change_collection = [])
+    {
         /**
          * on traite chaque attribut de maniere unique, attribut qui est lui aussi une liste d'entité
          */
@@ -182,7 +189,7 @@ class DBAL extends Database {
             $association = true;
             foreach ($listentity as $entity) {
 
-                if(! is_object($entity))
+                if (!is_object($entity))
                     continue;
 
                 if (!$entity->getId())
@@ -225,11 +232,11 @@ class DBAL extends Database {
 
                     $reflect = new ReflectionClass($entityTable);
                     $object = $reflect->newInstance();
-                    $obarr = (array) $object;
+                    $obarr = (array)$object;
                     $obarr[$this->objectName] = $this->object;
                     $obarr[strtolower(get_class($entity))] = $entity;
 
-                    $entitycol = Bugmanager::cast((object) $obarr, $entityTable);
+                    $entitycol = Bugmanager::cast((object)$obarr, $entityTable);
 
                     $success = $entitycol->__save();
 
@@ -252,7 +259,8 @@ class DBAL extends Database {
      * @param type $id
      * @return type
      */
-    private function manyToManyDelete($id, $change_collection = []) {
+    private function manyToManyDelete($id, $change_collection = [])
+    {
 
         $sql = "";
         $success = "";
@@ -264,7 +272,7 @@ class DBAL extends Database {
             if (!empty($listentity['todrop'])) {
 
                 $entityName = strtolower(get_class($listentity['todrop'][0]));
-                $objectarray = (array) $listentity['todrop'][0];
+                $objectarray = (array)$listentity['todrop'][0];
                 $arrayvalues = array_values($objectarray);
                 foreach ($arrayvalues as $value) {
 
@@ -294,13 +302,14 @@ class DBAL extends Database {
         return $success;
     }
 
-    public function belongto($entity, $relation) {
+    public function belongto($entity, $relation)
+    {
 
         if (is_object($relation)) {
             if ($relation->getId())
                 return $relation->__show();
             else {
-                $obarray = (array) $entity;
+                $obarray = (array)$entity;
                 $relationname = strtolower(get_class($relation));
                 //dv_dump($relationname);
                 if (isset($obarray[$relationname . "_id"]))
@@ -311,7 +320,7 @@ class DBAL extends Database {
             }
         } elseif (!is_object($relation)) {
 
-            $obarray = (array) $entity;
+            $obarray = (array)$entity;
             if (isset($obarray[$relation . "_id"]))
                 $id = $obarray[$relation . "_id"];
             elseif (isset($obarray[$relation]))
@@ -337,26 +346,27 @@ class DBAL extends Database {
         return $qb->select()->where("id", "=", $id)->__getOneRow();
     }
 
-    public function hasmany($entity, $collection, $exec = true, $incollectionof = null, $recursif = false) {
+    public function hasmany($entity, $collection, $exec = true, $incollectionof = null, $recursif = false)
+    {
 
         $collectionName = strtolower(get_class($collection));
-        if($incollectionof != null){
+        if ($incollectionof != null) {
 
             $qb = new QueryBuilder($collection);
             $qb->select()
-                ->where( "this.id")//$collectionName .
+                ->where("this.id")//$collectionName .
                 ->in(
                     $qb->addselect($collectionName . "_id", new $incollectionof, false)
                         ->where($entity)
                         ->close()
                 );
 
-            if($exec)
+            if ($exec)
                 return $qb->__getAll($recursif);
             else
                 return $qb;
 
-        }else{
+        } else {
             $objectName = strtolower(get_class($entity));
 
             if ($this->tableExists($collectionName . '_' . $objectName)) {
@@ -369,7 +379,7 @@ class DBAL extends Database {
                 $qb->select()
                     ->where($entity);
 
-                if($exec)
+                if ($exec)
                     return $qb->__getAll($recursif);
                 else
                     return $qb;
@@ -387,7 +397,7 @@ class DBAL extends Database {
                     ->close()
             );
 
-        if($exec)
+        if ($exec)
             return $qb->__getAll($recursif);
         else
             return $qb;
@@ -400,12 +410,13 @@ class DBAL extends Database {
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
-    public function insertserialiseDbal($object, $listentity) {
+    public function insertserialiseDbal($object, $listentity)
+    {
         if ($object)
             $this->instanciateVariable($object);
 
         foreach ($listentity as $entity) {
-            $objectarray = (array) $entity;
+            $objectarray = (array)$entity;
             $objectvalue = array_values($objectarray);
             $rowvalue = [];
             foreach ($objectarray as $key => $value) {
@@ -414,7 +425,7 @@ class DBAL extends Database {
                 elseif (is_object($value) and get_class($value) == 'DateTime') {
                     //$rowvalue[] = $value->getDate();
                     //echo "entre la";
-                    $date = array_values((array) $value);
+                    $date = array_values((array)$value);
                     $rowvalue[] = $date[0];
                 } else
                     $rowvalue[] = $value;
@@ -442,7 +453,8 @@ class DBAL extends Database {
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
-    public function updateserialiseDbal($table, $var, $arrayvalues) {
+    public function updateserialiseDbal($table, $var, $arrayvalues)
+    {
 
         if (is_object($table))
             $table = strtolower(get_class($table));
@@ -469,7 +481,8 @@ class DBAL extends Database {
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
-    public function deleteserialiseDbal($object, $listid) {
+    public function deleteserialiseDbal($object, $listid)
+    {
         if ($object)
             $this->instanciateVariable($object);
 
@@ -483,6 +496,7 @@ class DBAL extends Database {
     public static $FETCHALL = 2;
     public static $FETCHOBJECT = 3;
     public static $FETCH = 4;
+
     /**
      * createDbal
      * persiste les entités en base de données.
@@ -490,7 +504,8 @@ class DBAL extends Database {
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
-    public function executeDbal($sql, $values = [], $action = 0) {
+    public function executeDbal($sql, $values = [], $action = 0)
+    {
 
         $query = $this->link->prepare($sql);
         $return = $query->execute($values) or die (Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
@@ -498,19 +513,27 @@ class DBAL extends Database {
 //        if(!$return["success"])
 //            return $return;
 
-        if ($action ==  self::$NOTHING) {
+        if ($action == self::$NOTHING) {
             // nothing
+            if (dbtransaction) {
+                $bd_dump = new \dclass\devups\DB_dumper();
+                $bd_dump->transaction($this->table, $sql, $values);
+            }
         } elseif ($action == self::$FETCH) {
             $return = $query->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
             //$return = 33;
         } elseif ($action == self::$INSERT) {
+            if (dbtransaction) {
+                $bd_dump = new \dclass\devups\DB_dumper();
+                $bd_dump->transaction($this->table, $sql, $values);
+            }
             $req = $this->link->prepare("select @@IDENTITY as id");
             $req->execute();
             $id = $req->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
             $return = $id['id'];
-        } elseif ($action ==  self::$FETCHALL) {
+        } elseif ($action == self::$FETCHALL) {
             $return = $query->fetchAll() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
-        } elseif ($action ==  self::$FETCHOBJECT) {
+        } elseif ($action == self::$FETCHOBJECT) {
             $return = $query->fetchObject($this->objectName) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
         }
 
@@ -524,7 +547,8 @@ class DBAL extends Database {
      * @param \stdClass $object
      * @return int l'id de l'entité persisté
      */
-    public function createDbal($object = null) {
+    public function createDbal($object = null)
+    {
         if ($object)
             $this->instanciateVariable($object);
 
@@ -545,7 +569,7 @@ class DBAL extends Database {
         $this->object->setId($id);
 
         // implement translation if anabled in class
-        if(method_exists($this->object, 'dvupsTranslate')){
+        if (method_exists($this->object, 'dvupsTranslate')) {
             $this->object->dvupsTranslate();
         }
 
@@ -564,7 +588,8 @@ class DBAL extends Database {
      * @param array $change_collection Autorise la modification de la collection d'objet en bd true par defaut
      * @return \stdClass
      */
-    public function updateDbal($object = null) {
+    public function updateDbal($object = null)
+    {
 
         global $_ENTITY_COLLECTION;
 
@@ -573,7 +598,7 @@ class DBAL extends Database {
         endif;
 
         $this->update = true;
-        $parameterQuery = '`' .$this->objectVar[1] . '`=?';
+        $parameterQuery = '`' . $this->objectVar[1] . '`=?';
         for ($i = 2; $i < $this->nbVar; $i++) {
             $parameterQuery .= ', `' . $this->objectVar[$i] . '`=?';
         }
@@ -587,8 +612,13 @@ class DBAL extends Database {
 
         $result = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
+        if (dbtransaction) {
+            $bd_dump = new \dclass\devups\DB_dumper();
+            $bd_dump->transaction($this->table, $sql, $values);
+        }
+
         // implement translation if anabled in class
-        if(method_exists($this->object, 'dvupsTranslate')){
+        if (method_exists($this->object, 'dvupsTranslate')) {
             $this->object->dvupsTranslate();
         }
 
@@ -608,7 +638,8 @@ class DBAL extends Database {
      *
      * @return array
      */
-    public function findAllDbal($critere = "") {
+    public function findAllDbal($critere = "")
+    {
         $sql = 'select * from `' . $this->table . '` ' . $critere;
         $query = $this->link->prepare($sql);
         $query->execute();
@@ -617,7 +648,8 @@ class DBAL extends Database {
         return $flowBD;
     }
 
-    public function findByIdDbal($object = null, $recursif = true, $collection = false) {
+    public function findByIdDbal($object = null, $recursif = true, $collection = false)
+    {
 
         if ($object):
             $this->instanciateVariable($object);
@@ -631,29 +663,37 @@ class DBAL extends Database {
         }
 //        var_dump( $this->objectVar);
         $sql .= ' where ' . $this->table . '.' . $this->objectVar[0] . ' = ? ';
-        if($this->softdelete)
+        if ($this->softdelete)
             $sql .= ' and ' . $this->table . '.deleted_at is null ';
 
         return $this->__findOne($sql, array($this->objectValue[0]), $collection, $recursif);
     }
 
-    public function deleteDbal($object = null) {
+    public function deleteDbal($object = null)
+    {
 
         if ($object):
             $this->instanciateVariable($object);
         endif;
 
-        if($this->softdelete)
+        if ($this->softdelete)
             $sql = "update " . $this->table . " set deleted_at = NOW() where " . $this->objectVar[0] . " = ?";
         else
             $sql = "delete from " . $this->table . " where " . $this->objectVar[0] . " = ?";
+
         $query = $this->link->prepare($sql);
         $retour = $query->execute(array($this->objectValue[0])) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo()));
+
+        if (dbtransaction) {
+            $bd_dump = new \dclass\devups\DB_dumper();
+            $bd_dump->transaction($this->table, $sql, array($this->objectValue[0]));
+        }
 
         return $retour;
     }
 
-    protected function __count($sql, $values = []) {
+    protected function __count($sql, $values = [])
+    {
 
         $query = $this->link->prepare($sql);
         $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $query->errorInfo()));
@@ -661,10 +701,11 @@ class DBAL extends Database {
         return $query->fetchColumn();
     }
 
-    private function dbrow($flowBD){
+    private function dbrow($flowBD)
+    {
 
 
-        $object_array = (array) $this->object;
+        $object_array = (array)$this->object;
 
         foreach ($object_array as $key => $value) {
 
@@ -680,16 +721,14 @@ class DBAL extends Database {
 
                         if (is_array($flowBD[$key2])) {
                             $object_array[$key] = null;//$classname;
-                            $object_array[$key."_id"] = $flowBD[$key2][0];
-                        }else {
+                            $object_array[$key . "_id"] = $flowBD[$key2][0];
+                        } else {
                             $object_array[$key] = null;// $classname;
-                            $object_array[$key."_id"] = $flowBD[$key2];
+                            $object_array[$key . "_id"] = $flowBD[$key2];
                         }
                         break;
                     }
-                }
-
-                elseif (is_array($value)) {
+                } elseif (is_array($value)) {
                     $object_array[$key] = [];
                     break;
                 } else {
@@ -705,7 +744,7 @@ class DBAL extends Database {
             }
         }
 
-        $flowBD = Bugmanager::cast((object) $object_array, get_class($this->object));
+        $flowBD = Bugmanager::cast((object)$object_array, get_class($this->object));
         $flowBD->dvfetched = true;
         $flowBD->dvinrelation = true;
 
@@ -720,7 +759,8 @@ class DBAL extends Database {
      * @param Array $values
      * @return Object
      */
-    protected function __findOneRow($sql, $values = []) {
+    protected function __findOneRow($sql, $values = [])
+    {
 
         $req = $this->link->prepare($sql);
         $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $req->errorInfo()));
@@ -747,7 +787,8 @@ class DBAL extends Database {
      * @param type $recursif
      * @return type
      */
-    protected function __findOne($sql, $values = [], $collection = false, $recursif = true) {
+    protected function __findOne($sql, $values = [], $collection = false, $recursif = true)
+    {
 
         $req = $this->link->prepare($sql);
         $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $req->errorInfo()));
@@ -777,7 +818,8 @@ class DBAL extends Database {
      * @param type $values
      * @return type
      */
-    protected function __findAllRow($sql, $values = []) {
+    protected function __findAllRow($sql, $values = [])
+    {
         $result = [];
         $query = $this->link->prepare($sql);
         $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
@@ -787,7 +829,7 @@ class DBAL extends Database {
             return $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
 
         $rows = $query->fetchAll(PDO::FETCH_NAMED);
-        foreach ($rows as $row){
+        foreach ($rows as $row) {
             $result[] = $this->dbrow($row);
         }
 
@@ -803,7 +845,8 @@ class DBAL extends Database {
      * @param type $recursif
      * @return array
      */
-    protected function __findAll($sql, $values = [], $collection = false, $recursif = false) {
+    protected function __findAll($sql, $values = [], $collection = false, $recursif = false)
+    {
 
         $query = $this->link->prepare($sql);
         $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
@@ -821,7 +864,8 @@ class DBAL extends Database {
         return $retour;
     }
 
-    private function inarray4($flowvalue) {
+    private function inarray4($flowvalue)
+    {
         $return = null;
         for ($i = 0; $i < count($flowvalue); $i++) {
             if (isset($flowvalue[$i])) {
@@ -854,11 +898,12 @@ class DBAL extends Database {
     protected $iteration = 0;
     protected $limit_iteration = 0;
 
-    private function orm($flowBD, $object, $imbricateindex = 0, $recursif = true, $collection = false) {
+    private function orm($flowBD, $object, $imbricateindex = 0, $recursif = true, $collection = false)
+    {
 
-        $object_array = (array) $object;
+        $object_array = (array)$object;
 
-        if($this->limit_iteration != 0 && $this->iteration >= $this->limit_iteration){
+        if ($this->limit_iteration != 0 && $this->iteration >= $this->limit_iteration) {
 
             $object_array["dvinrelation"] = true;
 
@@ -880,8 +925,8 @@ class DBAL extends Database {
 
                     if (strtolower(get_class($value)) . '_id' == $key2) {
 
-                        if(!Empty($this->collect)){
-                            $el = strtolower(get_class($object)).".".strtolower(get_class($value));
+                        if (!Empty($this->collect)) {
+                            $el = strtolower(get_class($object)) . "." . strtolower(get_class($value));
                             if (!in_array($el, $this->collect)) {
                                 //break;
                                 $innerrecursif = false;
@@ -897,7 +942,7 @@ class DBAL extends Database {
                                 $object_array[$key] = $this->findByIdDbal($value);
                             else
                                 $object_array[$key] = $value;
-                        }else {
+                        } else {
 
                             $this->iteration++;
                             $value->setId($flowBD[$key2]);
@@ -910,10 +955,8 @@ class DBAL extends Database {
                         $this->instanciateVariable($object);
                         break;
                     }
-                }
-
-                elseif (is_array($value)) {
-                    if($collection)
+                } elseif (is_array($value)) {
+                    if ($collection)
                         $object_array[$key] = $object->__hasmany(strtolower(get_class($value[0])));
                     else
                         $object_array[$key] = $value;
@@ -947,7 +990,8 @@ class DBAL extends Database {
      * @param Boolean $recursif weither or not the requeste should go deeper in finding entity relation.
      * @return type
      */
-    private function djoin($flowBD, $object, $collection = false, $recursif = true) {
+    private function djoin($flowBD, $object, $collection = false, $recursif = true)
+    {
 
         if (!is_array($flowBD)) {
 
@@ -956,7 +1000,7 @@ class DBAL extends Database {
 
         $object_array = $this->orm($flowBD, $object, 0, $recursif, $collection);
 
-        return Bugmanager::cast((object) $object_array, get_class($object));
+        return Bugmanager::cast((object)$object_array, get_class($object));
     }
 
     public $hasrelation = false;
@@ -968,7 +1012,8 @@ class DBAL extends Database {
      *
      * @param type $object
      */
-    protected function instanciateVariable($object) {
+    protected function instanciateVariable($object)
+    {
         global $em;
 
         $this->entity_link_list = [];
@@ -980,7 +1025,7 @@ class DBAL extends Database {
 
             $this->classmetadata = $em->getClassMetadata("\\" . get_class($object));
             $this->instanceid = $object->getId();
-            $objecarray = (array) $object;
+            $objecarray = (array)$object;
             if (isset($objecarray["dvfetched"])) {
                 unset($objecarray["dvfetched"]);
             }
@@ -1004,8 +1049,8 @@ class DBAL extends Database {
 
             $fieldname = array_keys($this->classmetadata->fieldNames);
             $association = array_keys($this->classmetadata->associationMappings);
-            if(!$this->tableExists($this->table)){
-                if($metadata = $em->getClassMetadata("\\" . $this->objectName)){
+            if (!$this->tableExists($this->table)) {
+                if ($metadata = $em->getClassMetadata("\\" . $this->objectName)) {
                     $this->table = strtolower($metadata->table['name']);
                 }
 
@@ -1031,7 +1076,7 @@ class DBAL extends Database {
                         //$date = new DateTime();
                         $this->objectVar[] = $fieldname[$j];
 //                        $this->objectVar[] = substr($key, 2);
-                        $date = array_values((array) $value);
+                        $date = array_values((array)$value);
                         $this->objectValue[$i] = $date[0];
                         $j++;
                     }
@@ -1042,7 +1087,7 @@ class DBAL extends Database {
                     unset($this->objectValue[$i]);
                 } else {
 //                    $this->objectVar[] = substr($key, 2);
-                    if(isset($fieldname[$j])){
+                    if (isset($fieldname[$j])) {
                         $this->objectVar[] = $fieldname[$j];
                         $j++;
                     }
@@ -1057,7 +1102,7 @@ class DBAL extends Database {
                 unset($this->objectValue[count($this->objectValue) - 1]);
             }
 
-            $this->nbVar = count((array) $this->objectVar);
+            $this->nbVar = count((array)$this->objectVar);
             $this->en = $this->nbVar;
 //                $this->inbricate();
             $this->en = $this->en - 1;
@@ -1068,7 +1113,8 @@ class DBAL extends Database {
      * Réinitialise l'instance du DBAL
      * c'est notament utile pour la persistance des objets avec des attributs null dans le cas d'une relation 1:n
      */
-    private function ResetObject() {
+    private function ResetObject()
+    {
         $link = $this->link;
         foreach ($this as $key => $value) {
             unset($this->$key);
@@ -1083,7 +1129,8 @@ class DBAL extends Database {
      * @param string $table Table to search for.
      * @return bool TRUE if table exists, FALSE if no table found.
      */
-    protected function tableExists($table, $pdo = null) {
+    protected function tableExists($table, $pdo = null)
+    {
 
         // Try a select statement against the table
         // Run it in try/catch in case PDO is in ERRMODE_EXCEPTION.

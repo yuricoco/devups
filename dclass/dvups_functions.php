@@ -121,3 +121,9 @@ function dv_dump(... $args){
 
     die(1);
 }
+
+function writein($file, $content){
+    $entityrooting = fopen($file, 'w');
+    fputs($entityrooting, $content);
+    fclose($entityrooting);
+}

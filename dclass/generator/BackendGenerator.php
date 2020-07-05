@@ -328,68 +328,71 @@ class BackendGenerator {
     /* 	CREATION DU CONTROLLER 	 */
     private function defaultCtrlContent($name, $entity){
 
+        $contentono = "";
+        $contentform = "";
+        $mtm = [];
+        $onoinsert = [];
+        $iter = 0;
+
+        if (!empty($entity->relation)) {
+            //relation sera l'entité
+            foreach ($entity->relation as $relation) {
+
+                if ($relation->cardinality == "oneToOne") {
+                    $contentform .= ", $".$relation->entity."_form = null";
+                    $contentono .= "
+                    
+        $" . $relation->entity . " = $" . "this->form_fillingentity(new " . ucfirst($relation->entity) . "(), $" . $relation->entity . "_form);
+        if ( $" . "this->error ) {
+            return 	array(	'success' => false,
+                            '" . $relation->entity . "' => $" . $relation->entity . ",
+                            'error' => $" . "this->error);
+        }
+        
+         ";
+                    $onoinsert[] = "
+                    $" . $relation->entity . "->__insert();
+                    $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . ");";
+                }
+            }
+        }
+
+        $onoinsert = "\n" . implode($onoinsert, "\n");
+        $otherattrib = false;
+
         $contenu = "public function listView($" . "next = 1, $" . "per_page = 10){
 
-            $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+        \$this->datatable = " . ucfirst($name) . "Table::init()->buildindextable();
 
         self::$" . "jsfiles[] = " . ucfirst($name) . "::classpath('Ressource/js/" . $name . "Ctrl.js');
 
         $" . "this->entitytarget = '" . ucfirst($name) . "';
         $" . "this->title = \"Manage " . ucfirst($name) . "\";
         
-        $" . "this->renderListView(" . ucfirst($name) . "Table::init($" . "lazyloading)->buildindextable()->render());
+        $" . "this->renderListView();
 
     }
 
     public function datatable($" . "next, $" . "per_page) {
-        $" . "lazyloading = $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+    
         return ['success' => true,
-            'datatable' => " . ucfirst($name) . "Table::init($" . "lazyloading)->buildindextable()->getTableRest(),
+            'datatable' => " . ucfirst($name) . "Table::init($" . "next, $" . "per_page)->buildindextable()->getTableRest(),
         ];
+        
     }
 
-    public function createAction($" . $name . "_form = null){
+    public function createAction($" . $name . "_form = null $contentform){
         extract($" . "_POST);
 
         $" . $name . " = $" . "this->form_fillingentity(new " . ucfirst($name) . "(), $" . $name . "_form);\n ";
         // gestion des relations many to many dans le controller
-        $mtm = [];
-        $mtmedit = [];
-        $iter = 0;
-        if (!empty($entity->relation)) {
-            //relation sera l'entité
-            foreach ($entity->relation as $relation) {
+        // $contenu .= "\n" . implode($mtm, "\n");
 
-                if ($relation->cardinality == "oneToOne") {
-                    $contenu .= "
-        //$" . $relation->entity . "Ctrl = new " . ucfirst($relation->entity) . "Controller();
-        //extract(" . ucfirst($relation->entity) . "Controller::i()->createAction());
-        $" . $relation->entity . " = $" . "this->form_fillingentity(new " . ucfirst($relation->entity) . "(), $" . $relation->entity . "_form);
-        $" . $relation->entity . "->__insert();
-        $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . "); ";
-                }
-            }
-        }
-        $contenu .= "\n" . implode($mtm, "\n");
-        $otherattrib = false;
-//        if (isset($entity->attribut[1])) {
-//            $otherattrib = true;
-        foreach ($entity->attribut as $attribut) {
-//			for($i = 1; $i < count($entity->attribut); $i++){
-            if (in_array($attribut->formtype, ['document', 'music', 'video', 'image'])){
-                $otherattrib = true;
-                $contenu .= "
-        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
-            }
-
-            if (in_array($attribut->datatype, ['date', 'datetime', 'time']) && isset($attribut->defaultvalue)){
-                $contenu .= "
-        $".$name ."->set" . ucfirst($attribut->name) . "(new DateTime());\n";
-            }
-
-        }
+//        foreach ($entity->attribut as $attribut) {
+//
 //        }
 
+        $contenu .= $contentono;
         $contenu .= "
         if ( $" . "this->error ) {
             return 	array(	'success' => false,
@@ -397,7 +400,7 @@ class BackendGenerator {
                             'action' => 'create', 
                             'error' => $" . "this->error);
         }
-        
+        $onoinsert
         $" . "id = $" . $name . "->__insert();
         return 	array(	'success' => true,
                         '" . $name . "' => $" . $name . ",
@@ -410,17 +413,7 @@ class BackendGenerator {
         extract($" . "_POST);
             
         $" . $name . " = $" . "this->form_fillingentity(new " . ucfirst($name) . "($" . "id), $" . $name . "_form);
-
-            "; //.implode($mtmedit, "\n")
-        if ($otherattrib):
-            foreach ($entity->attribut as $attribut) {
-//                            for($i = 1; $i < count($entity->attribut); $i++){
-                if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
-                    $contenu .= "
-                        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
-            }
-        endif;
-        $contenu .= "        
+     
         if ( $" . "this->error ) {
             return 	array(	'success' => false,
                             '" . $name . "' => $" . $name . ",
@@ -490,13 +483,29 @@ class BackendGenerator {
     }
 
     private function frontCtrlContent($name, $entity){
-        $contenu = "public function ll($" . "next = 1, $" . "per_page = 10){
 
-            return $" . "this->lazyloading(new " . ucfirst($name) . "(), $" . "next, $" . "per_page);
+        $contentono = "";
+        $contentform = "";
+
+        if (!empty($entity->relation)) {
+            //relation sera l'entité
+            foreach ($entity->relation as $relation) {
+
+                if ($relation->cardinality == "oneToOne") {
+                    $contentform .= ", $" . $relation->entity . "_form = null";
+                }
+            }
+        }
+
+        $contenu = "public function ll($" . "next = 1, $" . "per_page = 10){
+        
+            \$ll = new Lazyloading();
+            \$ll->lazyloading(new " . ucfirst($name) . "());
+            return \$ll;
 
     }
 
-    public function createAction($" . $name . "_form = null){
+    public function createAction($" . $name . "_form = null $contentform){
         $" . "rawdata = \Request::raw();
         $" . $name . " = $" . "this->hydrateWithJson(new " . ucfirst($name) . "(), $" . "rawdata[\"$name\"]);\n ";
         // gestion des relations many to many dans le controller
@@ -655,8 +664,11 @@ class " . ucfirst($name) . "Table extends Datatable{
         parent::__construct($"."lazyloading, $"."datatablemodel);
     }
 
-    public static function init($"."lazyloading = null){
-        $"."dt = new " . ucfirst($name) . "Table($"."lazyloading);
+    public static function init(\$next = 1, \$per_page = 25){
+        $"."dt = new " . ucfirst($name) . "Table();
+        \$dt->next = \$next;
+        \$dt->per_page = \$per_page;
+        
         return $"."dt;
     }
 
@@ -664,6 +676,7 @@ class " . ucfirst($name) . "Table extends Datatable{
 
         $"."this->datatablemodel = $datatablemodel;
 
+        \$this->lazyloading(new " . ucfirst($name) . "());
         return $"."this;
     }
     
@@ -756,7 +769,7 @@ class " . ucfirst($name) . "Table extends Datatable{
 
             $field .= "
             $" . "entitycore->field['" . $attribut->name . "'] = [
-                \"label\" => '" . ucfirst($attribut->name) . "', \n";
+                \"label\" => t('" . $entity->name . "." . $attribut->name . "'), \n";
 
             if ($attribut->nullable == 'default') {
                 $field .= "\t\t\tFH_REQUIRE => false,\n ";
@@ -840,7 +853,7 @@ class " . ucfirst($name) . "Table extends Datatable{
                 $" . "entitycore->field['" . $relation->entity . "'] = [
                     \"type\" => FORMTYPE_SELECT, 
                     \"value\" => $" . $name . "->get" . ucfirst($relation->entity) . "()->getId(),
-                    \"label\" => '" . ucfirst($relation->entity) . "',
+                    \"label\" => t('entity." . $relation->entity . "'),
                     \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
                 ];\n";
                 } elseif ($relation->cardinality == 'oneToOne') {
@@ -848,15 +861,15 @@ class " . ucfirst($name) . "Table extends Datatable{
                 $" . "entitycore->field['" . $relation->entity . "'] = [
                     \"type\" => FORMTYPE_INJECTION, 
                     FH_REQUIRE => true,
-                    \"label\" => '" . ucfirst($relation->entity) . "',
-                    \"imbricate\" => " . ucfirst($relation->entity) . "Form::__renderForm(" . ucfirst($relation->entity) . "::getFormData($" . $name . "->" . $relation->entity . "->getId(), false)),
+                    \"label\" => t('entity." . $relation->entity . "'),
+                    \"imbricate\" => " . ucfirst($relation->entity) . "Form::__renderForm(" . ucfirst($relation->entity) . "Form::getFormData($" . $name . "->" . $relation->entity . "->getId(), false)),
                 ];\n";
                 } elseif ($relation->cardinality == 'manyToMany') {
                     $field .= "
                 $" . "entitycore->field['" . $relation->entity . "'] = [
                     \"type\" => FORMTYPE_CHECKBOX, 
                     \"values\" => FormManager::Options_Helper('" . $enititylinkattrname . "', $" . $name . "->get" . ucfirst($relation->entity) . "()),
-                    \"label\" => '" . ucfirst($relation->entity) . "',
+                    \"label\" => t('entity." . $relation->entity . "'),
                     \"options\" => FormManager::Options_ToCollect_Helper('" . $enititylinkattrname . "', new " . ucfirst($relation->entity) . "(), $" . $name . "->get" . ucfirst($relation->entity) . "()),
                 ];\n";
                 }
@@ -944,7 +957,9 @@ use Genesis as g;
             if($attribut->formtype == "none")
                 continue;
 
-            $field .= "<div class='form-group'>\n<label for='" . $attribut->name . "'>" . ucfirst($attribut->name) . "</label>\n";
+            $field .= "<div class='form-group'>
+                <label for='" . $attribut->name . "'>{{t('" . $entity->name . "." . $attribut->name . "')}}</label>
+            ";
 
 //            if ($attribut->nullable == 'default') {
 //                $field .= "\tFH_REQUIRE => false,\n ";
@@ -1038,7 +1053,8 @@ use Genesis as g;
                     ['class' => 'form-control']); ?>\n";
                 }
 
-                $field .= " </div>\n";
+                $field .= " </div>
+            ";
             }
         }
 

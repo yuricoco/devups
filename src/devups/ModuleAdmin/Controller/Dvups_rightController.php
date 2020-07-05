@@ -139,4 +139,8 @@ class Dvups_rightController extends Controller{
 
             }
 
-	}
+    public function listView($next = 1, $per_page = 10)
+    {
+        // TODO: Implement listView() method.
+    }
+}

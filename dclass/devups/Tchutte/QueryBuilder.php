@@ -152,6 +152,7 @@ class QueryBuilder extends \DBAL
      */
     public function select($columns = '*', $object = null, $defaultjoin = true)
     {
+        $this->softdeletehandled = false;
         $this->defaultjoin = "";
         if (is_object($columns)):
             $this->instanciateVariable($columns);
@@ -313,6 +314,7 @@ class QueryBuilder extends \DBAL
      */
     public function selectcount($object = null)
     {
+        $this->softdeletehandled = false;
         $columns = "COUNT(*)";
         if ($object):
             $this->instanciateVariable($object);

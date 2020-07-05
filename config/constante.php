@@ -8,7 +8,9 @@ define ('dbname', 'devupstest2_bd');
 define ('dbuser', 'root');
 define ('dbpassword',  '');//BD20Devupstuto18
 define ('dbhost',  'localhost');
-        
+define ('dbdumper',  false);
+define ('dbtransaction',  false);
+
 // base url
 /**
  * config environment
@@ -21,7 +23,7 @@ define('__env', __server.'/devupstuto/');
 define('__prod', false);
 define('__default_lang', "fr");
 define('__project_id', 'devupstuto');
-define('__lang', 'en');
+define('__lang', 'fr');
 
 
 define('ROOT', __DIR__  . '/../');

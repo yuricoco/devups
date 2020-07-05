@@ -15,7 +15,7 @@ use dclass\devups\Datatable\TableRow;
  *
  * @author Aurelien Atemkeng
  */
-class Datatable
+class Datatable extends Lazyloading
 {
     protected $btnedit_class = "btn btn-warning btn-sm";
     protected $btnview_class = "btn btn-info btn-sm";
@@ -115,15 +115,15 @@ class Datatable
 
         $this->class = $lazyloading["classname"];
         $this->entity = $lazyloading["classname"];
-        $this->listentity = $lazyloading["listEntity"];
-        $this->nb_element = $lazyloading["nb_element"];
-        $this->per_page = $lazyloading["per_page"];
-        $this->pagination = $lazyloading["pagination"];
-        $this->paginationcustom = $lazyloading["paginationcustom"];
-        $this->current_page = $lazyloading["current_page"];
-        $this->next = $lazyloading["next"];
-        $this->previous = $lazyloading["previous"];
-        $this->remain = $lazyloading["remain"];
+//        $this->listentity = $lazyloading["listEntity"];
+//        $this->nb_element = $lazyloading["nb_element"];
+//        $this->per_page = $lazyloading["per_page"];
+//        $this->pagination = $lazyloading["pagination"];
+//        $this->paginationcustom = $lazyloading["paginationcustom"];
+//        $this->current_page = $lazyloading["current_page"];
+//        $this->next = $lazyloading["next"];
+//        $this->previous = $lazyloading["previous"];
+//        $this->remain = $lazyloading["remain"];
 
         // todo: free memory used by $lazyloading
         //unset($lazyloading);

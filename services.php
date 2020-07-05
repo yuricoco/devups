@@ -17,7 +17,7 @@ $storageCtrl = new StorageFrontController();
 switch (Request::get('path')) {
 
     case 'test.webservice': // test.webservice
-        g::json_encode($storageCtrl->testwebservice());
+        g::json_encode((new Local_contentFrontController())->ll());
         break;
 
     default :

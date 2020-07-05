@@ -13,9 +13,13 @@ class Local_contentTable extends Datatable
         parent::__construct($lazyloading, $datatablemodel);
     }
 
-    public static function init($lazyloading = null)
+    public static function init($next = 1, $per_page = 25)
     {
-        $dt = new Local_contentTable($lazyloading);
+
+        $dt = new Local_contentTable();
+        $dt->next = $next;
+        $dt->per_page = $per_page;
+
         return $dt;
     }
 
@@ -27,10 +31,12 @@ class Local_contentTable extends Datatable
             ['header' => t('local_content.lang', 'Lang'), 'value' => 'lang', 'search' => true],
             ['header' => t('local_content.content', 'Content'), 'value' => 'content', 'search' => true]
         ];
-
+        $this->topactions[] = "generatecache";
         //$this->per_pageEnabled = true;
         $this->enablefilter();
 
+        $this->per_page = 10;
+        $this->lazyloading(new Local_content());
         return $this;
     }
 
