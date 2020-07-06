@@ -15,6 +15,9 @@ function t($ref, $default = "", $local = null ){
     if(is_array($default)){
         $matcher = $default;
         $default = $ref;
+    }else if(is_array($local)){
+        $matcher = $local;
+        // $default = $ref;
     }else if(!$default){
         $default = $ref;
     }

@@ -6,16 +6,16 @@ use dclass\devups\Datatable\Datatable;
 class Dvups_adminTable extends Datatable
 {
 
-    public $entity = "dvups_admin";
-
     public function __construct($lazyloading = null, $datatablemodel = [])
     {
         parent::__construct($lazyloading, $datatablemodel);
     }
 
-    public static function init($lazyloading = null)
+    public static function init(\Dvups_admin $admin = null)
     {
-        $dt = new Dvups_adminTable($lazyloading);
+        $dt = new Dvups_adminTable();
+        $dt->entity = $admin;
+
         return $dt;
     }
 
@@ -28,6 +28,12 @@ class Dvups_adminTable extends Datatable
         ];
 
         $this->addcustomaction("callbackbtn");
+
+        $this->qbcustom = Dvups_admin::select()
+            ->where("login", "!=", "dv_admin");
+        //->andwhere("password", "!=", sha1("admin"));
+        $this->order_by = "dvups_admin.id desc";
+        // $this->lazyloading(new Dvups_admin(), $qb,"dvups_admin.id desc");
         return $this;
     }
 

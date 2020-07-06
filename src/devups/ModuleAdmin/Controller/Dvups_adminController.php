@@ -72,6 +72,7 @@ class Dvups_adminController extends Controller {
         Dvups_roleController::getNavigationAction($admin);
 
         $_SESSION[ADMIN] = serialize($admin);
+        $_SESSION[CSRFTOKEN] = serialize($admin);
         //$_SESSION[LANG] = $_POST['lang'];
 
         Local_contentController::buildlocalcachesinglelang($_POST['lang']);
@@ -184,11 +185,6 @@ class Dvups_adminController extends Controller {
 
     }
 
-    public static function renderDetail($id)
-    {
-        Dvups_adminForm::__renderDetailWidget(Dvups_admin::find($id));
-    }
-
     public static function renderForm($id = null, $action = "create")
     {
         $dvups_admin = new Dvups_admin();
@@ -206,45 +202,22 @@ class Dvups_adminController extends Controller {
     public function datatable($next, $per_page)
     {
 
-        $qb = Dvups_admin::select()
-            ->where("login", "!=", "dv_admin");
-        //->andwhere("password", "!=", sha1("admin"));
-
-        $admin = getadmin();
-        $approved_centre = $admin->getApprovedCenter();
-        if ($approved_centre->getId())
-            $qb = $qb->andwhere($approved_centre);
-
-        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb,"dvups_admin.id desc");
         return ['success' => true,
-            'datatable' => Dvups_adminTable::init($lazyloading)->buildindextable()->getTableRest(),
+            'datatable' => Dvups_adminTable::init(new Dvups_admin())->buildindextable()->getTableRest(),
         ];
     }
 
     public function listView($next = 1, $per_page = 10)
     {
 
-        $qb = Dvups_admin::select()
-            ->where("login", "!=", "dv_admin");
-        //->andwhere("password", "!=", sha1("admin"));
-
-        $admin = getadmin();
-        $approved_centre = $admin->getApprovedCenter();
-        if ($approved_centre->getId())
-            $qb = $qb->andwhere($approved_centre);
-
-        $lazyloading = $this->lazyloading(new Dvups_admin(), $next, $per_page, $qb, "dvups_admin.id desc");
-
         //self::$jsfiles[] = Client::classpath('Ressource/js/dvups_roleCtrl.js');
+
+        $this->datatable = Dvups_adminTable::init(new Dvups_admin())->buildindextable();
 
         $this->entitytarget = 'dvups_admin';
         $this->title = "Manage Admin";
 
-        $this->renderListView(
-            Dvups_adminTable::init($lazyloading)
-                ->buildindextable()
-                ->render()
-        );
+        $this->renderListView();
 
     }
 

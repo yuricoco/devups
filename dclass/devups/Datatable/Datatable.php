@@ -87,12 +87,17 @@ class Datatable extends Lazyloading
     protected $customaction = [];
     protected $customactions = [];
     protected $rowaction = [];
+    protected $mainrowaction = "edit";
+    protected $mainrowactionbtn = "";
     protected $groupaction = false;
     protected $groupactioncore = [];
     protected $searchaction = false;
     protected $openform = "";
     protected $closeform = "";
     protected $defaultgroupaction = "";// '<button id="deletegroup" class="btn btn-danger">delete</button>';
+
+    protected $qbcustom = null;
+    protected $order_by = "";
 
     public $base_url = "";
 
@@ -113,8 +118,9 @@ class Datatable extends Lazyloading
             return;
         }
 
-        $this->class = $lazyloading["classname"];
-        $this->entity = $lazyloading["classname"];
+        if($this->entity)
+            $this->class = get_class($this->entity);
+        // $this->entity = $lazyloading["classname"];
 //        $this->listentity = $lazyloading["listEntity"];
 //        $this->nb_element = $lazyloading["nb_element"];
 //        $this->per_page = $lazyloading["per_page"];
@@ -214,6 +220,9 @@ class Datatable extends Lazyloading
                 $this->defaultaction["delete"] = $result;
             }
 
+            if(isset($this->defaultaction[$this->mainrowaction]))
+                $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
+
             return 1;
         }
 
@@ -237,6 +246,7 @@ class Datatable extends Lazyloading
                         $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
 
                     $this->rowaction[] = $this->defaultaction["edit"];
+
                 }
             }
 
@@ -265,6 +275,9 @@ class Datatable extends Lazyloading
                 }
 
             }
+
+            if(isset($this->defaultaction[$this->mainrowaction]))
+                $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
 
             return true;
 
@@ -312,6 +325,9 @@ class Datatable extends Lazyloading
 
                     $this->rowaction[] = $this->defaultaction["delete"];
                 }
+
+                if(isset($this->defaultaction[$this->mainrowaction]))
+                    $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
 
                 return true;
             } else {
@@ -418,6 +434,9 @@ class Datatable extends Lazyloading
 
     public function render()
     {
+
+        $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
+
         $this->rowaction = [];
         if ($this->searchaction) {
             $this->openform = '<form id="datatable-form" action="#" method="get" >';
@@ -727,9 +746,8 @@ EOF;
 
     public function getSingleRowRest($entity)
     {
-
+        $this->entity = $entity;
         $this->class = get_class($entity);
-        $this->entity = get_class($entity);
         $this->listentity = [$entity];
         return $this->tablebodybuilder();
 
@@ -737,6 +755,8 @@ EOF;
 
     public function getTableRest($datatablemodel = [])
     {
+
+        $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
 
         if (!$this->listentity) {
 
@@ -930,6 +950,7 @@ EOF;
                 if (!empty($this->customactions)) {
                     foreach ($this->customactions as $customaction) {
                         $resactions = call_user_func(array($entity, $customaction . 'Action'));
+
                         if (is_array($resactions)) {
                             foreach ($resactions as $action) {
                                 if (is_string($action)) {
@@ -939,8 +960,13 @@ EOF;
                             }
 
                         } elseif (is_string($resactions)) {
+
                             $customrowaction[] = $resactions;
                         }
+
+                        if(is_string($this->mainrowaction) && $customaction == $this->mainrowaction)
+                            $this->mainrowactionbtn = $resactions;
+
                     }
 
                 }
@@ -953,7 +979,7 @@ EOF;
 
                 if ($actionbutton) {
 
-                    $actionbutton = \AdminTemplateGenerator::dt_btn_action($this->rowaction, $customrowaction, $this->actionDropdown);
+                    $actionbutton = \AdminTemplateGenerator::dt_btn_action($this->rowaction, $customrowaction, $this->actionDropdown, $this->mainrowactionbtn);
 
 //                foreach ($this->rowaction as $action)
 //                    $act .= '<li>'. $action . '</li>';
@@ -1016,7 +1042,7 @@ EOF;
          * but rowaction is a static attribut therefore it's built each time the datatable is rendering and data from
          * customaction are use at that moment.
          */
-        //$this->rowaction[] = call_user_func(array($this->entity, $action.'Action'));
+
         if (is_string($action))
             $this->customactions[] = $action;
         return $this;

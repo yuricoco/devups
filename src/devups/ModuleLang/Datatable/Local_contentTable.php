@@ -6,19 +6,16 @@ use dclass\devups\Datatable\Datatable as Datatable;
 class Local_contentTable extends Datatable
 {
 
-    public $entity = "local_content";
-
     public function __construct($lazyloading = null, $datatablemodel = [])
     {
         parent::__construct($lazyloading, $datatablemodel);
     }
 
-    public static function init($next = 1, $per_page = 25)
+    public static function init(\Local_content $local_content = null)
     {
 
         $dt = new Local_contentTable();
-        $dt->next = $next;
-        $dt->per_page = $per_page;
+        $dt->entity = $local_content;
 
         return $dt;
     }
@@ -36,8 +33,9 @@ class Local_contentTable extends Datatable
         $this->enablefilter();
 
         $this->per_page = 10;
-        $this->lazyloading(new Local_content());
+        /// $this->lazyloading(new Local_content());
         return $this;
+
     }
 
     public function builddetailtable()

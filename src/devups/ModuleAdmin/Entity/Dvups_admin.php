@@ -182,9 +182,6 @@ class Dvups_admin extends Model implements JsonSerializable
 
     public function __insert()
     {
-        $admin = getadmin();
-        if($admin->getApprovedCenter()->getId())
-            $this->approved_center = $admin->getApprovedCenter();
 
         return parent::__insert();
 

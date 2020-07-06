@@ -347,22 +347,20 @@ class BackendGenerator {
             return 	array(	'success' => false,
                             '" . $relation->entity . "' => $" . $relation->entity . ",
                             'error' => $" . "this->error);
-        }
-        
-         ";
-                    $onoinsert[] = "
-                    $" . $relation->entity . "->__insert();
-                    $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . ");";
+        }";
+        $onoinsert[] = "
+        $" . $relation->entity . "->__insert();
+        $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . ");";
                 }
             }
         }
 
-        $onoinsert = "\n" . implode($onoinsert, "\n");
+        $onoinsert = "\n" . implode($onoinsert, "");
         $otherattrib = false;
 
         $contenu = "public function listView($" . "next = 1, $" . "per_page = 10){
 
-        \$this->datatable = " . ucfirst($name) . "Table::init()->buildindextable();
+        \$this->datatable = " . ucfirst($name) . "Table::init(new " . ucfirst($name) . "())->buildindextable();
 
         self::$" . "jsfiles[] = " . ucfirst($name) . "::classpath('Ressource/js/" . $name . "Ctrl.js');
 
@@ -376,7 +374,7 @@ class BackendGenerator {
     public function datatable($" . "next, $" . "per_page) {
     
         return ['success' => true,
-            'datatable' => " . ucfirst($name) . "Table::init($" . "next, $" . "per_page)->buildindextable()->getTableRest(),
+            'datatable' => " . ucfirst($name) . "Table::init(new " . ucfirst($name) . "())->buildindextable()->getTableRest(),
         ];
         
     }
@@ -384,7 +382,13 @@ class BackendGenerator {
     public function createAction($" . $name . "_form = null $contentform){
         extract($" . "_POST);
 
-        $" . $name . " = $" . "this->form_fillingentity(new " . ucfirst($name) . "(), $" . $name . "_form);\n ";
+        $" . $name . " = $" . "this->form_fillingentity(new " . ucfirst($name) . "(), $" . $name . "_form);
+        if ( $" . "this->error ) {
+            return 	array(	'success' => false,
+                            '" . $name . "' => $" . $name . ",
+                            'action' => 'create', 
+                            'error' => $" . "this->error);
+        } ";
         // gestion des relations many to many dans le controller
         // $contenu .= "\n" . implode($mtm, "\n");
 
@@ -394,12 +398,6 @@ class BackendGenerator {
 
         $contenu .= $contentono;
         $contenu .= "
-        if ( $" . "this->error ) {
-            return 	array(	'success' => false,
-                            '" . $name . "' => $" . $name . ",
-                            'action' => 'create', 
-                            'error' => $" . "this->error);
-        }
         $onoinsert
         $" . "id = $" . $name . "->__insert();
         return 	array(	'success' => true,
@@ -657,17 +655,16 @@ use dclass\devups\Datatable\Datatable as Datatable;
 
 class " . ucfirst($name) . "Table extends Datatable{
     
-    public $"."entity = \"" . $name . "\";
 
     public function __construct($"."lazyloading = null, $"."datatablemodel = [])
     {
         parent::__construct($"."lazyloading, $"."datatablemodel);
     }
 
-    public static function init(\$next = 1, \$per_page = 25){
+    public static function init(\\" . ucfirst($name) . " \$$name = null){
+    
         $"."dt = new " . ucfirst($name) . "Table();
-        \$dt->next = \$next;
-        \$dt->per_page = \$per_page;
+        \$dt->entity = \$$name;
         
         return $"."dt;
     }
@@ -676,7 +673,6 @@ class " . ucfirst($name) . "Table extends Datatable{
 
         $"."this->datatablemodel = $datatablemodel;
 
-        \$this->lazyloading(new " . ucfirst($name) . "());
         return $"."this;
     }
     

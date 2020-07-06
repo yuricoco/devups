@@ -11,7 +11,7 @@ class Local_contentController extends Controller
 
     public function listView($next = 1, $per_page = 10){
 
-        $this->datatable = Local_contentTable::init()->buildindextable();
+        $this->datatable = Local_contentTable::init(new Local_content())->buildindextable();
 
         self::$jsfiles[] = Local_content::classpath('Ressource/js/local_contentCtrl.js');
 
@@ -24,7 +24,7 @@ class Local_contentController extends Controller
 
     public function datatable($next, $per_page) {
         return ['success' => true,
-            'datatable' => Local_contentTable::init($next, $per_page)->buildindextable()->getTableRest(),
+            'datatable' => Local_contentTable::init(new Local_content())->buildindextable()->getTableRest(),
         ];
     }
 

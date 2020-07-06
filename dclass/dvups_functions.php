@@ -127,3 +127,7 @@ function writein($file, $content){
     fputs($entityrooting, $content);
     fclose($entityrooting);
 }
+
+function randomtoken(){
+    $randomtoken = base64_encode( openssl_random_pseudo_bytes(32));
+}

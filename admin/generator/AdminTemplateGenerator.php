@@ -10,7 +10,7 @@ class AdminTemplateGenerator extends DvAdmin
         $this->traitement = new Traitement();
     }
 
-    static function dt_btn_action($rowaction, $customrowactions, $actionDropdown)
+    static function dt_btn_action($rowaction, $customrowactions, $actionDropdown, $mainaction)
     {
 
         $actionclass = ['edit' => "mb-2 mr-2 btn btn-warning",
@@ -58,13 +58,24 @@ EOF;
             }
         }
 
+        if (is_array($mainaction)) {
+
+//                if (isset($actionclass[$mainaction["class"]]))
+//                    $mainaction["ctlass"] = $actionclass[$mainaction["class"]];
+
+            $mainaction = '<button type="button" class="btn btn-warning" ' . $mainaction["action"] . ' >' . $mainaction["content"] . '</button>';
+
+            }
         return <<<EOF
-<div class="d-inline-block dropdown">
+<div class="btn-group d-inline-block dropdown">
+    $mainaction
+    <div class="btn-group" role="group">
     <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" class="btn-shadow dropdown-toggle btn btn-light">
-        Actions
+        <i class="fa fa-angle-down"></i>
     </button>
     <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-131px, 33px, 0px);">
         <ul class="nav flex-column"> $act </ul>
+    </div>
     </div>
 </div>
 EOF;

@@ -17,6 +17,7 @@ class Local_contentForm extends FormManager
 
         //$entitycore->addcss('csspath');
 
+        // todo: add hidden field for csrf look for : https://resources.infosecinstitute.com/fixing-csrf-vulnerability-in-php-application/#gref
 
         $entitycore->field['lang'] = [
             "label" => 'Lang',

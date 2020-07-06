@@ -41,6 +41,7 @@ define('ENTITY', 0);
 define('VIEW', 1);
 
 define('ADMIN', __project_id.'_devups');
+define('CSRFTOKEN', __project_id.'_csrf_token');
 define('dv_role_navigation', __project_id.'_navigation');
 define('dv_role_permission', __project_id.'_permission');
 

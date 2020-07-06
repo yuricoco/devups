@@ -1,9 +1,8 @@
 
 @extends('layout')
-@section('title', 'New admin')
+@section('title', 'List')
 
-
-@section('content')
+@section('layout_content')
 
 
 <div class="row">
