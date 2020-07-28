@@ -165,11 +165,11 @@ abstract class FormManager {
         
     }
 
-    public static function key_as_value(array $array)
+    public static function key_as_value(array $array, $translate = false)
     {
         $key_value = [];
         foreach ($array as $item){
-            $key_value[$item] = $item;
+            $key_value[$item] = t("option.".$item, $item);
         }
         return $key_value;
     }

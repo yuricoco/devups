@@ -132,7 +132,7 @@ class Local_contentController extends Controller
     }
 
     public function regeneratecacheAction(){
-        // self::buildlocalcache();
+        self::buildlocalcache();
 
         Response::success()
             ->message(t("local cache regenerated with success"))
@@ -148,6 +148,9 @@ class Local_contentController extends Controller
             $lcs = Local_content::where("lang", $lang)->__getAllRow();
 
             $info = [];
+
+            if(file_exists(self::$path . $lang . ".json"))
+                unlink(self::$path . $lang . ".json");
 
             foreach ($lcs as $lc) {
                 $info[$lc->getReference()] = $lc->getContent();

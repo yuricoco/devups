@@ -84,24 +84,14 @@ class Dvups_roleController extends Controller
     public function listView($next = 1, $per_page = 10)
     {
 
-        $lazyloading = $this->lazyloading(new Dvups_role(), $next, $per_page);
-
         self::$jsfiles[] = Dvups_role::classpath('Ressource/js/dvups_roleCtrl.js');
 
         $this->entitytarget = 'dvups_role';
         $this->title = "Manage Role";
-        $datatablemodel = [
-            ['header' => 'Name', 'value' => 'name'],
-            ['header' => 'Alias', 'value' => 'alias']
-        ];
 
-        $this->renderListView(
-            Dvups_roleTable::init($lazyloading)->buildindextable()->render()
-        );
-//        $this->renderListView(
-//            Datatable::buildtable($lazyloading, $datatablemodel)
-//                ->render()
-//        );
+        $this->datatable = Dvups_roleTable::init()->buildindextable();
+
+        $this->renderListView();
 
     }
 

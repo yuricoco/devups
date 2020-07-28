@@ -48,40 +48,23 @@ class Dvups_moduleController extends Controller
 
     public function datatable($next, $per_page)
     {
-        $lazyloading = $this->lazyloading(new Dvups_module(), $next, $per_page);
+
         return ['success' => true,
-            'datatable' => Dvups_moduleTable::init($lazyloading)
-                ->buildindextable()
-                ->getTableRest(),
+            'datatable' => Dvups_moduleTable::init(new Dvups_module())->buildindextable()->getTableRest(),
         ];
     }
 
     public function listView($next = 1, $per_page = 10)
     {
 
-        $lazyloading = $this->lazyloading(new Dvups_module(), $next, $per_page);
-
-        //self::$jsfiles[] = Client::classpath('Ressource/js/dvups_roleCtrl.js');
+        self::$jsfiles[] = Dvups_entity::classpath('Ressource/js/dvups_moduleCtrl.js');
 
         $this->entitytarget = 'dvups_module';
         $this->title = "Manage Module";
 
-        $this->renderListView(
-            Dvups_moduleTable::init($lazyloading)
-                ->buildindextable()
-                ->render()
-        );
+        $this->datatable = Dvups_entityTable::init()->buildindextable();
 
-    }
-
-    public function listAction($next = 1, $per_page = 10)
-    {
-
-        $lazyloading = $this->lazyloading(new Dvups_module(), $next, $per_page);
-
-        return array('success' => true, // pour le restservice
-            'lazyloading' => $lazyloading, // pour le web service
-            'detail' => '');
+        $this->renderListView();
 
     }
 

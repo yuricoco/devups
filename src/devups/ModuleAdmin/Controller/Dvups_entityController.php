@@ -46,22 +46,22 @@ class Dvups_entityController extends Controller
 
     public function datatable($next, $per_page)
     {
-        $lazyloading = $this->lazyloading(new Dvups_entity(), $next, $per_page);
         return ['success' => true,
-            'datatable' => Dvups_entityTable::init($lazyloading)
-                ->buildindextable()
-                ->getTableRest(),
+            'datatable' => Dvups_entityTable::init(new Dvups_entity())->buildindextable()->getTableRest(),
         ];
     }
 
-    public function listAction($next = 1, $per_page = 10)
+    public function listView($next = 1, $per_page = 10)
     {
 
-        $lazyloading = $this->lazyloading(new Dvups_entity(), $next, $per_page);
+        self::$jsfiles[] = Dvups_entity::classpath('Ressource/js/dvups_entityCtrl.js');
 
-        return array('success' => true, // pour le restservice
-            'lazyloading' => $lazyloading, // pour le web service
-            'detail' => '');
+        $this->entitytarget = 'dvups_entity';
+        $this->title = "Manage Entity";
+
+        $this->datatable = Dvups_entityTable::init()->buildindextable();
+
+        $this->renderListView();
 
     }
 
@@ -137,8 +137,4 @@ class Dvups_entityController extends Controller
 
     }
 
-    public function listView($next = 1, $per_page = 10)
-    {
-        // TODO: Implement listView() method.
-    }
 }

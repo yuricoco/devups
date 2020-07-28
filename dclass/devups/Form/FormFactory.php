@@ -18,6 +18,20 @@ class FormFactory {
     protected static $fieldid;
     protected static $class;
 
+    public static function __inputradio($entitycore, $field, $directive = "") {
+
+        $radio = '';
+        $key = $field['option'];
+        //foreach ($field['options'] as $key => $value) {
+            if ('' . $field['value'] == '' . $key)
+                $radio .= '<input class="" name="' . FormFactory::$fieldname . '" type="radio" value="' . $key . '" checked />';
+            else
+                $radio .= '<input class="" name="' . FormFactory::$fieldname . '" type="radio" value="' . $key . '" />';
+        //}
+
+        return $radio;
+    }
+
     public static function __radio($entitycore, $field, $directive = "") {
 
         $radio = '';
@@ -109,7 +123,16 @@ class FormFactory {
 //                            . '</div>';
 //                }
 //            };
-        } else {
+        }
+        elseif (isset($field['checker'])){
+            if(is_callable($field['checker'])){
+                foreach ($field['options'] as $key => $value) {
+                    $ckecked = $field['checker']($key) ? "checked": "";
+                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $key . '" '.$ckecked.' /><span>' . $value . '</span></label></div>';
+                }
+            }
+        }
+        else {
 
             if ($field['values']) {
                 foreach ($field['values'] as $key => $value) {
@@ -144,9 +167,9 @@ class FormFactory {
 
         foreach ($field['options'] as $key => $value) {
             if ('' . $field['value'] == '' . $key)
-                $select .= '<option value="' . $key . '" selected >' . $value . '</option>\n';
+                $select .= '<option value="' . $key . '" selected >' . $value . '</option>';
             else
-                $select .= '<option value="' . $key . '" >' . $value . '</option>\n';
+                $select .= '<option value="' . $key . '" >' . $value . '</option>';
         }
 
         return $select . '</select>';

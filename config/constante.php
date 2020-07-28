@@ -22,8 +22,8 @@ define('__server', 'http://127.0.0.1');
 define('__env', __server.'/devupstuto/');
 define('__prod', false);
 define('__default_lang', "fr");
-define('__project_id', 'devupstuto');
 define('__lang', 'fr');
+define('__project_id', 'devupstuto');
 
 
 define('ROOT', __DIR__  . '/../');

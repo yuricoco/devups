@@ -5,6 +5,10 @@
         "ifsnop/mysqldump-php": "^2.9"
     },
     "autoload": {
+        "classmap": [
+            "dclass/",
+            "src/"
+        ],
         "psr-0": {"": "src/"}
     }
 }

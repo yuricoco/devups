@@ -15,6 +15,8 @@ $action = 'index.php?path=connexion';
     <!-- iso-8859-1  -->
     <meta name="author" content="spacekola">
     <title class="mdi mdi-sort-variant">Dashboard | Dvups Admin</title>
+    <!-- Favicons -->
+    <link href="<?= __env; ?>favicon.png" rel="icon">
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Language" content="en">
@@ -27,44 +29,47 @@ $action = 'index.php?path=connexion';
 </head>
 
 <body>
+
 <div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
 
     <div class="app-main">
-        <div class="app-main__outer">
-            <div class="app-main__inner">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-4 col-md-offset-4">
-                            <div class="login-panel panel panel-default">
-                                <div class="panel-heading">
-                                    <h3 class="panel-title">Please Sign In </h3>
-                                    <?php if (isset($_GET["err"])){ ?>
-                                    <div class="alert alert-warning"><?= $_GET["err"] ?></div>
-                                    <?php } ?>
-                                </div>
-                                <div class="panel-body">
-                                    <form role="form" method="post" action="<?= $action; ?>">
-                                        <fieldset>
-                                            <div class="form-group">
-                                                <input class="form-control" placeholder="Login" name="login" type="text"
-                                                       autofocus/>
-                                            </div>
-                                            <div class="form-group">
-                                                <input class="form-control" placeholder="Password" name="password"
-                                                       type="password"
-                                                       value=""/>
-                                            </div>
+        <div class="container">
+            <div style="width: 400px; margin: auto" class="loginbox">
 
-                                            <button type="submit" class="btn btn-lg btn-success btn-block">Se
-                                                connecter
-                                            </button>
-                                        </fieldset>
-                                    </form>
+                <div class="login-left">
+                    <img class="img-fluid" src="<?= __env; ?>logo-long.png" alt="Logo">
+                </div><hr >
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+
+                        <h1>Login</h1>
+                        <p class="account-subtitle">Access to our dashboard</p>
+
+                        <?php if (isset($_GET["err"])){ ?>
+                            <div class="alert alert-warning"><?= $_GET["err"] ?></div>
+                        <?php } ?>
+                    </div>
+                    <div class="panel-body">
+                        <form role="form" method="post" action="<?= $action; ?>">
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Login" name="login" type="text"
+                                           autofocus/>
                                 </div>
-                            </div>
-                        </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Password" name="password"
+                                           type="password"
+                                           value=""/>
+                                </div>
+
+                                <button type="submit" class="btn btn-lg btn-success btn-block">Se
+                                    connecter
+                                </button>
+                            </fieldset>
+                        </form>
                     </div>
                 </div>
+
             </div>
         </div>
     </div>

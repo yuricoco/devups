@@ -220,7 +220,11 @@ class QueryBuilder extends \DBAL
     {
         $this->columns = null;
         $this->sequence = 'delete';
-        $this->query = "  delete `" . $this->table . "` from `" . $this->table . "` ";
+        if ($this->softdelete)
+            $this->query = "update " . $this->table . " set deleted_at = NOW() ";
+        else
+            $this->query = "  delete `" . $this->table . "` from `" . $this->table . "` ";
+
         $this->endquery = " where id = " . $this->instanceid;
 
         return $this;
@@ -296,7 +300,8 @@ class QueryBuilder extends \DBAL
                     }
                 } else {
                     $this->parameters[] = $value;
-                    $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
+                    // $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
+                    $arrayset[] = $dot . implode('.', $keymap) . " = ? ";
                 }
             }
             $this->query .= implode(", ", $arrayset);

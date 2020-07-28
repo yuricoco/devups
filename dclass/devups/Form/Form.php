@@ -26,9 +26,10 @@ class Form extends FormFactory{
         Form::$name = strtolower(Form::$classname);
         $action = trim($directives["action"]);
         $directives["action"] = "index.php?path=".Form::$name."/".trim($action);
-        if($overideaction)
+        if($overideaction){
             $directives["action"] = trim($action);
-
+        }else
+            $action = Form::$name . "/" . $action;
         $formdirective = [];
         foreach ($directives as $key => $value) {
             $formdirective[] = $key ."='" . $value ."'";
@@ -36,7 +37,7 @@ class Form extends FormFactory{
 
         //return "<form id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
         // onsubmit=\"return dform._submit(this, '".Form::$name."/$action' )\"
-        return "<form action='" . Form::$name . "/" . $action . "' id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
+        return "<form action='" . $action . "' id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
 
     }
 
@@ -73,7 +74,7 @@ class Form extends FormFactory{
     }
 
     public static function addjs($js){
-        return "<script src='".$js.".js?v="._jsversion."' ></script>";
+        return "<script src='".$js.".js?v=".__jsversion."' ></script>";
     }
 
     public static function addcss($css){
@@ -208,6 +209,14 @@ class Form extends FormFactory{
         FormFactory::$fieldid = Form::$name."-".$name.'';
         $field["value"] = $value;
         $field["type"] = $type;
+
+        if($type == FORMTYPE_RADIO){
+            Form::inputfield($name, $value[0], $setter);
+
+            $field["value"] = $value[0];
+            $field["option"] = $value[1];
+            return Form::__inputradio("", $field, Form::serialysedirective($directive));
+        }
 
         Form::inputfield($name, $value, $setter);
 
