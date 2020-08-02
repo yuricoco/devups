@@ -169,6 +169,16 @@ abstract class Controller
 
                     if (isset($value['values']) || isset($value["checker"])) {
 
+                        if(!class_exists($key)){
+
+                            if (!method_exists($object, $currentfieldsetter)) {
+                                $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
+                            } elseif ($error = call_user_func(array($object, $currentfieldsetter), implode(",", $_ENTITY_FORM[$key])))
+                                $this->error[$key] = $error;
+
+                            continue;
+                        }
+
                         $toadd = array_diff($_ENTITY_FORM[$key], $value["values"]);
                         $todrop = array_diff($value["values"],$_ENTITY_FORM[$key]);
 

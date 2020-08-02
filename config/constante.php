@@ -2,7 +2,7 @@
                 
 define('PROJECT_NAME', 'devupstuto');
 
-define ('dbname', 'devupstest2_bd');
+define ('dbname', 'devupstest3_bd');
 //define ('dbname', 'devupstest_bd');
 //define ('dbname', 'devupstuto_bd');
 define ('dbuser', 'root');

@@ -164,16 +164,21 @@ class BackendGenerator {
             $length = "";
             $nullable = "";
 
-            if (in_array($attribut->formtype, ["radio", "checkbox", "select"]) && isset($attribut->enum)) {
+            if (in_array($attribut->formtype, ["radio", "checkbox", "select"])) {
                 $staticenum = [];
-                foreach ($attribut->enum as $key => $enum){
-                    $staticenum[] = " '$key' => '$enum'";
+                if(isset($attribut->enum)){
+                    foreach ($attribut->enum as $key => $enum){
+                        if(is_string($enum))
+                            $staticenum[] = "'$enum'";
+                        else
+                            $staticenum[] = $enum;
+                        //$staticenum[] = " '$key' => '$enum'";
+                    }
                 }
 
                 $construt .= "
-        /**
-         **/
-        public static $" . strtoupper($attribut->name) . "S = [".implode(",", $staticenum)."];";
+        /* enum */
+        public static $" . $attribut->name. "s = [".implode(",", $staticenum)."];";
 
             }
 
@@ -218,7 +223,7 @@ class BackendGenerator {
             $"."dfile = self::Dfile($"."file);
             if(!$"."dfile->errornofile){
             
-                $"."filedir = '" . $attribut->name . "/';
+                $"."filedir = '" . $name . "/';
                 $"."url = $"."dfile
                     ->hashname()
                     ->moveto($"."filedir);
@@ -232,6 +237,9 @@ class BackendGenerator {
             }
         }     
              
+        public function src" . ucfirst($attribut->name) . "() {
+            return Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
+        }
         public function show" . ucfirst($attribut->name) . "() {
             $"."url = Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
             return Dfile::fileadapter($"."url, $"."this->" . $attribut->name . ");
@@ -245,14 +253,14 @@ class BackendGenerator {
             $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
         }
         ";
-                } elseif (in_array($attribut->formtype, ['date', 'datepicker'])) {
+                } elseif (false && in_array($attribut->formtype, ['date', 'datepicker'])) {
                     $construt .= "
 
         public function get" . ucfirst($attribut->name) . "() {
-                if(is_object($" . "this->" . $attribut->name . "))
-                        return $" . "this->" . $attribut->name . ";
-                else
-                        return new DateTime($" . "this->" . $attribut->name . ");
+            if(is_object($" . "this->" . $attribut->name . "))
+                return $" . "this->" . $attribut->name . ";
+            else
+                return new DateTime($" . "this->" . $attribut->name . ");
         }
 
         public function set" . ucfirst($attribut->name) . "($" . $attribut->name . ") {
@@ -793,7 +801,14 @@ class " . ucfirst($name) . "Table extends Datatable{
                 \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'radio') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), 
+                \"options\" => " . ucfirst($name) . "::$" . $attribut->name . "s, 
+                ";
+            } elseif ($attribut->formtype == 'select') {
+                $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
+                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), 
+                \"options\" => " . ucfirst($name) . "::$" . $attribut->name . "s, 
+                ";
             } elseif ($attribut->formtype == 'email') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
                 \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
@@ -975,7 +990,9 @@ use Genesis as g;
             } elseif ($attribut->formtype == 'datepicker') {
                 $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'radio') {
-                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::radio('" . $attribut->name . "', " . ucfirst($name) . "::$" . $attribut->name . "s, $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+            } elseif ($attribut->formtype == 'select') {
+                $field .= "\t<?= Form::select('" . $attribut->name . "', " . ucfirst($name) . "::$" . $attribut->name . "s, $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'email') {
                 $field .= "\t<?= Form::email('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
             } elseif (in_array($attribut->formtype, ['document', 'image', 'musique', 'video'])){
@@ -1024,7 +1041,7 @@ use Genesis as g;
                     $enititylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $field .= "<div class='form-group'>\n<label for='" . $relation->entity . "'>" . ucfirst($relation->entity) . "</label>\n";
+                $field .= "<div class='form-group'><label for='" . $relation->entity . "'>" . ucfirst($relation->entity) . "</label>";
 
                 if ($relation->cardinality == 'manyToOne') {
                     $field .= "
@@ -1044,7 +1061,7 @@ use Genesis as g;
                     $field .= "
                     <?= Form::checkbox('" . $relation->entity . "', 
                     FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
-                    $" . $name . "->inCollectionOf('" . ucfirst($relation->entity) . "')),
+                    $" . $name . "->inCollectionOf('" . ucfirst($relation->entity) . "'),
                     ['class' => 'form-control']); ?>\n";
                 }
 
@@ -1101,14 +1118,14 @@ use Genesis as g;
         $field = $this->formwidget($entity, $listmodule);
 
         $contenu = "
-    <?php use dclass\devups\Form\Form; ?>
+    <?php //use dclass\devups\Form\Form; ?>
     <?php //Form::addcss(" . ucfirst($name) . " ::classpath('Ressource/js/".$name."')) ?>
     
     <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action\", \"method\"=> \"post\"]) ?>
 
      " . $field . "
        
-    <?= Form::submit(\"save\", ['class' => 'btn btn-success']) ?>
+    <?= Form::submitbtn(\"save\", ['class' => 'btn btn-success btn-block']) ?>
     
     <?= Form::close() ?>
     
