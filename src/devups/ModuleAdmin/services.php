@@ -8,6 +8,8 @@ use Request as R;
 
 header("Access-Control-Allow-Origin: *");
 
+global $viewdir;
+$viewdir[] = __DIR__ . '/Ressource/views';
 
 $dvups_adminCtrl = new Dvups_adminController();
 $dvups_entityCtrl = new Dvups_entityController();
@@ -53,7 +55,7 @@ switch (Request::get('path')) {
         break;
 
     case 'dvups_entity._new':
-        g::json_encode(Dvups_entityController::renderForm());
+        Dvups_entityForm::render();
         break;
     case 'dvups_entity.create':
         g::json_encode($dvups_entityCtrl->createAction());
@@ -62,7 +64,7 @@ switch (Request::get('path')) {
         g::json_encode($dvups_entityCtrl->updateAction(R::get("id")));
         break;
     case 'dvups_entity._edit':
-        g::json_encode(Dvups_entityController::renderForm(R::get("id")));
+        Dvups_entityForm::render(R::get("id"));
         break;
     case 'dvups_entity._show':
         g::json_encode(Dvups_entityController::renderDetail(R::get("id")));
@@ -122,7 +124,7 @@ switch (Request::get('path')) {
         break;
 
     case 'dvups_role._new':
-        g::json_encode(Dvups_roleController::renderForm());
+        Dvups_roleForm::renderWidget();
         break;
     case 'dvups_role.create':
         g::json_encode($dvups_roleCtrl->createAction());
@@ -131,7 +133,7 @@ switch (Request::get('path')) {
         g::json_encode($dvups_roleCtrl->updateAction(R::get("id")));
         break;
     case 'dvups_role._edit':
-        g::json_encode(Dvups_roleController::renderForm(R::get("id")));
+        Dvups_roleForm::renderWidget(R::get("id"));
         break;
     case 'dvups_role._show':
         g::json_encode(Dvups_roleController::renderDetail(R::get("id")));

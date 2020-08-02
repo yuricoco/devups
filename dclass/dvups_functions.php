@@ -28,7 +28,10 @@ function setlang($lang) {
     $_SESSION[LANG] = $lang;
 }
 
-function redirect($url = ""){
+function redirect($url = "", $admin = false){
+    if($admin)
+        header('location: '. $url );
+
     header('location: '. __env . $url );
 }
 

@@ -20,12 +20,28 @@
     display: block;
 }
 .app-wrapper-footer{
-    /*position: absolute;*/
-    /*bottom: 0;*/
-    /*width: calc(100% - 80px)!important;*/
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: calc(100%)!important;
+}
+.app-main__outer  .app-wrapper-footer{
+    left: 280px;
+    width: calc(100% - 280px)!important;
 }
 
 .dv_modal{
     width: 500px; background: transparent; display: block; min-height: 50px; padding-top: 80px;
     transition: .5s;
+}
+
+.app-main__inner {
+    padding-bottom: 50px !important;
+}
+
+.dv_datatable .torder{
+    position: absolute;
+    bottom: .5em;
+    display: block;
+    opacity: .3;
 }

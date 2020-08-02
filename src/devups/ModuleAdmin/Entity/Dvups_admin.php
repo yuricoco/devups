@@ -9,8 +9,13 @@ class Dvups_admin extends Model implements JsonSerializable
      * @Id @GeneratedValue @Column(type="integer")
      * @var int
      * */
-    private $id;
+    protected $id;
 
+    /**
+     * @Column(name="firstconnexion", type="integer", nullable=true )
+     * @var string
+     * */
+    private $firstconnexion = 1;
     /**
      * @Column(name="lastlogin_at", type="datetime", nullable=true )
      * @var string
@@ -60,6 +65,22 @@ class Dvups_admin extends Model implements JsonSerializable
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getFirstconnexion()
+    {
+        return $this->firstconnexion;
+    }
+
+    /**
+     * @param string $firstconnexion
+     */
+    public function setFirstconnexion($firstconnexion)
+    {
+        $this->firstconnexion = $firstconnexion;
     }
 
     /**

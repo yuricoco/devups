@@ -5,8 +5,8 @@
 
 @section('layout_content')
 
-    <div class="row">
-        <div class="col-md-4 col-md-offset-4 auto">
+    <div style="width: 400px; margin: auto"  class="">
+        <div class="auto">
             <div class="login-panel panel panel-default">
                 <div class="panel-heading">
                     <h3 class="panel-title">Change password <?php echo $detail; ?></h3>

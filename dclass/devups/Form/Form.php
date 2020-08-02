@@ -217,6 +217,20 @@ class Form extends FormFactory{
             $field["option"] = $value[1];
             return Form::__inputradio("", $field, Form::serialysedirective($directive));
         }
+        if($type == FORMTYPE_CHECKBOX){
+            Form::inputfield($name, $value[0], $setter);
+
+            if(isset($field["values"]))
+                $field["values"] += $value[1];
+            else
+                $field["values"] = $value[1];
+
+            $field["option"] = $value[0];
+
+            Form::collectionfield($name, $field["values"], [], $setter);
+
+            return Form::__checkboxinput($field, Form::serialysedirective($directive));
+        }
 
         Form::inputfield($name, $value, $setter);
 

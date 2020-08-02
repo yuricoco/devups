@@ -13,6 +13,7 @@ use Philo\Blade\Blade;
 abstract class Controller
 {
 
+    public static $sidebar = true;
     protected $error = [];
     protected $error_exist = false;
     protected $entity = null;
@@ -166,7 +167,12 @@ abstract class Controller
 
                     $currentfieldsetter = 'set' . ucfirst($value["setter"]);
 
-                    if (isset($value['values'])) {
+                    if (isset($value['values']) || isset($value["checker"])) {
+
+                        $toadd = array_diff($_ENTITY_FORM[$key], $value["values"]);
+                        $todrop = array_diff($value["values"],$_ENTITY_FORM[$key]);
+
+                        //dv_dump($toadd, $todrop);
 
                         $_ENTITY_COLLECTION[] = [
                             'owner' => $object->getId()
@@ -175,8 +181,10 @@ abstract class Controller
                         $collection = [];
                         $oldselection = [];
 
-                        if ($_ENTITY_FORM[$key]) {
-                            foreach ($_ENTITY_FORM[$key] as $val) {
+                        // if ($_ENTITY_FORM[$key]) {
+                        if ($toadd) {
+                            // foreach ($_ENTITY_FORM[$key] as $val) {
+                            foreach ($toadd as $val) {
 
                                 $reflect = new \ReflectionClass($key);
                                 $value2 = $reflect->newInstance();
@@ -188,41 +196,42 @@ abstract class Controller
                             $_ENTITY_COLLECTION[]["selection"] = false;
                         }
 
-                        if (isset($value['values']['list'])) {
+                        if ($todrop) {
 
-                            foreach ($value['values']['list'] as $ky => $val) {
-
-                                $reflect = new \ReflectionClass($key);
-                                $value2 = $reflect->newInstance();
-                                $value2->setId($ky);
-                                $oldselection[] = $value2;
-                            }
-                        } else {
-
-                            foreach ($value['values'] as $ky => $val) {
+                            foreach ($todrop as $val) {
 
                                 $reflect = new \ReflectionClass($key);
                                 $value2 = $reflect->newInstance();
-                                $value2->setId($ky);
+                                $value2->setId($val);
                                 $oldselection[] = $value2;
                             }
                         }
+// else {
+//
+//                            foreach ($value['values'] as $ky => $val) {
+//
+//                                $reflect = new \ReflectionClass($key);
+//                                $value2 = $reflect->newInstance();
+//                                $value2->setId($ky);
+//                                $oldselection[] = $value2;
+//                            }
+//                        }
+//
+//                        $intersect = \EntityCollection::intersection($oldselection, $collection);
 
-                        $intersect = \EntityCollection::intersection($oldselection, $collection);
+                        //$toadd = \EntityCollection::diff($collection, $intersect);
+                        // $todrop = \EntityCollection::diff($oldselection, $intersect);
 
-                        $toadd = \EntityCollection::diff($collection, $intersect);
-                        $todrop = \EntityCollection::diff($oldselection, $intersect);
-
-                        if ($toadd)
+                        if ($collection)
                             $_ENTITY_COLLECTION[]["toadd"] = true;
 
                         if ($todrop) {
-                            $_ENTITY_COLLECTION[]["todrop"] = array_values($todrop);
+                            $_ENTITY_COLLECTION[]["todrop"] = $oldselection;//array_values($todrop);
                         }
 
                         if (!method_exists($object, $currentfieldsetter)) {
                             $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
-                        } elseif ($error = call_user_func(array($object, $currentfieldsetter), $toadd))
+                        } elseif ($error = call_user_func(array($object, $currentfieldsetter), $collection))
                             $this->error[$key] = $error;
 
                     } else

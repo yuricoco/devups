@@ -784,9 +784,7 @@ abstract class Model extends \stdClass
     public function __construct($id = null)
     {
 
-        if ($id) {
             $this->id = $id;
-        }
 
     }
 
@@ -864,6 +862,44 @@ abstract class Model extends \stdClass
             "updated_at" => $this->updated_at,
             "deleted_at" => $this->deleted_at,
         ];
+    }
+
+    public function inCollectionOf($collection, $key_map = ""){
+
+        if(!$this->getId())
+            return [];
+
+        $thisclass = get_class($this);
+        $entityTable = $collection;
+        $entity_id = "id";
+
+        $dbal = new DBAL();
+        if ($key_map) {
+            // do nothing
+            $entityTable = $key_map;
+        }elseif ($dbal->tableExists($collection . '_' . $thisclass)) {
+            $entityTable = $collection . '_' . $thisclass;
+            $entity_id = $collection."_id";
+        } elseif ($dbal->tableExists($thisclass . "_" . $collection)) {
+            $entityTable = $thisclass . "_" . $collection;
+            $entity_id = $collection."_id";
+        }
+//        else {
+//            $association = false;
+//            $entityTable = $entityName;
+//            $direction = "lr";
+//        }
+
+        $collection_ids = [];
+
+        $dbal = new DBAL();
+        $results = $dbal->executeDbal(strtolower(" select $entity_id from `$entityTable` where ".$thisclass."_id = ".$this->getId()), [], DBAL::$FETCHALL);
+        foreach ($results as $index => $values)
+            $collection_ids[] = $values[0];
+            //$result = $result[$index][0];
+
+        return $collection_ids;
+        //return implode(",", $collection_ids);
     }
 
 }

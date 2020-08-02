@@ -62,7 +62,7 @@ class Dvups_moduleController extends Controller
         $this->entitytarget = 'dvups_module';
         $this->title = "Manage Module";
 
-        $this->datatable = Dvups_entityTable::init()->buildindextable();
+        $this->datatable = Dvups_moduleTable::init()->buildindextable();
 
         $this->renderListView();
 

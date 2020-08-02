@@ -33,4 +33,16 @@ class Dvups_moduleTable extends Datatable
         return $this;
     }
 
+    public function render()
+    {
+        $this->lazyloading($this->entity);
+        return parent::render();
+    }
+
+    public function getTableRest($datatablemodel = [])
+    {
+        $this->lazyloading($this->entity);
+        return parent::getTableRest();
+    }
+
 }

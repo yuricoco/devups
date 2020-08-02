@@ -93,8 +93,8 @@ class BackendGenerator {
 
                     $attrib .= "
         /**
-         * @" . ucfirst($relation->cardinality) . "(targetEntity=\"" . $antislash . ucfirst($relation->entity) . "\")
-         * , inversedBy=\"reporter\"
+         * " . ucfirst($relation->cardinality) . "
+         * @ManyToOne(targetEntity=\"" . $antislash . ucfirst($relation->entity) . "\")
          * @var " . $antislash . ucfirst($relation->entity) . "
          */
         public $" . $relation->entity . ";\n";
@@ -120,7 +120,6 @@ class BackendGenerator {
                     $attrib .= "
         /**
          * @" . ucfirst($relation->cardinality) . "(targetEntity=\"" . $antislash . ucfirst($relation->entity) . "\")
-         * , inversedBy=\"reporter\"
          * @var " . $antislash . ucfirst($relation->entity) . "
          */
         public $" . $relation->entity . ";\n";
@@ -864,9 +863,9 @@ class " . ucfirst($name) . "Table extends Datatable{
                     $field .= "
                 $" . "entitycore->field['" . $relation->entity . "'] = [
                     \"type\" => FORMTYPE_CHECKBOX, 
-                    \"values\" => FormManager::Options_Helper('" . $enititylinkattrname . "', $" . $name . "->get" . ucfirst($relation->entity) . "()),
+                    \"values\" => $" . $name . "->inCollectionOf('" . ucfirst($relation->entity) . "'),
                     \"label\" => t('entity." . $relation->entity . "'),
-                    \"options\" => FormManager::Options_ToCollect_Helper('" . $enititylinkattrname . "', new " . ucfirst($relation->entity) . "(), $" . $name . "->get" . ucfirst($relation->entity) . "()),
+                    \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
                 ];\n";
                 }
             }
@@ -1044,8 +1043,8 @@ use Genesis as g;
                     //FormManager::Options_ToCollect_Helper('name', new Dvups_right(), $dvups_role->getDvups_right()
                     $field .= "
                     <?= Form::checkbox('" . $relation->entity . "', 
-                    FormManager::Options_ToCollect_Helper('" . $enititylinkattrname . "', new " . ucfirst($relation->entity) . "(), $" . $name . "->get" . ucfirst($relation->entity) . "()),
-                    FormManager::Options_Helper('" . $enititylinkattrname . "', $" . $name . "->get" . ucfirst($relation->entity) . "()),
+                    FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
+                    $" . $name . "->inCollectionOf('" . ucfirst($relation->entity) . "')),
                     ['class' => 'form-control']); ?>\n";
                 }
 

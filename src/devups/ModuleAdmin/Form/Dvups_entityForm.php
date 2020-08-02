@@ -1,67 +1,86 @@
 <?php
 
+
+use Genesis as g;
+
 class Dvups_entityForm extends FormManager
 {
 
-    public static function formBuilder(\Dvups_entity $dvups_entity, $action = null, $button = false)
+    public static function formBuilder($dataform, $button = false)
     {
+        $dvups_entity = new \Dvups_entity();
+        extract($dataform);
         $entitycore = new Core($dvups_entity);
 
         $entitycore->formaction = $action;
         $entitycore->formbutton = $button;
 
-        if($dvups_entity->getId()){
+        //$entitycore->addcss('csspath');
 
-            $entitycore->field['name'] = [
-                "label" => 'Name',
-                "type" => FORMTYPE_TEXT,
-                "directive" => ["readonly"=>true],
-                "value" => $dvups_entity->getName(),
-            ];
 
-        }else{
-
-            $entitycore->field['name'] = [
-                "label" => 'Name',
-                "type" => FORMTYPE_TEXT,
-                "value" => $dvups_entity->getName(),
-            ];
-
-        }
-
-        $entitycore->field['label'] = [
-            "label" => 'Label',
+        $entitycore->field['name'] = [
+            "label" => t('dvups_entity.name'),
             "type" => FORMTYPE_TEXT,
-            "value" => $dvups_entity->getLabel(),
+            "value" => $dvups_entity->getName(),
         ];
 
         $entitycore->field['dvups_module'] = [
             "type" => FORMTYPE_SELECT,
             "value" => $dvups_entity->getDvups_module()->getId(),
-            "label" => 'Dvups_module',
-            "options" => FormManager::Options_Helper('name', Dvups_module::all()),
+            "label" => t('entity.dvups_module'),
+            "options" => FormManager::Options_Helper('name', Dvups_module::allrows()),
         ];
 
         $entitycore->field['dvups_right'] = [
             "type" => FORMTYPE_CHECKBOX,
-            "values" => FormManager::Options_Helper('name', $dvups_entity->getDvups_right()),
-            "label" => 'Dvups_right',
-            "options" => FormManager::Options_ToCollect_Helper('name', new Dvups_right(), $dvups_entity->getDvups_right()),
+            "values" => $dvups_entity->inCollectionOf('Dvups_right'),
+            "label" => t('entity.dvups_right'),
+            "options" => FormManager::Options_Helper('name', Dvups_right::allrows()),
         ];
 
 
-        $entitycore->addDformjs();
+        $entitycore->addDformjs($button);
+        $entitycore->addjs(Dvups_entity::classpath('Ressource/js/dvups_entityForm'));
+
         return $entitycore;
     }
 
-    public static function __renderForm(\Dvups_entity $dvups_entity, $action = null, $button = false)
+    public static function __renderForm($dataform, $button = false)
     {
-        return FormFactory::__renderForm(Dvups_entityForm::formBuilder($dvups_entity, $action, $button));
+        return FormFactory::__renderForm(Dvups_entityForm::formBuilder($dataform, $button));
     }
 
-    public static function __renderDetailWidget(\Dvups_entity $dvups_entity)
+    public static function getFormData($id = null, $action = "create")
     {
-        include ROOT . Dvups_entity::classpath() . "Form/Dvups_entityDetailWidget.php";
+        if (!$id):
+            $dvups_entity = new Dvups_entity();
+
+            return [
+                'success' => true,
+                'dvups_entity' => $dvups_entity,
+                'action' => "create",
+            ];
+        endif;
+
+        $dvups_entity = Dvups_entity::find($id);
+        return [
+            'success' => true,
+            'dvups_entity' => $dvups_entity,
+            'action' => "update&id=" . $id,
+        ];
+
+    }
+
+    public static function render($id = null, $action = "create")
+    {
+        g::json_encode(['success' => true,
+            'form' => self::__renderForm(self::getFormData($id, $action), true),
+        ]);
+    }
+
+    public static function renderWidget($id = null, $action = "create")
+    {
+        Genesis::renderView("dvups_entity.formWidget", self::getFormData($id, $action));
     }
 
 }

@@ -48,7 +48,7 @@
                 @foreach ($dvups_navigation as $key => $module)
                     <li>
                         <a aria-expanded="true" href="#">
-                            <i class="metismenu-icon pe-7s-diamond"></i>
+                            <i class="{{$module["module"]->getFavicon()}}"></i>
                             <span class="menu-title">{{$module["module"]->getLabel()}}</span>
                             <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                         </a>

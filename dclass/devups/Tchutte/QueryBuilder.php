@@ -300,8 +300,7 @@ class QueryBuilder extends \DBAL
                     }
                 } else {
                     $this->parameters[] = $value;
-                    // $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
-                    $arrayset[] = $dot . implode('.', $keymap) . " = ? ";
+                    $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
                 }
             }
             $this->query .= implode(", ", $arrayset);

@@ -48,26 +48,28 @@ class FormFactory {
 
     public static function __checkboxinput($field, $directive = "", $callback = null ) {
 
-        $checkbox['checkecd'] = [];
-        $checkbox['uncheckecd'] = [];
+//        $checkbox['checkecd'] = [];
+//        $checkbox['uncheckecd'] = [];
 
-        if ($field['values']) {
-            foreach ($field['values'] as $key => $value) {
-                $input = '<input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $value->getId() . '" checked />';
+//        if ($field['values']) {
+//            foreach ($field['values'] as $key => $value) {
+//                $input = '<input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $value->getId() . '" checked />';
+//
+//                $checkbox['checkecd'][] = ["checkbox" => $input, "entity" => $value];
+//            }
+//        }
 
-                $checkbox['checkecd'][] = ["checkbox" => $input, "entity" => $value];
-            }
+        if ($field['option']) {
+            //foreach ($field['options'] as $key => $value) {
+
+                $ckecked = (in_array($field['option'], $field['values']) )? "checked": "";
+                return '<input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $field['option'] . '"  '.$ckecked.' />';
+
+//                $checkbox['uncheckecd'][] = ["checkbox" => $input, "entity" => $value];
+            //}
         }
 
-        if ($field['options']) {
-            foreach ($field['options'] as $key => $value) {
-                $input = '<input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $value->getId() . '" />';
-
-                $checkbox['uncheckecd'][] = ["checkbox" => $input, "entity" => $value];
-            }
-        }
-
-        call_user_func($callback, $checkbox);
+//        call_user_func($callback, $checkbox);
     }
 
     public static function __checkbox($entitycore, $field, $directive = "") {
@@ -126,23 +128,30 @@ class FormFactory {
         }
         elseif (isset($field['checker'])){
             if(is_callable($field['checker'])){
-                foreach ($field['options'] as $key => $value) {
-                    $ckecked = $field['checker']($key) ? "checked": "";
-                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $key . '" '.$ckecked.' /><span>' . $value . '</span></label></div>';
+                foreach ($field['options'] as $id => $value) {
+                    $ckecked = $field['checker']($id) ? "checked": "";
+                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $id . '" '.$ckecked.' /><span>' . $value . '</span></label></div>';
+                }
+            }
+            elseif (is_array($field['checker'])){
+                foreach ($field['options'] as $id => $value) {
+                    $ckecked = (in_array($id, $field['checker']) )? "checked": "";
+                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $id . '" '.$ckecked.' /><span>' . $value . '</span></label></div>';
                 }
             }
         }
         else {
 
-            if ($field['values']) {
-                foreach ($field['values'] as $key => $value) {
-                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $key . '" checked /><span>' . $value . '</span></label></div>';
-                }
-            }
-            $checkbox .= '<hr>';
+//            if ($field['values']) {
+//                foreach ($field['values'] as $key => $value) {
+//                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $key . '" checked /><span>' . $value . '</span></label></div>';
+//                }
+//            }
+//            $checkbox .= '<hr>';
             if ($field['options']) {
-                foreach ($field['options'] as $key => $value) {
-                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $key . '" /><span>' . $value . '</span></label></div>';
+                foreach ($field['options'] as $id => $value) {
+                    $ckecked = (in_array($id, $field['values']) )? "checked": "";
+                    $checkbox .= '<div class="checkbox dv-checkbox" ><label><input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $id . '" '.$ckecked.' /><span>' . $value . '</span></label></div>';
                 }
             }
         }

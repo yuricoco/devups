@@ -41,8 +41,12 @@
     @include("layout.navbartop")
 
     <div class="app-main">
-        @include("layout.navbar")
-        <div class="app-main__outer">
+
+        @if(\dclass\devups\Controller\Controller::$sidebar)
+            @include("layout.navbar")
+        @endif
+
+        <div class="{{\dclass\devups\Controller\Controller::$sidebar ? 'app-main__outer' : ""}}">
             <div id="dv_main_container" class="app-main__inner">
                 @yield('content')
             </div>

@@ -10,7 +10,7 @@ class Dvups_entity extends Model implements JsonSerializable, DvupsTranslation
      * @Id @GeneratedValue @Column(type="integer")
      * @var int
      * */
-    private $id;
+    protected $id;
 
     /**
      * @Column(name="name", type="string" , length=25 )

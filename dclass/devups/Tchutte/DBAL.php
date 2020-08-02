@@ -494,6 +494,7 @@ class DBAL extends Database
     public static $NOTHING = 0;
     public static $INSERT = 1;
     public static $FETCHALL = 2;
+    public static $FETCHALLROWS = 5;
     public static $FETCHOBJECT = 3;
     public static $FETCH = 4;
 
@@ -532,7 +533,7 @@ class DBAL extends Database
             $id = $req->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
             $return = $id['id'];
         } elseif ($action == self::$FETCHALL) {
-            $return = $query->fetchAll() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+            $return = $query->fetchAll();// or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
         } elseif ($action == self::$FETCHOBJECT) {
             $return = $query->fetchObject($this->objectName) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
         }
@@ -1129,7 +1130,7 @@ class DBAL extends Database
      * @param string $table Table to search for.
      * @return bool TRUE if table exists, FALSE if no table found.
      */
-    protected function tableExists($table, $pdo = null)
+    public function tableExists($table, $pdo = null)
     {
 
         // Try a select statement against the table

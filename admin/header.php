@@ -20,8 +20,8 @@ require __DIR__.'/../src/requires.php';
 define('VENDOR', __env. 'admin/vendors/');
 define('assets', __env. 'admin/assets/');
 
-define('_cssversion', '1');
-define('_jsversion', '1');
+define('__cssversion', '1');
+define('__jsversion', '1');
 
 
 // move comment scope to enable authentication 

@@ -9,7 +9,7 @@
          * @Id @GeneratedValue @Column(type="integer")
          * @var int
          * */
-        private $id; 
+        protected $id;
         
         /**
          * @ManyToOne(targetEntity="\Dvups_entity")

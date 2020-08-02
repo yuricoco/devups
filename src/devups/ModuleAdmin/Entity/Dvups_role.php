@@ -3,7 +3,8 @@
 /**
  * @Entity @Table(name="dvups_role")
  * */
-class Dvups_role extends Model implements JsonSerializable {
+class Dvups_role extends Model implements JsonSerializable
+{
 
     static $SELLER = "seller";
 
@@ -11,7 +12,7 @@ class Dvups_role extends Model implements JsonSerializable {
      * @Id @GeneratedValue @Column(type="integer")
      * @var int
      * */
-    private $id;
+    protected $id;
     /**
      * @Column(name="name", type="string" , length=255 )
      * @var string
@@ -38,7 +39,8 @@ class Dvups_role extends Model implements JsonSerializable {
      */
     public $dvups_entity;
 
-    public function array_rigth() {
+    public function array_rigth()
+    {
         $array_rigth = [];
 
         foreach ($this->rigth as $rigth) {
@@ -49,7 +51,8 @@ class Dvups_role extends Model implements JsonSerializable {
         return $array_rigth;
     }
 
-    public function array_gestion() {
+    public function array_gestion()
+    {
         $array_gestion = [];
         $array_gestion_avance = [];
         $gestionDao = new GestionDAO();
@@ -74,121 +77,145 @@ class Dvups_role extends Model implements JsonSerializable {
         return $array_gestion;
     }
 
-    public function __construct($id = null) {
+    public function __construct($id = null)
+    {
 
-        if ($id) {
+        if ($id)
             $this->id = $id;
-        }
 
-        $this->dvups_right = EntityCollection::entity_collection('dvups_right');
-        $this->dvups_module = EntityCollection::entity_collection('dvups_module');
-        $this->dvups_entity = EntityCollection::entity_collection('dvups_entity');
+        $this->dvups_right = [];
+        $this->dvups_module = [];
+        $this->dvups_entity = [];
     }
 
-    function collectDvups_right() {
+    function collectDvups_right()
+    {
         $this->dvups_right = $this->__hasmany('dvups_right');
         return $this->dvups_right;
     }
 
-    function collectDvups_module() {
+    function collectDvups_module()
+    {
         $this->dvups_module = $this->__hasmany('dvups_module');
         return $this->dvups_module;
     }
 
-    function collectDvups_entity() {
+    function collectDvups_entity()
+    {
         $this->dvups_entity = $this->__hasmany('dvups_entity');
         return $this->dvups_entity;
     }
-    
-    public function getId() {
+
+    public function getId()
+    {
         return $this->id;
     }
 
-    public function setId($id) {
+    public function setId($id)
+    {
         $this->id = $id;
     }
 
-    public function getName() {
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function setName($name) {
+    public function setName($name)
+    {
         $this->name = $name;
     }
 
-    public function getAlias() {
+    public function getAlias()
+    {
         return $this->alias;
     }
 
-    public function setAlias($alias) {
+    public function setAlias($alias)
+    {
         $this->alias = $alias;
     }
 
     /**
      *  manyToMany
-     * 	@return \Dvups_right
+     * @return \Dvups_right
      */
-    function setDvups_right($rigth) {
+    function setDvups_right($rigth)
+    {
         $this->dvups_right = $rigth;
     }
-    function setDvups_module($dvups_module) {
+
+    function setDvups_module($dvups_module)
+    {
         $this->dvups_module = $dvups_module;
     }
 
-    function setDvups_entity($dvups_entity) {
+    function setDvups_entity($dvups_entity)
+    {
         $this->dvups_entity = $dvups_entity;
     }
 
-        /**
+    /**
      *  manyToMany
-     * 	@return \Dvups_right
+     * @return \Dvups_right
      */
-    function getDvups_right() {
+    function getDvups_right()
+    {
         return $this->dvups_right;
     }
 
-    function addDvups_right(\Dvups_right $dvups_right) {
+    function addDvups_right(\Dvups_right $dvups_right)
+    {
         $this->dvups_right[] = $dvups_right;
     }
 
-    function dropDvups_rightCollection() {
+    function dropDvups_rightCollection()
+    {
         $this->dvups_right = EntityCollection::entity_collection('dvups_right');
     }
 
     /**
      *  manyToMany
-     * 	@return \Dvups_module
+     * @return \Dvups_module
      */
-    function getDvups_module() {
+    function getDvups_module()
+    {
         return $this->dvups_module;
     }
 
-    function addDvups_module(\Dvups_module $dvups_module) {
+    function addDvups_module(\Dvups_module $dvups_module)
+    {
         $this->dvups_module[] = $dvups_module;
     }
 
-    function dropDvups_moduleCollection() {
+    function dropDvups_moduleCollection()
+    {
         $this->dvups_module = EntityCollection::entity_collection('dvups_module');
     }
 
     /**
      *  manyToMany
-     * 	@return \Dvups_entity
+     * @return \Dvups_entity
      */
-    function getDvups_entity() {
+    function getDvups_entity()
+    {
         return $this->dvups_entity;
     }
 
-    function addDvups_entity(\Dvups_entity $dvups_entity) {
+    function addDvups_entity(\Dvups_entity $dvups_entity)
+    {
         $this->dvups_entity[] = $dvups_entity;
     }
 
-    function dropDvups_entityCollection() {
+    function dropDvups_entityCollection()
+    {
         $this->dvups_entity = EntityCollection::entity_collection('dvups_entity');
     }
 
-    public function jsonSerialize() {
+    public function jsonSerialize()
+    {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'alias' => $this->alias,
             'dvups_right' => $this->dvups_right,
@@ -199,7 +226,7 @@ class Dvups_role extends Model implements JsonSerializable {
 
     public function is($role)
     {
-        if($this->name == $role)
+        if ($this->name == $role)
             return true;
 
         return false;
@@ -207,17 +234,18 @@ class Dvups_role extends Model implements JsonSerializable {
 
     public function isIn($roles)
     {
-        if(in_array($this->name,  $roles))
+        if (in_array($this->name, $roles))
             return true;
 
         return false;
     }
 
-    public static function updateprivilegeAction(){
+    public static function updateprivilegeAction()
+    {
 
         $admin = getadmin();
-        if($admin->dvups_role->is("admin"))
-            return '<button onclick="model.updateprivilege()"  class=\'btn btn-info\'> '.t("Update Privilege").' </button>';
+        if ($admin->dvups_role->is("admin"))
+            return '<button onclick="model.updateprivilege()"  class=\'btn btn-info\'> ' . t("Update Privilege") . ' </button>';
 
     }
 

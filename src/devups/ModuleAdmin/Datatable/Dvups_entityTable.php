@@ -24,6 +24,7 @@ class Dvups_entityTable extends Datatable
     {
 
         $this->datatablemodel = [
+            ['header' => "#", 'value' => 'id', "order"=>true],
             ['header' => 'Name', 'value' => 'name', 'search' => true],
             ['header' => 'Dvups_module', 'value' => 'Dvups_module.name'],
             ['header' => 'Label', 'value' => 'label', 'get' => 'labelform']
@@ -31,6 +32,18 @@ class Dvups_entityTable extends Datatable
         $this->enablefilter();
 
         return $this;
+    }
+
+    public function render()
+    {
+        $this->lazyloading($this->entity);
+        return parent::render();
+    }
+
+    public function getTableRest($datatablemodel = [])
+    {
+        $this->lazyloading($this->entity);
+        return parent::getTableRest();
     }
 
 }

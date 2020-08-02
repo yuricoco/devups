@@ -23,6 +23,12 @@ switch (Request::get('path')) {
         Genesis::renderView("overview");
         break;
 
+    case 'dvups-admin/complete-registration':
+        Genesis::renderView('dvups_admin.complete_registration', $dvups_adminCtrl->completeRegistrationView(Request::get("id")));
+        break;
+    case 'dvups-admin/complete':
+        $dvups_adminCtrl->completeRegistrationAction(Request::get("id"));
+        break;
     case 'dvups-admin/profile':
         Genesis::renderView('dvups_admin.profile', ["admin" => Dvups_admin::find(getadmin()->getId())], "profile");
         break;

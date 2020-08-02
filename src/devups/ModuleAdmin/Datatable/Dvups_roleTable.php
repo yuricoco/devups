@@ -6,11 +6,6 @@ use dclass\devups\Datatable\Datatable;
 class Dvups_roleTable extends Datatable
 {
 
-    public $datatablemodel = [
-        ['header' => 'Name', 'value' => 'name'],
-        ['header' => 'Alias', 'value' => 'alias']
-    ];
-
     public function __construct($lazyloading = null, $datatablemodel = [])
     {
         parent::__construct($lazyloading, $datatablemodel);
