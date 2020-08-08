@@ -149,14 +149,15 @@ class Local_contentController extends Controller
 
             $info = [];
 
-            if(file_exists(self::$path . $lang . ".json"))
-                unlink(self::$path . $lang . ".json");
-
             foreach ($lcs as $lc) {
                 $info[$lc->getReference()] = $lc->getContent();
             }
 
             if ($info) {
+                // todo - fix issue on php warning during the first call of the function translate t().
+                if(file_exists(self::$path . $lang . ".json"))
+                    unlink(self::$path . $lang . ".json");
+
                 $contenu = json_encode($info, 1024);
 
                 $entityrooting = fopen(self::$path . $lang . ".json", 'w');

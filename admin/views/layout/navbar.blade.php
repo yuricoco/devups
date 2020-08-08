@@ -56,7 +56,7 @@
                             @foreach ($module["entities"] as $entity)
                                 <li>
                                     <a href="<?= path('src/' . strtolower($module["module"]->getProject()) . '/' . $module["module"]->getName() . '/' . $entity->getUrl() . '/index') ?>">
-                                        <i class="metismenu-icon"></i> <?= $entity->getLabel() ?> | manage
+                                        <i class="metismenu-icon"></i> <?= $entity->getLabel() ?>
                                     </a>
                                 </li>
                             @endforeach
