@@ -28,9 +28,9 @@ INSERT INTO `dvups_module` (`id`, `name`, `project`, `dvups_component_id`) VALUE
 -- Déchargement des données de la table `dvups_entity`
 --
 
-INSERT INTO `dvups_entity` (`id`, `name`, `dvups_module_id`) VALUES
-(1, 'dvups_admin', 1),
-(2, 'dvups_role', 1);
+INSERT INTO `dvups_entity` (`id`, `name`,`url`, `dvups_module_id`) VALUES
+(1, 'dvups_admin','dvups-admin', 1),
+(2, 'dvups_role', 'dvups-role', 1);
 
 
 --
@@ -96,28 +96,4 @@ INSERT INTO `dvups_role_dvups_component` (`id`, `dvups_component_id`, `dvups_rol
 -- Déchargement des données de la table `dvups_role_dvups_module`
 --
 
-INSERT INTO `configuration` ( `_key`, `_value`) VALUES
-("PROJECT_NAME", "My Projet"),
-("dbname", "my_project"),
-("dbuser", "my_project"),
-("dbpassword", "my_project"),
-("dbhost", "my_project"),
-("__v", "my_project"),
-("__env", "my_project"),
-("__prod", "my_project"),
-("UPLOAD_DIR", "my_project"),
-("RESSOURCE", "my_project"),
-("admin_dir", "my_project"),
-("web_dir", "my_project"),
-("SRC_FILE", "my_project"),
-("VENDOR", "my_project"),
-("UPLOAD_DIR_SRC", "my_project"),
-("JS", "my_project"),
-("IMG", "my_project"),
-("CSS", "my_project"),
-("IHM", "my_project"),
-("ENTITY", "my_project"),
-("VIEW", "my_project"),
-("ADMIN", "my_project"),
-("ADMIN", "my_project");
 

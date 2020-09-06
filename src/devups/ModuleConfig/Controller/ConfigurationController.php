@@ -101,4 +101,10 @@ class ConfigurationController extends Controller{
 
     }
 
+    public function buildAction()
+    {
+        Configuration::buildConfig();
+        return  Response::$data;
+    }
+
 }

@@ -15,7 +15,7 @@ class Dvups_config_item extends Model implements JsonSerializable, DvupsTranslat
      **/
     protected $name;
     /**
-     * @Column(name="label", type="string" , length=50 )
+     * @Column(name="label", type="string" , length=50, nullable=true )
      * @var string
      **/
     protected $label;

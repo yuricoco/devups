@@ -70,6 +70,9 @@
         case 'dvups_entity.datatable':
                 g::json_encode($dvups_entityCtrl->datatable(R::get('next'), R::get('per_page')));
                 break;
+        case 'dvups-entity.truncate':
+                g::json_encode($dvups_entityCtrl->truncateAction(R::get('id')));
+                break;
 
         case 'dvups_module._new':
                 Dvups_moduleForm::render();
@@ -119,6 +122,9 @@
                 break;
         case 'configuration.datatable':
                 g::json_encode($configurationCtrl->datatable(R::get('next'), R::get('per_page')));
+                break;
+        case 'configuration.build':
+                g::json_encode($configurationCtrl->buildAction());
                 break;
 
 	

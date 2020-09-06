@@ -139,4 +139,17 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
     {
         // TODO: Implement dvupsTranslate() method.
     }
+
+    public function truncate()
+    {
+
+        $sql = "TRUNCATE `".$this->name."` ";
+        $dbal = new DBAL();
+        $dbal->executeDbal($sql);
+
+    }
+    public function countRow()
+    {
+        return ucfirst($this->getLabel())::count();
+    }
 }

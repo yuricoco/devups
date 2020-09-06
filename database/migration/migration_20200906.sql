@@ -10,3 +10,7 @@
      ALTER TABLE dvups_component ADD url VARCHAR(25) DEFAULT NULL;
      ALTER TABLE dvups_entity CHANGE name name VARCHAR(50) NOT NULL, CHANGE label label VARCHAR(50) NOT NULL;
      ALTER TABLE dvups_module ADD url VARCHAR(25) DEFAULT NULL, CHANGE label label VARCHAR(50) NOT NULL;
+     ALTER TABLE configuration ADD comment LONGTEXT DEFAULT NULL;
+     ALTER TABLE dvups_component CHANGE label label VARCHAR(50) DEFAULT NULL;
+     ALTER TABLE dvups_entity CHANGE label label VARCHAR(50) DEFAULT NULL;
+     ALTER TABLE dvups_module CHANGE label label VARCHAR(50) DEFAULT NULL;

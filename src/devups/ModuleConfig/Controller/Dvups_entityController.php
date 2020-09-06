@@ -137,4 +137,15 @@ class Dvups_entityController extends Controller
 
     }
 
+    public function truncateAction($id)
+    {
+        $dvups_entity = Dvups_entity::find($id);
+        $dvups_entity->truncate();
+
+        return 	array(	'success' => true,
+            'dvups_entity' => $dvups_entity,
+            'tablerow' => Dvups_entityTable::init()->buildindextable()->getSingleRowRest($dvups_entity),
+            'detail' => '');
+    }
+
 }

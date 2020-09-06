@@ -91,7 +91,7 @@ class Datatable extends Lazyloading
     protected $mainrowactionbtn = "";
     protected $groupaction = false;
     protected $groupactioncore = [];
-    protected $searchaction = false;
+    protected $searchaction = true;
     protected $openform = "";
     protected $closeform = "";
     protected $defaultgroupaction = "";// '<button id="deletegroup" class="btn btn-danger">delete</button>';
@@ -114,11 +114,11 @@ class Datatable extends Lazyloading
 
     public function __construct($lazyloading, $datatablemodel = [])
     {
-        if(!$lazyloading){
+        if (!$lazyloading) {
             return;
         }
 
-        if($this->entity)
+        if ($this->entity)
             $this->class = get_class($this->entity);
         // $this->entity = $lazyloading["classname"];
 //        $this->listentity = $lazyloading["listEntity"];
@@ -134,7 +134,7 @@ class Datatable extends Lazyloading
         // todo: free memory used by $lazyloading
         //unset($lazyloading);
 
-        if( $datatablemodel )
+        if ($datatablemodel)
             $this->datatablemodel = $datatablemodel;
 
         //$this->columnaction = $action;
@@ -149,24 +149,23 @@ class Datatable extends Lazyloading
 
     }
 
-    public function top_action() {
+    public function top_action()
+    {
 
         $top_action = '';
-        foreach ($this->topactions as $topaction){
+        foreach ($this->topactions as $topaction) {
 
-            if (method_exists($this->class, $topaction."Action") && $result = call_user_func(array($this->class, $topaction."Action")))
-            {
-                if(is_array($result))
+            if (method_exists($this->class, $topaction . "Action") && $result = call_user_func(array($this->class, $topaction . "Action"))) {
+                if (is_array($result))
                     $top_action .= implode('', $result);
                 else
                     $top_action .= $result;
-            }
-            else
+            } else
                 $top_action .= $topaction;
 
         }
         //$rigths = getadmin()->availableentityright($action);
-        if(!$this->defaultaction)
+        if (!$this->defaultaction)
             return $top_action;
 
         $entityrigths = \Dvups_entity::getRigthOf($this->class);
@@ -186,8 +185,8 @@ class Datatable extends Lazyloading
                 //}
                 //$top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
             }
-        }elseif (isset($_SESSION[dv_role_permission])) {
-            if (in_array('create', $_SESSION[dv_role_permission])){
+        } elseif (isset($_SESSION[dv_role_permission])) {
+            if (in_array('create', $_SESSION[dv_role_permission])) {
                 if (is_string($this->createaction))
                     $top_action .= $this->createaction;
                 else
@@ -220,7 +219,7 @@ class Datatable extends Lazyloading
                 $this->defaultaction["delete"] = $result;
             }
 
-            if(isset($this->defaultaction[$this->mainrowaction]))
+            if (isset($this->defaultaction[$this->mainrowaction]))
                 $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
 
             return 1;
@@ -235,14 +234,13 @@ class Datatable extends Lazyloading
             if (in_array('update', $entityrigths)) {
                 if (in_array('update', $_SESSION[dv_role_permission])) {
                     $method = 'editAction';
-                    if (method_exists($entity, $method)){
+                    if (method_exists($entity, $method)) {
                         $result = call_user_func(array($entity, $method), $this->defaultaction["edit"]);
                         if (!is_null($result))
                             $this->defaultaction["edit"] = $result;
                         else
                             $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
-                    }
-                    else
+                    } else
                         $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
 
                     $this->rowaction[] = $this->defaultaction["edit"];
@@ -263,7 +261,7 @@ class Datatable extends Lazyloading
                 }
             }
             if (in_array('delete', $entityrigths)) {
-                if (in_array('delete', $_SESSION[dv_role_permission])){
+                if (in_array('delete', $_SESSION[dv_role_permission])) {
 
                     $method = 'deleteAction';
                     if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["delete"]))
@@ -276,7 +274,7 @@ class Datatable extends Lazyloading
 
             }
 
-            if(isset($this->defaultaction[$this->mainrowaction]))
+            if (isset($this->defaultaction[$this->mainrowaction]))
                 $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
 
             return true;
@@ -288,14 +286,13 @@ class Datatable extends Lazyloading
 
                 if (in_array('update', $_SESSION[dv_role_permission])) {
                     $method = 'editAction';
-                    if (method_exists($entity, $method)){
+                    if (method_exists($entity, $method)) {
                         $result = call_user_func(array($entity, $method), $this->defaultaction["edit"]);
                         if (!is_null($result))
                             $this->defaultaction["edit"] = $result;
                         else
                             $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
-                    }
-                    else
+                    } else
                         $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
 
                     $this->rowaction[] = $this->defaultaction["edit"];
@@ -311,22 +308,21 @@ class Datatable extends Lazyloading
                     $this->rowaction[] = $this->defaultaction["show"];
                 }
 
-                if (in_array('delete', $_SESSION[dv_role_permission])){
+                if (in_array('delete', $_SESSION[dv_role_permission])) {
                     $method = 'deleteAction';
-                    if (method_exists($entity, $method)){
+                    if (method_exists($entity, $method)) {
                         $result = call_user_func(array($entity, $method), $this->defaultaction["delete"]);
                         if (!is_null($result))
                             $this->defaultaction["delete"] = $result;
                         else
                             $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
-                    }
-                    else
+                    } else
                         $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
 
                     $this->rowaction[] = $this->defaultaction["delete"];
                 }
 
-                if(isset($this->defaultaction[$this->mainrowaction]))
+                if (isset($this->defaultaction[$this->mainrowaction]))
                     $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
 
                 return true;
@@ -356,7 +352,7 @@ class Datatable extends Lazyloading
         return '<table data-entity="' . $this->class . '"  class="table table-bordered table-hover table-striped" >'
             //. '<thead><tr>' . implode(" ", $theader['th']) . '</tr><tr>' . implode(" ", $theader['thf']) . '</tr></thead>'
             . '<tbody>' . implode(" ", $tb) . '</tbody>'
-            . '<tfoot>' . $newrows. '</tfoot>'
+            . '<tfoot>' . $newrows . '</tfoot>'
             . '</table>';
 
     }
@@ -444,7 +440,7 @@ class Datatable extends Lazyloading
         }
 
         $headaction = "";
-        if($this->enabletopaction)
+        if ($this->enabletopaction)
             $headaction = $this->top_action();
 
         $html = <<<EOF
@@ -480,14 +476,14 @@ EOF;
 
         $filterParam = "";
         if (!empty($this->filterParam)) {
-            $filterParam = "&". implode("&", $this->filterParam);
+            $filterParam = "&" . implode("&", $this->filterParam);
         }
 
         $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
-        if($this->defaultroute)
+        if ($this->defaultroute)
             $route = $this->defaultroute;
         else
-            $route = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/') ;
+            $route = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/');
 
         // data-route="' . $route . '" data-entityurl="' . str_replace("_", "-", $this->class) . '"
         $html .= '<div class="  ' . $this->responsive . '">
@@ -499,7 +495,7 @@ EOF;
 
         //$this->html .= self::renderListViewUI($this->lazyloading['listEntity'], $header, $action, $defaultaction, $searchaction);
         if ($this->enablepagination)
-            $html .= '<div class="card-footer">'.$this->paginationbuilder(). '</div>';
+            $html .= '<div class="card-footer">' . $this->paginationbuilder() . '</div>';
 
         $html .= "";//</div> $this->closeform.
 
@@ -508,7 +504,7 @@ EOF;
 
     public function addFilterParam($param, $value)
     {
-        $this->filterParam[] = $param."=".$value;
+        $this->filterParam[] = $param . "=" . $value;
         return $this;
     }
 
@@ -604,9 +600,9 @@ EOF;
         return $this;
     }
 
-    public function enablefilter()
+    public function enablefilter($val = true)
     {
-        $this->searchaction = true;
+        $this->searchaction = $val;
         return $this;
     }
 
@@ -663,7 +659,7 @@ EOF;
 
         }
 
-        if ($this->pagination > 10 && !$this->dynamicpagination){
+        if ($this->pagination > 10 && !$this->dynamicpagination) {
             $options = "";
             for ($page = 1; $page <= $this->pagination; $page++) {
                 if ($page == $this->current_page) {
@@ -672,11 +668,9 @@ EOF;
                     $options .= '<option value="' . $page . '" >' . $page . '</option>';
                 }
             }
-            $html .= '<select class=" paginate_button page-item" onchange="ddatatable.pagination(this.value)">'.$options.'</select>';
-        }
-        else
-            if ($this->dynamicpagination)
-            {
+            $html .= '<select class=" paginate_button page-item" onchange="ddatatable.pagination(this.value)">' . $options . '</select>';
+        } else
+            if ($this->dynamicpagination) {
 
                 //dv_dump($this->paginationcustom);
                 foreach ($this->paginationcustom['firsts'] as $key => $page) {
@@ -714,9 +708,7 @@ EOF;
 
                 }
 
-            }
-
-            else
+            } else
                 for ($page = 1; $page <= $this->pagination; $page++) {
                     if ($page == $this->current_page) {
                         $html .= '<li class="paginate_button page-item active "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
@@ -783,7 +775,7 @@ EOF;
         $th = [];
         $fields = [];
         if ($this->groupaction) {
-            if(!$this->isRadio)
+            if (!$this->isRadio)
                 $th[] = '<th><input id="checkall" name="all" type="checkbox" class="" ></th>';
             else
                 $th[] = '<th></th>';
@@ -795,6 +787,13 @@ EOF;
             $thforder = "";
 
             $value = $valuetd["value"];
+            if(is_callable($value)){
+
+                $thf[] = '<th > </th>';
+
+                $th[] = '<th>' . $valuetd['header'] . $thforder . '</th>';
+                continue;
+            }
             if (!isset($valuetd["order"]))
                 $valuetd["order"] = false;
 
@@ -804,11 +803,12 @@ EOF;
                 //$thisfield = str_replace(".", "-", $value) . ":opt";
                 $thisfield = $value . ":opt";
                 if (!$this->searchaction) {
-                } elseif (isset($valuetd["search"])) {
-                    if (is_string($valuetd["search"])) {
-                        $thfvalue = call_user_func(array($this->class, $valuetd["search"] . 'Search'), $thisfield);
-                    } else
-                        $thfvalue = '<input name="' . $thisfield . '" value="" placeholder="' . $valuetd['header'] . '" class="form-control" >';
+                } elseif (!isset($valuetd["search"])) {
+                    $thfvalue = '<input name="' . $thisfield . '" value="" placeholder="' . $valuetd['header'] . '" class="form-control" >';
+                } elseif (is_string($valuetd["search"])) {
+                    $thfvalue = call_user_func(array($this->class, $valuetd["search"] . 'Search'), $thisfield);
+                } elseif ($valuetd["search"]) {
+                    $thfvalue = '<input name="' . $thisfield . '" value="" placeholder="' . $valuetd['header'] . '" class="form-control" >';
                 }
 //                else {
 //                }
@@ -820,13 +820,14 @@ EOF;
             } else {
                 $thisfield = $value . ":opt";
                 if (!$this->searchaction) {
-                } elseif (isset($valuetd["search"])) {
-                    if (is_string($valuetd["search"])) {
-                        $thfvalue = call_user_func(array($this->class, $valuetd["search"] . 'Search'), $thisfield);
-                    } else
-                        $thfvalue = '<input name="' . $thisfield . '" placeholder="' . $valuetd['header'] . '" value="" class="search-field form-control" >';
+                } elseif (!isset($valuetd["search"])) {
+                    $thfvalue = '<input name="' . $thisfield . '" placeholder="' . $valuetd['header'] . '" value="" class="search-field form-control" >';
 
-                }
+                } elseif (is_string($valuetd["search"])) {
+                    $thfvalue = call_user_func(array($this->class, $valuetd["search"] . 'Search'), $thisfield);
+                } else if ($valuetd["search"])
+                    $thfvalue = '<input name="' . $thisfield . '" placeholder="' . $valuetd['header'] . '" value="" class="search-field form-control" >';
+
                 if ($valuetd["order"])
                     $thforder = '<div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
 
@@ -861,23 +862,24 @@ EOF;
         foreach ($this->listentity as $entity) {
             $tr = [];
 
-            if ($this->groupaction){
+            if ($this->groupaction) {
                 $checkmethod = 'isSelectable'; // must return a boolean
                 if (method_exists($entity, $checkmethod)) {
                     if (call_user_func(array($entity, $checkmethod)))
-                        $tr[] = '<td><input name="id[]" value="'.$entity->getId().'" type="checkbox" class="dcheckbox" ></td>';
+                        $tr[] = '<td><input name="id[]" value="' . $entity->getId() . '" type="checkbox" class="dcheckbox" ></td>';
                     else
                         $tr[] = '<td></td>';
-                }elseif($this->isRadio)
-                    $tr[] = '<td><input name="id" value="'.$entity->getId().'" type="radio" class="dcheckbox" ></td>';
+                } elseif ($this->isRadio)
+                    $tr[] = '<td><input name="id" value="' . $entity->getId() . '" type="radio" class="dcheckbox" ></td>';
                 else
-                    $tr[] = '<td><input name="id[]" value="'.$entity->getId().'" type="checkbox" class="dcheckbox" ></td>';
+                    $tr[] = '<td><input name="id[]" value="' . $entity->getId() . '" type="checkbox" class="dcheckbox" ></td>';
 
             }
 
             foreach ($this->datatablemodel as $valuetd) {
                 // will call the default get[Value] of the attribut
                 $value = $valuetd["value"];
+
                 $tdcontent = "";
                 $param = [];
                 // but if dev set get the will call custom get[Get]
@@ -886,6 +888,17 @@ EOF;
 
                 if (isset($valuetd["param"]))
                     $param = $valuetd["param"];
+
+                if(is_callable($value)){
+                    if($param)
+                        $tdcontent = $value($entity, $param);
+                    else
+                        $tdcontent = $value($entity);
+
+                    $tr[] = "<td>" . $tdcontent . "</td>";
+
+                    continue;
+                }
 
                 $join = explode(".", $value);
                 if (isset($join[1])) {
@@ -911,14 +924,15 @@ EOF;
                         $tdcontent = call_user_func(array($entityjoin, 'get' . ucfirst($join[1])), $param);
                     }
 
-                } else {
+                }
+                else {
                     $src = explode(":", $join[0]);
 
                     if (isset($src[1]) and $src[0] = 'src') {
 
                         $tdcontent = call_user_func(array($entity, 'show' . ucfirst($src[1])), $param);
                         //$td = "<td>" . $file . "</td>";
-                    } elseif (isset($valuetd["param"])){
+                    } elseif (isset($valuetd["param"])) {
                         $param = $valuetd["param"];
                         $tdcontent = call_user_func_array(array($entity, 'get' . ucfirst($value)), $param);
                         //dv_dump($param);
@@ -945,11 +959,14 @@ EOF;
             $customrowaction = [];
             // the user may write the method in the entity for better code practice
 
-            if ($this->enablecolumnaction){
+            if ($this->enablecolumnaction) {
 
                 if (!empty($this->customactions)) {
                     foreach ($this->customactions as $customaction) {
-                        $resactions = call_user_func(array($entity, $customaction . 'Action'));
+                        if(is_callable($customaction)){
+                            $resactions = $customaction($entity);
+                        }else
+                            $resactions = call_user_func(array($entity, $customaction . 'Action'));
 
                         if (is_array($resactions)) {
                             foreach ($resactions as $action) {
@@ -964,7 +981,7 @@ EOF;
                             $customrowaction[] = $resactions;
                         }
 
-                        if(is_string($this->mainrowaction) && $customaction == $this->mainrowaction)
+                        if (is_string($this->mainrowaction) && $customaction == $this->mainrowaction)
                             $this->mainrowactionbtn = $resactions;
 
                     }

@@ -86,6 +86,7 @@ $products = Category::find(1)->__hasmany('product');
 
 //$storage = Storage::find(1);
 //$storage = Storage::findrow(1);
+//$storages = Storage::find([1,2,3]);
 
 // requeste the first element
 //$storage = Storage::first();

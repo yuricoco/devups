@@ -290,6 +290,41 @@ if (isset($argv[2])) {
             $rqg = new Database();
             $path = __DIR__ . '/config_data.sql';
             $dvupsadminsql = file_get_contents($path);
+            $dvupsadminsql .= "
+            TRUNCATE `configuration`;
+            INSERT INTO `configuration` ( `_key`, `_value`, `_type`) VALUES
+                    (\"PROJECT_NAME\", \"".PROJECT_NAME."\", 'string'),
+                    (\"dbname\", \"".dbname."\", 'string'),
+                    (\"dbuser\", \"root\", 'string'),
+                    (\"dbpassword\", \"\", 'string'),
+                    (\"dbhost\", \"localhost\", 'string'),
+                    (\"dbdumper\", \"false\", 'bool'),
+                    (\"dbtransaction\", \"false\", 'bool'),
+                    (\"__v\", 1, 'integer'),
+                    (\"__server\", \"http://127.0.0.1\", 'string'),
+                    (\"__env\", \"{__server}/".PROJECT_NAME."/\", 'string'),
+                    (\"__prod\", 0, 'integer'),
+                    (\"__project_id\", \"".PROJECT_NAME."\", 'string'),
+                    (\"UPLOAD_DIR\", \"{ROOT}uploads/\", 'string'),
+                    (\"RESSOURCE\", \"{ROOT}admin/Ressource/\", 'string'),
+                    (\"admin_dir\", \"{ROOT}admin/\", 'string'),
+                    (\"web_dir\", \"{ROOT}web/\", 'string'),
+                    (\"SRC_FILE\", \"{__env}uploads/\", 'string'),
+                    (\"CLASSJS\", \"{__env}dclass/devupsjs/\", 'string'),
+                    (\"RESSOURCE2\", \"{__env}admin/Ressource/\", 'string'),
+                    (\"node_modules\", \"{__env}node_modules/\", 'string'),
+                    (\"ENTITY\", 0, 'integer'),
+                    (\"VIEW\", 1, 'integer'),
+                    (\"ADMIN\", \"{__project_id}_devups\", 'string'),
+                    (\"CSRFTOKEN\", \"{__project_id}_csrf_token\", 'string'),
+                    (\"dv_role_navigation\", \"{__project_id}_navigation\", 'string'),
+                    (\"dv_role_permission\", \"{__project_id}_permission\", 'string'),
+                    (\"LANG\", \"en\", 'string'),
+                    (\"__lang\", \"en\", 'string'),
+                    (\"PREVIOUSPAGE\", \"previous_page\", 'string'),
+                    (\"JSON_ENCODE_DEPTH\", 512, 'integer');
+            ";
+
             $rqg->link()->prepare($dvupsadminsql)->execute();
 
             echo "\n\n > Set the master admin.\n\nData master admin initialized with success.\ncredential\nlogin: dv_admin\npassword: admin\n\nYour project is ready to use. Do your best :)";

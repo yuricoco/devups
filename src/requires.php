@@ -35,11 +35,11 @@ require 'devups/ModuleTranslate/devups.moduletranslate.php';
 //require 'edition3ag/ModuleTranslation/edition3ag.moduletranslation.php';
 
 
-require 'subcontractor/ModuleEnterprise/subcontractor.moduleenterprise.php';
-require 'subcontractor/ModuleUser/subcontractor.moduleuser.php';
-require 'subcontractor/ModulePost/subcontractor.modulepost.php';
-require 'subcontractor/ModuleJob/subcontractor.modulejob.php';
-require 'subcontractor/ModuleData/subcontractor.moduledata.php';
+//require 'subcontractor/ModuleEnterprise/subcontractor.moduleenterprise.php';
+//require 'subcontractor/ModuleUser/subcontractor.moduleuser.php';
+//require 'subcontractor/ModulePost/subcontractor.modulepost.php';
+//require 'subcontractor/ModuleJob/subcontractor.modulejob.php';
+//require 'subcontractor/ModuleData/subcontractor.moduledata.php';
 
 
 
