@@ -250,10 +250,12 @@ if (isset($argv[2])) {
     chdir('../../');
 } else {
 
-    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_module.php';
+    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_component.php';
+    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_module.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right.php';
-    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_entity.php';
+    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_entity.php';
+    require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_component.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right_dvups_entity.php';
@@ -286,7 +288,7 @@ if (isset($argv[2])) {
             echo "\n > Update database schema (DOCTRINE ORM).\n\n" . implode("\n", $result);
 
             $rqg = new Database();
-            $path = __DIR__ . '/dvupsadmin.sql';
+            $path = __DIR__ . '/config_data.sql';
             $dvupsadminsql = file_get_contents($path);
             $rqg->link()->prepare($dvupsadminsql)->execute();
 
@@ -303,7 +305,7 @@ if (isset($argv[2])) {
 
         case 'dvups_:admin':
             $rqg = new DBAL();
-            $path = __DIR__ . '/dvupsadmin.sql';
+            $path = __DIR__ . '/config_data.sql';
             $dvupsadminsql = file_get_contents($path);
             $rqg->executeDbal($dvupsadminsql);
             echo "Data admin initialized with success";

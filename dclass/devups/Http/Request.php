@@ -24,6 +24,7 @@ class Request {
         $uri = explode('?', $_SERVER['REQUEST_URI']);
 
         if (isset($uri[1])) {
+            $uri[1] = str_replace("%3C", "<",$uri[1]);
             $param = explode('&', str_replace("%20", " ",$uri[1]));
             //$param = explode('&', $uri[1]);
             foreach ($param as $el) {

@@ -456,9 +456,9 @@ abstract class Model extends \stdClass
      * return the entity
      * when recursif set to false, attribut as relation manyToOne has just their id hydrated
      * when recursif set to true, the DBAL does recursif request to hydrate the association entity and those of it.
-     * @param integer $id the id of the entity
+     * @param integer | array $id the id of the entity
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
-     * @return $this
+     * @return $this | array
      */
     public static function find($id, $recursif = true, $collect = [])
     {
@@ -467,7 +467,11 @@ abstract class Model extends \stdClass
         $entity = $reflection->newInstance();
         $entity->setId($id);
 
-        $dbal = new DBAL();
+        if(is_array($id)){
+            $qb = new QueryBuilder($entity);
+            return $qb->where("this.id")->in($id)->get();
+        }
+                $dbal = new DBAL();
         $dbal->setCollect($collect);
         return $dbal->findByIdDbal($entity, $recursif);
     }
@@ -597,6 +601,31 @@ abstract class Model extends \stdClass
             return $qb->__dclone($update)->where("this.id", $id)->exec(DBAL::$INSERT);
 
         return $qb->__dclone($update);
+    }
+
+    /**
+     * @param $column
+     * @return $this
+     */
+    public static function sum($column, $as = "")
+    {
+        if ($as)
+            $as = "as " . $as;
+
+        return " SUM(" . $column . ") $as ";
+    }
+
+    public static function avg($column, $as = "")
+    {
+        if ($as)
+            $as = "as " . $as;
+
+        return " AVG(" . $column . ") $as ";
+    }
+
+    public static function distinct($column)
+    {
+        return " DISTINCT " . $column . " ";
     }
 
     /**

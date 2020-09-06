@@ -6,3 +6,4 @@
  * and open the template in the editor.
  */
 
+require "Dvups_config_item.php";

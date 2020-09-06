@@ -17,20 +17,25 @@ class Dvups_roleController extends Controller
         $role = $admin->getDvups_role();
         //foreach ($admin->getDvups_role() as $key => $role) {
 
-        $role->collectDvups_entity();
-        $role->collectDvups_module();
+        $role->collectDvups_component();
         $role->collectDvups_right();
 
-        foreach ($role->getDvups_module() as $module) {
-            $entities = [];
-            foreach ($role->getDvups_entity() as $key => $entity) {
-                if ($entity->getDvups_module()->getId() == $module->getId()) {
-                    $entities[] = $entity;
-                    $admin->manageentity[$entity->getName()] = $entity;
-                    unset($role->getDvups_entity()[$key]);
+        foreach ($role->dvups_component as $component) {
+            $role->collectDvups_moduleOfComponent($component);
+            $modules = [];
+            foreach ($role->getDvups_module() as $module) {
+                $role->collectDvups_entityOfModule($module);
+                $entities = [];
+                foreach ($role->getDvups_entity() as $key => $entity) {
+                    //if ($entity->dvups_module->getId() == $module->getId()) {
+                        $entities[] = $entity;
+                        $admin->manageentity[$entity->getName()] = $entity;
+                        //unset($role->getDvups_entity()[$key]);
+                    //}
                 }
+                $modules[] = ['module' => $module, 'entities' => $entities];
             }
-            $dvups_navigation[] = ['module' => $module, 'entities' => $entities];
+            $dvups_navigation[] = ['component' => $component, 'modules' => $modules];
         }
         foreach ($role->getDvups_right() as $value) {
             $right[] = $value->getName();

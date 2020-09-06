@@ -14,7 +14,7 @@ if (isset($_GET['path'])) {
 
 switch ($path[ENTITY]) {
     case 'dashboard':
-        Genesis::render("dashboard");
+        Genesis::render("dashboard", AdminTemplateGenerator::dashboardView());
         break;
 
     case 'connexion':

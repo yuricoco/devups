@@ -1,0 +1,54 @@
+{
+  "id": 1,
+  "name": "ModuleConfig",
+  "project": "admin",
+  "nbent": 10,
+  "listentity": [
+    {
+      "id": 2,
+      "name": "dvups_component",
+      "module": {
+        "id": 1
+      },
+      "ref": null,
+      "attribut": {
+        "1": {
+          "name": "name",
+          "visibility": "",
+          "datatype": "string",
+          "size": "50",
+          "nullable": "not",
+          "formtype": "text"
+        }
+      },
+      "relation": []
+    },
+    {
+      "id": 2,
+      "name": "dvups_module",
+      "module": {
+        "id": 1
+      },
+      "ref": null,
+      "attribut": {
+        "1": {
+          "name": "name",
+          "visibility": "",
+          "datatype": "string",
+          "size": "50",
+          "nullable": "not",
+          "formtype": "text"
+        }
+      },
+      "relation": [
+        {
+          "entity": "dvups_component",
+          "cardinality": "manyToOne",
+          "nullable": "not",
+          "ondelete": "cascade",
+          "onupdate": "cascade"
+        }
+      ]
+    }
+  ]
+}

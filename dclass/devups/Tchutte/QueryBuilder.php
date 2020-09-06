@@ -440,6 +440,9 @@ class QueryBuilder extends \DBAL
 
     }
 
+    public function whereMonth($column){
+
+    }
     /**
      * Add a basic where clause to the query.
      *
@@ -485,7 +488,8 @@ class QueryBuilder extends \DBAL
             } else {
                 $this->query .= " is null ";
             }
-        } elseif (is_array($column)) {
+        }
+        elseif (is_array($column)) {
             if (is_array($operator)) {
                 for ($index = 0; $index < count($column); $index++) {
                     $this->andwhere($column[$index], "=", $operator[$index]);
@@ -499,7 +503,8 @@ class QueryBuilder extends \DBAL
                     $this->andwhere($key, "=", $value);
                 }
             }
-        } else {
+        }
+        else {
             $keymap = explode(".", $column);
             if (count($keymap) == 2) {
                 $this->query .= " " . $link . " " . $column;
@@ -744,6 +749,16 @@ class QueryBuilder extends \DBAL
         return $this->__findAll($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 
+    public function cursor($callback)
+    {
+        return $this->__cursor($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, $callback);
+    }
+
+    public function get($recursif = true, $collect = [])
+    {
+        return $this->__getAll($recursif, $collect);
+    }
+
     public function __getOneRow()
     {
         return $this->__findOneRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters);
@@ -760,6 +775,15 @@ class QueryBuilder extends \DBAL
     }
 
     public function __countEl($recursif = true, $defaultjoin = false)
+    {
+        //$this->setCollect($collect);
+        if ($defaultjoin):
+            $this->join();
+        endif;
+
+        return $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
+    }
+    public function count($recursif = true, $defaultjoin = false)
     {
         //$this->setCollect($collect);
         if ($defaultjoin):

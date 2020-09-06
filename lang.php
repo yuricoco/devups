@@ -42,19 +42,3 @@ function t($ref, $default = "", $local = null ){
     return $translate;
 
 }
-
-function gettranslation($ref, $local = null, $default = "no translation found"){
-    global $lang;
-
-    if($local != "fr" && $local != "en")
-        $local = \DClass\lib\Util::local();
-
-    if(!isset($lang[$ref]))
-        return "reference: <b>".$ref."</b> not found!";
-
-    if(!isset($lang[$ref][$local]))
-        return $default;
-
-    return $lang[$ref][$local];
-
-}

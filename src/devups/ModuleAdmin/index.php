@@ -9,8 +9,6 @@ $moduledata = Dvups_module::init("ModuleAdmin");
 define('CHEMINMODULE', ' ');
 
 $dvups_adminCtrl = new Dvups_adminController();
-$dvups_entityCtrl = new Dvups_entityController();
-$dvups_moduleCtrl = new Dvups_moduleController();
 $dvups_rightCtrl = new Dvups_rightController();
 $dvups_roleCtrl = new Dvups_roleController();
 
@@ -47,16 +45,6 @@ switch (Request::get('path')) {
     case 'dvups-admin/index':
         $dvups_adminCtrl->listView();
         //Genesis::renderView('dvups_admin.index', $dvups_adminCtrl->listAction());
-        break;
-
-    case 'dvups-entity/index':
-        $dvups_entityCtrl->listView();
-        // Genesis::renderView('dvups_entity.index',  $dvups_entityCtrl->listAction());
-        break;
-
-    case 'dvups-module/index':
-        $dvups_moduleCtrl->listView();
-        //Genesis::renderView('dvups_module.index',  $dvups_moduleCtrl->listAction());
         break;
 
     case 'dvups-right/index':

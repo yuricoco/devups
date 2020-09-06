@@ -149,6 +149,26 @@ class Core extends stdClass {
         
         foreach ($global_navigation as $key => $project) {
             if (is_object($project)) {
+
+                $projectname = ucfirst($project->name);
+                $qb = new QueryBuilder(new Dvups_component());
+                $dvcomponent = $qb->select()->where("name", '=', $projectname )->__getOne();
+
+                if(!$dvcomponent->getId()){
+
+                    $dvcomponent->setName($projectname);
+                    $dvcomponent->setLabel($projectname);
+                    $dvcomponent->__insert();
+
+                    $rolecomponent = new Dvups_role_dvups_component();
+                    $rolecomponent->setDvups_component($dvcomponent);
+                    $rolecomponent->setDvups_role(new Dvups_role(1));
+                    $rolecomponent->__insert();
+
+                    $updated = true;
+
+                }
+
                 foreach ($project->listmodule as $key => $module) {
                     
                     if(!is_object($module)){
@@ -156,12 +176,13 @@ class Core extends stdClass {
                     }
                     $modulename = ucfirst($module->name);
                     $qb = new QueryBuilder(new Dvups_module());
-                    $dvmodule = $qb->select()->where("name", '=', $modulename )->__getOne();
-                    
+                    $dvmodule = $qb->select()->where("this.name", '=', $modulename )->__getOne();
+
+                    $dvmodule->setProject($project->name);
+                    $dvmodule->dvups_component = $dvcomponent;
                     if(!$dvmodule->getId()){
                         
                         $dvmodule->setName($modulename);
-                        $dvmodule->setProject($project->name);
                         $dvmodule->__insert();
                         
                         $rolemodule = new Dvups_role_dvups_module();
@@ -171,18 +192,20 @@ class Core extends stdClass {
                         
                         $updated = true;
                         
+                    }else{
+                        $dvmodule->__update();
                     }
                     
                     foreach ($module->listentity as $key => $entity) {
                         $entityname = strtolower($entity->name);
                         $qb = new QueryBuilder(new Dvups_entity());
                         $dventity = $qb->select()->where("dvups_entity.name", '=', $entityname )->__getOne();
-                    
+
+                        $dventity->setDvups_module($dvmodule);
                         if(!$dventity->getId()){
 //                            $dventity = new Dvups_entity();
                             $dventity->setName($entityname);
                             $dventity->setUrl($entityname);
-                            $dventity->setDvups_module($dvmodule);
                             $dventity->__insert();
                             
                             $roleentity = new Dvups_role_dvups_entity();
@@ -192,6 +215,8 @@ class Core extends stdClass {
                             
                             $updated = true;
                         
+                        }else{
+                            $dventity->__update();
                         }
                     }
                 }

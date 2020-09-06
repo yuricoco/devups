@@ -36,32 +36,39 @@
     <div class="scrollbar-sidebar">
         <div class="app-sidebar__inner">
             <ul class="vertical-nav-menu">
-                <li class="app-sidebar__heading">Dashboards</li>
+                <li class="app-sidebar__heading">{{t("Dashboards")}}</li>
                 <li>
                     <a href="<?= __env ?>admin/" class="mm-active">
                         <i class="metismenu-icon pe-7s-rocket"></i>
-                        Dashboard
+                        {{t("Dashboards")}}
                     </a>
                 </li>
-                <li class="app-sidebar__heading">UI Components</li>
+                @foreach ($dvups_navigation as $key => $component)
+                    <li class="app-sidebar__heading">{{$component["component"]->getLabel()}}</li>
 
-                @foreach ($dvups_navigation as $key => $module)
-                    <li>
-                        <a aria-expanded="true" href="#">
-                            <i class="{{$module["module"]->getFavicon()}}"></i>
-                            <span class="menu-title">{{$module["module"]->getLabel()}}</span>
-                            <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
-                        </a>
-                        <ul class="mm-collapse">
-                            @foreach ($module["entities"] as $entity)
+                    @foreach ($component["modules"] as $key => $module)
+                        <li>
+                            <a aria-expanded="true" href="#">
+                                <i class="{{$module["module"]->getFavicon()}}"></i>
+                                <span class="menu-title">{{$module["module"]->getLabel()}}</span>
+                                <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
+                            </a>
+                            <ul class="mm-collapse">
                                 <li>
-                                    <a href="<?= path('src/' . strtolower($module["module"]->getProject()) . '/' . $module["module"]->getName() . '/' . $entity->getUrl() . '/index') ?>">
-                                        <i class="metismenu-icon"></i> <?= $entity->getLabel() ?>
+                                    <a href="{{ $module["module"]->route() }}">
+                                        <i class="metismenu-icon"></i> {{t("Dashboard")}}
                                     </a>
                                 </li>
-                            @endforeach
-                        </ul>
-                    </li>
+                                @foreach ($module["entities"] as $entity)
+                                    <li>
+                                        <a href="{{ $entity->route() }}">
+                                            <i class="metismenu-icon"></i> {{$entity->getLabel()}}
+                                        </a>
+                                    </li>
+                                @endforeach
+                            </ul>
+                        </li>
+                    @endforeach
                 @endforeach
             </ul>
         </div>

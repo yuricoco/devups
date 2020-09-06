@@ -12,8 +12,6 @@ global $viewdir;
 $viewdir[] = __DIR__ . '/Ressource/views';
 
 $dvups_adminCtrl = new Dvups_adminController();
-$dvups_entityCtrl = new Dvups_entityController();
-$dvups_moduleCtrl = new Dvups_moduleController();
 $dvups_rightCtrl = new Dvups_rightController();
 $dvups_roleCtrl = new Dvups_roleController();
 
@@ -52,56 +50,6 @@ switch (Request::get('path')) {
         break;
     case 'dvups_admin.datatable':
         g::json_encode($dvups_adminCtrl->datatable(R::get('next'), R::get('per_page')));
-        break;
-
-    case 'dvups_entity._new':
-        Dvups_entityForm::render();
-        break;
-    case 'dvups_entity.create':
-        g::json_encode($dvups_entityCtrl->createAction());
-        break;
-    case 'dvups_entity.update':
-        g::json_encode($dvups_entityCtrl->updateAction(R::get("id")));
-        break;
-    case 'dvups_entity._edit':
-        Dvups_entityForm::render(R::get("id"));
-        break;
-    case 'dvups_entity._show':
-        g::json_encode(Dvups_entityController::renderDetail(R::get("id")));
-        break;
-    case 'dvups_entity._delete':
-        g::json_encode($dvups_entityCtrl->deleteAction(R::get("id")));
-        break;
-    case 'dvups_entity._deletegroup':
-        g::json_encode($dvups_entityCtrl->deletegroupAction(R::get("ids")));
-        break;
-    case 'dvups_entity.datatable':
-        g::json_encode($dvups_entityCtrl->datatable(R::get('next'), R::get('per_page')));
-        break;
-
-    case 'dvups_module._new':
-        g::json_encode(Dvups_moduleController::renderForm());
-        break;
-    case 'dvups_module.create':
-        g::json_encode($dvups_moduleCtrl->createAction());
-        break;
-    case 'dvups_module._edit':
-        g::json_encode(Dvups_moduleController::renderForm(R::get("id")));
-        break;
-    case 'dvups_module.update':
-        g::json_encode($dvups_moduleCtrl->updateAction(R::get("id")));
-        break;
-    case 'dvups_module._show':
-        g::json_encode(Dvups_moduleController::renderDetail(R::get("id")));
-        break;
-    case 'dvups_module._delete':
-        g::json_encode($dvups_moduleCtrl->deleteAction(R::get("id")));
-        break;
-    case 'dvups_module._deletegroup':
-        g::json_encode($dvups_moduleCtrl->deletegroupAction(R::get("ids")));
-        break;
-    case 'dvups_module.datatable':
-        g::json_encode($dvups_moduleCtrl->datatable(R::get('next'), R::get('per_page')));
         break;
 
     case 'dvups_right._new':

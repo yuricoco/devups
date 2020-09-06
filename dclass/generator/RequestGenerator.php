@@ -100,7 +100,7 @@ class RequestGenerator
             }
         }
 
-        $path = __DIR__ . '/dvupsadmin.sql';
+        $path = __DIR__ . '/config_data.sql';
         $dvupsadminsql = file_get_contents($path);
 
 

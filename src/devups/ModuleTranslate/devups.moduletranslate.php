@@ -1,8 +1,5 @@
 <?php
 
-require 'Entity/Generalinfo.php';
-require 'Controller/GeneralinfoController.php';
-
     require 'Entity/Dvups_lang.php';
     require 'Form/Dvups_langForm.php';
     require 'Datatable/Dvups_langTable.php';

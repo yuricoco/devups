@@ -89,6 +89,21 @@ class Lazyloading implements \JsonSerializable
 
     }
 
+    public function extractXJoin($join, $attr){
+        //$value = '[This] is a [test] string, [eat] my [shorts].';
+//        preg_match_all("/\<([^\>]*)\>/", $value, $matches);
+//        $join = $matches[1][0];
+//        $this->currentqb->leftjoin($join);
+//        return str_replace($matches[0][0], "", $value);
+        //$pos = strpos($value, "<");
+        if(strpos($join, "<") !== false){
+            $lj = explode("<", $join);
+            $this->currentqb->leftjoin($lj[0], $lj[1]);
+            return str_replace("<".$lj[1], "", $attr);
+        }
+        return $attr;
+    }
+
     private function filter(\stdClass $entity, QueryBuilder $qb)
     {
         $this->currentqb = $qb;
@@ -103,6 +118,7 @@ class Lazyloading implements \JsonSerializable
             $attr = explode(":", $key);
             $join = explode(".", $attr[0]);
             if (isset($join[1])) {
+                $attr[0] = $this->extractXJoin($join[0], $attr[0]);
                 $this->filterswicher($attr[1], $attr[0], $value);
             } else if ($this->currentqb->hasrelation && isset($attr[1]))
                 $this->filterswicher($attr[1], strtolower(get_class($entity)) . "." . $join[0], $value);

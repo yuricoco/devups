@@ -40,22 +40,4 @@
 
 @endsection
 
-<?php function modalview($entitytarget){ ?>
-
-<div class="modal fade" id="{{ strtolower($entitytarget) }}modal" tabindex="-1" role="dialog" aria-labelledby="modallabel">
-    <div class="modal-dialog modal-lg" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal"
-                        aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                <h3 class="title" id="modallabel">Modal Label</h3>
-            </div>
-            <div class="modal-body panel generalinformation"></div>
-            <div class="modal-footer">
-                <button onclick="model._dismissmodal()" data-dismiss="modal" aria-label="Close" type="button" class="btn btn-danger">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-<?php } ?>
 

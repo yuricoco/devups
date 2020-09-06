@@ -13,11 +13,6 @@ if (file_exists(__DIR__ . '/../vendor')) {
 require __DIR__ . '/constante.php';
 require __DIR__ . '/Database.php';
 
-require __DIR__ . '/../dclass/dvups_functions.php';
-require __DIR__ . '/../dclass/lib/lib_dependances.php';
-
-require __DIR__ . '/../admin/generator/TableTemplateRender.php';
-
 require __DIR__ . '/../dclass/devups/Tchutte/Bugmanager.php';
 require __DIR__ . '/../dclass/devups/Core.php';
 require __DIR__ . '/../dclass/devups/Tchutte/DBAL.php';
@@ -42,6 +37,11 @@ require __DIR__ . '/../dclass/devups/Form/FormManager.php';
 require __DIR__ . '/../dclass/devups/Form/Form.php';
 require __DIR__ . '/../dclass/devups/Http/Request.php';
 require __DIR__ . '/../dclass/devups/Http/Response.php';
+
+require __DIR__ . '/../dclass/dvups_functions.php';
+require __DIR__ . '/../dclass/lib/lib_dependances.php';
+
+require __DIR__ . '/../admin/generator/TableTemplateRender.php';
 
 require __DIR__ . '/../dclass/extends/extends_dependances.php';
 require __DIR__ . '/../dclass/generator/template/Templatedependences.php';

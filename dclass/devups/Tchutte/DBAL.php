@@ -865,6 +865,34 @@ class DBAL extends Database
         return $retour;
     }
 
+    protected function __cursor($sql, $values, $callback = null)
+    {
+
+        $query = $this->link->prepare($sql);
+        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+
+        if(is_callable($callback)){
+            while ($row = $query->fetch(PDO::FETCH_NAMED)) {
+                $row = $this->djoin($row, $this->object, false, false);
+                $callback($row);
+            }
+//            while ($row = $query->fetch(PDO::FETCH_OBJ)) {
+//                $callback($row);
+//            }
+            return [1];
+        }
+        if (empty($this->entity_link_list))
+            $retour = $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
+        elseif ($arraybd = $query->fetchAll(PDO::FETCH_NAMED)) {
+            return $arraybd;
+        } else
+            $retour = array();
+
+//            $this->ResetObject();
+        return $retour;
+    }
+
+
     private function inarray4($flowvalue)
     {
         $return = null;
@@ -995,13 +1023,13 @@ class DBAL extends Database
     {
 
         if (!is_array($flowBD)) {
-
             return null;
         }
 
         $object_array = $this->orm($flowBD, $object, 0, $recursif, $collection);
 
         return Bugmanager::cast((object)$object_array, get_class($object));
+
     }
 
     public $hasrelation = false;
