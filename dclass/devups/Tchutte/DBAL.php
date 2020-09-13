@@ -554,19 +554,19 @@ class DBAL extends Database
             $this->instanciateVariable($object);
 
         $values = [];
-        $parameterQuery = '?';
+        $parameterQuery = ':'.implode(", :", $this->objectVar);
 
-        for ($i = 1; $i < $this->nbVar; $i++) {
-            $parameterQuery .= ',?';
-        }
+//        for ($i = 1; $i < $this->nbVar; $i++) {
+//            $parameterQuery .= ',?';
+//        }
 
         $sql = "insert into `" . $this->table . "` (`" . strtolower(implode('` ,`', $this->objectVar)) . "`) values (" . strtolower($parameterQuery) . ")";
 
-        foreach ($this->objectValue as $value) {
-            $values[] = $value;
-        }
+//        foreach ($this->objectValue as $value) {
+//            $values[] = $value;
+//        }
 
-        $id = $this->executeDbal($sql, $values, 1);
+        $id = $this->executeDbal($sql, $this->objectKeyValue, 1);
         $this->object->setId($id);
 
         // implement translation if anabled in class
@@ -1033,6 +1033,7 @@ class DBAL extends Database
     }
 
     public $hasrelation = false;
+    public $objectKeyValue = [];
 
     /**
      * methode qui initialise les variables d'instance. elle est notament utilisé pour permetre de persister
@@ -1048,12 +1049,37 @@ class DBAL extends Database
         $this->entity_link_list = [];
         $this->listeEntity = [];
         $this->objectCollection = [];
+        $this->objectKeyValue = [];
         $this->select = false;
 
         if (is_object($object)) {
 
-            $this->classmetadata = $em->getClassMetadata("\\" . get_class($object));
+            $this->object = $object;
+            $this->objectName = strtolower(get_class($object));
+            $this->table = strtolower($this->objectName);
+
+            if (!$this->tableExists($this->table)) {
+                if ($metadata = $em->getClassMetadata("\\" . $this->objectName)) {
+                    $this->table = strtolower($metadata->table['name']);
+                }
+            }
+
             $this->instanceid = $object->getId();
+            $keys = $object->entityKey($this->entity_link_list, $this->objectCollection, $this->softdelete);
+            $this->objectVar = array_keys($keys);
+            $this->objectValue = array_values($keys);
+            $this->objectKeyValue = $keys;
+            $this->hasrelation = !empty($this->entity_link_list);
+            $this->nbVar = count($this->objectVar);
+            $this->en = $this->nbVar - 1;
+
+            return;
+
+            var_dump($keys, $this->objectVar, $this->objectCollection, $this->softdelete);
+            die;
+
+            $this->classmetadata = $em->getClassMetadata("\\" . get_class($object));
+
             $objecarray = (array)$object;
             if (isset($objecarray["dvfetched"])) {
                 unset($objecarray["dvfetched"]);
@@ -1066,24 +1092,13 @@ class DBAL extends Database
                 unset($objecarray["dvinrelation"]);
             }
 
-            $this->object = $object;
-            $this->objectName = strtolower(get_class($object));
-
             $this->objectValue = array_values($objecarray);
             $heritage = false;
             $i = 0;
             $j = 0;
             $k = 0;
-            $this->table = strtolower($this->objectName);
-
             $fieldname = array_keys($this->classmetadata->fieldNames);
             $association = array_keys($this->classmetadata->associationMappings);
-            if (!$this->tableExists($this->table)) {
-                if ($metadata = $em->getClassMetadata("\\" . $this->objectName)) {
-                    $this->table = strtolower($metadata->table['name']);
-                }
-
-            }
 
             foreach ($objecarray as $obkey => $value) {
                 // gere les attributs hérités en visibilité protected
@@ -1135,6 +1150,7 @@ class DBAL extends Database
             $this->en = $this->nbVar;
 //                $this->inbricate();
             $this->en = $this->en - 1;
+
         }
     }
 

@@ -16,7 +16,7 @@ class Local_content_key extends Model implements JsonSerializable
      * @Column(name="reference", type="string" , length=255 )
      * @var string
      **/
-    private $reference;
+    protected $reference;
 
 
     public function __construct($id = null)

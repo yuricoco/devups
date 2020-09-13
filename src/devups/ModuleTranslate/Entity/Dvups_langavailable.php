@@ -13,7 +13,7 @@
          * @Column(name="name", type="string" , length=55 )
          * @var string
          **/
-        private $name; 
+        protected $name;
         
 
         

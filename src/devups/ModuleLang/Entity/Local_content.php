@@ -16,17 +16,17 @@ class Local_content extends Model implements JsonSerializable
      * @Column(name="lang", type="string" , length=25 )
      * @var string
      **/
-    private $lang;
+    protected $lang;
     /**
      * @Column(name="reference", type="string" , length=255 )
      * @var string
      **/
-    private $reference;
+    protected $reference;
     /**
      * @Column(name="content", type="text"  )
      * @var text
      **/
-    private $content;
+    protected $content;
 
     /**
      * @ManyToOne(targetEntity="\Local_content_key")

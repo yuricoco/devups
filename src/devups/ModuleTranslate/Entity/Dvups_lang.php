@@ -15,23 +15,23 @@ class Dvups_lang extends \Model implements JsonSerializable
      * @Column(name="ref", type="string" , length=150 )
      * @var string
      **/
-    private $ref;
+    protected $ref;
     /**
      * @Column(name="_table", type="string" , length=55 )
      * @var string
      **/
-    private $_table;
+    protected $_table;
     /**
      * @Column(name="_row", type="integer" )
      * @var string
      **/
-    private $_row;
+    protected $_row;
 
     /**
      * @Column(name="_column", type="string" , length=55 )
      * @var string
      **/
-    private $_column;
+    protected $_column;
 
 
     public function __construct($id = null)

@@ -931,4 +931,32 @@ abstract class Model extends \stdClass
         //return implode(",", $collection_ids);
     }
 
+    public function entityKey(&$entity_link_list, &$collection, &$softdelete){
+        $keys = [];
+        $softdelete = $this->dvsoftdelete;
+        foreach ($this as $key => $val){
+            if(in_array($key, ["dvfetched","dvinrelation","dvsoftdelete",]))
+                continue;
+            if(is_object($val)){
+                $entity_link_list[strtolower(get_class($val).":".$key)] = $val;
+                $keys[$key.'_id'] = $val->getId();
+            }elseif(is_array($val))
+                $collection[] = $val;
+            else
+                $keys[$key] = $val;
+        }
+        return $keys;
+    }
+
+    public function hasRelation($name){
+        $keys = [];
+        foreach ($this as $key => $val){
+            if(in_array($key, ["dvfetched","dvinrelation","dvsoftdelete",]))
+                continue;
+            if(is_object($val) && $name == $key)
+                return $val;
+        }
+        return false;
+    }
+
 }

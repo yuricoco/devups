@@ -16,22 +16,22 @@ class Configuration extends Model implements JsonSerializable
      * @Column(name="comment", type="text" , nullable=true )
      * @var string
      **/
-    private $comment;
+    protected $comment;
     /**
      * @Column(name="_key", type="string" , length=150 )
      * @var string
      **/
-    private $_key;
+    protected $_key;
     /**
      * @Column(name="_value", type="string" , length=255 )
      * @var string
      **/
-    private $_value;
+    protected $_value;
     /**
      * @Column(name="_type", type="string" , length=150 , nullable=true)
      * @var string
      **/
-    private $_type = "string";
+    protected $_type = "string";
 
 
     public function __construct($id = null)

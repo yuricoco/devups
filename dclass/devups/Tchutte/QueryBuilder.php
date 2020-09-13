@@ -119,8 +119,10 @@ class QueryBuilder extends \DBAL
     {
 
         if (!empty($this->entity_link_list)) {
-            foreach ($this->entity_link_list as $entity_link) {
-                $this->defaultjoin .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
+            $entity_links = array_keys($this->entity_link_list);
+            foreach ($entity_links as $entity_link) {
+                $class_attrib = explode(":", $entity_link);
+                $this->defaultjoin .= " left join `" . strtolower($class_attrib[0]) . "` on " . strtolower($class_attrib[0]) . ".id = " . $this->table . "." . strtolower($class_attrib[1]) . "_id";
             }
         }
     }
@@ -135,8 +137,11 @@ class QueryBuilder extends \DBAL
     {
         $this->defaultjoinsetted = true;
         if (!empty($this->entity_link_list)) {
-            foreach ($this->entity_link_list as $entity_link) {
-                $this->defaultjoin .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
+            $entity_links = array_keys($this->entity_link_list);
+            foreach ($entity_links as $entity_link) {
+                $class_attrib = explode(":", $entity_link);
+                $this->defaultjoin .= " left join `" . strtolower($class_attrib[0]) . "` on " . strtolower($class_attrib[0]) . ".id = " . $this->table . "." . strtolower($class_attrib[1]) . "_id";
+                //$this->defaultjoin .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
             }
         }
         return $this;
@@ -259,7 +264,8 @@ class QueryBuilder extends \DBAL
             $this->parameters[] = $arrayvalues->getId();
             $this->query .= " " . $this->table . "." . $class . "_id = ? ";
             $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
-        } elseif (is_array($case)) {
+        }
+        elseif (is_array($case)) {
 
             $whens = [];
             $this->query .= " `" . $arrayvalues . "` = CASE " . $seton . " ";
@@ -746,6 +752,7 @@ class QueryBuilder extends \DBAL
             $this->limit_iteration = $recursif;
 
         $this->setCollect($collect);
+        //var_dump($this->objectVar);
         return $this->__findAll($this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query), $this->parameters, false, $recursif);
     }
 

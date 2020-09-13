@@ -198,7 +198,7 @@ class BackendGenerator {
          * @Column(name=\"" . $attribut->name . "\", type=\"" . $attribut->datatype . "\" $length $nullable)
          * @var " . $attribut->datatype . "
          **/
-        private $" . $attribut->name . "$defaultvalue;";
+        protected $" . $attribut->name . "$defaultvalue;";
         }
         $otherattrib = true;
 //        }
@@ -300,15 +300,15 @@ class BackendGenerator {
         
         public function jsonSerialize() {
                 return [
-                        'id' => $" . "this->id,";
+                    'id' => $" . "this->id,";
         foreach ($entity->attribut as $attribut) {
             $construt .= "
-                                '" . $attribut->name . "' => $" . "this->" . $attribut->name . ",";
+                    '" . $attribut->name . "' => $" . "this->" . $attribut->name . ",";
         }
         if (!empty($entity->relation)) {
             foreach ($entity->relation as $relation) {
                 $construt .= "
-                                '" . $relation->entity . "' => $" . "this->" . $relation->entity . ",";
+                    '" . $relation->entity . "' => $" . "this->" . $relation->entity . ",";
             }
         }
         $construt .= "

@@ -13,12 +13,12 @@
          * @Column(name="content", type="text"  )
          * @var text
          **/
-        private $content;
+        protected $content;
         /**
          * @Column(name="lang", type="string" , length=2 )
          * @var string
          **/
-        private $lang; 
+        protected $lang;
         
         /**
          * @ManyToOne(targetEntity="\Dvups_lang")

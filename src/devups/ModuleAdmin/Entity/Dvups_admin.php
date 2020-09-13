@@ -15,29 +15,29 @@ class Dvups_admin extends Model implements JsonSerializable
      * @Column(name="firstconnexion", type="integer", nullable=true )
      * @var string
      * */
-    private $firstconnexion = 1;
+    protected $firstconnexion = 1;
     /**
      * @Column(name="lastlogin_at", type="datetime", nullable=true )
      * @var string
      * */
-    private $lastlogin_at;
+    protected $lastlogin_at;
     /**
      * @Column(name="name", type="string" , length=255 )
      * @var string
      * */
-    private $name;
+    protected $name;
 
     /**
      * @Column(name="login", type="string" , length=255 )
      * @var string
      * */
-    private $login;
+    protected $login;
 
     /**
      * @Column(name="password", type="string" , length=255 )
      * @var string
      * */
-    private $password;
+    protected $password;
 
     /**
      * @ManyToOne(targetEntity="\Dvups_role")
@@ -208,7 +208,7 @@ class Dvups_admin extends Model implements JsonSerializable
 
     }
 
-    private function wd_remove_accents($str, $charset = 'utf-8')
+    protected function wd_remove_accents($str, $charset = 'utf-8')
     {
         $str = htmlentities($str, ENT_NOQUOTES, $charset);
 

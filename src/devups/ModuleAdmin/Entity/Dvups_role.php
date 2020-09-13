@@ -17,12 +17,12 @@ class Dvups_role extends Model implements JsonSerializable
      * @Column(name="name", type="string" , length=255 )
      * @var string
      * */
-    private $name;
+    protected $name;
     /**
      * @Column(name="alias", type="string" , length=255 )
      * @var string
      * */
-    private $alias;
+    protected $alias;
 
     /**
      * @var \Dvups_right

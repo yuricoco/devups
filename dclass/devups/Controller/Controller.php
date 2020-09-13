@@ -137,7 +137,10 @@ abstract class Controller
             $entitycore = new \stdClass();
             $entitycore->field = json_decode($_POST["dvups_form"][strtolower(get_class($object))], true);
         }
-
+//        $entitylinks = [];
+//        $entitycollections = [];
+//        $keyvalues = $object->entityKey($entitylinks, $entitycollections);
+        //var_dump($keyvalues);
         //Genesis::json_encode($_POST["dvups_form"]);
 
         foreach ($entitycore->field as $key => $value) {
@@ -155,6 +158,8 @@ abstract class Controller
             foreach ($_ENTITY_FORM as $key_form => $value_form) {
 
                 if ($key_form == $key) {
+
+                    //var_dump($keyvalues, $key."_id", $object->isRelation($key));
 
 //                    if(!is_string($value["setter"]))
 //                        continue;
@@ -245,9 +250,11 @@ abstract class Controller
                             $this->error[$key] = $error;
 
                     } else
-                        if (isset($value['options']) && !isset($value['arrayoptions']) && class_exists($key)) {// && is_object ($value['options'][0])
-                            $reflect = new \ReflectionClass($key);
-                            $value2 = $reflect->newInstance();
+                        if (isset($value['options']) && !isset($value['arrayoptions']) && $value2 = $object->hasRelation($key)
+                           // && (class_exists($key) || isset($keyvalues[$key."_id"]) || isset($entitycollections[$key]))
+                        ) {// && is_object ($value['options'][0])
+//                            $reflect = new \ReflectionClass($key);
+//                            $value2 = $reflect->newInstance();
 
                             if (is_array($value['options']) && isset($_ENTITY_FORM[$key])) {
 

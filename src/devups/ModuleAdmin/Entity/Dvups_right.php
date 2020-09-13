@@ -15,7 +15,7 @@ class Dvups_right extends Model implements JsonSerializable
      * @Column(name="name", type="string" , length=255 )
      * @var string
      * */
-    private $name;
+    protected $name;
 
 
     public function __construct($id = null)

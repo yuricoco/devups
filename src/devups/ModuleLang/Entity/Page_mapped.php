@@ -14,7 +14,7 @@
          * @Column(name="base_url", type="string" , length=255 )
          * @var string
          **/
-        private $base_url; 
+        protected $base_url;
         
 
         

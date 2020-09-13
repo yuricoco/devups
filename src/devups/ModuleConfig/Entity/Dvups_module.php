@@ -17,13 +17,13 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
      * @Column(name="favicon", type="string" , length=255, nullable=true )
      * @var string
      * */
-    private $favicon = "fas fa-fw fa-cog";
+    protected $favicon = "fas fa-fw fa-cog";
 
     /**
      * @Column(name="project", type="string" , length=25 )
      * @var string
      * */
-    private $project;
+    protected $project;
 
     /**
      * @ManyToOne(targetEntity="\Dvups_component")

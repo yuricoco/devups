@@ -1,7 +1,7 @@
 
 
 RewriteEngine On
-#
+
 
 RewriteRule    ^api/?$    services.php    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+)/?$    services.php?path=$1    [NC,L]
@@ -12,7 +12,7 @@ RewriteRule    ^/?$    index.php    [NC,L]
 #RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]    # Process all products
 RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1   [NC,L]    # Process all products
 RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC,L]    # Process all products
-#
+
 #<IfModule mod_headers.c>
 #    Header always set X-FRAME-OPTIONS "DENY"
 #</IfModule>
@@ -25,3 +25,13 @@ RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1/$2   [NC
 #  RewriteCond %{REQUEST_FILENAME} !-d
 #  RewriteRule . /index.php [L]
 #</IfModule>
+
+#Options +FollowSymLinks -Indexes
+#RewriteEngine On
+#
+#RewriteCond %{HTTP:Authorization} .
+#RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+#
+#RewriteCond %{REQUEST_FILENAME} !-d
+#RewriteCond %{REQUEST_FILENAME} !-f
+#RewriteRule ^ index.php [L]
