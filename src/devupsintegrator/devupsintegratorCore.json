@@ -1,0 +1,218 @@
+{
+  "name": "devupsintegrator",
+  "template": "adminv2",
+  "listmodule": [
+    {
+      "id": 3,
+      "name": "ModuleTemplate",
+      "project": "devupscms",
+      "nbent": 4,
+      "listentity": [
+        {
+          "id": 1,
+          "name": "template",
+          "module": {
+            "id": 3
+          },
+          "ref": null,
+          "attribut": {
+            "1": {
+              "name": "header",
+              "visibility": "",
+              "datatype": "string",
+              "size": "255",
+              "nullable": "not",
+              "formtype": "text"
+            },
+            "2": {
+              "name": "footer",
+              "visibility": "",
+              "datatype": "string",
+              "size": "255",
+              "nullable": "not",
+              "formtype": "text"
+            },
+            "3": {
+              "name": "logo",
+              "visibility": "",
+              "datatype": "string",
+              "size": "255",
+              "nullable": "not",
+              "formtype": "text"
+            }
+          },
+          "relation": []
+        },
+        {
+          "id": 2,
+          "name": "page",
+          "module": {
+            "id": 3
+          },
+          "ref": null,
+          "attribut": {
+            "1": {
+              "name": "label",
+              "visibility": "",
+              "datatype": "string",
+              "size": "50",
+              "nullable": "not",
+              "formtype": "text"
+            }
+          },
+          "relation": [
+            {
+              "entity": "hooks",
+              "cardinality": "manyToMany",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade",
+              "entitygenerateid": 11
+            }
+          ]
+        },
+        {
+          "id": 3,
+          "name": "hooks",
+          "module": {
+            "id": 3
+          },
+          "ref": null,
+          "attribut": {
+            "1": {
+              "name": "label",
+              "visibility": "",
+              "datatype": "string",
+              "size": "50",
+              "nullable": "not",
+              "formtype": "text"
+            }
+          },
+          "relation": [
+            {
+              "entity": "block",
+              "cardinality": "manyToMany",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade",
+              "entitygenerateid": 10
+            }
+          ]
+        },
+        {
+          "id": 4,
+          "name": "block",
+          "module": {
+            "id": 3
+          },
+          "ref": null,
+          "attribut": {
+            "1": {
+              "name": "label",
+              "visibility": "",
+              "datatype": "string",
+              "size": "50",
+              "nullable": "not",
+              "formtype": "text"
+            }
+          },
+          "relation": [
+            {
+              "entity": "article",
+              "cardinality": "manyToMany",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade",
+              "entitygenerateid": 14
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "ModuleMenu",
+      "project": "devupscms",
+      "nbent": 3,
+      "listentity": [
+        {
+          "id": 8,
+          "name": "menu",
+          "module": {
+            "id": 4
+          },
+          "ref": null,
+          "attribut": {
+            "1": {
+              "name": "label",
+              "visibility": "",
+              "datatype": "string",
+              "size": "50",
+              "nullable": "not",
+              "formtype": "text"
+            }
+          },
+          "relation": [
+            {
+              "entity": "page",
+              "cardinality": "manyToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            },
+            {
+              "entity": "article",
+              "cardinality": "manyToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            }
+          ]
+        },
+        {
+          "id": 9,
+          "name": "encre",
+          "module": {
+            "id": 4
+          },
+          "ref": null,
+          "attribut": [],
+          "relation": [
+            {
+              "entity": "menu",
+              "cardinality": "oneToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            }
+          ]
+        },
+        {
+          "id": 14,
+          "name": "menuencre",
+          "module": {
+            "id": 4
+          },
+          "ref": null,
+          "attribut": [],
+          "relation": [
+            {
+              "entity": "encre",
+              "cardinality": "manyToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            },
+            {
+              "entity": "menu",
+              "cardinality": "manyToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -8,6 +8,13 @@
 
 global $lang;
 
+function editlang($content, $ref){
+    if(isset($_SESSION['debuglang']) && $_SESSION['debuglang'])
+        $content .= '<button type="button" data-toggle="modal" data-target="#dvContentModalCenter" onclick="model.editcontent(this, \''.$ref.'\')" class="btn btn-link" ><i class="fa fa-edit"></i></button>';
+
+    return $content;
+}
+
 function t($ref, $default = "", $local = null ){
 
     $lang = Local_contentController::getdata();
@@ -30,7 +37,7 @@ function t($ref, $default = "", $local = null ){
     }
 
     if(empty($matcher))
-        return $lang[$ref];
+        return editlang($lang[$ref], $ref);
 
     $translate = $lang[$ref];
 
@@ -39,6 +46,20 @@ function t($ref, $default = "", $local = null ){
 
     }
     //dd($translate);
-    return $translate;
+    return editlang($translate, $ref);
+//
+//    $lang = Local_contentController::getdata();
+//
+//    if(!$default)
+//        $default = $ref;
+//
+//    $ref = Local_content_key::key_sanitise($ref);
+//
+//    if(!isset($lang[$ref])){
+//        Local_contentController::newdatacollection($ref, $default);
+//        return $default;
+//    }
+//
+//    return $lang[$ref];
 
 }

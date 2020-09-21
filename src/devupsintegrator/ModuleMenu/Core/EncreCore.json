@@ -1,0 +1,1 @@
+{"id":9,"name":"encre","module":{"id":4},"ref":null,"attribut":[],"relation":[{"entity":"menu","cardinality":"oneToOne","nullable":"not","ondelete":"cascade","onupdate":"cascade"}]}

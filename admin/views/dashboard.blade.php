@@ -29,9 +29,9 @@
                {{$module->getLabel()}}</h3>
             <hr>
         <div class="row">
-            @foreach($admin->dvups_role->collectDvups_entityOfModule($module) as $entity)
-                @include("default.entitywidget")
-            @endforeach
+            @ foreach($admin->dvups_role->collectDvups_entityOfModule($module) as $entity)
+                @ include("default.entitywidget")
+            @ endforeach
         </div>
         @endforeach
 @endsection

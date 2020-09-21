@@ -41,5 +41,9 @@ require 'devups/ModuleTranslate/devups.moduletranslate.php';
 //require 'subcontractor/ModuleJob/subcontractor.modulejob.php';
 //require 'subcontractor/ModuleData/subcontractor.moduledata.php';
 
+require 'devupsintegrator/ModuleTemplate/devupsintegrator.moduletemplate.php';
+require 'devupsintegrator/ModuleMenu/devupsintegrator.modulemenu.php';
+
+
 
 

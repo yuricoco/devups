@@ -1,0 +1,1 @@
+{"id":4,"name":"block","module":{"id":3},"ref":null,"attribut":{"1":{"name":"label","visibility":"","datatype":"string","size":"50","nullable":"not","formtype":"text"}},"relation":[{"entity":"article","cardinality":"manyToMany","nullable":"not","ondelete":"cascade","onupdate":"cascade","entitygenerateid":14}]}

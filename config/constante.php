@@ -22,6 +22,7 @@ define('__v', '4.3');
 
 define('__server', 'http://127.0.0.1');
 define('__env', __server.'/devupstuto/');
+define('__front', __env.'web/assets/');
 define('__prod', false);
 define('__default_lang', "fr");
 define('__lang', 'fr');

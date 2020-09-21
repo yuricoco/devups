@@ -1,0 +1,1 @@
+{"id":2,"name":"page","module":{"id":3},"ref":null,"attribut":{"1":{"name":"label","visibility":"","datatype":"string","size":"50","nullable":"not","formtype":"text"}},"relation":[{"entity":"hooks","cardinality":"manyToMany","nullable":"not","ondelete":"cascade","onupdate":"cascade","entitygenerateid":11}]}
