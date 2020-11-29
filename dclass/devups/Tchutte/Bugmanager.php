@@ -33,7 +33,9 @@ class Bugmanager {
 //        if(SYSTEM_DEBUG){
 //        Genesis::json_encode($debug);
 //        die;
-            dv_dump($debug);
+        $calledfrom = debug_backtrace();
+        var_dump($debug, $calledfrom);
+        die;
 //        }
 //        else{
 //            return json_encode($debug);

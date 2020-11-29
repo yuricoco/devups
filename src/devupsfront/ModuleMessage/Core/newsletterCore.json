@@ -1,0 +1,1 @@
+{"id":9,"name":"newsletter","module":{"id":4},"attribut":{"1":{"name":"creationdate","visibility":"","datatype":"datetime","size":"","nullable":"not","formtype":"text","$$hashKey":"object:3521"},"2":{"name":"email","visibility":"","datatype":"string","size":"255","nullable":"not","formtype":"email","$$hashKey":"object:3549"}},"relation":[],"$$hashKey":"object:1362"}

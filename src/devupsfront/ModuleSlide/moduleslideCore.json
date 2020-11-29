@@ -1,0 +1,81 @@
+{
+  "id": 5,
+  "name": "ModuleSlide",
+  "project": "devupscms",
+  "nbent": 1,
+  "listentity": [
+    {
+      "id": 624,
+      "name": "slide",
+      "attribut": [
+        {
+          "name": "id",
+          "nullable": "not",
+          "size": "11",
+          "formtype": "text",
+          "datatype": "integer"
+        },
+        {
+          "name": "activated",
+          "nullable": "default",
+          "size": "105",
+          "formtype": "text",
+          "datatype": "string"
+        },
+        {
+          "name": "width_size",
+          "nullable": "not",
+          "size": "5",
+          "formtype": "text",
+          "datatype": "string"
+        },
+        {
+          "name": "height_size",
+          "nullable": "not",
+          "size": "5",
+          "formtype": "text",
+          "datatype": "string"
+        },
+        {
+          "name": "title",
+          "nullable": "default",
+          "size": "55",
+          "formtype": "text",
+          "datatype": "string"
+        },
+        {
+          "name": "content",
+          "nullable": "default",
+          "size": "255",
+          "formtype": "text",
+          "datatype": "string"
+        },
+        {
+          "name": "creationdate",
+          "nullable": "not",
+          "size": "",
+          "formtype": "date",
+          "datatype": "datetime"
+        },
+        {
+          "name": "image",
+          "nullable": "not",
+          "size": "255",
+          "formtype": "text",
+          "datatype": "string"
+        },
+        {
+          "name": "path",
+          "nullable": "default",
+          "size": "150",
+          "formtype": "text",
+          "datatype": "string"
+        }
+      ],
+      "relation": [],
+      "module": {
+        "id": 5
+      }
+    }
+  ]
+}

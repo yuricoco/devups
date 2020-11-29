@@ -124,6 +124,18 @@ switch (R::get('path')) {
         g::json_encode($page_local_contentCtrl->datatable(R::get('next'), R::get('per_page')));
         break;
 
+    case 'local-content.edit':
+        global $viewdir;
+        $viewdir[] = Local_content::classroot("Ressource/views");
+        g::json_encode(Local_contentForm::renderWidgetFront(Request::get("ref")));
+        break;
+
+    case 'local-content.update':
+        g::json_encode((new Local_contentFrontController())->updateAction(Request::get("id")));
+        break;
+    case 'local-content.regeneratecache':
+        g::json_encode((new Local_contentFrontController())->regeneratecacheAction());
+        break;
 
     default:
         g::json_encode(['success' => false, 'error' => ['message' => "404 : action note found", 'route' => R::get('path')]]);

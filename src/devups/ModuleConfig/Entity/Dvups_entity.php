@@ -37,8 +37,18 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
         return $rights;
     }
 
+    public function exist(){
+        if(class_exists($this->name))
+            return true;
+
+        parent::__delete();
+        return  false;
+    }
+
     public function __construct($id = null)
     {
+
+        $this->dvsoftdelete = true;
 
         if ($id) {
             $this->id = $id;
@@ -121,8 +131,15 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
             'name' => $this->name,
             'label' => $this->label,
             'dvups_module' => $this->dvups_module,
-            'dvups_right' => $this->dvups_right,
+            //'dvups_right' => $this->dvups_right,
         ];
+    }
+
+    public function getLinkname()
+    {
+        return "<a href='". route('src/' . strtolower($this->dvups_module->getProject()) . '/'
+                . $this->dvups_module->getName() . '/' . $this->getUrl()) . '/index'."' >
+<i class=\"metismenu-icon\"></i> ".$this->getLabel()."| manage</a>";
     }
 
     public function __delete($exec = true)
@@ -150,6 +167,14 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
     }
     public function countRow()
     {
+        if(!$this->exist())
+            return "deleted";
+
         return ucfirst($this->getLabel())::count();
     }
+
+    public static function menu() {
+        return self::where("name", "menu");
+    }
+
 }

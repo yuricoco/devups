@@ -10,6 +10,9 @@ require 'devups/ModuleConfig/devups.moduleconfig.php';
 require 'devups/ModuleAdmin/devups.moduleadmin.php';
 require 'devups/ModuleLang/devups.modulelang.php';
 require 'devups/ModuleTranslate/devups.moduletranslate.php';
+//require 'devups/ModuleWebservice/devups.modulewebservice.php';
+
+require 'devupscms/ModuleNotification/devupscms.modulenotification.php';
 
 //require 'devupstuto/ModuleStock/devupstuto.modulestock.php';
 //require 'devupstuto/ModuleProduct/devupstuto.moduleproduct.php';
@@ -42,8 +45,6 @@ require 'devups/ModuleTranslate/devups.moduletranslate.php';
 //require 'subcontractor/ModuleData/subcontractor.moduledata.php';
 
 require 'devupsintegrator/ModuleTemplate/devupsintegrator.moduletemplate.php';
-require 'devupsintegrator/ModuleMenu/devupsintegrator.modulemenu.php';
-
 
 
 

@@ -21,6 +21,21 @@ var model = {
     baseredirect : "index.php",
     baseurl : "services.php",
 
+    spinner : '<span class="spinner-border spinner-border-sm mr-2" role="status"></span>',
+    btnactive: null,
+    addLoader(btn) {
+        this.btnactive = btn;
+        this.btnactive.attr("disabled", true);
+        this.btnactive.prepend(this.spinner);
+
+    },
+    removeLoader() {
+
+        this.btnactive.attr("disabled", false);
+        this.btnactive.find(".spinner-border").remove();
+
+    },
+
     url: function (route, parameter) {
         var getAttr = "";
         if (parameter) {

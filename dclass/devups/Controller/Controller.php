@@ -2,15 +2,18 @@
 
 namespace dclass\devups\Controller;
 
+use dclass\devups\Datatable\Lazyloading;
 use Genesis as g;
 use Philo\Blade\Blade;
+use ReflectionClass;
+use Request;
 
 /**
  * class Controller 1.0
  *
  * @author yuri coco
  */
-abstract class Controller
+class Controller
 {
 
     public static $sidebar = true;
@@ -28,6 +31,27 @@ abstract class Controller
     {
         $reflection = new \ReflectionClass(get_called_class());
         return $reflection->newInstance();
+    }
+
+    public function ll($next = 1, $per_page = 10)
+    {
+
+        $classname = Request::get('dclass');
+        $dventity = \Dvups_entity::getbyattribut("this.name", $classname);
+        if (!$dventity->getId())
+            return [
+                "success" =>  false,
+                "message" =>  "entity ".$classname." not found",
+                "available" =>  \Dvups_entity::all(),
+            ];
+
+        $reflection = new ReflectionClass(ucfirst($classname));
+        $entity = $reflection->newInstance();
+
+        $ll = new Lazyloading();
+        $ll->lazyloading($entity , $next, $per_page);
+        return $ll;
+
     }
 
     /**
@@ -441,7 +465,7 @@ abstract class Controller
     public static $jsscript = "";
     public static $jsfiles = [];
 
-    public abstract function listView($next = 1, $per_page = 10);
+    // public abstract function listView($next = 1, $per_page = 10);
 
     public function renderListView($data = [])
     {

@@ -16,8 +16,12 @@ $storageCtrl = new StorageFrontController();
 
 switch (Request::get('path')) {
 
+    case 'lazyloading':
+        g::json_encode((new dclass\devups\Controller\Controller())->ll());
+        break;
+
     case 'test.webservice': // test.webservice
-        g::json_encode((new Local_contentFrontController())->ll());
+        g::json_encode(Local_content::select()->__getAll(true, []));
         break;
 
     default :

@@ -146,7 +146,7 @@ class Core extends stdClass {
     public static function updateDvupsTable() {
         $updated = false;
         $global_navigation = Core::buildOriginCore();
-        
+
         foreach ($global_navigation as $key => $project) {
             if (is_object($project)) {
 
@@ -170,7 +170,7 @@ class Core extends stdClass {
                 }
 
                 foreach ($project->listmodule as $key => $module) {
-                    
+
                     if(!is_object($module)){
                         continue;
                     }
@@ -181,50 +181,53 @@ class Core extends stdClass {
                     $dvmodule->setProject($project->name);
                     $dvmodule->dvups_component = $dvcomponent;
                     if(!$dvmodule->getId()){
-                        
+
                         $dvmodule->setName($modulename);
                         $dvmodule->__insert();
-                        
+
                         $rolemodule = new Dvups_role_dvups_module();
                         $rolemodule->setDvups_module($dvmodule);
                         $rolemodule->setDvups_role(new Dvups_role(1));
                         $rolemodule->__insert();
-                        
+
                         $updated = true;
-                        
+
                     }else{
                         $dvmodule->__update();
                     }
-                    
+
                     foreach ($module->listentity as $key => $entity) {
+
                         $entityname = strtolower($entity->name);
                         $qb = new QueryBuilder(new Dvups_entity());
                         $dventity = $qb->select()->where("dvups_entity.name", '=', $entityname )->__getOne();
 
                         $dventity->setDvups_module($dvmodule);
                         if(!$dventity->getId()){
-//                            $dventity = new Dvups_entity();
+                            $dventity = new Dvups_entity();
                             $dventity->setName($entityname);
                             $dventity->setUrl($entityname);
+                            $dventity->dvups_module = $dvmodule;
                             $dventity->__insert();
-                            
+
                             $roleentity = new Dvups_role_dvups_entity();
                             $roleentity->setDvups_entity($dventity);
                             $roleentity->setDvups_role(new Dvups_role(1));
                             $roleentity->__insert();
-                            
+
                             $updated = true;
-                        
+
                         }else{
+                            $dventity->dvups_module = $dvmodule;
                             $dventity->__update();
                         }
                     }
                 }
             }
         }
-        
+
         return $updated;
-        
+
     }
-    
+
 }

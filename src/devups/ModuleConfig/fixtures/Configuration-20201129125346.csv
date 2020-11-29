@@ -1,0 +1,11 @@
+comment;_key;_value;_type;created_at;updated_at;deleted_at
+;__env;{__server}/devupstuto/;string;;;
+;__prod;0;integer;;;
+;__project_id;devupstuto;string;;;
+;UPLOAD_DIR;{ROOT}uploads/;string;;;
+;RESSOURCE;{ROOT}admin/Ressource/;string;;;
+;admin_dir;{ROOT}admin/;string;;;
+;web_dir;{ROOT}web/;string;;;
+;SRC_FILE;{__env}uploads/;string;;;
+;CLASSJS;{__env}dclass/devupsjs/;string;;;
+;RESSOURCE2;{__env}admin/Ressource/;string;;;

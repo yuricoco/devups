@@ -72,7 +72,27 @@ class Util
         return __lang;
     }
 
-    public static function log($root, $file, $content) {
+    /**
+     * this method write file with path setted on ROOT folder of the project by default
+     * @param $content
+     * @param string $file
+     * @param string $root
+     */
+    static function writein($content, $file = "log", $root = ""){
+
+        if (!file_exists(ROOT . $root))
+            mkdir(ROOT . $root, 0777, true);
+
+        $moddepend = fopen(ROOT .$root.'/'.$file, "a+");
+        fputs($moddepend, $content."\n");
+        fclose($moddepend);
+    }
+
+    public static function log($content, $file = "log", $root = ROOT) {
+
+        if (!$content)
+            return;
+
         $moddepend = fopen($root.'/'.$file, "a+");
         fputs($moddepend, "  ". $content."\n");
         fclose($moddepend);

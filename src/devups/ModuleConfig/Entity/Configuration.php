@@ -56,12 +56,13 @@ class Configuration extends Model implements JsonSerializable
     public function set_key($_key)
     {
 
+        $this->_key = $_key;
+
         $entity = self::where("_key", $_key)->__getOne();
         if ($entity->getId() && $entity->getId() != $this->id) {
             return t("A constante with same key already exist");
         }
 
-        $this->_key = $_key;
     }
 
     public function get_value()
@@ -110,6 +111,25 @@ class Configuration extends Model implements JsonSerializable
         ];
     }
 
+    public static function get($key)
+    {
+        return self::getbyattribut("_key", $key)->get_value();
+    }
+
+    public static function set($key, $value, $type = "string", $comment = "")
+    {
+
+        $cf = self::getbyattribut("_key", $key);
+        $cf->set_key($key);
+        $cf->set_value($key);
+        if (!$cf->getId()) {
+            $cf->set_type($key);
+            $cf->setComment($key);
+        }
+        $cf->__save();
+
+    }
+
     public static function buildConfig()
     {
         $configs = Configuration::allrows();
@@ -126,7 +146,7 @@ class Configuration extends Model implements JsonSerializable
         foreach ($configs as $config) {
             $filecontent .= '
             /**
-                '.$config->getComment().'
+                ' . $config->getComment() . '
             */
             ';
             if ($config->get_type() != "string")
@@ -140,7 +160,7 @@ class Configuration extends Model implements JsonSerializable
                     $value = str_replace($matches[0][0], "", $config->get_value());
 
                     $filecontent .= "define('" . $config->get_key() . "', " . $configkey . ".'" . $value . "');\n";
-                }else{
+                } else {
                     $filecontent .= "define('" . $config->get_key() . "', '" . $config->get_value() . "');\n";
                 }
             }

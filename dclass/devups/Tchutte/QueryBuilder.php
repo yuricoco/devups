@@ -19,7 +19,7 @@ class QueryBuilder extends \DBAL
     private $sequence = "";
     private $parameters = [];
     private $columns = "*";
-    private $defaultjoin = "";
+    //private $defaultjoin = "";
     private $columnscount = "COUNT(*)";
     private $endquery = "";
     private $initwhereclause = false;
@@ -93,8 +93,13 @@ class QueryBuilder extends \DBAL
         if ($defaultjoin) {
 
             if (!empty($this->entity_link_list)) {
-                foreach ($this->entity_link_list as $entity_link) {
-                    $this->query .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
+                $entity_links = array_keys($this->entity_link_list);
+                foreach ($entity_links as $entity_link) {
+                    $class_attrib = explode(":", $entity_link);
+                    if( $class_attrib[0] != $class_attrib[1])
+                        $this->query .= " left join `" . $class_attrib[0]."` ".$class_attrib[1] . " on " . $class_attrib[1] . ".id = " . $this->table . "." . $class_attrib[1] . "_id";
+                    else
+                        $this->query .= " left join `" . $class_attrib[0]."` on " . $class_attrib[0] . ".id = " . $this->table . "." . $class_attrib[0] . "_id";
                 }
             }
         }
@@ -115,17 +120,6 @@ class QueryBuilder extends \DBAL
         return $query;
     }
 
-    private function initdefaultjoin()
-    {
-
-        if (!empty($this->entity_link_list)) {
-            $entity_links = array_keys($this->entity_link_list);
-            foreach ($entity_links as $entity_link) {
-                $class_attrib = explode(":", $entity_link);
-                $this->defaultjoin .= " left join `" . strtolower($class_attrib[0]) . "` on " . strtolower($class_attrib[0]) . ".id = " . $this->table . "." . strtolower($class_attrib[1]) . "_id";
-            }
-        }
-    }
 
     /**
      * Set the columns to be selected.
@@ -140,8 +134,10 @@ class QueryBuilder extends \DBAL
             $entity_links = array_keys($this->entity_link_list);
             foreach ($entity_links as $entity_link) {
                 $class_attrib = explode(":", $entity_link);
-                $this->defaultjoin .= " left join `" . strtolower($class_attrib[0]) . "` on " . strtolower($class_attrib[0]) . ".id = " . $this->table . "." . strtolower($class_attrib[1]) . "_id";
-                //$this->defaultjoin .= " left join `" . strtolower(get_class($entity_link)) . "` on " . strtolower(get_class($entity_link)) . ".id = " . $this->table . "." . strtolower(get_class($entity_link)) . "_id";
+                if( $class_attrib[0] != $class_attrib[1])
+                    $this->defaultjoin .= " left join `" . $class_attrib[0]."` ".$class_attrib[1] . " on " . $class_attrib[1] . ".id = " . $this->table . "." . $class_attrib[1] . "_id";
+                else
+                    $this->defaultjoin .= " left join `" . $class_attrib[0]."` on " . $class_attrib[0] . ".id = " . $this->table . "." . $class_attrib[0] . "_id";
             }
         }
         return $this;
@@ -461,7 +457,7 @@ class QueryBuilder extends \DBAL
     {
         $this->endquery = "";
 //        if(is_array($critere)){
-//            
+//
 //        }
 //        $this->columns = is_array($columns) ? $columns : func_get_args();
 
@@ -709,6 +705,17 @@ class QueryBuilder extends \DBAL
         return $this->executeDbal($this->querysanitize($this->query . $this->endquery), $this->parameters, $action);
     }
 
+    public function __getValue()
+    {
+        $value = $this->executeDbal(
+            $this->querysanitize($this->initquery($this->columns) . $this->defaultjoin . $this->query),
+            $this->parameters, DBAL::$FETCH);
+        if (is_array($value))
+            return $value[0];
+
+        return $value;
+    }
+
     public function __getFirst($recursif = true, $collect = [])
     {
         if (is_numeric($recursif))
@@ -716,6 +723,42 @@ class QueryBuilder extends \DBAL
 
         $this->setCollect($collect);
         return $this->limit(1)->__getOne($recursif);
+    }
+    public function __first($recursif = true, $collect = [])
+    {
+        if (is_numeric($recursif))
+            $this->limit_iteration = $recursif;
+
+        $this->setCollect($collect);
+        return $this->limit(1)->__getOne($recursif);
+    }
+    public function __firstOrNull($recursif = true, $collect = [])
+    {
+        $model = $this->__first($recursif, $collect);
+
+        if($model->getId())
+            return $model;
+
+        return null;
+    }
+
+    /**
+     * @param $callback
+     * @param bool $recursif
+     * @param array $collect
+     * @return type|null
+     */
+    public function __firstOr($callback, $recursif = true, $collect = [])
+    {
+        $model = $this->__first($recursif, $collect);
+
+        if($model->getId())
+            return $model;
+
+        if(is_callable($callback))
+            return $callback();
+
+        dv_dump("callback is not callable");
     }
 
     public function __getLast($recursif = true, $collect = [])
@@ -737,6 +780,10 @@ class QueryBuilder extends \DBAL
         return $this->limit($i - 1, $i)->__getOne($recursif);
     }
 
+    public function __exportAllRow($callback)
+    {
+        return $this->__findAllRow($this->querysanitize($this->initquery($this->columns) . $this->query), $this->parameters, $callback);
+    }
     public function __getAllRow($setdefaultjoin = false)
     {
         if ($setdefaultjoin)

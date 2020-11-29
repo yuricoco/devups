@@ -1,0 +1,51 @@
+{
+  "name": "ModuleSocial",
+  "project": "buyamsellam24",
+  "id": "21",
+  "listentity": [
+    {
+      "attribut": [
+        {
+          "name": "id",
+          "designation": "",
+          "visibility": "",
+          "datatype": "integer",
+          "size": "",
+          "nullable": "not",
+          "formtype": "",
+          "comment": "Default identifier by auto-increment"
+        },
+        {
+          "name": "name",
+          "designation": "",
+          "visibility": "",
+          "datatype": "string",
+          "size": "150",
+          "nullable": "not",
+          "formtype": "text",
+          "comment": ""
+        },
+        {
+          "name": "logo",
+          "designation": "",
+          "visibility": "",
+          "datatype": "string",
+          "size": "255",
+          "nullable": "not",
+          "formtype": "image",
+          "comment": ""
+        }
+      ],
+      "relation": [],
+      "methods": [],
+      "name": "social_network",
+      "id": "26",
+      "module": {
+        "id": "21",
+        "name": "ModuleSocial"
+      },
+      "projectid": "4",
+      "relations": []
+    }
+  ]
+}

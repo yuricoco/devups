@@ -13,14 +13,14 @@
         
         /**
          * @ManyToOne(targetEntity="\Page_mapped")
-         * , inversedBy="reporter"
+         * @JoinColumn(onDelete="set null")
          * @var \Page_mapped
          */
         public $page_mapped;
 
         /**
          * @ManyToOne(targetEntity="\Local_content")
-         * , inversedBy="reporter"
+         * @JoinColumn(onDelete="set null")
          * @var \Local_content
          */
         public $local_content;

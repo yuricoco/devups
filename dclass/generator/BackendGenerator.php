@@ -95,6 +95,7 @@ class BackendGenerator {
         /**
          * " . ucfirst($relation->cardinality) . "
          * @ManyToOne(targetEntity=\"" . $antislash . ucfirst($relation->entity) . "\")
+         * @JoinColumn(onDelete=\"".$relation->ondelete."\")
          * @var " . $antislash . ucfirst($relation->entity) . "
          */
         public $" . $relation->entity . ";\n";

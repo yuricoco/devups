@@ -131,6 +131,9 @@ if (isset($argv[2])) {
 
     switch ($argv[1]) {
 
+        case 'entity:e:data':
+            break;
+
         case 'entity:g:core':
             __Generator::core($argv[2], $project); //,
             echo $argv[2] . ": Core generated with success";

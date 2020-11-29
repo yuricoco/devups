@@ -1,0 +1,54 @@
+{
+    "id": 4,
+    "name": "ModuleMessage",
+    "project": "costbenchmark",
+    "nbent": 3,
+    "listentity": [{
+            "id": 9,
+            "name": "message",
+            "module": {
+                "id": 4
+            },
+            "attribut": {
+                "1": {
+                    "name": "nom",
+                    "visibility": "",
+                    "datatype": "string",
+                    "size": "255",
+                    "nullable": "not",
+                    "formtype": "text",
+                    "$$hashKey": "object:3521"
+                },
+                "2": {
+                    "name": "email",
+                    "visibility": "",
+                    "datatype": "string",
+                    "size": "255",
+                    "nullable": "not",
+                    "formtype": "email",
+                    "$$hashKey": "object:3549"
+                },
+                "3": {
+                    "name": "telephone",
+                    "visibility": "",
+                    "datatype": "string",
+                    "size": "35",
+                    "nullable": "default",
+                    "formtype": "text",
+                    "$$hashKey": "object:3577"
+                },
+                "4": {
+                    "name": "message",
+                    "visibility": "",
+                    "datatype": "text",
+                    "size": "",
+                    "nullable": "default",
+                    "formtype": "textarea",
+                    "$$hashKey": "object:3606"
+                }
+            },
+            "relation": [],
+            "$$hashKey": "object:1362"
+        }],
+    "$$hashKey": "object:4470"
+}

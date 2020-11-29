@@ -20,9 +20,22 @@ class Local_contentTable extends Datatable
         return $dt;
     }
 
+    public function buildfrontcustom()
+    {
+
+        global $viewdir, $moduledata;
+        $viewdir[] = Local_content::classroot("") . '/Ressource/views';
+
+        $this->template = "front.test";
+
+        $this->per_page = 10;
+        return $this;
+    }
+
     public function buildindextable()
     {
 
+        $this->groupaction = true;
         $this->datatablemodel = [
             ['header' => t('local_content.reference', 'Reference'), 'value' => 'reference', 'search' => true],
             ['header' => t('local_content.lang', 'Lang'), 'value' => 'lang', 'search' => true],
@@ -32,7 +45,7 @@ class Local_contentTable extends Datatable
         //$this->per_pageEnabled = true;
         $this->enablefilter();
 
-        $this->per_page = 10;
+        $this->per_page = 30;
         /// $this->lazyloading(new Local_content());
         return $this;
 

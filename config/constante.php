@@ -2,7 +2,7 @@
                 
 define('PROJECT_NAME', 'devupstuto');
 
-define ('dbname', 'devupstest4_bd');
+define ('dbname', 'devupstest5_bd');
 //define ('dbname', 'devupstest3_bd');
 
 //define ('dbname', 'devupstest_bd');
@@ -23,6 +23,7 @@ define('__v', '4.3');
 define('__server', 'http://127.0.0.1');
 define('__env', __server.'/devupstuto/');
 define('__front', __env.'web/assets/');
+define('__admin', __env.'admin/assets/');
 define('__prod', false);
 define('__default_lang', "fr");
 define('__lang', 'fr');

@@ -29,10 +29,7 @@ function setlang($lang) {
 }
 
 function redirect($url = "", $admin = false){
-    if($admin)
-        header('location: '. $url );
-
-    header('location: '. __env . $url );
+    header('location: '. $url );
 }
 
 if(!isset($_SESSION["__lang"] )){
@@ -123,12 +120,6 @@ function dv_dump(... $args){
     echo json_encode($args);
 
     die(1);
-}
-
-function writein($file, $content){
-    $entityrooting = fopen($file, 'w');
-    fputs($entityrooting, $content);
-    fclose($entityrooting);
 }
 
 function randomtoken(){

@@ -1,0 +1,35 @@
+{
+  "attribut": {
+    "1": {
+      "name": "name",
+      "designation": "",
+      "visibility": "",
+      "datatype": "string",
+      "size": "123",
+      "nullable": "not",
+      "formtype": "",
+      "comment": ""
+    },
+    "2": {
+      "name": "description",
+      "designation": "",
+      "visibility": "",
+      "datatype": "text",
+      "size": "",
+      "nullable": "default",
+      "formtype": "",
+      "comment": "",
+      "nullablevalue": true
+    }
+  },
+  "relation": [],
+  "methods": [],
+  "name": "tree",
+  "id": "171",
+  "module": {
+    "id": "41",
+    "name": "ModuleTree"
+  },
+  "projectid": "5",
+  "visible": true
+}

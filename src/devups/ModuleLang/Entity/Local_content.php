@@ -30,7 +30,7 @@ class Local_content extends Model implements JsonSerializable
 
     /**
      * @ManyToOne(targetEntity="\Local_content_key")
-     * , inversedBy="reporter"
+     * @JoinColumn(onDelete="set null")
      * @var \Local_content_key
      */
     public $local_content_key;
@@ -105,6 +105,10 @@ class Local_content extends Model implements JsonSerializable
 
     public function jsonSerialize()
     {
+
+        if($dataset = parent::apimapper())
+            return $dataset;
+
         return [
             'id' => $this->id,
             'reference' => $this->reference,

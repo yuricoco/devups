@@ -24,7 +24,7 @@ class Datatable extends Lazyloading
     protected $table_class = "table table-bordered table-striped table-hover dataTable no-footer";
     //table table-bordered table-hover table-striped
     protected $actionDropdown = true;
-    protected $filterParam = [];
+    private $filterParam = [];
     protected $defaultroute = "";
     protected $dynamicpagination = false;
     protected $isFrontEnd = false;
@@ -35,8 +35,9 @@ class Datatable extends Lazyloading
     protected $html = "";
     protected $lazyloading = "";
     protected $tablefilter = "";
-    protected $pagination = 0;
+    public $pagination = 0;
     protected $paginationcustom = [];
+    protected $editAction = null;
     protected $datatablemodel = []; // describe the model of the table (available column and metadata of row)
     protected $header = []; // describe the model of the table (available column and metadata of row)
     protected $tablebody = "";
@@ -89,12 +90,12 @@ class Datatable extends Lazyloading
     protected $rowaction = [];
     protected $mainrowaction = "edit";
     protected $mainrowactionbtn = "";
-    protected $groupaction = false;
+    protected $groupaction = true;
     protected $groupactioncore = [];
     protected $searchaction = true;
     protected $openform = "";
     protected $closeform = "";
-    protected $defaultgroupaction = "";// '<button id="deletegroup" class="btn btn-danger">delete</button>';
+    protected $defaultgroupaction = '<button id="deletegroup" class="btn btn-danger btn-block">delete</button>';
 
     protected $qbcustom = null;
     protected $order_by = "";
@@ -102,8 +103,8 @@ class Datatable extends Lazyloading
     public $base_url = "";
 
     protected $pagejump = 10;
-    protected $per_page = 10;
-    protected $per_pageEnabled = false;
+    public $per_page = 10;
+    protected $per_pageEnabled = true;
 
     protected $additionnalrow = [];
     protected $enablepagination = true;
@@ -111,6 +112,7 @@ class Datatable extends Lazyloading
     protected $enablecolumnaction = true;
     protected $responsive = "";
     protected $isRadio = false;
+    protected $defaulttopaction = true;
 
     public function __construct($lazyloading, $datatablemodel = [])
     {
@@ -149,6 +151,12 @@ class Datatable extends Lazyloading
 
     }
 
+    public function Qb(\QueryBuilder $qb)
+    {
+        $this->qbcustom = $qb;
+        return $this;
+    }
+
     public function top_action()
     {
 
@@ -164,39 +172,51 @@ class Datatable extends Lazyloading
                 $top_action .= $topaction;
 
         }
-        //$rigths = getadmin()->availableentityright($action);
-        if (!$this->defaultaction)
-            return $top_action;
 
-        $entityrigths = \Dvups_entity::getRigthOf($this->class);
+        if (getadmin()->getId()) {
+            if (!$this->defaulttopaction)
+                return $top_action;
 
-        if ($entityrigths) {
-            // first we check if create action is available for the entity
-            if (in_array('create', $entityrigths)) {
-                // next we check if the user has create right for this entity
-                //if (in_array('create', $rigths)){
-                //if (in_array('create', $_SESSION['action'])){
-                $top_action .= '<button type="button" class="' . $this->createaction["class"] . '" ' . $this->createaction["action"] . ' >' . $this->createaction["content"] . '</button>';
-//                    if(!$statefull)
-//                        $top_action .= '<button data-toggle="modal" data-target="#'.$action.'modal" id="model_new" onclick="model._new()"  class="btn btn-success" ><i class="fa fa-plus"></i> add</button>';
-//                    else
-//                        $top_action .= '<a href="' . $index_ajouter . '" class="btn btn-success" ><i class="fa fa-plus"></i> add</a>';
+            $entityrigths = \Dvups_entity::getRigthOf($this->class);
 
-                //}
-                //$top_action .= '<a id="model_new" href="' . $index_ajouter . '" data-toggle="modal" data-target="#' . $action . 'modal"   class="btn btn-default" ><i class="fa fa-plus"></i> add</a>';
-            }
-        } elseif (isset($_SESSION[dv_role_permission])) {
-            if (in_array('create', $_SESSION[dv_role_permission])) {
-                if (is_string($this->createaction))
-                    $top_action .= $this->createaction;
-                else
+            if ($entityrigths) {
+                // first we check if create action is available for the entity
+                if (in_array('create', $entityrigths)) {
+
                     $top_action .= '<button type="button" class="' . $this->createaction["class"] . '" ' . $this->createaction["action"] . ' >' . $this->createaction["content"] . '</button>';
-            } else {
-                $top_action .= "<span class='alert alert-info' ></span>";
+
+                }
+            } elseif (isset($_SESSION[dv_role_permission])) {
+                if (in_array('create', $_SESSION[dv_role_permission])) {
+                    if (is_string($this->createaction))
+                        $top_action .= $this->createaction;
+                    else
+                        $top_action .= '<button type="button" class="' . $this->createaction["class"] . '" ' . $this->createaction["action"] . ' >' . $this->createaction["content"] . '</button>';
+                } else {
+                    $top_action .= "<span class='alert alert-info' ></span>";
+                }
             }
         }
 
-        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" ><i class="fa fa-retweet"></i> Reload</button>';
+        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" >
+ <i class="fa fa-retweet"></i> Reload</button>
+ ';
+
+        if(getadmin()->getId()){
+            $top_action .= '<div class="btn-group" role="group">
+    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      <i class="fa fa-angle-down"></i> options
+    </button>
+    <div class="dropdown-menu text-left" aria-labelledby="btnGroupDrop1">
+        <button type="button" class="dv_export_csv btn btn-default btn-block" >
+            <i class="fa fa-arrow-down"></i> Export csv
+        </button>
+        <button type="button" class="dv_import_csv btn btn-default btn-block" >
+            <i class="fa fa-arrow-up"></i> Import csv
+        </button>
+    </div>
+  </div>';
+        }
 
         return $top_action;
 
@@ -333,7 +353,7 @@ class Datatable extends Lazyloading
 
     }
 
-    public function renderentitydata($entity)//, $header
+    public function renderentitydata($entity, $callback = null)//, $header
     {
 //        $dt = new Datatable();
 //        $dt->class = get_class($entity);
@@ -341,8 +361,10 @@ class Datatable extends Lazyloading
         if (!$this->datatablemodel) {
             $tb = [];
         } else
-            $tb = self::getTableEntityBody($entity, $this->datatablemodel);
+            $tb = self::getTableEntityBody($entity, $this->datatablemodel, $callback);
 
+        if ($callback)
+            return "";
 
         $newrows = "";
         if (!empty($this->additionnalrow)) {
@@ -357,7 +379,7 @@ class Datatable extends Lazyloading
 
     }
 
-    private static function getTableEntityBody($entity, $header)
+    private static function getTableEntityBody($entity, $header, $callback = null)
     {
 
         foreach ($header as $valuetd) {
@@ -378,18 +400,18 @@ class Datatable extends Lazyloading
                     $entityjoin = call_user_func(array($entity, 'get' . ucfirst($src[1])));
                     $file = call_user_func(array($entityjoin, 'show' . ucfirst($join[1])));
 
-                    $td = "<td>" . $file . "</td>";
+                    $td = "" . $file . "";
                 } elseif (isset($collection[1])) {
                     $td = [];
                     $entitycollection = call_user_func(array($entity, 'get' . ucfirst($collection[1])));
                     foreach ($entitycollection as $entity) {
                         $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
-                        $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
+                        $td = '' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '';
                     }
-                    $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
+                    $td = '' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '';
                 } else {
                     $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
-                    $td = '<td>' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '</td>';
+                    $td = '' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '';
                 }
             } else {
 
@@ -398,19 +420,25 @@ class Datatable extends Lazyloading
                 if (isset($src[1]) and $src[0] = 'src') {
 
                     $file = call_user_func(array($entity, 'show' . ucfirst($src[1])));
-                    $td = "<td>" . $file . "</td>";
+                    $td = "" . $file . "";
                 } else {
                     if (is_object(call_user_func(array($entity, 'get' . ucfirst($value)))) && get_class(call_user_func(array($entity, 'get' . ucfirst($value)))) == "DateTime") {
-                        $td = '<td>' . call_user_func(array($entity, 'get' . ucfirst($value)))->format('d M Y') . '</td>';
+                        $td = '' . call_user_func(array($entity, 'get' . ucfirst($value)))->format('d M Y') . '';
                     } else {
-                        $td = '<td>' . call_user_func(array($entity, 'get' . ucfirst($value))) . '</td>';
+                        $td = '' . call_user_func(array($entity, 'get' . ucfirst($value))) . '';
                     }
                 }
             }
 
-            $tr[] = '<tr ><td><b>' . $valuetd["label"] . '</b></td>' . $td . '</tr>';
+            if ($callback)
+                $callback($valuetd["label"], $td);
+            else
+                $tr[] = '<tr ><td> ' . $valuetd["label"] . ' </td><td>' . $td . '</td></tr>';
 
         }
+
+        if ($callback)
+            return true;
 
         return $tr;
     }
@@ -428,27 +456,32 @@ class Datatable extends Lazyloading
         return $this;
     }
 
-    public function render()
+    public function renderTopaction()
     {
+        $headaction = "";
+        if ($this->enabletopaction)
+            $headaction = $this->top_action();
 
-        $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
+        return $headaction;
+    }
 
-        $this->rowaction = [];
-        if ($this->searchaction) {
-            $this->openform = '<form id="datatable-form" action="#" method="get" >';
-            $this->closeform = '</form>';
-        }
+    public function renderOption()
+    {
 
         $headaction = "";
         if ($this->enabletopaction)
             $headaction = $this->top_action();
 
+        if ($this->groupaction) {
+            $groupaction = $this->groupactionbuilder();
+        }
+
         $html = <<<EOF
- <div class="">
+
 <div class="card-header-tab card-header">
                         <div class="card-header-title">
                             <i class="header-icon lnr-rocket icon-gradient bg-tempting-azure"> </i>
-                            
+                            $groupaction
                         </div>
                         <div class="btn-actions-pane-right">
                             <div class="nav">
@@ -460,14 +493,37 @@ EOF;
 
         $html .= ' ';//.$this->openform;
 
-        $html .= $this->tableoption();
+        return $html;
+
+    }
+    public function render()
+    {
+
+        $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
+
+        $this->rowaction = [];
+        if ($this->searchaction) {
+            $this->openform = '<form id="datatable-form" action="#" method="get" >';
+            $this->closeform = '</form>';
+        }
+
+        $headaction = $this->renderOption();
+
+        $html = <<<EOF
+
+        $headaction
+EOF;
+
+        $html .= ' ';//.$this->openform;
+
+        //$html .= $this->tableoption();
 
         $theader = $this->headerbuilder();
 
         if (!$this->listentity) {
-            $tb = "";
+            $tbody = "";
         } else
-            $tb = $this->tablebodybuilder();
+            $tbody = $this->tablebodybuilder();
 
         $newrows = "";
         if (!empty($this->additionnalrow)) {
@@ -489,7 +545,7 @@ EOF;
         $html .= '<div class="  ' . $this->responsive . '">
         <table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . $route . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
             . '<thead>' . $theader['th'] . $theader['thf'] . '</thead>'
-            . '<tbody>' . $tb . '</tbody>'
+            . '<tbody>' . $tbody . '</tbody>'
             . '<tfoot>' . $newrows . '</tfoot>'
             . '</table></div>';
 
@@ -497,14 +553,34 @@ EOF;
         if ($this->enablepagination)
             $html .= '<div class="card-footer">' . $this->paginationbuilder() . '</div>';
 
-        $html .= "";//</div> $this->closeform.
+        $html .= "</div>";//</div> $this->closeform.
 
-        return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dataTables_wrapper dt-bootstrap4" >' . $html . '</div>';
+        return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dataTables_wrapper dt-bootstrap4" >' . $html . '</div>
+
+    <div id="' . $this->class . 'box" class="swal2-container swal2-fade swal2-shown" style="display:none; overflow-y: auto;">
+        <div role="dialog" aria-labelledby="swal2-title" aria-describedby="swal2-content" class="swal2-modal swal2-show dv_modal" tabindex="1"
+             style="">
+            <div class="main-card mb-3 card  box-container">
+                <div class="card-header">.
+
+                    <button onclick="model._dismissmodal()" type="button" class="swal2-close" aria-label="Close this dialog" style="display: block;">×</button>
+                </div>
+                <div class="card-body"></div>
+            </div>
+
+        </div>
+    </div>
+
+';
     }
 
-    public function addFilterParam($param, $value)
+    public function addFilterParam($param, $value = null)
     {
-        $this->filterParam[] = $param . "=" . $value;
+        if (is_object($param))
+            $this->filterParam[] = strtolower(get_class($param)) . ".id:eq=" . $param->getId();
+        else
+            $this->filterParam[] = $param . "=" . $value;
+
         return $this;
     }
 
@@ -512,10 +588,6 @@ EOF;
     {
 
         $html = '<div class="col-lg-12 col-md-12">';
-
-        if ($this->groupaction) {
-            $html .= $this->groupactionbuilder();
-        }
 
         $html .= $this->perpagebuilder();
 
@@ -569,13 +641,24 @@ EOF;
         $customaction = [];
         foreach ($this->groupactioncore as $action) {
             //$customaction[] = "<span id='".$action["id"]."' class=\"btn btn-info\" >".$action["label"]."</span>";
-            $customaction[] = call_user_func(array($this->class, $action . "Groupaction")); //, $param)
+            if (is_callable($action))
+                $customaction[] = $action(); //, $param)
+            else
+                $customaction[] = call_user_func(array($this->class, $action . "Groupaction")); //, $param)
         }
 
         return '
+
 <div class="col-lg-8 col-md-12">
-<label class="" >Action groupe:</label> ' . implode("", $customaction) . '
-' . $this->defaultgroupaction . '
+<div class="btn-group" role="group">
+    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Action groupe
+    </button>
+    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+      ' . implode("", $customaction) . '
+      ' . $this->defaultgroupaction . '
+    </div>
+  </div>
                     </div>';
 
     }
@@ -613,11 +696,11 @@ EOF;
             return "";
 
         $html = '                    
-            <div class="col-lg-4 col-md-12 ">
+            <div class="col-lg-3 col-md-12 ">
 
         <label class=" col-lg-7" >Line to show </label>';
 
-        $html .= '<select id="dt_nbrow" class="form-control" style="width:100px;" onchange="ddatatable.setperpage(this.options[this.selectedIndex].value)" >';
+        $html .= '<select id="dt_nbrow" class="form-control" style="width:100px; display: inline-block" onchange="ddatatable.setperpage(this.options[this.selectedIndex].value)" >';
         //$html .= '<option value="&next=' . $current_page . '&per_page=10" >10</option>';
 
         for ($i = 1; $i <= $this->per_page; $i++) {
@@ -634,19 +717,22 @@ EOF;
     {
 
         if (!$this->listentity) {
-            return '<div id="dv_pagination" > no page</div>';
+            return '<div id="dv_pagination" class="alert alert-info" > no item founded</div>';
         }
 
 //        if (!is_numeric($this->paginationnav))
 //            return "<div id=\"dv_pagination\" class=\"col-lg-12\"></div>";
 
-        $html = '<div id="dv_pagination" >
-<div class="row">
-            <div id="pagination-notice" data-notice="' . $this->pagination . '" class="col-lg-4 col-md-4">Showing ' . (($this->current_page - 1) * $this->per_page + 1) . ' to ' . $this->per_page * $this->current_page . ' of ' . $this->nb_element . '</div>
+        $html = '
+<div id="dv_pagination"  style="width: 100%" class="row">
+            <div id="pagination-notice" data-notice="' . $this->pagination . '" class="col-lg-2 col-md-4">
+            Showing ' . (($this->current_page - 1) * $this->per_page + 1) . ' to ' . $this->per_page * $this->current_page . ' of ' . $this->nb_element . '
+            </div>
+            
             ';
 
 
-        $html .= '<div class="col-lg-8 col-md-8">
+        $html .= '<div class="col-lg-6 col-md-8">
                 <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
                     <ul class="pagination">';
         if ($this->previous > 0) {
@@ -669,7 +755,8 @@ EOF;
                 }
             }
             $html .= '<select class=" paginate_button page-item" onchange="ddatatable.pagination(this.value)">' . $options . '</select>';
-        } else
+        }
+        else
             if ($this->dynamicpagination) {
 
                 //dv_dump($this->paginationcustom);
@@ -708,7 +795,8 @@ EOF;
 
                 }
 
-            } else
+            }
+            else
                 for ($page = 1; $page <= $this->pagination; $page++) {
                     if ($page == $this->current_page) {
                         $html .= '<li class="paginate_button page-item active "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
@@ -729,9 +817,12 @@ EOF;
                 </div>
             </div>";
 
+        $perpage = $this->perpagebuilder();
+
         $html .= " 
-            </div>
-            </div>";
+ $perpage
+            </div> 
+           ";
 
         return $html;
     }
@@ -783,11 +874,11 @@ EOF;
             $thf[] = '<th></th>';
         }
 
-        foreach ($this->datatablemodel as $valuetd) {
+        foreach ($this->datatablemodel as $key => $valuetd) {
             $thforder = "";
 
             $value = $valuetd["value"];
-            if(is_callable($value)){
+            if (is_callable($value)) {
 
                 $thf[] = '<th > </th>';
 
@@ -856,6 +947,39 @@ EOF;
 
     }
 
+    public $template = "";
+    public function renderCustomBody($template = "", $column = 4){
+        $collection = [];
+        if($template)
+            $this->template = $template;
+
+        if (!$this->template){
+            echo "you must specify a custom template!!";
+            return;
+        }
+
+        $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
+
+        foreach ($this->listentity as $i => $entity) {
+
+            // todo: handle default action to send to the view
+
+            $cvlot[] = \Genesis::getView($this->template, [$this->classname => $entity]);
+            if (count($cvlot) == $column) {
+                //$collection[] = "<div class='row'>". $cvlot ."</div>";
+                echo "<div class='row'>". implode("", $cvlot) ."</div>";
+                $cvlot = [];
+            }
+
+        }
+
+        if (count($cvlot) != 0 && count($cvlot) < $column) {
+            //$collection[] = $cvlot;
+            echo "<div class='row'>". implode("", $cvlot) ."</div>";
+        }
+
+    }
+
     private function tablebodybuilder()
     {
 
@@ -889,8 +1013,8 @@ EOF;
                 if (isset($valuetd["param"]))
                     $param = $valuetd["param"];
 
-                if(is_callable($value)){
-                    if($param)
+                if (is_callable($value)) {
+                    if ($param)
                         $tdcontent = $value($entity, $param);
                     else
                         $tdcontent = $value($entity);
@@ -924,8 +1048,7 @@ EOF;
                         $tdcontent = call_user_func(array($entityjoin, 'get' . ucfirst($join[1])), $param);
                     }
 
-                }
-                else {
+                } else {
                     $src = explode(":", $join[0]);
 
                     if (isset($src[1]) and $src[0] = 'src') {
@@ -963,9 +1086,9 @@ EOF;
 
                 if (!empty($this->customactions)) {
                     foreach ($this->customactions as $customaction) {
-                        if(is_callable($customaction)){
+                        if (is_callable($customaction)) {
                             $resactions = $customaction($entity);
-                        }else
+                        } else
                             $resactions = call_user_func(array($entity, $customaction . 'Action'));
 
                         if (is_array($resactions)) {

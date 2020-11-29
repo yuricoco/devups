@@ -60,7 +60,7 @@ class Dvups_adminController extends Controller
         unset($_SESSION[dv_role_permission]);
         unset($_SESSION[dv_role_navigation]);
         //session_destroy();
-        header("location: " . path('admin/login.php'));
+        redirect( route('admin/login.php'));
     }
 
     public function connexionAction($login = "", $password = "")

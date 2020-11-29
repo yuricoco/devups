@@ -11,6 +11,10 @@
         <!-- Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
 
+        <?php foreach (dclass\devups\Controller\Controller::$cssfiles as $cssfile){ ?>
+        <link href="<?= $cssfile ?>" rel="stylesheet">
+    <?php } ?>
+
         <!-- Styles -->
         <style>
             html, body {
@@ -73,12 +77,12 @@
                 </div>
 
             <div class="content">
-                <div class="title m-b-md">                    
-                    Hello Devups.  Waitting for your front-end template. Do your best :)
+                <div class="title m-b-md">
+                    @tt("Hello Devups.  Waitting for your front-end template. Do your best ") :)
                 </div>
 
-                <div class="">
-                    <?= ProductTable::init($lazyloading)->buildindextable()->render() ?>
+                <div class="content">
+                {!! Local_contentTable::init(new Local_content())->buildfrontcustom()->renderCustomBody() !!}
                 </div>
 
                 <div class="links">
@@ -90,5 +94,6 @@
                 </div>
             </div>
         </div>
+    {!! Local_contentFrontController::renderSetting() !!}
     </body>
 </html>
