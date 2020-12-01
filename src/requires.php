@@ -13,6 +13,7 @@ require 'devups/ModuleTranslate/devups.moduletranslate.php';
 //require 'devups/ModuleWebservice/devups.modulewebservice.php';
 
 require 'devupscms/ModuleNotification/devupscms.modulenotification.php';
+require 'devupsfront/ModuleUser/subcontractor.moduleuser.php';
 
 //require 'devupstuto/ModuleStock/devupstuto.modulestock.php';
 //require 'devupstuto/ModuleProduct/devupstuto.moduleproduct.php';

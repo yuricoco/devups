@@ -23,7 +23,6 @@ function userapp()
 }
 
 require 'Entity/User.php';
-require 'Entity/User_skill.php';
 require 'Form/UserForm.php';
 require 'Datatable/UserTable.php';
 require 'Controller/UserController.php';
