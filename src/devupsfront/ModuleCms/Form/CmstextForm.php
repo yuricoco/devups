@@ -61,12 +61,19 @@ class CmstextForm extends FormManager
 
     public static function getFormData($id = null, $action = "create")
     {
+        if ($complet = Request::get("tree_item"))
+            $tree_item = Tree_item::find($complet);
+        else
+            $tree_item = new Tree_item();
+
         if (!$id):
             $cmstext = new Cmstext();
-
+            $cmstext->setTitle($tree_item->getName());
+            $cmstext->setReference($tree_item->getSlug());
             return [
                 'success' => true,
                 'cmstext' => $cmstext,
+                'tree_item' => $tree_item,
                 'action' => Cmstext::classpath("cmstext/create"),
             ];
         endif;
@@ -74,6 +81,7 @@ class CmstextForm extends FormManager
         $cmstext = Cmstext::find($id);
         return [
             'success' => true,
+            'tree_item' => $tree_item,
             'cmstext' => $cmstext,
             'action' => Cmstext::classpath("cmstext/update?id=") . $id,
         ];

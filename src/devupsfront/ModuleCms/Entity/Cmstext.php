@@ -188,6 +188,21 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
         $this->position = $position;
     }
 
+    /**
+     * @return Tree_item
+     */
+    public function getTree_item()
+    {
+        return $this->tree_item;
+    }
+
+    /**
+     * @param Tree_item $tree_item
+     */
+    public function setTree_item($tree_item)
+    {
+        $this->tree_item = $tree_item;
+    }
 
     public function jsonSerialize()
     {

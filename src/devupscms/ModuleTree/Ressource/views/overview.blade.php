@@ -12,8 +12,10 @@
         <div class="col-12">
 
             <!-- Content -->
-            <section id="content" xmlns:v-bind="http://www.w3.org/1999/xhtml"
+            <section id="content"
+                     xmlns:v-bind="http://www.w3.org/1999/xhtml"
                      xmlns:v-on="http://www.w3.org/1999/xhtml"
+                    data-url="{!! $basecontenturl !!}"
                      class="content">
                 <!-- Column Center -->
                 <div class="row">
@@ -94,4 +96,9 @@
     </div>
 
 @endsection 
-            
+
+@section("jsimport")
+    <script>
+        var createcontenturl = '{!! $addcontenturl !!}';
+    </script>
+@endsection

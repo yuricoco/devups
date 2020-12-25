@@ -24,6 +24,7 @@
         }
 
         public static function __renderDetailWidget(\Dvups_right $dvups_right){
+            Genesis::getView("form/Dvups_rightDetailWidget.php");
             include ROOT . Dvups_right::classpath() . "Form/Dvups_rightDetailWidget.php";
         }
         

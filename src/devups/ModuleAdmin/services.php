@@ -72,7 +72,7 @@ switch (Request::get('path')) {
         break;
 
     case 'dvups_role._new':
-        Dvups_roleForm::renderWidget();
+        g::json_encode(Dvups_roleForm::renderWidget());
         break;
     case 'dvups_role.create':
         g::json_encode($dvups_roleCtrl->createAction());
@@ -81,7 +81,7 @@ switch (Request::get('path')) {
         g::json_encode($dvups_roleCtrl->updateAction(R::get("id")));
         break;
     case 'dvups_role._edit':
-        Dvups_roleForm::renderWidget(R::get("id"));
+        g::json_encode(Dvups_roleForm::renderWidget(R::get("id")));
         break;
     case 'dvups_role._show':
         g::json_encode(Dvups_roleController::renderDetail(R::get("id")));

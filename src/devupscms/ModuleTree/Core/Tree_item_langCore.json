@@ -1,0 +1,44 @@
+{
+  "attribut": {
+    "1": {
+      "name": "value",
+      "designation": "",
+      "visibility": "",
+      "datatype": "string",
+      "size": "123",
+      "nullable": "not",
+      "formtype": "",
+      "comment": ""
+    }
+  },
+  "relation": [
+    {
+      "entity": "tree_item",
+      "name": "tree_item",
+      "ondelete": "set null",
+      "cardinality": "manyToOne"
+    }
+  ],
+  "methods": [
+    {
+      "name": "",
+      "datatype": "",
+      "comment": ""
+    }
+  ],
+  "name": "tree_item_lang",
+  "id": "172",
+  "module": {
+    "id": "41",
+    "name": "ModuleTree"
+  },
+  "projectid": "5",
+  "visible": true,
+  "relations": [
+    {
+      "entity": "tree_item",
+      "name": "tree_item",
+      "cardinality": "manyToOne"
+    }
+  ]
+}

@@ -36,6 +36,13 @@
             <label for='content'>Sommary</label>
             <?= Form::textarea('sommary', $cmstext->getSommary(), ['class' => 'form-control']); ?>
         </div>
+
+        @if($tree_item_id = Request::get("tree_item"))
+            <div class='form-group'>
+                <label for='content'>{{$tree_item->getName()}}</label>
+                <?= Form::select('tree_item', FormManager::Options_Helper("id", [$tree_item]), $tree_item_id, ['class' => 'form-control']); ?>
+            </div>
+        @endif
         <?= Form::submitbtn("save", ['class' => 'btn btn-success btn-block']) ?>
 
         <?= Form::close() ?>

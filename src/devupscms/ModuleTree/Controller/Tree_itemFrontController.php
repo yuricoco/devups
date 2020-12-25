@@ -20,7 +20,6 @@ class Tree_itemFrontController extends Tree_itemController
         $rawdata = \Request::raw();
         $tree_item = $this->hydrateWithJson(new Tree_item(), $rawdata["tree_item"]);
 
-
         $id = $tree_item->__insert();
         return array('success' => true,
             'tree_item' => $tree_item,

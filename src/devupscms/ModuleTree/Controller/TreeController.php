@@ -25,7 +25,10 @@ class TreeController extends Controller{
         self::$jsfiles[] = Tree::classpath('Ressource/js/treeForm.js');
         self::$jsfiles[] = Tree::classpath('Ressource/js/tree_itemManager.js');
 
-        Genesis::renderView("overview", []);
+
+        Genesis::renderView("overview", [
+            "basecontenturl"=>Cmstext::classpath("cmstext/")
+        ]);
     }
 
     public function datatable($next, $per_page) {

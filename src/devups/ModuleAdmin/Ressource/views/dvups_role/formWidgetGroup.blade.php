@@ -5,7 +5,7 @@
 
 <div class='text-left'>
     <div class='form-group'>
-        <label for='name'>{{t('dvups_role.name')}}</label>
+        <label for='name'>{{t('dvups_role.name')}} </label>
         <?= Form::input('name', $dvups_role->getName(), ['class' => 'form-control']); ?>
     </div>
     <div class='form-group'>
@@ -14,7 +14,6 @@
     </div>
     <div class='form-group'>
         <label for='dvups_right'>Dvups_right</label>
-
         <?= Form::checkbox('dvups_right', FormManager::Options_Helper('name', Dvups_right::allrows()),
             $dvups_role->inCollectionOf("dvups_right"), ['class' => 'form-control']); ?>
     </div>
@@ -29,7 +28,7 @@
                 <ul class=''>
                     <label for='dvups_module'>Dvups_Entities</label>
                     @foreach($module->__hasmany(Dvups_entity::class) as $entity)
-                        <li class='form-group'>
+                        <li >
                             <label class='form-group '>
                                 <?= Form::input('dvups_entity', [$entity->getId(), $value_entities], ['class' => 'form-control'], "checkbox"); ?>
                                 {{$entity->getName()}}

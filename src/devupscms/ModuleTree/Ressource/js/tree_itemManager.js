@@ -6,7 +6,6 @@ Vue.component("tree_itemForm", {
             treeitem: {},
             tree_itemparent: {},
             tree_itemtree: [],
-            chain: [],
         }
     },
     props: ["tree_item"],
@@ -38,6 +37,14 @@ Vue.component("tree_itemForm", {
 
                 }, false);
         },
+        createcontent(){
+            var url = $("#content").data('url')
+            console.log(url);
+            if(this.tree_item.content_id)
+                window.location.href = url+'edit?id='+this.tree_item.content_id+'&tree_item='+this.tree_item.id;
+            else
+                window.location.href = url+'new?tree_item='+this.tree_item.id;
+        }
 
     },
     template: `
@@ -101,19 +108,25 @@ Vue.component("tree_itemForm", {
                                 </select>
                             </div>
                         </form>
+                        
+                <button @click="createcontent()" type="button" id="btnUpdate"
+                    class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> ajouter un content
+                </button>
+                
             </div>
             <div class="card-footer">
-                        <button v-if="tree_item.id" @click="update()" type="button" id="btnUpdate"
-                                class="btn btn-primary">
-                            <i class="fas fa-sync-alt"></i> Update
-                        </button>
-                        <button v-if="!tree_item.id" @click="create()" type="button" id="btnAdd" class="btn btn-success">
-                            <i class="fas fa-plus"></i> Add
-                        </button>
-                        <button @click="tree_item = {}" type="button" class="btn btn-danger">
-                            <i class="fas fa-times"></i> Annuler
-                        </button>
-                    </div>
+                <button v-if="tree_item.id" @click="update()" type="button" id="btnUpdate"
+                        class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Update
+                </button>
+                <button v-if="!tree_item.id" @click="create()" type="button" id="btnAdd" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Add
+                </button>
+                <button @click="tree_item = {}" type="button" class="btn btn-danger">
+                    <i class="fas fa-times"></i> Annuler
+                </button>
+            </div>
         </div>
     `
 });
@@ -171,8 +184,8 @@ Vue.component("addchild", {
             <div class="input-group center">
             <input type="text" class="filter datepicker date-input form-control hasDatepicker" 
               v-model="tree_item.name" :placeholder="'Ajouter un enfant a ' +nameparent"  >
-            <span  @click="create()" class="input-group-addon">
-            <i class="icon-add"></i> add
+            <span  @click="create()" class="btn btn-default input-group-addon">
+            <i class="fa fa-plus"></i>
             </span>
             </div>
         </li>
@@ -186,14 +199,14 @@ Vue.component("childrenTree", {
             chain: [],
         }
     },
-    props: ["tree_item", "tree", "index"],
+    props: ["tree_item", "tree", "index", "nbitem"],
     mounted() {
     },
     methods: {
 
         findchildren(el) {
 
-            model._apiget("tree-item.lazyloading&dfilters=on&next=1&per_page=25&parent_id:eq=" + this.tree_item.id, (response) => {
+            model._apiget("tree-item.lazyloading?dfilters=on&next=1&per_page=25&parent_id:eq=" + this.tree_item.id, (response) => {
                 console.log(response);
 
                 this.children = response.listEntity;
@@ -262,31 +275,31 @@ Vue.component("childrenTree", {
         <li class="list-group-item">
             <div class="dd-handle dd-primary">
                 <button style="width: 120px; overflow: hidden"  class="btn btn-light">
-                <span v-html="tree_item.name"></span> {{tree_item.position}}
+                <span v-html="tree_item.name"></span> {{tree_item.position}} {{nbitem}}
                 ({{tree_item.children}})</button>
-                <button @click="move(1)" class="btn btn-info"><i class="icon-arrow-up"></i></button> 
-                <button @click="move(-1)" class="btn btn-info"><i class="icon-arrow-down"></i></button> 
+                <button v-if="tree_item.position" @click="move(1)" class="btn btn-info"><i class="fa fa-angle-up"></i></button> 
+                <button v-if="tree_item.position >= nbitem - 1" @click="move(-1)" class="btn btn-info"><i class="fa fa-angle-down"></i></button> 
 
                 <span class="pull-right fs11 fw600">
                     <a v-if="parseInt(tree_item.status)" @click="changestatus(tree_item, 0)"
                        class="btn list-item  text-success">
-                        <i class="fa fa-circle fs10"></i> Activer
+                        <i class="fa fa-circle fs10"></i> on
                     </a>
                     <a v-if="!parseInt(tree_item.status)" @click="changestatus(tree_item, 1)"
                        class="btn list-item  text-danger">
-                        <i class="fa fa-circle fs10"></i> Desactiver
+                        <i class="fa fa-circle fs10"></i> off
                     </a>
-                    <button v-if="tree_item.children" @click="saveorder()" type="button"
+                    <button v-if="tree_item.children" @click="saveorder()" title="Save Order" type="button"
                             class="btn btn-info">
-                        <i class="fa fa-exchange-alt"></i> Save Order</button>
+                        <i class="fa fa-exchange-alt"></i> </button>
                         
                     <button v-if="tree_item.children" @click="findchildren(tree_item)" type="button"
                             class="btn btn-info">
-                        <i class="icon-copy"></i></button>
+                        <i class="fa fa-copy"></i></button>
                     <button @click="edit(tree_item)" type="button" class="btn btn-info">
-                        <i class="icon-edit"></i></button>
+                        <i class="fa fa-edit"></i></button>
                     <button @click="_delete(tree_item, index)" type="button" class="btn btn-danger">
-                        <i class="icon-close"></i></button>
+                        <i class="fa fa-close"></i></button>
 
                 </span>
             </div>
@@ -298,6 +311,7 @@ Vue.component("childrenTree", {
                 <li v-if="children.length" is="childrenTree" v-for="(child, $index) in children"
                     v-bind:key="child.id" :tree="tree"  
                     :tree_item="child" 
+                    :nbitem="children.length" 
                     :index="$index" 
                     class="list-group-item"></li>
                               
@@ -322,7 +336,7 @@ Vue.component("tree_item", {
     props: ["tree"],
     mounted() {
 
-        model._apiget("tree-item.lazyloading?dfilters=on&next=1&per_page=10&tree.id:eq=" + this.tree.id,
+        model._apiget("tree-item.lazyloading?dfilters=on&next=1&per_page=10&main:eq=1&tree.id:eq=" + this.tree.id,
             (response) => {
                 console.log(response);
                 this.ll = response;

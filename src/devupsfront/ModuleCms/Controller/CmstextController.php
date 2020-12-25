@@ -78,7 +78,6 @@ class CmstextController extends Controller{
                             'action' => 'create', 
                             'error' => $this->error);
         } 
-        
 
         $id = $cmstext->__insert();
         return 	array(	'success' => true,
@@ -112,10 +111,6 @@ class CmstextController extends Controller{
         extract($_POST);
 
         $cmstext = $this->form_fillingentity(new Cmstext(), $cmstext_form);
-
-
-        $cmstext->setCreationdate(new DateTime());
-
         if ( $this->error ) {
             return Genesis::renderView("cmstext.form", array(	'success' => false,
                 'cmstext' => $cmstext,

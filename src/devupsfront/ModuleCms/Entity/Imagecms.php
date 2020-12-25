@@ -15,9 +15,7 @@
          * @var string
          **/
         protected $width_size;
-        
 
-        
         public function __construct($id = null){
             
                 if( $id ) { $this->id = $id; }   

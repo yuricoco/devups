@@ -204,6 +204,7 @@ class Tree_item extends Model implements JsonSerializable
             'status' => $this->status,
             'chain' => $this->chain,
             'tree' => $this->tree,
+            'content_id' => $this->getContent()->getId(),
             'children' => (int)self::where("parent_id", $this->id)->__countEl(),
         ];
     }
@@ -300,5 +301,10 @@ class Tree_item extends Model implements JsonSerializable
             ->orderby("position")
             //->limit(5)
             ->__getAll();
+    }
+    public function getContent()
+    {
+        return Cmstext::where($this)
+            ->__getOne();
     }
 }

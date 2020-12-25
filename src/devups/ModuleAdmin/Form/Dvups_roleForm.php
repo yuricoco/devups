@@ -95,6 +95,7 @@ class Dvups_roleForm extends FormManager
 
     public static function renderWidget($id = null, $action = "create")
     {
+
         $data = self::getFormData($id, $action);
         $data["rights"] = Dvups_right::all();
         $data["modules"] = Dvups_module::all();
@@ -103,7 +104,13 @@ class Dvups_roleForm extends FormManager
         $data["value_modules"] = $data["dvups_role"]->inCollectionOf("dvups_module");
         $data["value_entities"] = $data["dvups_role"]->inCollectionOf("dvups_entity");
 
-        Genesis::renderView("dvups_role.formWidgetGroup", $data);
+        $form = Genesis::getView("dvups_role.formWidgetGroup", $data);
+        return [
+            "success" => true,
+            "form" => $form,
+        ];
+
+        //Genesis::renderView("dvups_role.formWidgetGroup", $data);
         //Genesis::renderView("dvups_role.formWidget", self::getFormData($id, $action));
     }
 
