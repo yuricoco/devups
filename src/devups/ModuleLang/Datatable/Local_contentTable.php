@@ -51,6 +51,26 @@ class Local_contentTable extends Datatable
 
     }
 
+    public function buildfronttable()
+    {
+        $this->isFrontEnd = true;
+        $this->defaultroute = __env . "";
+        $this->groupaction = true;
+        $this->datatablemodel = [
+            ['header' => t('local_content.reference', 'Reference'), 'value' => 'reference', 'search' => true],
+            ['header' => t('local_content.lang', 'Lang'), 'value' => 'lang', 'search' => true],
+            ['header' => t('local_content.content', 'Content'), 'value' => 'content', 'search' => true]
+        ];
+        $this->topactions[] = "generatecache";
+        //$this->per_pageEnabled = true;
+        $this->enablefilter();
+
+        $this->per_page = 5;
+        /// $this->lazyloading(new Local_content());
+        return $this;
+
+    }
+
     public function builddetailtable()
     {
         $this->datatablemodel = [
@@ -59,6 +79,21 @@ class Local_contentTable extends Datatable
         ];
         // TODO: overwrite datatable attribute for this view
         return $this;
+    }
+
+    public function router()
+    {
+        $tablemodel = Request::get("tablemodel");
+        if (method_exists($this, "build" . $tablemodel . "table") && $result = call_user_func(array($this, "build" . $tablemodel . "table"))) {
+            return $result;
+        } else
+            switch ($tablemodel) {
+                case "front":
+                    return $this->buildfronttable();
+                default:
+                    return $this->buildindextable();
+            }
+
     }
 
 }

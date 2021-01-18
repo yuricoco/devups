@@ -8,7 +8,7 @@ class BackendGeneratorJava {
 
         unset($entity->attribut[0]);
 
-        $fichier = fopen('Ressource/java/' . $name."/models/" .ucfirst($name) . '.java', 'w');
+        $fichier = fopen('Resource/java/' . $name."/models/" .ucfirst($name) . '.java', 'w');
 
         fputs($fichier, "package $package;
     
@@ -155,7 +155,7 @@ class BackendGeneratorJava {
     public function activityGenerator($entity, $package) {
         $name = strtolower($entity->name);
 
-        $classController = fopen('Ressource/java/' . $name.'/activities/' . ucfirst($name) . 'DetailActivity.java', 'w');
+        $classController = fopen('Resource/java/' . $name.'/activities/' . ucfirst($name) . 'DetailActivity.java', 'w');
 
         $contenu = "package $package;
         
@@ -179,7 +179,7 @@ public class " . ucfirst($name) . "DetailActivity extends BaseActivity{
         fputs($classController, $contenu);
         fclose($classController);
 
-        $classController = fopen('Ressource/java/' . $name.'/activities/' . ucfirst($name) . 'ListActivity.java', 'w');
+        $classController = fopen('Resource/java/' . $name.'/activities/' . ucfirst($name) . 'ListActivity.java', 'w');
 
         $contenu = "package $package;
         
@@ -203,7 +203,7 @@ public class " . ucfirst($name) . "ListActivity extends BaseActivity{
         fputs($classController, $contenu);
         fclose($classController);
 
-        $classController = fopen('Ressource/java/' . $name.'/activities/' . ucfirst($name) . 'FormActivity.java', 'w');
+        $classController = fopen('Resource/java/' . $name.'/activities/' . ucfirst($name) . 'FormActivity.java', 'w');
 
         $contenu = "package $package;
         
@@ -382,7 +382,7 @@ public class " . ucfirst($name) . "FormActivity extends BaseActivity{
         /* if($name == 'utilisateur')
           return 0; */
 
-        $classAdapter = fopen('Ressource/java/' . $name.'/adapters/' . ucfirst($name) . 'Adapter.java', 'w');
+        $classAdapter = fopen('Resource/java/' . $name.'/adapters/' . ucfirst($name) . 'Adapter.java', 'w');
 
         $contenu = "package $package;
         
@@ -461,7 +461,7 @@ public class " . ucfirst($name) . "Adapter extends RecyclerView.Adapter<" . ucfi
         /* if($name == 'utilisateur')
           return 0; */
 
-        $classDao = fopen('Ressource/java/' . $name.'/services/' . ucfirst($name) . 'WebServiceClient.java', 'w');
+        $classDao = fopen('Resource/java/' . $name.'/services/' . ucfirst($name) . 'WebServiceClient.java', 'w');
         $contenu = "package $package;
         
     import java.util.List;
@@ -520,7 +520,7 @@ public class " . ucfirst($name) . "Adapter extends RecyclerView.Adapter<" . ucfi
         fputs($classDao, $contenu);
         fclose($classDao);
 
-        $classDao = fopen('Ressource/java/' . $name.'/services/' . ucfirst($name) . 'WebServiceClientInterface.java', 'w');
+        $classDao = fopen('Resource/java/' . $name.'/services/' . ucfirst($name) . 'WebServiceClientInterface.java', 'w');
         $contenu = "package $package;
 
 import java.util.List;

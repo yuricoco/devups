@@ -11,7 +11,7 @@
 
 @section('content')
  
-    @include("default.moduleheaderwidget")
+    @ include("default.moduleheaderwidget")
     <hr>
 
     @yield('layout_content')

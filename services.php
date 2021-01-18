@@ -13,6 +13,7 @@ header("Access-Control-Allow-Origin: *");
 $storageCtrl = new StorageFrontController();
 $treeCtrl = new TreeFrontController();
 $treeitemCtrl = new Tree_itemFrontController();
+$local_contentCtrl = new Local_contentController();
 
 
 (new Request('hello'));
@@ -66,6 +67,35 @@ switch (Request::get('path')) {
     case 'tree-item.getchildren':
         g::json_encode($treeitemCtrl->getchildren(Request::get("id")));
         break;
+
+    case 'local_content._new':
+        Local_contentForm::render();
+        break;
+    case 'local_content.create':
+        g::json_encode($local_contentCtrl->createAction());
+        break;
+    case 'local_content._edit':
+        Local_contentForm::render(R::get("id"));
+        break;
+    case 'local_content.update':
+        g::json_encode($local_contentCtrl->updateAction(R::get("id")));
+        break;
+    case 'local_content._show':
+        $local_contentCtrl->detailView(R::get("id"));
+        break;
+    case 'local_content._delete':
+        g::json_encode($local_contentCtrl->deleteAction(R::get("id")));
+        break;
+    case 'local_content._deletegroup':
+        g::json_encode($local_contentCtrl->deletegroupAction(R::get("ids")));
+        break;
+    case 'local_content.datatable':
+        g::json_encode($local_contentCtrl->datatable(R::get('next'), R::get('per_page')));
+        break;
+    case 'local_content.regeneratecache':
+        g::json_encode($local_contentCtrl->regeneratecacheAction());
+        break;
+
     default :
         g::json_encode(["success" => false, "message" => "404 :".Request::get('path')." page note found"]);
         break;

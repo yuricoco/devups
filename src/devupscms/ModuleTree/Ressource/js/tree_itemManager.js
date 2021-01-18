@@ -4,6 +4,7 @@ Vue.component("tree_itemForm", {
         return {
             chain: [],
             treeitem: {},
+            contenturl: "",
             tree_itemparent: {},
             tree_itemtree: [],
         }
@@ -11,39 +12,42 @@ Vue.component("tree_itemForm", {
     props: ["tree_item"],
     mounted() {
 
-        model._apiget("tree-item.detail?id=" + this.tree_item.id, (response) => {
+        /*model._apiget("tree-item.detail?id=" + this.tree_item.id, (response) => {
             console.log(response);
             //this.tree_item = response.tree_item;
 
             // this.tree_itemtree = response.data.tree_itemtree;
             // this.tree_itemparent = response.data.tree_itemparent;
 
-        })
+        })*/
+
+        var url = $("#content").data('url')
+        console.log(url);
+        if(this.tree_item.content_id)
+            this.contenturl = url+'edit?id='+this.tree_item.content_id+'&tree_item='+this.tree_item.id;
+        else
+            this.contenturl = url+'new?tree_item='+this.tree_item.id;
 
     },
     methods: {
 
         update() {
             console.log(this.tree_item);
+            //return ;
             model._apipost('tree-item.update?id=' + this.tree_item.id,
                 JSON.stringify({
-                    "tree_item": model.entitytoformentity(this.tree_item)
+                    //"tree_item": model.entitytoformentity(this.tree_item)
+                    "tree_item": this.tree_item
                 }),
                 response => {
                     console.log(response);
-                    this.tree_item = {};
+                    // this.tree_item = {};
 
                     // $.notify("Categorié mise à jour avec succès!", "success");
 
                 }, false);
         },
         createcontent(){
-            var url = $("#content").data('url')
-            console.log(url);
-            if(this.tree_item.content_id)
-                window.location.href = url+'edit?id='+this.tree_item.content_id+'&tree_item='+this.tree_item.id;
-            else
-                window.location.href = url+'new?tree_item='+this.tree_item.id;
         }
 
     },
@@ -58,6 +62,14 @@ Vue.component("tree_itemForm", {
 
                                 <input autocomplete="off" v-model="tree_item.name" type="text"
                                        class="form-control " name="text" id="text"
+                                       placeholder="Text">
+
+                            </div>
+                            <div v-for="(lang, $index) in tree_item.namelangs" :key="$index" class="form-group">
+                                <label for="text">{{lang.lang}}</label>
+
+                                <input autocomplete="off" v-model="lang.content" type="text"
+                                       class="form-control " 
                                        placeholder="Text">
 
                             </div>
@@ -109,10 +121,9 @@ Vue.component("tree_itemForm", {
                             </div>
                         </form>
                         
-                <button @click="createcontent()" type="button" id="btnUpdate"
-                    class="btn btn-primary">
-                    <i class="fas fa-sync-alt"></i> ajouter un content
-                </button>
+                <a :href="contenturl" target="_blank" class="btn btn-primary">
+                    <i class="fas fa-edit"></i> advanced content
+                </a>
                 
             </div>
             <div class="card-footer">
@@ -165,7 +176,9 @@ Vue.component("addchild", {
             }
 
             model._apipost("tree-item.create", JSON.stringify({
-                tree_item: this.tree_item
+                "tree_item": this.tree_item,
+                // "tree_item": model.entitytoformentityexcept(this.tree_item, ["itemlangs"]),
+                // "itemlangs": this.tree_item.itemlangs
             }), (response) => {
                 console.log(response);
                 // todo: add to the parent
@@ -247,7 +260,7 @@ Vue.component("childrenTree", {
         },
         addcontent() {
 
-            model._apiget("tree-item.addcontent&id=" + this.tree_item.id, function (response) {
+            model._apiget("tree-item.addcontent?id=" + this.tree_item.id, function (response) {
                 console.log(response);
                 window.location.href = response.redirect;
             });
@@ -256,7 +269,7 @@ Vue.component("childrenTree", {
         _delete(el, index) {
             // this.el =el;
 
-            model._apiget("tree-item.delete&id=" + this.tree_item.id, (response)=> {
+            model._apiget("tree-item.delete?id=" + this.tree_item.id, (response)=> {
                 console.log(response);
                 if(this.$parent)
                     this.$parent.tree_items.splice(index, 1)

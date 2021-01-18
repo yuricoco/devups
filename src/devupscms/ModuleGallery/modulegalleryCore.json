@@ -1,0 +1,106 @@
+{
+  "name": "ModuleGallery",
+  "project": "subcontractor",
+  "id": "41",
+  "listentity": [
+    {
+      "attribut": [
+        {
+          "name": "id",
+          "designation": "",
+          "visibility": "",
+          "datatype": "integer",
+          "size": "",
+          "nullable": "not",
+          "formtype": "",
+          "comment": "Default identifier by auto-increment "
+        },
+        {
+          "name": "reference",
+          "designation": "",
+          "visibility": "",
+          "datatype": "string",
+          "size": "123",
+          "nullable": "not",
+          "formtype": "",
+          "comment": ""
+        },
+        {
+          "name": "name",
+          "designation": "",
+          "visibility": "",
+          "datatype": "string",
+          "size": "123",
+          "nullable": "not",
+          "formtype": "",
+          "comment": ""
+        },
+        {
+          "name": "description",
+          "designation": "",
+          "visibility": "",
+          "datatype": "text",
+          "size": "",
+          "nullable": "default",
+          "formtype": "",
+          "comment": "",
+          "nullablevalue": true
+        },
+        {
+          "name": "image",
+          "designation": "",
+          "visibility": "",
+          "datatype": "string",
+          "size": "255",
+          "nullable": "not",
+          "formtype": "image",
+          "comment": "",
+          "nullablevalue": true
+        },
+        {
+          "name": "size",
+          "designation": "",
+          "visibility": "",
+          "datatype": "float",
+          "size": "",
+          "nullable": "default",
+          "formtype": "",
+          "comment": "",
+          "nullablevalue": true
+        },
+        {
+          "name": "width",
+          "designation": "",
+          "visibility": "",
+          "datatype": "float",
+          "size": "",
+          "nullable": "default",
+          "formtype": "",
+          "comment": "",
+          "nullablevalue": true
+        },
+        {
+          "name": "height",
+          "designation": "",
+          "visibility": "",
+          "datatype": "float",
+          "size": "",
+          "nullable": "default",
+          "formtype": "",
+          "comment": "",
+          "nullablevalue": true
+        }
+      ],
+      "relation": [],
+      "methods": [],
+      "name": "dv_image",
+      "id": "171",
+      "module": {
+        "id": "41",
+        "name": "ModuleGallery"
+      },
+      "projectid": "5",
+      "visible": true
+    }
+  ]
+}

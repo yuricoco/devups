@@ -266,17 +266,17 @@ Usage:
         $entity->attribut = (array) $entity->attribut;
         $name = strtolower($entity->name);
 
-        if (!file_exists('Ressource/java/' .$name))
-            mkdir('Ressource/java/' .$name, 0777);
+        if (!file_exists('Resource/java/' .$name))
+            mkdir('Resource/java/' .$name, 0777);
 
-        if (!file_exists('Ressource/java/' .$name."/models"))
-            mkdir('Ressource/java/' .$name."/models", 0777);
-        if (!file_exists('Ressource/java/' .$name."/activities"))
-            mkdir('Ressource/java/' .$name."/activities", 0777);
-        if (!file_exists('Ressource/java/' .$name."/services"))
-            mkdir('Ressource/java/' .$name."/services", 0777);
-        if (!file_exists('Ressource/java/' .$name."/adapters"))
-            mkdir('Ressource/java/' .$name."/adapters", 0777);
+        if (!file_exists('Resource/java/' .$name."/models"))
+            mkdir('Resource/java/' .$name."/models", 0777);
+        if (!file_exists('Resource/java/' .$name."/activities"))
+            mkdir('Resource/java/' .$name."/activities", 0777);
+        if (!file_exists('Resource/java/' .$name."/services"))
+            mkdir('Resource/java/' .$name."/services", 0777);
+        if (!file_exists('Resource/java/' .$name."/adapters"))
+            mkdir('Resource/java/' .$name."/adapters", 0777);
 
         if ($crud['model'])
             $backend->modelGenerator($entity, $package);
@@ -291,19 +291,19 @@ Usage:
             $backend->adapterGenerator($entity, $package);
 
 //        if ($crud['views']) {
-//            if (!file_exists('Ressource'))
-//                mkdir('Ressource', 0777);
+//            if (!file_exists('Resource'))
+//                mkdir('Resource', 0777);
 //
-//            if (!file_exists('Ressource/views'))
-//                mkdir('Ressource/views', 0777);
+//            if (!file_exists('Resource/views'))
+//                mkdir('Resource/views', 0777);
 //
-//            if (!file_exists('Ressource/views/' . strtolower($entity->name)))
-//                mkdir('Ressource/views/' . strtolower($entity->name), 0777);
+//            if (!file_exists('Resource/views/' . strtolower($entity->name)))
+//                mkdir('Resource/views/' . strtolower($entity->name), 0777);
 //
-//            if (!file_exists('Ressource/js'))
-//                mkdir("Ressource/js", 0777);
+//            if (!file_exists('Resource/js'))
+//                mkdir("Resource/js", 0777);
 //
-//            $vue = "Ressource/views/" . strtolower($entity->name);
+//            $vue = "Resource/views/" . strtolower($entity->name);
 //            $frontend->viewsGenerator(__Generatorjava::$projectcore->listmodule, $entity, __Generatorjava::$projectcore->template, $vue);
 //        }
 
@@ -367,8 +367,8 @@ Usage:
 
         /* RESSOURCE (VIEW) */
 
-        if (!file_exists("Ressource")) {
-            mkdir('Ressource', 0777);
+        if (!file_exists("Resource")) {
+            mkdir('Resource', 0777);
         }
 
 
@@ -409,7 +409,7 @@ Usage:
         require '../../../admin/header.php';
         
         global $" . "views;
-        $" . "views = __DIR__ . '/Ressource/views';
+        $" . "views = __DIR__ . '/Resource/views';
                 \n\n";
 
         $dependance = array();
@@ -522,7 +522,7 @@ Usage:
         fclose($root);
 
         $frontend = new FrontendGenerator();
-        $frontend->layoutGenerator($module, $projet->template, "Ressource/views/");
+        $frontend->layoutGenerator($module, $projet->template, "Resource/views/");
         
         // on sort du module
         chdir('../');
@@ -542,15 +542,15 @@ Usage:
         define ('dbpassword',  '');
         define ('dbhost',  'localhost');
         
-	define ('RESSOURCE', __DIR__ . '/../admin/Ressource/' );
-	define ('RESSOURCE2', sanitize_src( '/../admin/Ressource/') );
+	define ('RESSOURCE', __DIR__ . '/../admin/Resource/' );
+	define ('RESSOURCE2', sanitize_src( '/../admin/Resource/') );
 	define ('VENDOR', sanitize_src( '/../admin/vendor/') );
-	define ('UPLOAD_DIR_SRC', sanitize_src( '/../admin/Ressource/js/') );
+	define ('UPLOAD_DIR_SRC', sanitize_src( '/../admin/Resource/js/') );
 	define ('UPLOAD_DIR', __DIR__. '/../uploads/' );
-        define('JS', sanitize_src( '/../admin/Ressource/js/') );
-        define('IMG', sanitize_src( '/../admin/Ressource/img/') );
-        define('CSS', sanitize_src( '/../admin/Ressource/css/') );
-        define('IHM', sanitize_src( '/../admin/Ressource/ihm/') );
+        define('JS', sanitize_src( '/../admin/Resource/js/') );
+        define('IMG', sanitize_src( '/../admin/Resource/img/') );
+        define('CSS', sanitize_src( '/../admin/Resource/css/') );
+        define('IHM', sanitize_src( '/../admin/Resource/ihm/') );
 	
 	define('ENTITY', 0);
 	define('VIEW', 1);

@@ -237,7 +237,7 @@ if (isset($argv[2])) {
 
         case 'core:g:moduleressources':
             __Generator::__ressources($project, $argv[2]); //,
-            echo $argv[2] . ": Ressources generated with success";
+            echo $argv[2] . ": Resources generated with success";
             break;
 
         case 'core:g:component':
@@ -309,12 +309,12 @@ if (isset($argv[2])) {
                     (\"__prod\", 0, 'integer'),
                     (\"__project_id\", \"".PROJECT_NAME."\", 'string'),
                     (\"UPLOAD_DIR\", \"{ROOT}uploads/\", 'string'),
-                    (\"RESSOURCE\", \"{ROOT}admin/Ressource/\", 'string'),
+                    (\"RESSOURCE\", \"{ROOT}admin/Resource/\", 'string'),
                     (\"admin_dir\", \"{ROOT}admin/\", 'string'),
                     (\"web_dir\", \"{ROOT}web/\", 'string'),
                     (\"SRC_FILE\", \"{__env}uploads/\", 'string'),
                     (\"CLASSJS\", \"{__env}dclass/devupsjs/\", 'string'),
-                    (\"RESSOURCE2\", \"{__env}admin/Ressource/\", 'string'),
+                    (\"RESSOURCE2\", \"{__env}admin/Resource/\", 'string'),
                     (\"node_modules\", \"{__env}node_modules/\", 'string'),
                     (\"ENTITY\", 0, 'integer'),
                     (\"VIEW\", 1, 'integer'),

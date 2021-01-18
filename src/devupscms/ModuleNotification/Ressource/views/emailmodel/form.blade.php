@@ -12,7 +12,7 @@
 
         iframe {
             width: 100%;
-            height: 300px;
+            height: 500px;
             border: 1px solid black;
             border-left: 0px;
         }
@@ -31,7 +31,7 @@
                     </div>
                     <div class="btn-actions-pane-right">
                         <div class="nav">
-
+                            <a href="{{Emailmodel::classpath("emailmodel/index")}}">retour a la liste</a>
                         </div>
                     </div>
                 </div>
@@ -51,10 +51,13 @@
                         <label for='object'>{{t('emailmodel.object')}}</label>
                         <?= Form::input('object', $emailmodel->getObject(), ['class' => 'form-control']); ?>
                     </div>
+                    <div class='form-group'>
+                        <label for='object'>{{t('style ressource')}}</label>
+                        <?= Form::input('styleressource', $emailmodel->getObject(), ['class' => 'form-control']); ?>
+                    </div>
                     <div class="row" id="container">
                         <div class="col-lg-6   stretch-card" id="textareacontainer">
-                            <textarea id="code_css" name="code_css"></textarea>
-                            <?= Form::textarea('styleressource', $emailmodel->getStyleressource(), ['id' => 'code_css', 'class' => 'form-control']); ?>
+                            <?= Form::textarea('style', $emailmodel->getStyle(), ['id' => 'code_css', 'class' => 'form-control']); ?>
                             <?= Form::textarea('content', $emailmodel->getContent(), ['id' => 'code', 'class' => 'form-control']); ?>
                         </div>
                         <div class="col-lg-6  stretch-card" id="iframecontainer">
@@ -91,7 +94,7 @@
         var delay;
         // Initialize CodeMirror editor with a nice html5 canvas demo.
         var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
-            mode: 'text/html'
+            mode: 'text/css'
         });
         var editorCss = CodeMirror.fromTextArea(document.getElementById('code_css'), {
             mode: 'text/html'
@@ -110,7 +113,7 @@
             var previewFrame = document.getElementById('preview');
             var preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
             preview.open();
-            preview.write(editor.getValue());
+            preview.write(editor.getValue().replace(/{__env}/g, __env));
             preview.close();
             // added this line
             loadCSS();

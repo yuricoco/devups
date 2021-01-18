@@ -10,6 +10,9 @@ require __DIR__ . '/lang.php';
 require 'src/requires.php';
 //require 'tests/ProductTest.php';
 
+define('assets', __env. 'web/assets/');
+define('webapp', __env. 'web/app/');
+
 
 global $viewdir;
 $viewdir = [web_dir . "views"];

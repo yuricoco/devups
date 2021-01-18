@@ -25,7 +25,7 @@ class Datatable extends Lazyloading
     //table table-bordered table-hover table-striped
     protected $actionDropdown = true;
     private $filterParam = [];
-    protected $defaultroute = "";
+    protected $base_url = "";
     protected $dynamicpagination = false;
     protected $isFrontEnd = false;
 
@@ -72,7 +72,7 @@ class Datatable extends Lazyloading
         //'type' => 'btn',
         'content' => '<i class="fa fa-plus" ></i> create',
         'class' => 'btn btn-success',
-        'action' => 'onclick="model._new()"',
+        'action' => 'onclick="model._new(this)"',
         'habit' => 'stateless',
         'modal' => 'data-toggle="modal" ',
     ];
@@ -100,7 +100,7 @@ class Datatable extends Lazyloading
     protected $qbcustom = null;
     protected $order_by = "";
 
-    public $base_url = "";
+    //public $base_url = "";
 
     protected $pagejump = 10;
     public $per_page = 10;
@@ -114,14 +114,17 @@ class Datatable extends Lazyloading
     protected $isRadio = false;
     protected $defaulttopaction = true;
 
-    public function __construct($lazyloading, $datatablemodel = [])
+    public function __construct($entity = null, $datatablemodel = [])
     {
-        if (!$lazyloading) {
-            return;
-        }
 
-        if ($this->entity)
-            $this->class = get_class($this->entity);
+        if ($entity) {
+            $this->entity = $entity;
+            $this->class = strtolower(get_class($this->entity));
+
+            $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
+            $this->base_url = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/');
+
+        }
         // $this->entity = $lazyloading["classname"];
 //        $this->listentity = $lazyloading["listEntity"];
 //        $this->nb_element = $lazyloading["nb_element"];
@@ -136,10 +139,6 @@ class Datatable extends Lazyloading
         // todo: free memory used by $lazyloading
         //unset($lazyloading);
 
-        if ($datatablemodel)
-            $this->datatablemodel = $datatablemodel;
-
-        //$this->columnaction = $action;
 
     }
 
@@ -202,7 +201,7 @@ class Datatable extends Lazyloading
  <i class="fa fa-retweet"></i> Reload</button>
  ';
 
-        if(getadmin()->getId()){
+        if (getadmin()->getId()) {
             $top_action .= '<div class="btn-group" role="group">
     <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <i class="fa fa-angle-down"></i> options
@@ -229,6 +228,8 @@ class Datatable extends Lazyloading
             $method = 'editFrontAction';
             if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["edit"])) {
                 $this->defaultaction["edit"] = $result;
+            } else {
+                $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
             }
             $method = 'showFrontAction';
             if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["show"])) {
@@ -237,6 +238,8 @@ class Datatable extends Lazyloading
             $method = 'deleteFrontAction';
             if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["delete"])) {
                 $this->defaultaction["delete"] = $result;
+            } else {
+                $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
             }
 
             if (isset($this->defaultaction[$this->mainrowaction]))
@@ -462,7 +465,7 @@ class Datatable extends Lazyloading
         if ($this->enabletopaction)
             $headaction = $this->top_action();
 
-        return $headaction;
+        return "<div class='dv-top-action' data-entity='" . $this->class . "' data-route='" . $this->base_url . "' >" . $headaction . "</div>";
     }
 
     public function renderOption()
@@ -496,6 +499,7 @@ EOF;
         return $html;
 
     }
+
     public function render()
     {
 
@@ -532,18 +536,19 @@ EOF;
 
         $filterParam = "";
         if (!empty($this->filterParam)) {
-            $filterParam = "&" . implode("&", $this->filterParam);
+            foreach ($this->filterParam as $key => $value)
+                $filterParam .= "&$key=$value";
+            //$filterParam = "&" . implode("&", $this->filterParam);
         }
 
-        $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
-        if ($this->defaultroute)
-            $route = $this->defaultroute;
-        else
-            $route = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/');
+        if (!$this->base_url) {
+            $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
+            $this->base_url = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/');
+        }
 
         // data-route="' . $route . '" data-entityurl="' . str_replace("_", "-", $this->class) . '"
         $html .= '<div class="  ' . $this->responsive . '">
-        <table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . $route . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
+        <table id="dv_table" data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . $this->base_url . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '" >'
             . '<thead>' . $theader['th'] . $theader['thf'] . '</thead>'
             . '<tbody>' . $tbody . '</tbody>'
             . '<tfoot>' . $newrows . '</tfoot>'
@@ -556,30 +561,42 @@ EOF;
         $html .= "</div>";//</div> $this->closeform.
 
         return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dataTables_wrapper dt-bootstrap4" >' . $html . '</div>
+' . $this->dialogBox();
+    }
 
-    <div id="' . $this->class . 'box" class="swal2-container swal2-fade swal2-shown" style="display:none; overflow-y: auto;">
-        <div role="dialog" aria-labelledby="swal2-title" aria-describedby="swal2-content" class="swal2-modal swal2-show dv_modal" tabindex="1"
-             style="">
-            <div class="main-card mb-3 card  box-container">
-                <div class="card-header">.
-
-                    <button onclick="model._dismissmodal()" type="button" class="swal2-close" aria-label="Close this dialog" style="display: block;">×</button>
-                </div>
-                <div class="card-body"></div>
-            </div>
-
-        </div>
-    </div>
-
-';
+    public function dialogBox()
+    {
+        return ' <div id="' . $this->class . 'box" class="swal2-container swal2-fade swal2-shown" style="display:none; overflow-y: auto;">
+                    <div role="dialog" aria-labelledby="swal2-title" aria-describedby="swal2-content" class="swal2-modal swal2-show dv_modal" tabindex="1"
+                         style="">
+                        <div class="main-card mb-3 card  box-container">
+                            <div class="card-header">.
+            
+                                <button onclick="model._dismissmodal()" type="button" class="swal2-close" aria-label="Close this dialog" style="display: block;">×</button>
+                            </div>
+                            <div class="card-body"></div>
+                        </div>
+            
+                    </div>
+                </div>';
     }
 
     public function addFilterParam($param, $value = null)
     {
         if (is_object($param))
-            $this->filterParam[] = strtolower(get_class($param)) . ".id:eq=" . $param->getId();
-        else
-            $this->filterParam[] = $param . "=" . $value;
+            $this->filterParam[strtolower(get_class($param)) . ".id:eq"] = $param->getId();
+        elseif (is_array($param)) {
+            foreach ($param as $key => $value)
+                $this->filterParam[$key] = $value;
+        } else
+            $this->filterParam[$param] = $value;
+
+        return $this;
+    }
+
+    public function setModel($name)
+    {
+        $this->filterParam["tablemodel"] = $name;
 
         return $this;
     }
@@ -755,8 +772,7 @@ EOF;
                 }
             }
             $html .= '<select class=" paginate_button page-item" onchange="ddatatable.pagination(this.value)">' . $options . '</select>';
-        }
-        else
+        } else
             if ($this->dynamicpagination) {
 
                 //dv_dump($this->paginationcustom);
@@ -795,8 +811,7 @@ EOF;
 
                 }
 
-            }
-            else
+            } else
                 for ($page = 1; $page <= $this->pagination; $page++) {
                     if ($page == $this->current_page) {
                         $html .= '<li class="paginate_button page-item active "><a class="page-link" href="javascript:ddatatable.pagination(' . $page . ');" data-next="' . $page . '" >' . $page . '</a></li>';
@@ -832,6 +847,10 @@ EOF;
         $this->entity = $entity;
         $this->class = get_class($entity);
         $this->listentity = [$entity];
+        if ($this->template) {
+            $this->classname = strtolower(get_class($entity));
+            return $this->buildCustomView($entity);
+        }
         return $this->tablebodybuilder();
 
     }
@@ -948,34 +967,78 @@ EOF;
     }
 
     public $template = "";
-    public function renderCustomBody($template = "", $column = 4){
-        $collection = [];
-        if($template)
-            $this->template = $template;
 
-        if (!$this->template){
+    private function buildCustomView($entity)
+    {
+
+// todo: handle default action to send to the view
+        $actionbutton = self::actionListView($entity);
+        $customrowaction = $this->buildCustomAction($entity);
+
+        return \Genesis::getView($this->template, [
+            $this->classname => $entity,
+            "defaultactions" => $this->defaultaction,
+            "customactions" => $this->customactions,
+        ]);
+    }
+
+    public function renderCustomBody($el = "", $directive = [], $column = null)
+//    public function renderCustomBody($template = "", $column = null)
+    {
+        $collection = [];
+//        if ($template)
+//            $this->template = $template;
+
+        if (!$this->template) {
             echo "you must specify a custom template!!";
             return;
         }
 
         $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
 
+        $filterParam = "";
+        if (!empty($this->filterParam)) {
+            foreach ($this->filterParam as $key => $value)
+                $filterParam .= "&$key=$value";
+            //$filterParam = "&" . implode("&", $this->filterParam);
+        }
+
+        $dentity = \Dvups_entity::select()->where("this.name", $this->class)->__getOne();
+        if ($this->base_url)
+            $route = $this->base_url;
+        else
+            $route = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/');
+
+        $directive = \Form::serialysedirective($directive);
+        // data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . $route . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '"
+        echo '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dataTables_wrapper dt-bootstrap4"  >';
+        echo "<div id='dv_table' data-perpage=\"" . $this->per_page . "\" data-filterparam=\"" . $filterParam . "\" data-route=\"" . $route . "\" data-entity=\"" . $this->class . "\"  class=\"dv_datatable " . $this->table_class . "\" >";
+        echo "<$el $directive >";
+        $cvlot = [];
         foreach ($this->listentity as $i => $entity) {
+            $view = $this->buildCustomView($entity);
 
-            // todo: handle default action to send to the view
-
-            $cvlot[] = \Genesis::getView($this->template, [$this->classname => $entity]);
+            if (!$column) {
+                echo $view;
+                continue;
+            }
+            $cvlot[] = $view;
             if (count($cvlot) == $column) {
                 //$collection[] = "<div class='row'>". $cvlot ."</div>";
-                echo "<div class='row'>". implode("", $cvlot) ."</div>";
+                echo "<div class='row'>" . implode("", $cvlot) . "</div>";
                 $cvlot = [];
             }
 
         }
+        return $cvlot;
+        if (!$column) {
+            echo "</$el></div></div>";
+            return;
+        }
 
         if (count($cvlot) != 0 && count($cvlot) < $column) {
             //$collection[] = $cvlot;
-            echo "<div class='row'>". implode("", $cvlot) ."</div>";
+            echo "<div class='row'>" . implode("", $cvlot) . "</div>";
         }
 
     }
@@ -1084,32 +1147,7 @@ EOF;
 
             if ($this->enablecolumnaction) {
 
-                if (!empty($this->customactions)) {
-                    foreach ($this->customactions as $customaction) {
-                        if (is_callable($customaction)) {
-                            $resactions = $customaction($entity);
-                        } else
-                            $resactions = call_user_func(array($entity, $customaction . 'Action'));
-
-                        if (is_array($resactions)) {
-                            foreach ($resactions as $action) {
-                                if (is_string($action)) {
-                                    $customrowaction[] = $action;
-                                } else
-                                    $this->rowaction[] = $action;
-                            }
-
-                        } elseif (is_string($resactions)) {
-
-                            $customrowaction[] = $resactions;
-                        }
-
-                        if (is_string($this->mainrowaction) && $customaction == $this->mainrowaction)
-                            $this->mainrowactionbtn = $resactions;
-
-                    }
-
-                }
+                $customrowaction = $this->buildCustomAction($entity);
 
                 if ($this->defaultaction) {
 
@@ -1149,6 +1187,38 @@ EOF;
 
         return implode(" ", $tb);
 
+    }
+
+    public function buildCustomAction($entity)
+    {
+
+        if (!empty($this->customactions)) {
+            foreach ($this->customactions as $customaction) {
+                if (is_callable($customaction)) {
+                    $resactions = $customaction($entity);
+                } else
+                    $resactions = call_user_func(array($entity, $customaction . 'Action'));
+
+                if (is_array($resactions)) {
+                    foreach ($resactions as $action) {
+                        if (is_string($action)) {
+                            $customrowaction[] = $action;
+                        } else
+                            $this->rowaction[] = $action;
+                    }
+
+                } elseif (is_string($resactions)) {
+
+                    $customrowaction[] = $resactions;
+                }
+
+                if (is_string($this->mainrowaction) && $customaction == $this->mainrowaction)
+                    $this->mainrowactionbtn = $resactions;
+
+            }
+            return $customrowaction;
+
+        }
     }
 
     public function crud_url($read = "", $update = "", $delete = "")

@@ -4,7 +4,7 @@
 /**
  * @Entity @Table(name="tree_item")
  * */
-class Tree_item extends Model implements JsonSerializable
+class Tree_item extends Model implements JsonSerializable, DvupsTranslation
 {
 
     /**
@@ -190,20 +190,24 @@ class Tree_item extends Model implements JsonSerializable
         $this->tree = $tree;
     }
 
-
     public function jsonSerialize()
     {
+        $namelangs = [];
+        $namelangs[] = $this->__getdvlang("name", "fr", $this->name);
+        $namelangs[] = $this->__getdvlang("name", "en", $this->name);
+
         return [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
-            'position' => (int) $this->position,
+            'position' => (int)$this->position,
             'description' => $this->description,
             'parent_id' => $this->parent_id,
             'main' => $this->main,
             'status' => $this->status,
             'chain' => $this->chain,
             'tree' => $this->tree,
+            'namelangs' => $namelangs,
             'content_id' => $this->getContent()->getId(),
             'children' => (int)self::where("parent_id", $this->id)->__countEl(),
         ];
@@ -216,7 +220,7 @@ class Tree_item extends Model implements JsonSerializable
 
         return self::select()
             ->where("this.parent_id", $this->id)
-            ->andwhere("this.id", "!=", $category->getId())
+            //->andwhere("this.id", "!=", $category->getId())
             ->orderby("this.name")
             ->__getAll();
     }
@@ -302,9 +306,26 @@ class Tree_item extends Model implements JsonSerializable
             //->limit(5)
             ->__getAll();
     }
+
     public function getContent()
     {
         return Cmstext::where($this)
             ->__getOne();
     }
+
+    public function dvupsTranslate()
+    {
+        // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
+        if (!isset(Request::$uri_raw_param["tree_item"]["namelangs"])) {
+
+            $namelangs[] = $this->__inittranslate("name", $this->name, "fr");
+            $namelangs[] = $this->__inittranslate("name", $this->name, "en");
+
+        } else
+            foreach (Request::$uri_raw_param["tree_item"]["namelangs"] as $namelang) {
+                $this->__inittranslate("name", $namelang["content"], $namelang["lang"]);
+            }
+
+    }
+
 }

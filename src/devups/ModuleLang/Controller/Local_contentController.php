@@ -24,7 +24,7 @@ class Local_contentController extends Controller
 
     public function datatable($next, $per_page) {
         return ['success' => true,
-            'datatable' => Local_contentTable::init(new Local_content())->buildindextable()->getTableRest(),
+            'datatable' => Local_contentTable::init(new Local_content())->router()->getTableRest(),
         ];
     }
 

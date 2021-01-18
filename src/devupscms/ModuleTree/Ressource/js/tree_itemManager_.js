@@ -39,6 +39,14 @@ Vue.component("tree_itemForm", {
 
                 }, false);
         },
+        createcontent(){
+            var url = $("#content").data('url')
+            console.log(url);
+            if(this.tree_item.content_id)
+                window.location.href = url+'edit?id='+this.tree_item.content_id+'&tree_item='+this.tree_item.id;
+            else
+                window.location.href = url+'new?tree_item='+this.tree_item.id;
+        }
 
     },
     template: `

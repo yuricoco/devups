@@ -69,9 +69,14 @@ var model = {
         this.init();
     },
     entity : null,
-    _new: function (callback) {
+    _new: function (el, callback) {
+        if($(el).parents(".dv-top-action").length){
+            this.baseurl = $(el).parents(".dv-top-action").data('route') + "services.php";
+            this.entity = $(el).parents(".dv-top-action").data('entity');
+            model.init()
+            console.log("top action route", this.baseurl);
+        }
         this._showmodal();
-
         console.log(this.baseurl+"?path="+this.entity+"._new")
         $.get(this.baseurl+"?path="+this.entity+"._new", function (response) {
             console.log(response)
@@ -405,9 +410,6 @@ var model = {
             console.log("not ready");
             return;
         }
-
-        model.baseurl = $(".dv_datatable").eq(0).data('route')+"services.php";
-        model.entity = $(".dv_datatable").eq(0).data('entity');
 
         // model.baseurl = dvdatatable.eq(0).data('route')+"services.php";
         // model.entity = dvdatatable.eq(0).data('entity');

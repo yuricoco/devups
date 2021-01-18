@@ -219,14 +219,16 @@ class Model extends \stdClass
         return $default;
     }
 
-    public function __gettranslate($column, $default = null)
+    public function __gettranslate($column, $lang = null, $default = null)
     {
         $id = $this->id;
 
         if (!$id)
             return "";
 
-        $lang = local();
+        if(!$lang)
+            $lang = local();
+        
         //$lang = __lang;
         $table = strtolower(get_class($this));
         $ref = $table . "_" . $id . "_" . $column;
@@ -240,6 +242,28 @@ class Model extends \stdClass
             return $dvcontentlang->getContent();
 
         return $default;
+    }
+
+    public function __getdvlang($column, $lang, $default = null)
+    {
+        $id = $this->id;
+
+        if (!$id)
+            return "";
+
+        $table = strtolower(get_class($this));
+        $ref = $table . "_" . $id . "_" . $column;
+
+        $dvlang = Dvups_contentlang::select()
+            ->where("dvups_lang.ref", $ref)
+            ->andwhere("lang", $lang)->__getOne();
+
+        if($dvlang->getId())
+            return $dvlang;
+
+        $dvlang->setContent($default);
+        $dvlang->setLang($lang);
+        return $dvlang;
     }
 
     /**

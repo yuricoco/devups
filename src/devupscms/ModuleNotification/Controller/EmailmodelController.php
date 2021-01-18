@@ -104,4 +104,17 @@ class EmailmodelController extends Controller{
 
     }
 
+    public function testmailAction($id, $email)
+    {
+
+        $emailmodel = Emailmodel::find($id);
+        Emailmodel::addReceiver($email, "devups developer");
+        $data = [
+            "activationcode" => "ddddd",
+            "username" => "devups developer",
+        ];
+
+        return $emailmodel->sendMail($data);
+    }
+
 }

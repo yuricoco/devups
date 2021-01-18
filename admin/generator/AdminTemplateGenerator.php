@@ -10,6 +10,30 @@ class AdminTemplateGenerator extends DvAdmin
         $this->traitement = new Traitement();
     }
 
+    static function dt_btn_action_builder($rowaction, $customrowactions)
+    {
+        $act = '';
+        foreach ($customrowactions as $el) {
+            $act .= '' . $el . '';
+        }
+        foreach ($rowaction as $el) {
+            if (is_array($el)) {
+
+                if (isset($actionclass[$el["class"]]))
+                    $el["class"] = $actionclass[$el["class"]];
+
+                $act .= '<button type="button" class="' . $el["class"] . '" ' . $el["action"] . ' >' . $el["content"] . '</button>';
+
+            } else {
+                $act .= $el;
+            }
+        }
+
+        return <<<EOF
+$act
+EOF;
+    }
+
     static function dt_btn_action($rowaction, $customrowactions, $actionDropdown, $mainaction)
     {
 
@@ -157,9 +181,12 @@ EOF;
 
         $index = self::buildindexdatatable($listemodule, $entity);
 
+        if (!file_exists($_dir))
+            mkdir($_dir, 0777, true);
+
         //---------------------------------- $head.
         $layout = "
-@extends('layout')
+@extends('admin.layout')
 @section('title', 'List')
 
 @section('layout_content')
@@ -179,23 +206,9 @@ EOF;
                     </div>
                 </div>
                 <div class=\"card-body\">
-                    <?= $" . "datatablehtml; ?>
+                    {!! $" . "datatablehtml; !!}
                 </div>
             </div>
-        </div>
-    </div>
-
-    <div id=\"{{ strtolower($" . "entity) }}box\" class=\"swal2-container swal2-fade swal2-shown\" style=\"display:none; overflow-y: auto;\">
-        <div role=\"dialog\" aria-labelledby=\"swal2-title\" aria-describedby=\"swal2-content\" class=\"swal2-modal swal2-show dv_modal\" tabindex=\"1\"
-             style=\"\">
-            <div class=\"main-card mb-3 card  box-container\">
-                <div class=\"card-header\">Header
-
-                    <button onclick=\"model._dismissmodal()\" type=\"button\" class=\"swal2-close\" aria-label=\"Close this dialog\" style=\"display: block;\">×</button>
-                </div>
-                <div class=\"card-body\"></div>
-            </div>
-
         </div>
     </div>
         
@@ -204,6 +217,42 @@ EOF;
 ";
 
         $view = fopen($_dir . 'index.blade.php', 'w');
+        fputs($view, $layout);
+        fclose($view);
+
+        //---------------------------------- $head.
+        $layout = "
+@extends('admin.layout')
+@section('title', 'List')
+
+@section('layout_content')
+
+<div class=\"row\">
+        <div class=\"col-lg-12 col-md-12  stretch-card\">
+            <div class=\"card\">
+                <div class=\"card-header-tab card-header\">
+                    <div class=\"card-header-title\">
+                        <i class=\"header-icon lnr-rocket icon-gradient bg-tempting-azure\"> </i>
+                        {{ $" . "title }}
+                    </div>
+                    <div class=\"btn-actions-pane-right\">
+                        <div class=\"nav\">
+
+                        </div>
+                    </div>
+                </div>
+                <div class=\"card-body\">
+                    {!! $" . "datatablehtml; !!}
+                </div>
+            </div>
+        </div>
+    </div>
+        
+@endsection
+
+";
+
+        $view = fopen($_dir . 'detail.blade.php', 'w');
         fputs($view, $layout);
         fclose($view);
 

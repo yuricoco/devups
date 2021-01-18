@@ -370,7 +370,7 @@ class BackendGenerator {
 
         \$this->datatable = " . ucfirst($name) . "Table::init(new " . ucfirst($name) . "())->buildindextable();
 
-        self::$" . "jsfiles[] = " . ucfirst($name) . "::classpath('Ressource/js/" . $name . "Ctrl.js');
+        self::$" . "jsfiles[] = " . ucfirst($name) . "::classpath('Resource/js/" . $name . "Ctrl.js');
 
         $" . "this->entitytarget = '" . ucfirst($name) . "';
         $" . "this->title = \"Manage " . ucfirst($name) . "\";
@@ -382,7 +382,7 @@ class BackendGenerator {
     public function datatable($" . "next, $" . "per_page) {
     
         return ['success' => true,
-            'datatable' => " . ucfirst($name) . "Table::init(new " . ucfirst($name) . "())->buildindextable()->getTableRest(),
+            'datatable' => " . ucfirst($name) . "Table::init(new " . ucfirst($name) . "())->router()->getTableRest(),
         ];
         
     }
@@ -664,14 +664,14 @@ use dclass\devups\Datatable\Datatable as Datatable;
 class " . ucfirst($name) . "Table extends Datatable{
     
 
-    public function __construct($"."lazyloading = null, $"."datatablemodel = [])
+    public function __construct(\$$name = null, $"."datatablemodel = [])
     {
-        parent::__construct($"."lazyloading, $"."datatablemodel);
+        parent::__construct(\$$name, $"."datatablemodel);
     }
 
     public static function init(\\" . ucfirst($name) . " \$$name = null){
     
-        $"."dt = new " . ucfirst($name) . "Table();
+        $"."dt = new " . ucfirst($name) . "Table(\$$name);
         \$dt->entity = \$$name;
         
         return $"."dt;
@@ -691,6 +691,20 @@ class " . ucfirst($name) . "Table extends Datatable{
         return $"."this;
     }
 
+    public function router()
+    {
+        \$tablemodel = Request::get(\"tablemodel\");
+        if (method_exists(\$this, \"build\" . \$tablemodel . \"table\") && \$result = call_user_func(array(\$this, \"build\" . \$tablemodel . \"table\"))) {
+            return \$result;
+        } else
+            switch (\$tablemodel) {
+                // case \"\": return this->
+                default:
+                    return \$this->buildindextable();
+            }
+
+    }
+    
 }\n";
         fputs($classController, $contenu);
         //fputs($classController, "\n}\n");
@@ -906,7 +920,7 @@ use Genesis as g;
             " . $field . "
             
             $" . "entitycore->addDformjs($" . "button);
-            $" . "entitycore->addjs(" . ucfirst($name) . "::classpath('Ressource/js/".$name."Form'));
+            $" . "entitycore->addjs(" . ucfirst($name) . "::classpath('Resource/js/".$name."Form'));
             
             return $" . "entitycore;
         }
@@ -1102,7 +1116,7 @@ use Genesis as g;
         unset($entity->attribut[0]);
         $contenu = $this->detailwidget($entity, $listmodule);
 
-        $entityform = fopen('Ressource/views/' . $name . '/detail.blade.php', 'w');
+        $entityform = fopen('Resource/views/' . $name . '/detail.blade.php', 'w');
         //$entityform = fopen('Form/' . ucfirst($name) . 'DetailWidget.php', 'w');
         fputs($entityform, $contenu);
 
@@ -1120,7 +1134,7 @@ use Genesis as g;
 
         $contenu = "
     <?php //use dclass\devups\Form\Form; ?>
-    <?php //Form::addcss(" . ucfirst($name) . " ::classpath('Ressource/js/".$name."')) ?>
+    <?php //Form::addcss(" . ucfirst($name) . " ::classpath('Resource/js/".$name."')) ?>
     
     <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action\", \"method\"=> \"post\"]) ?>
 
@@ -1131,10 +1145,10 @@ use Genesis as g;
     <?= Form::close() ?>
     
     <?= Form::addDformjs() ?>    
-    <?= Form::addjs(" . ucfirst($name) . "::classpath('Ressource/js/".$name."Form')) ?>
+    <?= Form::addjs(" . ucfirst($name) . "::classpath('Resource/js/".$name."Form')) ?>
     ";
 
-        $entityform = fopen('Ressource/views/' . $name . '/formWidget.blade.php', 'w');
+        $entityform = fopen('Resource/views/' . $name . '/formWidget.blade.php', 'w');
         fputs($entityform, $contenu);
 
         fclose($entityform);

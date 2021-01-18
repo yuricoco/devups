@@ -24,6 +24,11 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
      **/
     protected $styleressource;
     /**
+     * @Column(name="style", type="text" , nullable=true )
+     * @var string
+     **/
+    protected $style;
+    /**
      * @Column(name="title", type="string" , length=255 )
      * @var string
      **/
@@ -88,6 +93,22 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
     public function setSubject($subject)
     {
         $this->subject = $subject;
+    }
+
+    /**
+     * @return string
+     */
+    public function getStyle()
+    {
+        return $this->style;
+    }
+
+    /**
+     * @param string $style
+     */
+    public function setStyle($style)
+    {
+        $this->style = $style;
     }
 
     public function getContenttext()
@@ -166,6 +187,13 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
         return self::getbyattribut("name", $model);
     }
 
+    public function getTest(){
+        return '
+        <input id="email-'.$this->id.'" class="form-control" name="emailtest" />
+        <button type="button" onclick="model.sendmail(this, '.$this->id.')" class="btn btn-info"> Test mail </button>';
+
+    }
+
     public function jsonSerialize()
     {
         return [
@@ -183,7 +211,6 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
 
     public function showAction($btarray)
     {
-        // TODO: Implement showAction() method.
     }
 
     public function deleteAction($btarray)
@@ -195,8 +222,11 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
     {
 
         foreach ($datareplace as $key => $value) {
-            $content = str_replace("$" . $key, $value, $content);
+            $content = str_replace("{{" . $key.'}}', $value, $content);
         }
+
+        $content = str_replace("{__env}" , __env, $content);
+        //$content = str_replace("__env" , __env, $content);
         return $content;
 
     }
@@ -223,12 +253,19 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
         $style = "";
         $stylefile = self::classroot("Ressource/css/" . $this->styleressource);
         if (file_exists($stylefile))
-            $style = file_get_contents($stylefile);
+            return file_get_contents($stylefile);
 
-        return $style;
+        return $this->style;
     }
 
-    public function sendMail(\User $userhydrate, $activationcode)
+    static $emailreceiver = [];
+    static $namereceiver = [];
+    public static function addReceiver($email, $name){
+        self::$emailreceiver[] = $email;
+        self::$namereceiver[] = $name;
+    }
+
+    public function sendMail($datacustom)
     {
 
         if(!__prod)
@@ -236,9 +273,7 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
 
         $data = [
             "style" => $this->getCss(),
-            "activationcode" => $activationcode,
-            "username" => $userhydrate->getFirstname(),
-        ];
+        ]+$datacustom;
         $message_html = $this->sanitizeContent($this->content, $data);
         $message_text = $this->sanitizeContent($this->contenttext, $data);
 // Instantiation and passing `true` enables exceptions
@@ -257,7 +292,7 @@ class Emailmodel extends Model implements JsonSerializable, DatatableOverwrite
 
             //Recipients
             $mail->setFrom(sm_from, $this->title);
-            $mail->addAddress($userhydrate->getEmail(), $userhydrate->getFirstname());     // Add a recipient
+            $mail->addAddress(self::$emailreceiver[0], self::$namereceiver[0]);     // Add a recipient
             //$mail->addAddress('ellen@example.com');               // Name is optional
             $mail->addReplyTo(sm_from, $this->title);
 //            $mail->addCC('cc@example.com');

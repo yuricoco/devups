@@ -29,7 +29,7 @@ class EmailmodelTable extends Datatable
         $this->datatablemodel = [
             ['header' => t('emailmodel.id', '#'), 'value' => 'id'],
             ['header' => t('emailmodel.object', 'Object'), 'value' => 'object'],
-            ['header' => t('emailmodel.content', 'Content'), 'value' => 'content']
+            ['header' => t('emailmodel.content', 'Content'), 'value' => 'test']
         ];
 
         return $this;

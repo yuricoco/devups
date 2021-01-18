@@ -11,6 +11,7 @@ class Local_contentFrontController extends Local_contentController{
         $viewdir[] = Local_content::classroot("Ressource/views");
         Genesis::renderView("front.setting", []);
     }
+
     public static function localcontentHandler()
     {
         if (!isset($_SESSION["debuglang"]) || $_SESSION["debuglang"] == 0)

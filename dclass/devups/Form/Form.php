@@ -69,6 +69,15 @@ class Form extends FormFactory{
         return $dvups_form;
     }
 
+    public static function addDevupsjs(){
+        return "<script src='".CLASSJS."model.js' ></script>
+<script src='".CLASSJS."dialogbox.js' ></script>
+<script src='".CLASSJS."ddatatable.js' ></script>
+<script src='".CLASSJS."dform.js' ></script>";
+    }
+    public static function addJquery(){
+        return "<script src='".__admin."plugins/jquery/jquery.min.js' ></script>";
+    }
     public static function addDformjs(){
         return "<script src='".CLASSJS."dform.js' ></script>";
     }

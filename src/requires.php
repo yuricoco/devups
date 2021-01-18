@@ -14,6 +14,7 @@ require 'devups/ModuleTranslate/devups.moduletranslate.php';
 
 require 'devupscms/ModuleNotification/devupscms.modulenotification.php';
 require 'devupscms/ModuleTree/devupscms.moduletree.php';
+require 'devupscms/ModuleGallery/devupscms.modulegallery.php';
 
 require 'devupsfront/ModuleCms/devupscms.modulecms.php';
 
