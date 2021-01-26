@@ -196,15 +196,18 @@ var ddatatable = {
         this.page()
     },
     urlparam: "",
+    callbackpaginaison(response){
+        this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
+        this.dtinstance.find("#dv_pagination").replaceWith(response.datatable.tablepagination);
+
+    },
     page: function (index) {
         this.setloader();
         console.log(this.geturl());
         $.get(this.geturl(), (response) => {
             console.log(response);
             removeloader();
-            this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
-            this.dtinstance.find("#dv_pagination").replaceWith(response.datatable.tablepagination);
-
+            this.callbackpaginaison(response)
         }, 'json').fail(function (resultat, statut, erreur) {
             console.log(resultat);
             model._showmodal();
@@ -345,10 +348,16 @@ setTimeout(function () {
         ddatatable.search($(this));
     });
 
-    ddatatable.pagination = function (page) {
+    ddatatable.pagination = function (el, page) {
+
+        model.baseurl = $("#dv_pagination").data('route') + "services.php";
+        model.entity = $("#dv_pagination").data('entity');
+
+        ddatatable.init(model.entity);
 
         this.currentpage = page;
         this.page(page);
+
     };
 
     ddatatable.dtinstance.find(".dv_export_csv").click(function () {

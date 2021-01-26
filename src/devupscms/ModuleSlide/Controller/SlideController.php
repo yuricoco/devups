@@ -94,7 +94,7 @@ class SlideController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Slide::delete()->where("id")->in($ids)->exec();
+        Slide::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

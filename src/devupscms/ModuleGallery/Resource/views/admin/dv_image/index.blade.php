@@ -14,21 +14,23 @@
                     </div>
                     <div class="btn-actions-pane-right">
                         <div class="nav">
-                            {!! Dv_imageTable::init(new Dv_image())->renderTopaction() !!}
+                            {!! $datatable->renderTopaction() !!}
                         </div>
                     </div>
                 </div>
                 <div class="card-body">
                     { $datatable->render(); !!}
-                    {!! Dv_imageTable::init(new Dv_image())->buildfrontcustom()
-                            ->setModel("frontcustom")
+                    {!! $datatable
                             //->setContainer()
                             ->renderCustomBody("div", ["class"=>"row"]) !!}
+                </div>
+                <div class="card-footer">
+                    {!! $datatable->paginationbuilder() !!}
                 </div>
             </div>
         </div>
     </div>
-{!! Dv_imageTable::init(new Dv_image())->dialogBox() !!}
+{!! $datatable->dialogBox() !!}
         
 @endsection
 

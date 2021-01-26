@@ -93,7 +93,7 @@ class Dvups_roleController extends Controller
         $this->entitytarget = 'dvups_role';
         $this->title = "Manage Role";
 
-        $this->datatable = Dvups_roleTable::init()->buildindextable();
+        $this->datatable = Dvups_roleTable::init(new Dvups_role())->buildindextable();
 
         $this->renderListView();
 
@@ -171,7 +171,7 @@ class Dvups_roleController extends Controller
     public function deletegroupAction($ids)
     {
 
-        Dvups_role::delete()->where("id")->in($ids)->exec();
+        Dvups_role::where("id")->in($ids)->delete();
 
         return array('success' => true, // pour le restservice
             'redirect' => 'index', // pour le web service

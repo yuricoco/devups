@@ -41,7 +41,7 @@ class Dvups_adminController extends Controller
         $dvups_admin = Dvups_admin::find(getadmin()->getId());
         extract($_POST);
         if (sha1($oldpwd) == $dvups_admin->getPassword()) {
-            $dvups_admin->__update("password", sha1($newpwd))->exec();
+            $dvups_admin->__update("password", sha1($newpwd));
             return array('success' => true, // pour le restservice
                 'redirect' => Dvups_admin::classpath() . 'dvups-admin/profile?detail=password updated successfully', // pour le web service
                 'detail' => '');
@@ -65,6 +65,7 @@ class Dvups_adminController extends Controller
 
     public function connexionAction($login = "", $password = "")
     {
+
         if (!isset($_POST['login']) and $_POST['login'] != '' and !isset($_POST['password'])) {
             header("Location: " . __env . "admin/login.php?error=Entré le login et le mot de passe.");
         }
@@ -72,6 +73,7 @@ class Dvups_adminController extends Controller
 
         $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
         //dv_dump($login, $password, $admin);
+
         if (!$admin->getId())
             header("Location: " . __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
 
@@ -80,7 +82,7 @@ class Dvups_adminController extends Controller
         //Local_contentController::buildlocalcachesinglelang($_POST['lang']);
 
         $admin->setLastloginAt(date("Y-m-d H:i:s"));
-        $admin->__update(["lastlogin_at"=> date("Y-m-d H:i:s")])->exec();
+        $admin->__update(["lastlogin_at"=> date("Y-m-d H:i:s")]);
 
         if ($admin->getFirstconnexion()) {
 
@@ -267,7 +269,7 @@ class Dvups_adminController extends Controller
                 $admin->__update([
                     "password" => sha1($newpwd),
                     "firstconnexion" => 0,
-                ])->exec();
+                ]);
 
                 unset($_SESSION[ADMIN]);
                 redirect("admin/");

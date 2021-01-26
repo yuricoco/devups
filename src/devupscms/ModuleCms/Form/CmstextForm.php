@@ -97,7 +97,7 @@ class CmstextForm extends FormManager
 
     public static function renderWidget($id = null, $action = "create")
     {
-        Genesis::renderView("cmstext.form", self::getFormData($id, $action));
+        Genesis::renderView("admin.cmstext.form", self::getFormData($id, $action));
     }
 
 }

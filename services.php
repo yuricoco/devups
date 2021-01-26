@@ -14,11 +14,20 @@ $storageCtrl = new StorageFrontController();
 $treeCtrl = new TreeFrontController();
 $treeitemCtrl = new Tree_itemFrontController();
 $local_contentCtrl = new Local_contentController();
+$dv_imageCtrl = new Dv_imageController();
 
 
 (new Request('hello'));
 
 switch (Request::get('path')) {
+
+    case 'uploadfile':
+        $result = Dfile::init("image")
+            ->sanitize()
+            ->moveto("test");
+
+        g::json_encode($result);
+        break;
 
     case 'lazyloading':
         g::json_encode((new dclass\devups\Controller\Controller())->ll());
@@ -96,6 +105,30 @@ switch (Request::get('path')) {
         g::json_encode($local_contentCtrl->regeneratecacheAction());
         break;
 
+    case 'dv_image._new':
+        Dv_imageForm::render();
+        break;
+    case 'dv_image.create':
+        g::json_encode($dv_imageCtrl->createAction());
+        break;
+    case 'dv_image._edit':
+        Dv_imageForm::render(R::get("id"));
+        break;
+    case 'dv_image.update':
+        g::json_encode($dv_imageCtrl->updateAction(R::get("id")));
+        break;
+    case 'dv_image._show':
+        $dv_imageCtrl->detailView(R::get("id"));
+        break;
+    case 'dv_image._delete':
+        g::json_encode($dv_imageCtrl->deleteAction(R::get("id")));
+        break;
+    case 'dv_image._deletegroup':
+        g::json_encode($dv_imageCtrl->deletegroupAction(R::get("ids")));
+        break;
+    case 'dv_image.datatable':
+        g::json_encode($dv_imageCtrl->datatable(R::get('next'), R::get('per_page')));
+        break;
     default :
         g::json_encode(["success" => false, "message" => "404 :".Request::get('path')." page note found"]);
         break;

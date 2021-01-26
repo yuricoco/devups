@@ -107,7 +107,7 @@ class TreeController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Tree::delete()->where("id")->in($ids)->exec();
+        Tree::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

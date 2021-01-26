@@ -169,7 +169,7 @@ class CmstextController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Cmstext::delete()->where("id")->in($ids)->exec();
+        Cmstext::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

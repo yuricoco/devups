@@ -11,31 +11,42 @@
  *
  * @author Aurelien Atemkeng
  */
-class Request {
+class Request
+{
 
     public static $uri_get_param = [];
     public static $uri_post_param = [];
     public static $uri_raw_param = [];
 
-    function __construct($default_path = 'hello') {
+    function strReplaceAssoc(array $replace, $subject) {
+        return str_replace(array_keys($replace), array_values($replace), $subject);
+    }
+
+    function __construct($default_path = 'hello')
+    {
 
         Request::$uri_get_param["path"] = $default_path;
 
         $uri = explode('?', $_SERVER['REQUEST_URI']);
 
         if (isset($uri[1])) {
-            $uri[1] = str_replace("%3C", "<",$uri[1]);
-            $param = explode('&', str_replace("%20", " ",$uri[1]));
+
+            $uri[1] = $this->strReplaceAssoc([
+                "%3C" =>"<",
+                "%20" =>" ",
+                "%3A" =>":",
+            ],$uri[1]);
+            //$uri[1] = str_replace("%3C", "<",$uri[1]);
+            $param = explode('&', $uri[1]);;
             //$param = explode('&', $uri[1]);
             foreach ($param as $el) {
                 $kv = explode("=", $el);
                 if (isset($kv[1])) {
                     $defaulthttpgetkey = str_replace(".", "_", $kv[0]);
-                    if(isset($_GET[$defaulthttpgetkey])){
+                    if (isset($_GET[$defaulthttpgetkey])) {
                         Request::$uri_get_param[$kv[0]] = $_GET[$defaulthttpgetkey];
                         unset($_GET[$defaulthttpgetkey]);
-                    }
-                    else
+                    } else
                         Request::$uri_get_param[$kv[0]] = $kv[1];
                 }
             }
@@ -55,35 +66,38 @@ class Request {
 
     }
 
-    public static function classroot($key) {
+    public static function classroot($key)
+    {
         if (isset(Request::$uri_get_param[$key]))
             return explode("/", Request::$uri_get_param[$key])[ENTITY];
         else
             return false;
     }
 
-    public static function get($key, $default = false) {
+    public static function get($key, $default = false)
+    {
         if (isset(Request::$uri_get_param[$key]))
             return Request::$uri_get_param[$key];
         else
             return $default;
     }
 
-    public static function post($key) {
+    public static function post($key)
+    {
         if (isset(Request::$uri_post_param[$key]))
             return Request::$uri_post_param[$key];
         else
             return false;
     }
 
-    public static function raw($format = "json") {
+    public static function raw($format = "json")
+    {
         $rawdata = file_get_contents("php://input");
 
-        if ($format == "json"){
+        if ($format == "json") {
             self::$uri_raw_param = json_decode($rawdata, true);
             return self::$uri_raw_param;
-        }
-        else
+        } else
             return $rawdata;
     }
 
@@ -95,10 +109,28 @@ class Request {
     public static function geturi()
     {
         $uri = $_SERVER["REQUEST_URI"];
-        if(__prod)
-            return substr($uri, -strlen($uri)+1);
+        if (__prod)
+            return substr($uri, -strlen($uri) + 1);
 
         return str_replace(__base_dir, "", $uri);
+    }
+
+    public static function Route($app, $path)
+    {
+        $array = explode("-", $path);
+        $function = "";
+        foreach ($array as $i => $item) {
+            if ($i >= 1)
+                $function .= ucfirst($item);
+            else
+                $function .= ($item);
+        }
+        $function .= "View";
+
+        if (!method_exists($app, $function)) {
+            var_dump(" You may create method " . " " . $function . " in entity. ");
+        }
+        call_user_func(array($app, $function));
     }
 
 }

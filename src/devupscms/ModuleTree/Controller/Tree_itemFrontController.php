@@ -109,7 +109,7 @@ class Tree_itemFrontController extends Tree_itemController
         $tree_itemorder = $rawdata["tree_items"];
 
         foreach ($tree_itemorder as $order){
-            Tree_item::update(['position'=>$order[1]])->where("this.id", $order[0])->exec();
+            Tree_item::update(['position'=>$order[1]])->where("this.id", $order[0]);
         }
 
         return Response::$data;

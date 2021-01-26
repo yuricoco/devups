@@ -226,9 +226,9 @@ class Model extends \stdClass
         if (!$id)
             return "";
 
-        if(!$lang)
+        if (!$lang)
             $lang = local();
-        
+
         //$lang = __lang;
         $table = strtolower(get_class($this));
         $ref = $table . "_" . $id . "_" . $column;
@@ -258,7 +258,7 @@ class Model extends \stdClass
             ->where("dvups_lang.ref", $ref)
             ->andwhere("lang", $lang)->__getOne();
 
-        if($dvlang->getId())
+        if ($dvlang->getId())
             return $dvlang;
 
         $dvlang->setContent($default);
@@ -345,7 +345,7 @@ class Model extends \stdClass
         if (is_null($parameter))
             return $qb->select()->__countEl();
 
-        if (is_object($parameter))
+        if (is_object($parameter) || is_array($parameter))
             return $qb->select()->where($parameter)->__countEl(false);
 
         return $qb->select()->where($parameter, "=", $value)->__countEl(false);
@@ -520,7 +520,6 @@ class Model extends \stdClass
             return $qb->where("this.id")->in($id)->delete();
         } elseif (is_numeric($id)) {
             $entity->setId($id);
-
             $dbal = new DBAL();
             return $dbal->deleteDbal($entity);
         } else {
@@ -644,8 +643,8 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if($as)
-            $as = "AS ".$as;
+        if ($as)
+            $as = "AS " . $as;
 
         return $qb->select(" SUM($columns) $as ");
     }
@@ -656,10 +655,22 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if($as)
-            $as = "AS ".$as;
+        if ($as)
+            $as = "AS " . $as;
 
         return $qb->select(" AVG($columns) $as ");
+    }
+
+    public static function max($columns, $as = "")
+    {
+        $reflection = new ReflectionClass(get_called_class());
+        $entity = $reflection->newInstance();
+
+        $qb = new QueryBuilder($entity);
+        if ($as)
+            $as = "AS " . $as;
+
+        return $qb->select(" MAX($columns) $as ");
     }
 
     public static function distinct($columns)
@@ -876,15 +887,19 @@ class Model extends \stdClass
      */
     public function setCreatedAt($created_at)
     {
-        $this->created_at = $created_at;
+        if ($created_at)
+            $this->created_at = $created_at;
     }
 
     /**
      * @return string
      */
-    public function getUpdatedAt()
+    public function getUpdatedAt($format = "")
     {
-        return $this->updated_at;
+        if (!$format)
+            return $this->updated_at;
+
+        return date($format, strtotime($this->updated_at));
     }
 
     /**
@@ -892,15 +907,19 @@ class Model extends \stdClass
      */
     public function setUpdatedAt($updated_at)
     {
-        $this->updated_at = $updated_at;
+        if ($updated_at)
+            $this->updated_at = $updated_at;
     }
 
     /**
      * @return string
      */
-    public function getDeletedAt()
+    public function getDeletedAt($format = "")
     {
-        return $this->deleted_at;
+        if (!$format)
+            return $this->deleted_at;
+
+        return date($format, strtotime($this->deleted_at));
     }
 
     /**
@@ -1026,7 +1045,7 @@ class Model extends \stdClass
                         // we finaly combine value with column key
                         //try {
                         $valuetobind = explode(self::split, $line);
-                        if(count($columns) != count($valuetobind) )
+                        if (count($columns) != count($valuetobind))
                             return [
                                 "content" => $line,
                                 "index" => $i,
@@ -1106,11 +1125,11 @@ class Model extends \stdClass
 
     /**
      * map data to the specify model from the webservice call's
-     * @example $custom = [
-            "show"=>function(){ return $this->srcImage();}
-        ];
      * @param array $cutom_data an array (key -> value) of callback
      * @return array
+     * @example $custom = [
+     * "show"=>function(){ return $this->srcImage();}
+     * ];
      */
     public function apimapper($cutom_data = [])
     {
@@ -1154,13 +1173,19 @@ class Model extends \stdClass
 
     private static $keyvalues = [];
 
-    public static function create($keyvalue)
+    public static function create(...$keyvalues)
     {
-        $keyvalue["created_at"] = date("Y-m-d H:i:s");
-        self::$keyvalues = $keyvalue;
-        $classname = get_called_class();
+        $ids = [];
+        foreach ($keyvalues as $keyvalue) {
+            $keyvalue["created_at"] = date("Y-m-d H:i:s");
+            self::$keyvalues = $keyvalue;
+            $classname = get_called_class();
+            $ids[] = DBAL::_createDbal($classname, $keyvalue);
+        }
+        if (count($ids) == 1)
+            return $ids[0];
 
-        return DBAL::_createDbal($classname, $keyvalue);
+        return $ids;
     }
 
     public function hasRelation($name)

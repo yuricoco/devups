@@ -97,7 +97,7 @@ class EmailmodelController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Emailmodel::delete()->where("id")->in($ids)->exec();
+        Emailmodel::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

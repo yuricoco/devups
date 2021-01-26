@@ -63,7 +63,7 @@ if ($path = Request::get("dvpath")) {
 
 
 // move comment scope to enable authentication
-if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
+if (!isset($_SESSION[ADMIN]) and Request::get('path') != 'connexion') {
 
     header("location: " . __env . 'admin/login.php');
 

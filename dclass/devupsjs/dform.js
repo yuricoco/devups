@@ -78,8 +78,9 @@ var dform = {
         // var formserialize = $(this).serialize();
         // console.log(formserialize);
         if (! url){
-            var actionarray = $(el).attr("action").split("/");
-            url = actionarray[1];
+            // var actionarray = $(el).attr("action").split("/");
+            // url = actionarray[1];
+            url = $(el).attr("action");
         }
 
         this.currentform = $(el);
@@ -106,7 +107,16 @@ var dform = {
         //     return 0;
         // }
         //return ;
+        Drequest.init(url, this.formdata)
+            .post((response)=> {
 
+            this.currentbtnsubmit.attr("disabled", false);
+            this.currentbtnsubmit.find(".spinner-border").remove();
+
+            this.callback(response);
+
+        });
+        request.param().send()
         model._post(model.entity+'.'+url, this.formdata, (response)=> {
 
             this.currentbtnsubmit.attr("disabled", false);

@@ -10,26 +10,27 @@
 <?php } ?>
 
 @section('content')
- 
-					<!-- Page Header -->
-					<div class="page-header">
-						<div class="row">
-							<div class="col-sm-12">
-								<h3 class="page-title">{{ $moduledata->getLabel() }}</h3>
-								<ul class="breadcrumb">
-									<li class="breadcrumb-item"><a href="<?= __env ?>admin">Dashboard</a></li>
-									<li class="breadcrumb-item active">{{ $moduledata->getLabel() }}</li>
-								</ul>
-							</div>
-						</div>
-					</div>
-					<!-- /Page Header -->
-					
+
+    <!-- Page Header -->
+    <div class="page-header">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3 class="page-title">{{ $moduledata->getLabel() }}</h3>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="<?= __env ?>admin">Dashboard</a></li>
+                    <li class="breadcrumb-item active">{{ $moduledata->getLabel() }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <!-- /Page Header -->
+
     <ul class="nav nav-justified">
-        
+
         @foreach ($moduledata->dvups_entity as $entity)
             <li class="nav-item">
-                <a class="nav-link active" href="<?= path('src/' . strtolower($moduledata->getProject()) . '/' . $moduledata->getName() . '/' . $entity->getUrl() . '/index') ?>">
+                <a class="nav-link active"
+                   href="<?= path('src/' . strtolower($moduledata->getProject()) . '/' . $moduledata->getName() . '/' . $entity->getUrl() . '/index') ?>">
                     <i class="metismenu-icon"></i> <span><?= $entity->getLabel() ?></span>
                 </a>
             </li>
@@ -40,8 +41,8 @@
     @yield('layout_content')
 
 
-        @endsection
-        
+@endsection
+
 <?php function script(){ ?>
 
 <script src="<?= CLASSJS ?>devups.js"></script>

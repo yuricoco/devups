@@ -137,8 +137,7 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
 
     public function getLinkname()
     {
-        return "<a href='". route('src/' . strtolower($this->dvups_module->getProject()) . '/'
-                . $this->dvups_module->getName() . '/' . $this->getUrl()) . '/index'."' >
+        return "<a href='". $this->route() ."' >
 <i class=\"metismenu-icon\"></i> ".$this->getLabel()."| manage</a>";
     }
 
@@ -149,7 +148,7 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
 
 
     public function route($path = "/index"){
-        return path('src/' . strtolower($this->dvups_module->getProject()) . '/' . $this->dvups_module->getName() . '/' . $this->url . $path);
+        return $this->dvups_module->route($this->url . $path);
     }
 
     public function dvupsTranslate()

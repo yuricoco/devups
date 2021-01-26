@@ -6,16 +6,8 @@
         <?= Form::open($cmstext, ["action" => "$action", "method" => "post"], true) ?>
 
         <div class='form-group'>
-            <label for='lang'>Lang</label>
-            <?= Form::radio('lang', Cmstext::$LANGS, $cmstext->getLang(), ['class' => 'form-control']); ?>
-        </div>
-        <div class='form-group'>
             <label for='lang'>Active</label>
             <?= Form::radio('active', Cmstext::$ACTIVES, $cmstext->getActive(), ['class' => 'form-control']); ?>
-        </div>
-        <div class='form-group'>
-            <label for='lang'>Position</label>
-            <?= Form::input('position', $cmstext->getPosition(), ['class' => 'form-control'], FORMTYPE_NUMBER); ?>
         </div>
         <div class='form-group'>
             <label for='lang'>Reference</label>

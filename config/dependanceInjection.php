@@ -24,6 +24,7 @@ require __DIR__ . '/../dclass/devups/model/Model.php';
 require __DIR__ . '/../dclass/devups/DvupsTranslation.php';
 require __DIR__ . '/../dclass/devups/model/EntityCollection.php';
 require __DIR__ . '/../dclass/devups/Controller/Controller.php';
+require __DIR__ . '/../dclass/devups/Controller/FrontController.php';
 require __DIR__ . '/../dclass/devups/Genesis.php';
 require __DIR__ . '/../dclass/devups/Datatable/Lazyloading.php';
 require __DIR__ . '/../dclass/devups/Datatable/Datatable.php';

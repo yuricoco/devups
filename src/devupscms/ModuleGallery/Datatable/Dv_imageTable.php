@@ -27,7 +27,9 @@ class Dv_imageTable extends Datatable{
 
         $this->template = "front.test";
 
-        $this->per_page = 10;
+        $this->base_url = __env;
+
+        $this->per_page = 3;
         return $this;
     }
 

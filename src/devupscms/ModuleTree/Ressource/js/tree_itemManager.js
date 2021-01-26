@@ -1,4 +1,3 @@
-
 Vue.component("tree_itemForm", {
     data() {
         return {
@@ -23,10 +22,10 @@ Vue.component("tree_itemForm", {
 
         var url = $("#content").data('url')
         console.log(url);
-        if(this.tree_item.content_id)
-            this.contenturl = url+'edit?id='+this.tree_item.content_id+'&tree_item='+this.tree_item.id;
+        if (this.tree_item.content_id)
+            this.contenturl = url + 'edit?id=' + this.tree_item.content_id + '&tree_item=' + this.tree_item.id;
         else
-            this.contenturl = url+'new?tree_item='+this.tree_item.id;
+            this.contenturl = url + 'new?tree_item=' + this.tree_item.id;
 
     },
     methods: {
@@ -47,7 +46,7 @@ Vue.component("tree_itemForm", {
 
                 }, false);
         },
-        createcontent(){
+        createcontent() {
         }
 
     },
@@ -160,7 +159,7 @@ Vue.component("addchild", {
             console.log(this.tree_item, this.tree)
             this.tree_item.main = 1;
 
-            if(this.tree_items)
+            if (this.tree_items)
                 this.tree_item.position = this.tree_items.length;
             else if (this.$parent.children && this.$parent.children[this.$parent.children.length - 1])
                 this.tree_item.position = this.$parent.children[this.$parent.children.length - 1].position;
@@ -175,20 +174,21 @@ Vue.component("addchild", {
                 this.tree_item.parent_id = this.parent.id;
             }
 
-            model._apipost("tree-item.create", JSON.stringify({
-                "tree_item": this.tree_item,
-                // "tree_item": model.entitytoformentityexcept(this.tree_item, ["itemlangs"]),
-                // "itemlangs": this.tree_item.itemlangs
-            }), (response) => {
-                console.log(response);
-                // todo: add to the parent
-                this.tree_item.name = "";
-                if(this.tree_items)
-                    this.tree_items.push(response.tree_item)
-                else if (this.$parent.children)
-                    this.$parent.children.push(response.tree_item)
+            Drequest.api("tree-item.create")
+                .data({
+                    tree_item: this.tree_item
+                })
+                .raw((response) => {
 
-            }, false);
+                    console.log(response);
+                    // todo: add to the parent
+                    this.tree_item.name = "";
+                    if (this.tree_items)
+                        this.tree_items.push(response.tree_item)
+                    else if (this.$parent.children)
+                        this.$parent.children.push(response.tree_item)
+
+                });
 
         },
     },
@@ -234,7 +234,7 @@ Vue.component("childrenTree", {
         },
         saveorder() {
             // this.el =el;
-            if (this.children){
+            if (this.children) {
                 var toupdate = [];
                 this.children.forEach((item) => {
                     toupdate.push([item.id, item.position])
@@ -248,7 +248,7 @@ Vue.component("childrenTree", {
 
                     })
             }
-                // this.$root.$emit("saveorder", this.$parent.children)
+            // this.$root.$emit("saveorder", this.$parent.children)
 
         },
         changestatus(el, status) {
@@ -269,11 +269,11 @@ Vue.component("childrenTree", {
         _delete(el, index) {
             // this.el =el;
 
-            model._apiget("tree-item.delete?id=" + this.tree_item.id, (response)=> {
+            model._apiget("tree-item.delete?id=" + this.tree_item.id, (response) => {
                 console.log(response);
-                if(this.$parent)
+                if (this.$parent)
                     this.$parent.tree_items.splice(index, 1)
-                else{
+                else {
                     this.$root.$emit("delete", index)
                 }
             });
@@ -349,12 +349,20 @@ Vue.component("tree_item", {
     props: ["tree"],
     mounted() {
 
-        model._apiget("tree-item.lazyloading?dfilters=on&next=1&per_page=10&main:eq=1&tree.id:eq=" + this.tree.id,
-            (response) => {
+        Drequest
+            .api("tree-item.lazyloading")
+            .param({
+                dfilters: "on",
+                next: 1,
+                per_page: 10,
+                "main:eq": 1,
+                "tree.id:eq": this.tree.id,
+            })
+            .get((response) => {
                 console.log(response);
                 this.ll = response;
                 this.tree_items = response.listEntity;
-            })
+            });
 
         this.$root.$on('edit', (item) => {
             console.log(item);
@@ -383,13 +391,18 @@ Vue.component("tree_item", {
         nextchildren(next) {
 
             this.currentpage = next;
-            model._apiget("tree_item.nextchildren?id=" + catid + "&next=" + next, (response) => {
-                console.log(response);
-                this.ll = response.data.ll;
 
-                this.tree_items = this.ll.listEntity;
-            });
-            xhrObj.abort();
+            Drequest
+                .api("tree-item.nextchildren")
+                .param({id: catid, next: next})
+                .get((response) => {
+                    console.log(response);
+                    this.ll = response.data.ll;
+
+                    this.tree_items = this.ll.listEntity;
+                });
+
+            //xhrObj.abort();
         },
         backtoparent(tree_item, index) {
 
@@ -416,12 +429,16 @@ Vue.component("tree_item", {
                     return;
                 }
                 // else
-                model._apiget("tree_item.find?search=" + devups.escapeHtml(this.search), (response) => {
-                    console.log(response);
-                    this.tree_itemtree = [];
-                    this.resultdatas = response.data;
-                    this.tree_items = response.data
-                });
+
+                Drequest
+                    .api("tree-item.find")
+                    .param({search: devups.escapeHtml(this.search)})
+                    .get((response) => {
+                        console.log(response);
+                        this.tree_itemtree = [];
+                        this.resultdatas = response.data;
+                        this.tree_items = response.data
+                    });
 
             } else {
                 $("#productselected").html("");
@@ -435,12 +452,14 @@ Vue.component("tree_item", {
             var tree_item_id = this.tree_item_id[0];
             var index = this.tree_item_id[1];
 
-            model._apiget("tree_item.delete?id=" + tree_item_id + "&option=" + option, (response) => {
-                console.log(response);
-                this.tree_items.splice(index, 1);
-                model._dismissmodal();
-
-            });
+            Drequest
+                .api("tree-item.delete")
+                .param({id: tree_item_id, "option": option})
+                .get((response) => {
+                    console.log(response);
+                    this.tree_items.splice(index, 1);
+                    model._dismissmodal();
+                });
 
         },
         save() {
@@ -450,8 +469,9 @@ Vue.component("tree_item", {
             this.tree_items = JSON.parse(cc);
             console.log(this.tree_items);
             this.tree_itemstring = cc;
-
-            model._apipost("tree_item.create", {data: cc}, (response) => {
+            Drequest
+                .api("tree-item.create")
+                .data({data: cc}).post((response) => {
                 console.log(response);
             });
 
@@ -473,19 +493,19 @@ Vue.component("tree_item", {
 
         saveorder() {
             // this.el =el;
-            if (this.tree_items){
+            if (this.tree_items) {
                 var toupdate = [];
                 this.tree_items.forEach((item) => {
                     toupdate.push([item.id, item.position])
                 })
                 console.log(toupdate);
-                model._apipost("tree-item.order",
-                    JSON.stringify({
+                Drequest
+                    .api("tree-item.order")
+                    .data({
                         tree_items: toupdate
-                    }), (response) => {
-                        console.log(response);
-
-                    })
+                    }).raw((response) => {
+                    console.log(response);
+                })
             }
             // this.$root.$emit("saveorder", this.$parent.children)
 
@@ -587,10 +607,14 @@ var tree_itemview = new Vue({
         treeedit: {},
     },
     mounted() {
-        model._apiget("tree.lazyloading", (response) => {
+        Drequest.api("tree.lazyloading").get((response) => {
             console.log(response);
             this.trees = response.listEntity;
         })
+        // model._apiget("tree.lazyloading", (response) => {
+        //     console.log(response);
+        //     this.trees = response.listEntity;
+        // })
 
         this.$root.$emit("saveorder", (tree_items) => {
 
@@ -601,16 +625,16 @@ var tree_itemview = new Vue({
             this.tree = tree;
             console.log("tree_item.getdata client");
         },
-        edit(tree){
+        edit(tree) {
             this.treeedit = tree
         },
 
         _delete(id, index) {
 
-            if(!confirm("confirmer la suppression?"))
-                return ;
+            if (!confirm("confirmer la suppression?"))
+                return;
 
-            model._apiget("tree.delete?id="+id, (response) => {
+            model._apiget("tree.delete?id=" + id, (response) => {
                 console.log(response);
                 this.trees.slice(index, 1)
             });
@@ -618,7 +642,7 @@ var tree_itemview = new Vue({
         },
 
         create() {
-            if(!this.treeedit.name)
+            if (!this.treeedit.name)
                 return null;
 
             model._apipost("tree.create", JSON.stringify({
@@ -633,27 +657,38 @@ var tree_itemview = new Vue({
         },
 
         update(treeedit) {
-            if(!treeedit.name)
+            if (!treeedit.name)
                 return null;
 
-            if(treeedit.id) {
-                model._apipost("tree.update?id=" + treeedit.id, JSON.stringify({
+            if (treeedit.id) {
+                Drequest.api("tree.update")
+                    .param({id: treeedit.id})
+                    .data({
+                        tree: {
+                            "name": treeedit.name
+                        }
+                    })
+                    .raw((response) => {
+                        console.log(response);
+                    });
+                /*model._apipost("tree.update?id=" + treeedit.id, JSON.stringify({
                     tree: {
                         "name": treeedit.name
                     }
                 }), (response) => {
                     console.log(response);
-                }, false);
-            }else{
-
-                model._apipost("tree.create", JSON.stringify({
-                    tree: {
-                        "name": treeedit.name
-                    }
-                }), (response) => {
-                    console.log(response);
-                    this.trees.push(response.tree)
-                }, false);
+                }, false);*/
+            } else {
+                Drequest.api("tree.create")
+                    .data({
+                        tree: {
+                            "name": treeedit.name
+                        }
+                    })
+                    .raw((response) => {
+                        console.log(response);
+                        this.trees.push(response.tree)
+                    });
             }
         },
 

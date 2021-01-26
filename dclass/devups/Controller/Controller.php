@@ -123,7 +123,10 @@ class Controller
 
         if ($object->getId()) {
             $object = $object->__show($deeper);
-        }
+            $object->setUpdatedAt(date(\DClass\lib\Util::dateformat));
+        }else
+            $object->setCreatedAt(date(\DClass\lib\Util::dateformat));
+
 
 //            if($jsondata){
 //                $object_array = Controller::formWithJson ($object, $jsondata, $change_collection_adresse);

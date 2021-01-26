@@ -6,4 +6,6 @@
  * and open the template in the editor.
  */
 
+require __DIR__ . '/HZip.php';
+require __DIR__ . '/My_ziparchive.php';
 require __DIR__ . '/Util.php';

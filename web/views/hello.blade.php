@@ -78,17 +78,22 @@
 
     <div class="content">
         <div class="title m-b-md">
-            @tt("Hello Devups. Waitting for your front-end template. Do your best ") :)
+            <form class="">
+                <div class="">
+                    <label class="">
+                        select a file:
+                    </label>
+                    {!! Form::file("image", "", ["id"=>"imageinput"]) !!}
+                </div>
+                <button onclick="model.uploadfile(this)" type="button" class="">submit</button>
+            </form>
         </div>
 
         <div class="content">
-            {!! Local_contentTable::init(new Local_content())
-->buildfronttable()
-->setModel("front")
-->render() !!}
+
         </div>
         <div class="content">
-            { Local_contentTable::init(new Local_content())->buildfrontcustom()->renderCustomBody() !!}
+
         </div>
 
         <div class="links">
@@ -100,8 +105,20 @@
         </div>
     </div>
 </div>
-{! Local_contentFrontController::renderSetting() !!}
-</body>
+
 {!! Form::addJquery() !!}
 {!! Form::addDevupsjs() !!}
+<script>
+    var __env = '{{__env}}';
+    model.uploadfile = function (el){
+        var file = $("#imageinput")[0].files[0];
+        console.log(file);
+        var fd = new FormData();
+        fd.append("image", file);
+        model._apipost("uploadfile", fd, function (response) {
+            console.log(response);
+        })
+    }
+</script>
+</body>
 </html>

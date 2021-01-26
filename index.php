@@ -2,14 +2,18 @@
 //
 
 require 'header.php';
+require 'App.php';
 
-(new Request('hello'));
-
+$app = new App();
+die;
 
 switch (Request::get('path')) {
 
     case 'hello':
-        Genesis::render("hello", []);
+        $datatable = Dv_imageTable::init(new Dv_image())
+            ->buildfrontcustom()
+            ->setModel("frontcustom");
+        Genesis::render("hello", compact("datatable"));
         break;
 
     case 'changelang':

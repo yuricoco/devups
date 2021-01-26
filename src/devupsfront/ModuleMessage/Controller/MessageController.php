@@ -95,7 +95,7 @@ class MessageController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Message::delete()->where("id")->in($ids)->exec();
+        Message::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

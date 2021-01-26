@@ -95,7 +95,7 @@ class ImagecmsController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Imagecms::delete()->where("id")->in($ids)->exec();
+        Imagecms::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

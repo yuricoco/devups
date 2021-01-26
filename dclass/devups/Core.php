@@ -150,9 +150,10 @@ class Core extends stdClass {
         foreach ($global_navigation as $key => $project) {
             if (is_object($project)) {
 
-                $projectname = ucfirst($project->name);
+                $projectname = ($project->name);
                 $qb = new QueryBuilder(new Dvups_component());
-                $dvcomponent = $qb->select()->where("name", '=', $projectname )->__getOne();
+                $dvcomponent = $qb->select()->where("name", '=', $projectname )
+                    ->__getOne();
 
                 if(!$dvcomponent->getId()){
 

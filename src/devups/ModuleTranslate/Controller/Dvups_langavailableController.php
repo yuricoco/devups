@@ -95,7 +95,7 @@ class Dvups_langavailableController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Dvups_langavailable::delete()->where("id")->in($ids)->exec();
+        Dvups_langavailable::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

@@ -7,7 +7,10 @@ class Dv_imageController extends Controller{
 
     public function listView($next = 1, $per_page = 10){
 
-        $this->datatable = Dv_imageTable::init(new Dv_image())->buildindextable();
+        //$this->datatable = Dv_imageTable::init(new Dv_image())->buildindextable();
+        $this->datatable = Dv_imageTable::init(new Dv_image())
+            ->buildfrontcustom()
+            ->setModel("frontcustom");
 
         self::$jsfiles[] = Dv_image::classpath('Resource/js/dv_imageCtrl.js');
 
@@ -94,7 +97,7 @@ class Dv_imageController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Dv_image::delete()->where("id")->in($ids)->exec();
+        Dv_image::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

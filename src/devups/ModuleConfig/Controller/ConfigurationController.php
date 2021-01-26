@@ -94,7 +94,7 @@ class ConfigurationController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Configuration::delete()->where("id")->in($ids)->exec();
+        Configuration::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

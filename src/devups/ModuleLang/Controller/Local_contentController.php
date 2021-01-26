@@ -9,7 +9,16 @@ class Local_contentController extends Controller
     private static $path = ROOT . "cache/local/";
     const pathmodule = ROOT . "web/app3/frontend1/src/devupsjs/";
 
-    public function listView($next = 1, $per_page = 10){
+    public function listView($next = 1, $per_page = 10)
+    {
+//        Storage::delete(7);
+//        Storage::create([
+//           "name"=> "dsfsfdfsd",
+//        ]);
+////        $rsult = Storage::where([
+////            "this.id" => 6,
+////        ])->delete();//->getSqlQuery();
+//        die(var_dump(Storage::allrows()));
 
         $this->datatable = Local_contentTable::init(new Local_content())->buildindextable();
 
@@ -22,7 +31,8 @@ class Local_contentController extends Controller
 
     }
 
-    public function datatable($next, $per_page) {
+    public function datatable($next, $per_page)
+    {
         return ['success' => true,
             'datatable' => Local_contentTable::init(new Local_content())->router()->getTableRest(),
         ];
@@ -102,7 +112,7 @@ class Local_contentController extends Controller
     public function deletegroupAction($ids)
     {
 
-        Local_content::delete()->where("id")->in($ids)->exec();
+        Local_content::where("id")->in($ids)->delete();
 
         return array('success' => true,
             'detail' => '');
@@ -131,7 +141,8 @@ class Local_contentController extends Controller
 
     }
 
-    public function regeneratecacheAction(){
+    public function regeneratecacheAction()
+    {
         self::buildlocalcache();
 
         Response::success()
@@ -155,7 +166,7 @@ class Local_contentController extends Controller
 
             if ($info) {
                 // todo - fix issue on php warning during the first call of the function translate t().
-                if(file_exists(self::$path . $lang . ".json"))
+                if (file_exists(self::$path . $lang . ".json"))
                     unlink(self::$path . $lang . ".json");
 
                 $contenu = json_encode($info, 1024);

@@ -6,16 +6,16 @@ use dclass\devups\Datatable\Datatable;
 class Dvups_roleTable extends Datatable
 {
 
-    public function __construct($lazyloading = null, $datatablemodel = [])
+    public function __construct($entity = null, $datatablemodel = [])
     {
-        parent::__construct($lazyloading, $datatablemodel);
-        $this->entity = new  Dvups_role();
+        parent::__construct($entity, $datatablemodel);
     }
 
     public static function init(\Dvups_role $entity = null)
     {
-        $dt = new Dvups_roleTable();
-        // $dt->entity = $entity;
+
+        $dt = new Dvups_roleTable($entity);
+        $dt->entity = $entity;
 
         return $dt;
     }

@@ -1,38 +1,40 @@
 <?php
-            //ModuleConfig
-        
-        require '../../../admin/header.php';
-        
+//ModuleConfig
+
+require '../../../admin/header.php';
+
 // move comment scope to enable authentication
 if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
     header("location: " . __env . 'admin/login.php');
 }
 
-        global $viewdir, $moduledata;
-        $viewdir[] = __DIR__ . '/Ressource/views';
-        
+global $viewdir, $moduledata;
+$viewdir[] = __DIR__ . '/Ressource/views';
+
 $moduledata = Dvups_module::init('ModuleConfig');
-                
 
 
-    
-        define('CHEMINMODULE', ' ');
+define('CHEMINMODULE', ' ');
 
-    
-        		$dvups_componentCtrl = new Dvups_componentController();
-		$dvups_entityCtrl = new Dvups_entityController();
-		$dvups_moduleCtrl = new Dvups_moduleController();
-		$configurationCtrl = new ConfigurationController();
-		
+
+$dvups_componentCtrl = new Dvups_componentController();
+$dvups_entityCtrl = new Dvups_entityController();
+$dvups_moduleCtrl = new Dvups_moduleController();
+$configurationCtrl = new ConfigurationController();
+
 
 (new Request('layout'));
 
 switch (Request::get('path')) {
 
     case 'layout':
-        Genesis::renderView("overview");
+
+        $datatablemodule = Dvups_moduleTable::init(new Dvups_module())->buildindextable();
+        $datatableentity = Dvups_entityTable::init(new Dvups_entity())->buildindextable();
+
+        Genesis::renderView("admin.overview", compact("datatableentity", "datatablemodule"));
         break;
-        
+
     case 'dvups-component/index':
         $dvups_componentCtrl->listView();
         break;
@@ -49,7 +51,7 @@ switch (Request::get('path')) {
         $configurationCtrl->listView();
         break;
 
-		
+
     default:
         Genesis::renderView('404', ['page' => Request::get('path')]);
         break;

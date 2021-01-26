@@ -95,7 +95,7 @@ class Page_mappedController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Page_mapped::delete()->where("id")->in($ids)->exec();
+        Page_mapped::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

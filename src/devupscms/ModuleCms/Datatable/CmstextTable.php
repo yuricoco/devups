@@ -27,6 +27,7 @@ class CmstextTable extends Datatable
         $this->topactions[] = "<a href='" . Cmstext::classpath("cmstext/new") . "' class='btn btn-primary'>Create new content</a>";
 
         $this->datatablemodel = [
+            ['header' => "#", 'value' => 'id'],
             ['header' => t('cmstext.titre', 'Titre'), 'value' => 'title'],
             ['header' => t('cmstext.reference', 'Reference'), 'value' => 'slug'],
             ['header' => t('cmstext.lang', 'Lang'), 'value' => 'lang'],

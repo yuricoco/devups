@@ -410,7 +410,7 @@ class BackendGenerator {
         $" . "id = $" . $name . "->__insert();
         return 	array(	'success' => true,
                         '" . $name . "' => $" . $name . ",
-                        'tablerow' => " . ucfirst($name) . "Table::init()->buildindextable()->getSingleRowRest($" . $name . "),
+                        'tablerow' => " . ucfirst($name) . "Table::init()->router()->getSingleRowRest($" . $name . "),
                         'detail' => '');
 
     }
@@ -430,7 +430,7 @@ class BackendGenerator {
         $" . $name . "->__update();
         return 	array(	'success' => true,
                         '" . $name . "' => $" . $name . ",
-                        'tablerow' => " . ucfirst($name) . "Table::init()->buildindextable()->getSingleRowRest($" . $name . "),
+                        'tablerow' => " . ucfirst($name) . "Table::init()->router()->getSingleRowRest($" . $name . "),
                         'detail' => '');
                         
     }
@@ -453,22 +453,9 @@ class BackendGenerator {
     }
     
     public function deleteAction($" . "id){
-    ";
-        //if ($otherattrib):
-        if (false):
-            // add and attribut to alert about media attib in entity
-            foreach ($entity->attribut as $attribut) {
-                if (in_array($attribut->formtype, ['document', 'image', 'musique', 'video']))
-                    $contenu .= " 
-        $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-        $" . $name . "->deleteFile($" . $name . "->get" . ucfirst($attribut->name) . "(), '" . $name . "');
-        $" . $name . "->__delete()";
-            }
-        else:
-            $contenu .= "  
-            " . ucfirst($name) . "::delete($" . "id);";
-        endif;
-        $contenu .= "
+    
+        " . ucfirst($name) . "::delete($" . "id);
+        
         return 	array(	'success' => true, 
                         'detail' => ''); 
     }
@@ -477,7 +464,7 @@ class BackendGenerator {
     public function deletegroupAction($" . "ids)
     {
 
-        " . ucfirst($name) . "::delete()->where(\"id\")->in($" . "ids)->exec();
+        " . ucfirst($name) . "::where(\"id\")->in($" . "ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 
@@ -693,8 +680,8 @@ class " . ucfirst($name) . "Table extends Datatable{
 
     public function router()
     {
-        \$tablemodel = Request::get(\"tablemodel\");
-        if (method_exists(\$this, \"build\" . \$tablemodel . \"table\") && \$result = call_user_func(array(\$this, \"build\" . \$tablemodel . \"table\"))) {
+        \$tablemodel = Request::get(\"tablemodel\", null);
+        if (\$tablemodel && method_exists(\$this, \"build\" . \$tablemodel . \"table\") && \$result = call_user_func(array(\$this, \"build\" . \$tablemodel . \"table\"))) {
             return \$result;
         } else
             switch (\$tablemodel) {
@@ -937,7 +924,7 @@ use Genesis as g;
                 return [
                     'success' => true,
                     '" . $name . "' => $" . $name . ",
-                    'action' => \"create\",
+                    'action' => " . ucfirst($name) . "::classpath(\"services.php?path=$name.create\"),
                 ];
             endif;
             
@@ -945,7 +932,7 @@ use Genesis as g;
             return [
                 'success' => true,
                 '" . $name . "' => $" . $name . ",
-                'action' => \"update&id=\" . $"."id,
+                'action' => " . ucfirst($name) . "::classpath(\"services.php?path=$name.update&id=\" . $"."id),
             ];
 
         }
@@ -1148,7 +1135,10 @@ use Genesis as g;
     <?= Form::addjs(" . ucfirst($name) . "::classpath('Resource/js/".$name."Form')) ?>
     ";
 
-        $entityform = fopen('Resource/views/' . $name . '/formWidget.blade.php', 'w');
+        if(!file_exists('Resource/views/admin/' . $name . ''))
+            mkdir('Resource/views/admin/' . $name . '', 777, true);
+
+        $entityform = fopen('Resource/views/admin/' . $name . '/formWidget.blade.php', 'w');
         fputs($entityform, $contenu);
 
         fclose($entityform);

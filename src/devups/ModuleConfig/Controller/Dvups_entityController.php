@@ -18,7 +18,7 @@ class Dvups_entityController extends Controller
 
 
         $dvups_entity = new Dvups_entity($id);
-        $dvups_entity->__update("dvups_entity.label", $label)->exec();
+        $dvups_entity->__update("dvups_entity.label", $label);
 
         return array('success' => true,
             'dvups_entity' => $dvups_entity,
@@ -114,8 +114,8 @@ class Dvups_entityController extends Controller
     public function deleteAction($id)
     {
 
-        Dvups_right_dvups_entity::delete()->where("dvups_entity_id", $id)->exec();
-        Dvups_role_dvups_entity::delete()->where("dvups_entity_id", $id)->exec();
+        Dvups_right_dvups_entity::delete()->where("dvups_entity_id", $id);
+        Dvups_role_dvups_entity::delete()->where("dvups_entity_id", $id);
         Dvups_entity::delete($id);
 
         return array('success' => true, // pour le restservice
@@ -127,9 +127,9 @@ class Dvups_entityController extends Controller
     public function deletegroupAction($ids)
     {
 
-        Dvups_right_dvups_entity::delete()->where("dvups_entity_id")->in($ids)->exec();
-        Dvups_role_dvups_entity::delete()->where("dvups_entity_id")->in($ids)->exec();
-        Dvups_entity::delete()->where("id")->in($ids)->exec();
+        Dvups_right_dvups_entity::delete()->where("dvups_entity_id")->in($ids);
+        Dvups_role_dvups_entity::delete()->where("dvups_entity_id")->in($ids);
+        Dvups_entity::where("id")->in($ids)->delete();
 
         return array('success' => true, // pour le restservice
             'redirect' => 'index', // pour le web service

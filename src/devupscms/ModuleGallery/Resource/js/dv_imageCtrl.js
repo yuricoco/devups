@@ -8,3 +8,11 @@ ddatatable.addrow = function (tablerow) {
     //this.dtinstance.find("#dv_table").find("tbody").prepend(tablerow);
     $("#dv_dv_image_table").find(".row").prepend(tablerow);
 }
+ddatatable.callbackpaginaison = function (response){
+    $("#dv_dv_image_table").find(".row").html(response.datatable.tablebody);
+    $("#dv_pagination").replaceWith(response.datatable.tablepagination);
+}
+ddatatable.callbackpaginaison = function (response){
+    $("#dv_dv_image_table").find(".row").html(response.datatable.tablebody);
+    $("#dv_pagination").replaceWith(response.datatable.tablepagination);
+}

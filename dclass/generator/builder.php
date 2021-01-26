@@ -265,6 +265,22 @@ if (isset($argv[2])) {
 
     switch ($argv[1]) {
 
+        case 'build':
+
+            $dir = __DIR__ . '/../../build';
+
+// we delete the previews version
+            if(file_exists($dir. ''))
+                mkdir ($dir. '', 777, true);
+
+            if(file_exists($dir. '/'.__project_id.'.zip'))
+                unlink ($dir. '/'.__project_id.'.zip');
+
+            $files = scanDir::scan(ROOT, [], true);
+
+            HZip::zipDir($dir, $dir . '/'.__project_id.'.zip');
+
+            break;
         case 'install':
 
             if (!file_exists("cache")) {
@@ -284,7 +300,7 @@ if (isset($argv[2])) {
             }
 
             RequestGenerator::databasecreate(dbname); //, 
-             echo " > Creating Database.\n\n". dbname . ": created with success ...\n";
+            echo " > Creating Database.\n\n". dbname . ": created with success ...\n";
             $result = [];
             exec("bin\doctrine orm:schema:create", $result);
 

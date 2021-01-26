@@ -95,7 +95,7 @@ class Dvups_contentlangController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Dvups_contentlang::delete()->where("id")->in($ids)->exec();
+        Dvups_contentlang::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

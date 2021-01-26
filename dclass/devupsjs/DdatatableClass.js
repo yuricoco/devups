@@ -1,5 +1,6 @@
 function Ddatatable(entity) {
-    this.baseurl = "services.php";
+    self = this;
+    //this.baseurl = "services.php";
     this.entity = "";
     this.currentpage = 1;
     this.per_page = 10;

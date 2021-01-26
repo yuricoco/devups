@@ -18,9 +18,7 @@
 
     <link rel="stylesheet" href="<?= assets; ?>css/dv_style.css">
 
-    @section('cssimport')
-
-    @show
+    @yield('cssimport')
 
     <?php
     if (function_exists("style"))
@@ -100,20 +98,11 @@
 <script src="<?= CLASSJS; ?>Request.js"></script>
 <script src="<?= CLASSJS; ?>dialogbox.js"></script>
 
-<!-- <script src="<?= node_modules ?>bootstrap/js/bootstrap.min.js"></script> -->
-{{----}}
-
-<?php
-if (function_exists("modalview"))
-    modalview($entity);
-?>
 <?php
 if (function_exists("script"))
     script();
 ?>
-@section('jsimport')
-
-@show
+@yield('jsimport')
 
 </body>
 

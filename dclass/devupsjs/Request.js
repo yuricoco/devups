@@ -1,20 +1,39 @@
+class Drequest {
+    baseurl = __env;
+    url = "";
+    _param = {};
+    _data = {};
 
-var drequest = function (){
-    self = this;
-    self.baseurl = __env;
-    self._param = {};
-    self.api = function (url){
-        self.url = url;
-        return self;
+    constructor() {
+
+    }
+
+    static init(url) {
+        let r = new Drequest();
+        r.baseurl = url;
+        return r;
+    }
+
+    static api(url) {
+        let r = new Drequest();
+        r.baseurl = __env+"api/"+url;
+        return r;
     };
-    self.param = function (_param){
-        self._param = _param;
-        return self;
+
+    param(_param) {
+        this._param = _param;
+        return this;
     };
-    self.sendformdata = function (callback){
+
+    data(_data) {
+        this._data = _data;
+        return this;
+    };
+
+    post(callback) {
         return $.ajax({
-            url: this.baseurl+self.url,
-            data: self._param,
+            url: this.baseurl + this.url +"?"+ $.param(this._param),
+            data: this._data,
             cache: false,
             contentType: false,
             processData: false,
@@ -23,13 +42,20 @@ var drequest = function (){
             success: callback,
             error: function (e) {
                 console.log(e);//responseText
-            }});
+            }
+        });
     };
-    self.send = function (callback){
-        $.ajax({
-            url: this.baseurl+self.url,
-            data: self._param,
-            method: "POST",
+
+    raw(callback) {
+        this._data = JSON.stringify(this._data);
+        return this.post(callback);
+    };
+
+    get(callback) {
+        return $.ajax({
+            url: this.baseurl + this.url,
+            data: this._param,
+            method: "GET",
             dataType: "json",
             success: callback,
             error: function (e) {

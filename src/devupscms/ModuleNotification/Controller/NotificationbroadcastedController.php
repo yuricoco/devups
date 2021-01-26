@@ -97,7 +97,7 @@ class NotificationbroadcastedController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Notificationbroadcasted::delete()->where("id")->in($ids)->exec();
+        Notificationbroadcasted::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

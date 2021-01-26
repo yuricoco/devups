@@ -1,4 +1,4 @@
-<div class="col-md-6 col-xl-3">
+<div id="image-{{$dv_image->getId()}}" class="col-md-6 col-xl-3 image-item">
     <div class="card mb-3 widget-content">
         <div class="widget-content-outer">
             <div class="widget-content-wrapper">

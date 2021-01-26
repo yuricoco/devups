@@ -68,9 +68,9 @@ class LoginController
         if (isset($_SESSION[USERID])) {
             $user = userapp();
             if (isset($useremail))
-                $user->__update("email", $useremail)->exec();
+                $user->__update("email", $useremail);
             else
-                $user->__update("telephone", $telephone)->exec();
+                $user->__update("telephone", $telephone);
 
         } else
             $user = User::select()
@@ -276,7 +276,7 @@ class LoginController
         if (sha1($oldpwd) == $user->getPassword()) {
 
             // $user->setPassword($newpwd);
-            $user->__update("password", sha1($newpwd))->exec();
+            $user->__update("password", sha1($newpwd));
 
             return array('success' => true, // pour le restservice
                 'message' => "Mot de passe modifié avec succes");
