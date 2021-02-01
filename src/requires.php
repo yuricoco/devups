@@ -19,8 +19,8 @@ require 'devupscms/ModuleCms/devupscms.modulecms.php';
 
 require 'devupsfront/ModuleUser/subcontractor.moduleuser.php';
 
-//require 'devupstuto/ModuleStock/devupstuto.modulestock.php';
-//require 'devupstuto/ModuleProduct/devupstuto.moduleproduct.php';
+require 'devupstuto/ModuleStock/devupstuto.modulestock.php';
+require 'devupstuto/ModuleProduct/devupstuto.moduleproduct.php';
 
 //require 'prettycash/ModuleListe_tache/prettycash.moduleliste_tache.php';
 //require 'prettycash/ModuleTransactions/prettycash.moduletransactions.php';

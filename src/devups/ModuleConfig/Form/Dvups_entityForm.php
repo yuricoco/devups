@@ -70,7 +70,7 @@ class Dvups_entityForm extends FormManager
             return [
                 'success' => true,
                 'dvups_entity' => $dvups_entity,
-                'action' => "create",
+                'action' => Dvups_entity::classpath("services.php?path=dvups_entity.create"),
             ];
         endif;
 
@@ -78,7 +78,7 @@ class Dvups_entityForm extends FormManager
         return [
             'success' => true,
             'dvups_entity' => $dvups_entity,
-            'action' => "update&id=" . $id,
+            'action' => Dvups_entity::classpath("services.php?path=dvups_entity.update&id=".$id),
         ];
 
     }

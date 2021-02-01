@@ -94,7 +94,7 @@ class BlockController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Block::where("id")->in($ids)->delete();
+        Block::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

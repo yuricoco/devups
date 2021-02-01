@@ -11,12 +11,14 @@ class SlideFrontController extends SlideController{
 
     }
 
-    public function createAction($slide_form = null ){
+    public function createAction($slide_form = null , $dv_image_form = null){
         $rawdata = \Request::raw();
         $slide = $this->hydrateWithJson(new Slide(), $rawdata["slide"]);
  
-
-        $slide->uploadImage();
+                    
+        $dv_image = $this->hydrateWithJson(new Dv_image(), $rawdata["dv_image"]);
+        $dv_image->__insert();
+        $slide->setDv_image($dv_image); 
 
         
         $id = $slide->__insert();
@@ -31,9 +33,7 @@ class SlideFrontController extends SlideController{
             
         $slide = $this->hydrateWithJson(new Slide($id), $rawdata["slide"]);
 
-            
-                        $slide->uploadImage();
-      
+                  
         
         $slide->__update();
         return 	array(	'success' => true,

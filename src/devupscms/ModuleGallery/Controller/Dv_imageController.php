@@ -88,7 +88,8 @@ class Dv_imageController extends Controller{
     
     public function deleteAction($id){
       
-            Dv_image::delete($id);
+           $di = Dv_image::find($id);
+           $di->__delete();
         return 	array(	'success' => true, 
                         'detail' => ''); 
     }

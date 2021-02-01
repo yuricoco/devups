@@ -10,6 +10,11 @@
 
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
+
+    <?php foreach (dclass\devups\Controller\Controller::$cssfiles as $cssfile){ ?>
+    <link href="<?= $cssfile ?>" rel="stylesheet">
+<?php } ?>
+
 <!-- Styles -->
     <style>
         html, body {
@@ -73,7 +78,22 @@
 
     <div class="content">
         <div class="title m-b-md">
-            @tt("Hello Devups. Waitting for your front-end template. Do your best ") :)
+            <form class="">
+                <div class="">
+                    <label class="">
+                        select a file:
+                    </label>
+                    {!! Form::file("image", "", ["id"=>"imageinput"]) !!}
+                </div>
+                <button onclick="model.uploadfile(this)" type="button" class="">submit</button>
+            </form>
+        </div>
+
+        <div class="content">
+
+        </div>
+        <div class="content">
+
         </div>
 
         <div class="links">
@@ -86,5 +106,19 @@
     </div>
 </div>
 
+{!! Form::addJquery() !!}
+{!! Form::addDevupsjs() !!}
+<script>
+    var __env = '{{__env}}';
+    model.uploadfile = function (el){
+        var file = $("#imageinput")[0].files[0];
+        console.log(file);
+        var fd = new FormData();
+        fd.append("image", file);
+        model._apipost("uploadfile", fd, function (response) {
+            console.log(response);
+        })
+    }
+</script>
 </body>
 </html>

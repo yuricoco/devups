@@ -30,12 +30,8 @@ class App extends \dclass\devups\Controller\FrontController
 
     }
 
-    public function homeView(){
-        echo "home page";
-    }
-
-    public function profileUserView(){
-        echo "profile-user";
+    public function helloView(){
+        Genesis::render("hello", []);
     }
 
 }

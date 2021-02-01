@@ -634,7 +634,7 @@ var tree_itemview = new Vue({
             if (!confirm("confirmer la suppression?"))
                 return;
 
-            model._apiget("tree.delete?id=" + id, (response) => {
+            Drequest.api("tree.delete?id=" + id).get( (response) => {
                 console.log(response);
                 this.trees.slice(index, 1)
             });
@@ -645,15 +645,16 @@ var tree_itemview = new Vue({
             if (!this.treeedit.name)
                 return null;
 
-            model._apipost("tree.create", JSON.stringify({
-                tree: {
-                    "name": this.treeedit.name
-                }
-            }), (response) => {
+            Drequest.api("tree.create")
+                .data({
+                    tree: {
+                        "name": this.treeedit.name
+                    }
+                })
+                .raw( (response) => {
                 console.log(response);
                 this.trees.push(response.tree)
-            }, false);
-
+            });
         },
 
         update(treeedit) {

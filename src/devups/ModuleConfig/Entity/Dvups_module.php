@@ -141,8 +141,10 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
     /**
      * @return string
      */
-    public function getPrinticon()
+    public function getPrinticon($width = "23")
     {
+        $icone = $this->route("icone.svg");
+        return '<img src="'.$icone.'" width=25 />';
         return '<i class="' . $this->favicon . '"></i>';
     }
 
@@ -179,7 +181,7 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
     }
 
     public function route($path = ""){
-        return route('src/' . strtolower($this->dvups_component->getName()) . '/' . $this->getName() . '/'.$path);
+        return route('src/' . strtolower($this->getProject()) . '/' . $this->getName() . '/'.$path);
     }
 
 }

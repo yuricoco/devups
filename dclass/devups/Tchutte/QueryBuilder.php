@@ -250,7 +250,7 @@ class QueryBuilder extends \DBAL
      */
     public function update($arrayvalues = null, $seton = null, $case = null)
     {
-        $this->join();
+        //$this->join();
         $this->columns = null;
         $this->query = "  update `" . $this->table . "` " . $this->defaultjoin;
 
@@ -267,19 +267,19 @@ class QueryBuilder extends \DBAL
         // update a column on multiple rows
         if (is_object($arrayvalues)) {
             $class = strtolower(get_class($arrayvalues));
-            $this->parameters[] = $arrayvalues->getId();
-            $this->query .= " " . $this->table . "." . $class . "_id = ? ";
-            $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
+            $this->parameters[$class."_id"] = $arrayvalues->getId();
+            $this->query .= " " . $this->table . "." . $class . "_id = :".$class."_id";
+            if ($this->instanceid)
+                $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
         }
         elseif (is_array($case)) {
-
             $whens = [];
             $this->query .= " `" . $arrayvalues . "` = CASE " . $seton . " ";
 
             foreach ($case as $when => $then) {
                 $whens[] = $when;
-                $this->parameters[] = $then;
-                $this->query .= " WHEN '$when' THEN ? ";
+                $this->parameters[$when] = $then;
+                $this->query .= " WHEN '$when' THEN :$when ";
             }
 
             $this->query .= " ELSE  $seton END ";
@@ -289,14 +289,16 @@ class QueryBuilder extends \DBAL
         } // update one column on one row
         elseif ($arrayvalues && $seton != null) {
             //elseif (true) {
-            $this->parameters[] = $seton;
-            $this->query .= " $arrayvalues = ? ";
+            $this->parameters[$arrayvalues] = $seton;
+            $this->query .= " $arrayvalues = :$arrayvalues ";
             $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
         } // update multiple column on one row
         else {
             $arrayset = [];
             foreach ($arrayvalues as $key => $value) {
                 $keymap = explode(".", $key);
+                $attrib = str_replace('.', '_', $key);
+
                 $dot = "`";
                 if (count($keymap) == 2)
                     $dot = "";
@@ -304,19 +306,20 @@ class QueryBuilder extends \DBAL
                 if (is_object($value)) {
                     if (strtolower(get_class($value)) == "datetime") {
                         $date = array_values((array)$value);
-                        $this->parameters[] = $date[0];
-                        $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
+                        $this->parameters[implode('_', $keymap)] = $date[0];
+                        $arrayset[] = $dot . implode('.`', $keymap) . "` = :".implode('_', $keymap);
                     } else {
-                        $this->parameters[] = $value->getId();
-                        $arrayset[] = strtolower(get_class($value)) . "_id = ? ";
+                        $this->parameters[strtolower(get_class($value)) ."_id"] = $value->getId();
+                        $arrayset[] = strtolower(get_class($value)) . "_id = :".strtolower(get_class($value)) ."_id";
                     }
                 } else {
-                    $this->parameters[] = $value;
-                    $arrayset[] = $dot . implode('.`', $keymap) . "` = ? ";
+                    $this->parameters[$attrib] = $value;
+                    $arrayset[] = $dot . implode('.`', $keymap) . "` = :".$attrib;
                 }
             }
             $this->query .= implode(", ", $arrayset);
-            $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
+            if ($this->instanceid)
+                $this->endquery = " WHERE " . $this->table . ".id = " . $this->instanceid;
         }
 
         return $this;
@@ -484,19 +487,19 @@ class QueryBuilder extends \DBAL
 
         if (is_object($column)) {
 
+            $attrib = strtolower(get_class($column)) . '_id';
             if ($this->defaultjoinsetted) {
                 $this->_where .= " " . $link . " " . strtolower(get_class($column)) . '.id';
-            } else {
-                $this->_where .= " " . $link . " " . strtolower(get_class($column)) . '_id';
-            }
+            }else
+                $this->_where .= " " . $link . " " . $attrib;
 
             if ($column->getId()) {
                 if ($operator == "not") {
-                    $this->_where .= " != ? ";
+                    $this->_where .= " != :$attrib";
                 } else {
-                    $this->_where .= " = ? ";
+                    $this->_where .= " = :".$attrib;
                 }
-                $this->parameters[] = $column->getId();
+                $this->parameters[$attrib] = $column->getId();
             } else {
                 $this->_where .= " is null ";
             }
@@ -521,6 +524,7 @@ class QueryBuilder extends \DBAL
         }
         else {
             $keymap = explode(".", $column);
+            $attrib = str_replace(".", "_", $column);
             if (count($keymap) == 2) {
                 $this->_where .= " " . $link . " " . $column;
             } else {
@@ -536,13 +540,13 @@ class QueryBuilder extends \DBAL
             //$this->query .= " " . $link . " " . $column;
             if ($operator) {
                 if (in_array($operator, $this->operators)) {
-                    $this->_where .= " " . $operator . " ? ";
-                    $this->parameters[] = $value;
+                    $this->_where .= " " . $operator . " :$attrib";
+                    $this->parameters[$attrib] = $value;
                 } elseif (strtolower($operator) == "like") {
                     $this->_where .= " LIKE '%" . $operator . "%' ";
                 } else {
-                    $this->_where .= " = ? ";
-                    $this->parameters[] = $operator;
+                    $this->_where .= " = :".$attrib;
+                    $this->parameters[$attrib] = $operator;
                 }
             }
         }

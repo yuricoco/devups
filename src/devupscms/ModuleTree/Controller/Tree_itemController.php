@@ -85,9 +85,9 @@ class Tree_itemController extends Controller{
     
     public function deleteAction($id){
       
-            Tree_item::delete($id);
+
         return 	array(	'success' => true, 
-                        'detail' => ''); 
+                        'detail' => Tree_item::delete($id));
     }
     
 

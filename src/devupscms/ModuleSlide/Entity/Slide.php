@@ -1,174 +1,173 @@
-<?php 
-        // user \dclass\devups\model\Model;
+<?php
+// user \dclass\devups\model\Model;
+
+/**
+ * @Entity @Table(name="slide")
+ * */
+class Slide extends Model implements JsonSerializable
+{
+
     /**
-     * @Entity @Table(name="slide")
+     * @Id @GeneratedValue @Column(type="integer")
+     * @var int
      * */
-    class Slide extends Model implements JsonSerializable{
+    protected $id;
+    /**
+     * @Column(name="activated", type="string" , length=105 , nullable=true)
+     * @var string
+     **/
+    protected $activated;
+    /**
+     * @Column(name="redirect", type="string" , length=150 , nullable=true)
+     * @var string
+     **/
+    protected $redirect;
+    /**
+     * @Column(name="title", type="string" , length=150 , nullable=true)
+     * @var string
+     **/
+    protected $title;
+    /**
+     * @Column(name="content", type="text" , nullable=true)
+     * @var string
+     **/
+    protected $content;
+    /**
+     * @Column(name="position", type="string" , length=55 , nullable=true)
+     * @var string
+     **/
+    private $position;
 
-        /**
-         * @Id @GeneratedValue @Column(type="integer")
-         * @var int
-         * */
-        protected $id;
-        /**
-         * @Column(name="activated", type="string" , length=105 , nullable=true)
-         * @var string
-         **/
-        protected $activated;
-        /**
-         * @Column(name="width_size", type="string" , length=5 , nullable=true)
-         * @var string
-         **/
-        protected $width_size;
-        /**
-         * @Column(name="height_size", type="string" , length=5 , nullable=true)
-         * @var string
-         **/
-        protected $height_size;
-        /**
-         * @Column(name="title", type="string" , length=55 , nullable=true)
-         * @var string
-         **/
-        protected $title;
-        /**
-         * @Column(name="content", type="string" , length=255 , nullable=true)
-         * @var string
-         **/
-        protected $content;
-        /**
-         * @Column(name="image", type="string" , length=255 )
-         * @var string
-         **/
-        protected $image;
-        /**
-         * @Column(name="path", type="string" , length=150 , nullable=true)
-         * @var string
-         **/
-        protected $path;
-        /**
-         * @Column(name="targeturl", type="string" , length=150 , nullable=true)
-         * @var string
-         **/
-        protected $targeturl; 
-        
+    /**
+     * OneToOne
+     * @ManyToOne(targetEntity="\Dv_image")
+     * @JoinColumn(onDelete="cascade")
+     * @var \Dv_image
+     */
+    public $image;
 
-        
-        public function __construct($id = null){
-            
-                if( $id ) { $this->id = $id; }   
-                          
-}
 
-        public function getId() {
-            return $this->id;
-        }
-        public function getActivated() {
-            return $this->activated;
+    public function __construct($id = null)
+    {
+
+        if ($id) {
+            $this->id = $id;
         }
 
-        public function setActivated($activated) {
-            $this->activated = $activated;
-        }
-        
-        public function getWidth_size() {
-            return $this->width_size;
-        }
+        $this->image = new Dv_image();
 
-        public function setWidth_size($width_size) {
-            $this->width_size = $width_size;
-        }
-        
-        public function getHeight_size() {
-            return $this->height_size;
-        }
+    }
 
-        public function setHeight_size($height_size) {
-            $this->height_size = $height_size;
-        }
-        
-        public function getTitle() {
-            return $this->title;
-        }
+    public function getId()
+    {
+        return $this->id;
+    }
 
-        public function setTitle($title) {
-            $this->title = $title;
-        }
-        
-        public function getContent() {
-            return $this->content;
-        }
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
 
-        public function setContent($content) {
-            $this->content = $content;
-        }
-        
-                        
-        public function uploadImage($file = 'image') {
-            $dfile = self::Dfile($file);
-            if(!$dfile->errornofile){
+    /**
+     * @param string $title
+     */
+    public function setTitle(string $title): void
+    {
+        $this->title = $title;
+    }
 
-                $filedir = 'slide/';
-                $url = $dfile
-                    ->hashname()
-                    ->moveto($filedir);
-    
-                if (!$url['success']) {
-                    return 	array(	'success' => false,
-                        'error' => $url);
-                }
+    /**
+     * @return string
+     */
+    public function getContent(): string
+    {
+        return $this->content;
+    }
 
-                $this->setHeight_size($url['file']["imagesize"][1]);
-                $this->setWidth_size($url['file']["imagesize"][0]);
+    /**
+     * @param string $content
+     */
+    public function setContent(string $content): void
+    {
+        $this->content = $content;
+    }
 
-                $this->image = $url['file']['hashname'];            
-            }
-        }     
-             
-        public function srcImage() {
-            return Dfile::show($this->image, 'slide');
-        }
-        public function showImage() {
-            $url = Dfile::show($this->image, 'slide');
-            return Dfile::fileadapter($url, $this->image);
-        }
-        
-        public function getImage() {
-            return $this->image;
-        }
+    /**
+     * @return string
+     */
+    public function getPosition(): string
+    {
+        return $this->position;
+    }
 
-        public function setImage($image) {
-            $this->image = $image;
-        }
-        
-        public function getPath() {
-            return $this->path;
-        }
+    /**
+     * @param string $position
+     */
+    public function setPosition(string $position): void
+    {
+        $this->position = $position;
+    }
 
-        public function setPath($path) {
-            $this->path = $path;
-        }
-        
-        public function getTargeturl() {
-            return $this->targeturl;
-        }
+    public function getActivated()
+    {
+        return $this->activated;
+    }
 
-        public function setTargeturl($targeturl) {
-            $this->targeturl = $targeturl;
-        }
-        
-        
-        public function jsonSerialize() {
-                return [
-                    'id' => $this->id,
-                    'activated' => $this->activated,
-                    'width_size' => $this->width_size,
-                    'height_size' => $this->height_size,
-                    'title' => $this->title,
-                    'content' => $this->content,
-                    'image' => $this->image,
-                    'path' => $this->path,
-                    'targeturl' => $this->targeturl,
-                ];
-        }
-        
+    public function setActivated($activated)
+    {
+        $this->activated = $activated;
+    }
+
+    public function getRedirect()
+    {
+        return $this->redirect;
+    }
+
+    public function setRedirect($redirect)
+    {
+        $this->redirect = $redirect;
+    }
+    public function setDv_image($redirect)
+    {
+        $this->image = $redirect;
+    }
+
+    /**
+     *  oneToOne
+     * @return \Dv_image
+     */
+    function getImage()
+    {
+        $this->image = $this->image->__show();
+        return $this->image;
+    }
+
+    function setImage(\Dv_image $dv_image = null)
+    {
+        $this->image = $dv_image;
+    }
+
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'activated' => $this->activated,
+            'redirect' => $this->redirect,
+            'image' => $this->image,
+            'position' => $this->position,
+        ];
+    }
+
+    public static function getactivatedslides($position = "slider", $limit=6)
+    {
+        return self::where("this.activated", 1)
+            //->andwhere("position", $position)
+            ->orderby("this.id desc")
+            ->limit($limit)->__getAll();
+    }
+
 }

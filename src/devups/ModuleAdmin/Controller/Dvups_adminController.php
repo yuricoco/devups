@@ -65,7 +65,6 @@ class Dvups_adminController extends Controller
 
     public function connexionAction($login = "", $password = "")
     {
-
         if (!isset($_POST['login']) and $_POST['login'] != '' and !isset($_POST['password'])) {
             header("Location: " . __env . "admin/login.php?error=Entré le login et le mot de passe.");
         }
@@ -73,7 +72,6 @@ class Dvups_adminController extends Controller
 
         $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
         //dv_dump($login, $password, $admin);
-
         if (!$admin->getId())
             header("Location: " . __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
 
@@ -210,8 +208,9 @@ class Dvups_adminController extends Controller
     public static function renderForm($id = null, $action = "create")
     {
         $dvups_admin = new Dvups_admin();
+        $action = Dvups_admin::classpath("services.php?path=dvups_admin.create");
         if ($id) {
-            $action = "update&id=" . $id;
+            $action = Dvups_admin::classpath("services.php?path=dvups_admin.update&id=" . $id);
             $dvups_admin = Dvups_admin::find($id);
             //$dvups_admin->collectDvups_role();
         }

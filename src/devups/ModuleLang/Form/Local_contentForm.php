@@ -59,7 +59,7 @@ class Local_contentForm extends FormManager
             return [
                 'success' => true,
                 'local_content' => $local_content,
-                'action' => "create",
+                'action' => Local_content::classpath("services.php?path=local_content.create"),
             ];
         endif;
 
@@ -67,7 +67,7 @@ class Local_contentForm extends FormManager
         return [
             'success' => true,
             'local_content' => $local_content,
-            'action' => "update&id=" . $id,
+            'action' => Local_content::classpath("services.php?path=local_content.update&id=" . $id),
         ];
 
     }

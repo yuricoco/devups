@@ -307,9 +307,9 @@ var ddatatable = {
     },
     init: function (entity) {
 
-        if (typeof $ === 'undefined') {
-            return;
-        }
+        // if (typeof $ === 'undefined') {
+        //     return;
+        // }
 
         console.log("#dv_" + entity + "_table");
         this.dtinstance = $("#dv_" + entity + "_table");
@@ -381,7 +381,7 @@ setTimeout(function () {
             ddatatable.search(this)
     });
 
-    $("#dv_main_container").on('mouseenter', ".dv_datatable_container", function () {
+    /*$("#dv_main_container").on('mouseenter', ".dv_datatable_container", function () {
 
         model.baseurl = $(this).find("#dv_table").eq(0).data('route') + "services.php";
         model.entity = $(this).find("#dv_table").eq(0).data('entity');
@@ -390,7 +390,7 @@ setTimeout(function () {
         //model.init($(this).find("#dv_table"));
         // ddatatable.init(model.entity);
 
-    })
+    })*/
 
 }, 800)
 

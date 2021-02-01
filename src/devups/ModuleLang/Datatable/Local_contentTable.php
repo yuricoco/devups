@@ -14,7 +14,7 @@ class Local_contentTable extends Datatable
     public static function init(\Local_content $local_content = null)
     {
 
-        $dt = new Local_contentTable();
+        $dt = new Local_contentTable($local_content);
         $dt->entity = $local_content;
 
         return $dt;

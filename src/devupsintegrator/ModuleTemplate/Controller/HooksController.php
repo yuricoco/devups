@@ -94,7 +94,7 @@ class HooksController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Hooks::where("id")->in($ids)->delete();
+        Hooks::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

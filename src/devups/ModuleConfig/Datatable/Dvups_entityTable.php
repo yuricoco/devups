@@ -8,7 +8,7 @@ class Dvups_entityTable extends Datatable
 
     public function __construct($lazyloading = null, $datatablemodel = [])
     {
-        parent::__construct($lazyloading, $datatablemodel);
+        parent::__construct(new Dvups_entity(), $datatablemodel);
         $this->entity = new  Dvups_entity();
     }
 

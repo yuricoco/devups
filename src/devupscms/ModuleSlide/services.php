@@ -6,6 +6,9 @@ require '../../../admin/header.php';
 // verification token
 //
 
+global $viewdir, $moduledata;
+$viewdir[] = __DIR__ . '/Resource/views';
+
 use Genesis as g;
 use Request as R;
 

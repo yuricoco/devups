@@ -32,7 +32,7 @@ class Drequest {
 
     post(callback) {
         return $.ajax({
-            url: this.baseurl + this.url +"?"+ $.param(this._param),
+            url: this.baseurl + this.url, //+"?"+ $.param(this._param),
             data: this._data,
             cache: false,
             contentType: false,

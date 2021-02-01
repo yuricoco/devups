@@ -3,7 +3,9 @@
         <div class="widget-content-outer">
             <div class="widget-content-wrapper">
                 <div class="widget-content-left">
-                    <div class="widget-heading">{{$entity->getLabel()}}</div>
+                    <div class="widget-heading">
+                        {{$entity->getLabel()}}
+                    </div>
                     <div class="widget-subheading"><a href="{{ $entity->route() }}">
                             <i class="fa fa-external-link-alt"></i> {{t("Details")}}
                         </a></div>

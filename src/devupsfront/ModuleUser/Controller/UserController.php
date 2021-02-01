@@ -103,7 +103,7 @@ class UserController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        User::where("id")->in($ids)->delete();
+        User::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

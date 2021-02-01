@@ -25,7 +25,9 @@
         </div>
 
         @foreach($modules as $module)
-            <h3><i class="{{$module->getFavicon()}}"></i>
+            <h3><i class="">
+                    {!! $module->getPrinticon(35) !!}
+                </i>
                {{$module->getLabel()}}</h3>
             <hr>
         <div class="row">

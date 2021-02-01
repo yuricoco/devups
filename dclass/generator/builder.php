@@ -43,7 +43,32 @@ function getcomponent($namespace) {
     return __Generator::findproject($components, $ns[0]);
 
 }
+function recurse_copy_dir(string $src, string $dest) : int {
+    $count = 0;
 
+    // ensure that $src and $dest end with a slash so that we can concatenate it with the filenames directly
+    $src = rtrim($src, "/\\") . "/";
+    $dest = rtrim($dest, "/\\") . "/";
+
+    // use dir() to list files
+    $list = dir($src);
+
+    // create $dest if it does not already exist
+    @mkdir($dest);
+
+    // store the next file name to $file. if $file is false, that's all -- end the loop.
+    while(($file = $list->read()) !== false) {
+        if($file === "." || $file === "..") continue;
+        if(is_file($src . $file)) {
+            copy($src . $file, $dest . $file);
+            $count++;
+        } elseif(is_dir($src . $file)) {
+            $count += recurse_copy_dir($src . $file, $dest . $file);
+        }
+    }
+
+    return $count;
+}
 if ($argv[1] === 'schema:update') {
 
     $result = [];
@@ -251,7 +276,8 @@ if (isset($argv[2])) {
     }
 
     chdir('../../');
-} else {
+}
+else {
 
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_component.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_module.php';
@@ -270,16 +296,36 @@ if (isset($argv[2])) {
             $dir = __DIR__ . '/../../build';
 
 // we delete the previews version
-            if(file_exists($dir. ''))
+            if(!file_exists($dir. ''))
                 mkdir ($dir. '', 777, true);
 
             if(file_exists($dir. '/'.__project_id.'.zip'))
                 unlink ($dir. '/'.__project_id.'.zip');
 
-            $files = scanDir::scan(ROOT, [], true);
+            recurse_copy_dir(ROOT."src", ROOT."build/src");
+            recurse_copy_dir(ROOT."dclass", ROOT."build/dclass");
+            //$files = scanDir::scan(ROOT, [], true);
 
             HZip::zipDir($dir, $dir . '/'.__project_id.'.zip');
 
+            echo 'succes de la compression';
+            break;
+        case 'deploy':
+
+            $dir = __DIR__ . '/../../build';
+            $file = $dir . '/'.__project_id.'.zip';
+
+            $zip = new ZipArchive;
+            if ($zip->open($file) === TRUE) {
+
+                echo 'unzip start';
+                $zip->extractTo('./');
+                $zip->close();
+
+                echo 'succes de la décompression';
+            } else {
+                echo 'échec de la décompression de ' . $file . '.zip';
+            }
             break;
         case 'install':
 

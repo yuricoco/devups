@@ -49,7 +49,11 @@
                     @foreach ($component["modules"] as $key => $module)
                         <li>
                             <a aria-expanded="true" href="#">
-                                <i class="{{$module["module"]->getFavicon()}}"></i>
+                                <i class="metismenu-icon ">
+                                    {!! $module["module"]->getPrinticon() !!}
+                                </i>
+
+{{--<i class="{{$module["module"]->getFavicon()}}"></i>--}}
                                 <span class="menu-title">{{$module["module"]->getLabel()}}</span>
                                 <i class="metismenu-state-icon pe-7s-angle-down caret-left"></i>
                             </a>

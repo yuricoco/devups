@@ -49,3 +49,27 @@
     display: block;
     opacity: .3;
 }
+.app-sidebar .scrollbar-sidebar {
+    overflow: auto;
+}
+.app-sidebar .app-sidebar__inner {
+    padding: 2px 1rem 1rem;
+}
+.fixed-sidebar .app-main .app-main__outer {
+     z-index: 9;
+     padding-left: 250px;
+ }
+.app-sidebar {
+    width: 250px;
+    display: flex;
+    z-index: 11;
+    overflow: hidden;
+    min-width: 250px;
+}
+.form-control {
+    display: block;
+    width: 100%;
+    height: calc(2.25rem + 2px);
+    padding: .375rem .75rem;
+    font-size: .88rem;
+}

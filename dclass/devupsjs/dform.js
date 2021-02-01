@@ -101,23 +101,10 @@ var dform = {
         }
 
         this.formdata = model._formdata($(el));
-        console.log(model.entity+'.'+url);
-        // if(next){
-        //     next(model.entity+'.'+url);
-        //     return 0;
-        // }
-        //return ;
-        Drequest.init(url, this.formdata)
+
+        Drequest.init(url)
+            .data(this.formdata)
             .post((response)=> {
-
-            this.currentbtnsubmit.attr("disabled", false);
-            this.currentbtnsubmit.find(".spinner-border").remove();
-
-            this.callback(response);
-
-        });
-        request.param().send()
-        model._post(model.entity+'.'+url, this.formdata, (response)=> {
 
             this.currentbtnsubmit.attr("disabled", false);
             this.currentbtnsubmit.find(".spinner-border").remove();

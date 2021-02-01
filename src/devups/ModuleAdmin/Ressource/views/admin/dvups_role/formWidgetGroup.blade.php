@@ -1,7 +1,7 @@
 <?php  ?>
 <?php //Form::addcss(Dvups_role ::classpath('Ressource/js/dvups_role')) ?>
 
-<?= Form::open($dvups_role, ["action" => "$action", "method" => "post"]) ?>
+<?= Form::open($dvups_role, ["action" => Dvups_role::classpath("services.php?path=dvups_role.$action"), "method" => "post"]) ?>
 
 <div class='text-left'>
     <div class='form-group'>

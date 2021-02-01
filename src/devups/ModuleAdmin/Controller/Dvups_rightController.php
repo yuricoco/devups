@@ -111,7 +111,7 @@ class Dvups_rightController extends Controller{
             public function deletegroupAction($ids)
             {
         
-                Dvups_right::where("id")->in($ids)->delete();
+                Dvups_right::delete()->where("id")->in($ids)->exec();
         
                 return array('success' => true, // pour le restservice
                         'redirect' => 'index', // pour le web service

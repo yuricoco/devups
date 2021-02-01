@@ -104,7 +104,7 @@ class Dvups_roleForm extends FormManager
         $data["value_modules"] = $data["dvups_role"]->inCollectionOf("dvups_module");
         $data["value_entities"] = $data["dvups_role"]->inCollectionOf("dvups_entity");
 
-        $form = Genesis::getView("dvups_role.formWidgetGroup", $data);
+        $form = Genesis::getView("admin.dvups_role.formWidgetGroup", $data);
         return [
             "success" => true,
             "form" => $form,

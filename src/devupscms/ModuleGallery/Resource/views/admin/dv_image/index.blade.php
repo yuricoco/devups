@@ -19,7 +19,7 @@
                     </div>
                 </div>
                 <div class="card-body">
-                    { $datatable->render(); !!}
+
                     {!! $datatable
                             //->setContainer()
                             ->renderCustomBody("div", ["class"=>"row"]) !!}

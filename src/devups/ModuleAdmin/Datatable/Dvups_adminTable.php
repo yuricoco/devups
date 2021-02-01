@@ -13,7 +13,7 @@ class Dvups_adminTable extends Datatable
 
     public static function init(\Dvups_admin $admin = null)
     {
-        $dt = new Dvups_adminTable();
+        $dt = new Dvups_adminTable($admin);
         $dt->entity = $admin;
 
         return $dt;

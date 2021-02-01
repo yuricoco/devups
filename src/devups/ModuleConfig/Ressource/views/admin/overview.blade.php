@@ -7,13 +7,5 @@
             @include("default.entitywidget")
         @endforeach
     </div>
-    <div class="row">
-        <div class="col-lg-6">
-            {!! $datatablemodule->render() !!}
-        </div>
-        <div class="col-lg-6">
-            {!! $datatableentity->render() !!}
-        </div>
-    </div>
 @endsection
             

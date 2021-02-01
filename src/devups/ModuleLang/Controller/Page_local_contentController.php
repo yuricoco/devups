@@ -95,7 +95,7 @@ class Page_local_contentController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Page_local_content::where("id")->in($ids)->delete();
+        Page_local_content::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

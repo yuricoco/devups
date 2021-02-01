@@ -191,7 +191,7 @@ class Dvups_adminFrontController extends \Dvups_adminController
         $dvups_admin = Dvups_admin::find($id);
 
         if (sha1($oldpwd) == $dvups_admin->getPassword()) {
-            $dvups_admin->__update("password", sha1($newpwd));
+            $dvups_admin->__update("password", sha1($newpwd))->exec();
             return array('success' => true, // pour le restservice
                 'detail' => 'Mot de passe mise a jour avec success');
         } else {

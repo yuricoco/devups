@@ -7,3 +7,6 @@
  */
 
 require "Dvups_config_item.php";
+require __DIR__ . '/Item.php';
+require __DIR__ . '/OrderCore.php';
+require __DIR__ . '/ImageCore.php';

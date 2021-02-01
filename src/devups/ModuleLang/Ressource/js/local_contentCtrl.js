@@ -1,7 +1,7 @@
 //local_contentCtrl
 model.regeneratecache = function () {
-
-    this._get("local_content.regeneratecache", (response)=>{
+    model.init("local_content")
+    model.request("local_content.regeneratecache").get((response)=>{
         console.log(response);
         alert(response.message)
     })

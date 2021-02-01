@@ -95,7 +95,7 @@ class NotificationController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Notification::where("id")->in($ids)->delete();
+        Notification::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

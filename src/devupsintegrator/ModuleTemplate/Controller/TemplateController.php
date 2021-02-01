@@ -100,7 +100,7 @@ class TemplateController extends Controller
     public function deletegroupAction($ids)
     {
 
-        Template::where("id")->in($ids)->delete();
+        Template::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
             'detail' => '');

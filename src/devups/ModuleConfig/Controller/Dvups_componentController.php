@@ -94,7 +94,7 @@ class Dvups_componentController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Dvups_component::where("id")->in($ids)->delete();
+        Dvups_component::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

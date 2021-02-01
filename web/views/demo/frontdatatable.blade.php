@@ -105,9 +105,9 @@
             </div>
             {!! $datatable->dialogBox() !!}
             { Local_contentTable::init(new Local_content())
-->buildfronttable()
-->setModel("front")
-->render() !!}
+            ->buildfronttable()
+            ->setModel("front")
+            ->render() !!}
         </div>
         <div class="content">
             { Local_contentTable::init(new Local_content())->buildfrontcustom()->renderCustomBody() !!}

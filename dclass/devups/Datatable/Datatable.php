@@ -206,9 +206,9 @@ class Datatable extends Lazyloading
             }
         }
 
-        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" >
- <i class="fa fa-retweet"></i> Reload</button>
- ';
+//        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" >
+// <i class="fa fa-retweet"></i> Reload</button>
+// ';
 
         if (getadmin()->getId()) {
             $top_action .= '<div class="btn-group" role="group">
@@ -238,7 +238,7 @@ class Datatable extends Lazyloading
             if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["edit"])) {
                 $this->defaultaction["edit"] = $result;
             } else {
-                $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
+                $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \''.$this->classname.'\')"';
             }
             $method = 'showFrontAction';
             if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["show"])) {
@@ -248,7 +248,7 @@ class Datatable extends Lazyloading
             if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["delete"])) {
                 $this->defaultaction["delete"] = $result;
             } else {
-                $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
+                $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ', \''.$this->classname.'\')"';
             }
 
             if (isset($this->defaultaction[$this->mainrowaction]))
@@ -271,9 +271,9 @@ class Datatable extends Lazyloading
                         if (!is_null($result))
                             $this->defaultaction["edit"] = $result;
                         else
-                            $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
+                            $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \''.$this->classname.'\')"';
                     } else
-                        $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
+                        $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \''.$this->classname.'\')"';
 
                     $this->rowaction[] = $this->defaultaction["edit"];
 
@@ -287,7 +287,7 @@ class Datatable extends Lazyloading
                     if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["show"]))
                         $this->defaultaction["show"] = $result;
                     else
-                        $this->defaultaction["show"]['action'] = 'onclick="model._show(' . $entity->getId() . ')"';
+                        $this->defaultaction["show"]['action'] = 'onclick="model._show(' . $entity->getId() . ', \''.$this->classname.'\')"';
 
                     $this->rowaction[] = $this->defaultaction["show"];
                 }
@@ -299,7 +299,7 @@ class Datatable extends Lazyloading
                     if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["delete"]))
                         $this->defaultaction["delete"] = $result;
                     else
-                        $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
+                        $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ', \''.$this->classname.'\')"';
 
                     $this->rowaction[] = $this->defaultaction["delete"];
                 }
@@ -323,9 +323,9 @@ class Datatable extends Lazyloading
                         if (!is_null($result))
                             $this->defaultaction["edit"] = $result;
                         else
-                            $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
+                            $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \''.$this->classname.'\')"';
                     } else
-                        $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ')"';
+                        $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \''.$this->classname.'\')"';
 
                     $this->rowaction[] = $this->defaultaction["edit"];
                 }
@@ -335,7 +335,7 @@ class Datatable extends Lazyloading
                     if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["show"]))
                         $this->defaultaction["show"] = $result;
                     else
-                        $this->defaultaction["show"]['action'] = 'onclick="model._show(' . $entity->getId() . ')"';
+                        $this->defaultaction["show"]['action'] = 'onclick="model._show(' . $entity->getId() . ', \''.$this->classname.'\')"';
 
                     $this->rowaction[] = $this->defaultaction["show"];
                 }
@@ -347,9 +347,9 @@ class Datatable extends Lazyloading
                         if (!is_null($result))
                             $this->defaultaction["delete"] = $result;
                         else
-                            $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
+                            $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ', \''.$this->classname.'\')"';
                     } else
-                        $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ')"';
+                        $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ', \''.$this->classname.'\')"';
 
                     $this->rowaction[] = $this->defaultaction["delete"];
                 }

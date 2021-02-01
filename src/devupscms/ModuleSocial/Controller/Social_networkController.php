@@ -99,7 +99,7 @@ class Social_networkController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Social_network::where("id")->in($ids)->delete();
+        Social_network::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

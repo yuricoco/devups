@@ -18,29 +18,29 @@ $dvups_roleCtrl = new Dvups_roleController();
 switch (Request::get('path')) {
 
     case 'layout':
-        Genesis::renderView("overview");
+        Genesis::renderView("admin.overview");
         break;
 
     case 'dvups-admin/complete-registration':
-        Genesis::renderView('dvups_admin.complete_registration', $dvups_adminCtrl->completeRegistrationView(Request::get("id")));
+        Genesis::renderView('admin.dvups_admin.complete_registration', $dvups_adminCtrl->completeRegistrationView(Request::get("id")));
         break;
     case 'dvups-admin/complete':
         $dvups_adminCtrl->completeRegistrationAction(Request::get("id"));
         break;
     case 'dvups-admin/profile':
-        Genesis::renderView('dvups_admin.profile', ["admin" => Dvups_admin::find(getadmin()->getId())], "profile");
+        Genesis::renderView('admin.dvups_admin.profile', ["admin" => Dvups_admin::find(getadmin()->getId())], "profile");
         break;
     case 'dvups-admin/changepassword':
-        Genesis::renderView('dvups_admin.changepwd', $dvups_adminCtrl->changepwAction(), true);
+        Genesis::renderView('admin.dvups_admin.changepwd', $dvups_adminCtrl->changepwAction(), true);
         break;
     case 'dvups-admin/editpassword':
-        Genesis::renderView('dvups_admin.changepwd', ["detail" => ""], 'list');
+        Genesis::renderView('admin.dvups_admin.changepwd', ["detail" => ""], 'list');
         break;
     case 'dvups-admin/resetcredential':
-        Genesis::renderView('dvups_admin.index', $dvups_adminCtrl->resetcredential(Request::get("id")),  true);
+        Genesis::renderView('admin.dvups_admin.index', $dvups_adminCtrl->resetcredential(Request::get("id")),  true);
         break;
     case 'dvups-admin/added':
-        Genesis::renderView('dvups_admin.added');
+        Genesis::renderView('admin.dvups_admin.added');
         break;
     case 'dvups-admin/index':
         $dvups_adminCtrl->listView();
@@ -49,7 +49,7 @@ switch (Request::get('path')) {
 
     case 'dvups-right/index':
         //$dvups_rightCtrl->listView();
-        Genesis::renderView('dvups_right.index',  $dvups_rightCtrl->listAction());
+        Genesis::renderView('admin.dvups_right.index',  $dvups_rightCtrl->listAction());
         break;
 
     case 'dvups-role/index':

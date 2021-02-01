@@ -73,7 +73,7 @@ class Model extends \stdClass
         $fn = $reflector->getFileName();
         $dirname = explode("src", dirname($fn));
         $dirname = str_replace("Entity", "", $dirname[1]);
-        return $route . "src" . $dirname . $src;
+        return str_replace("\\", "/", $route . "src" . $dirname . $src);
     }
 
     public static function classroot($src)

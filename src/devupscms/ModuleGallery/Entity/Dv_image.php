@@ -1,157 +1,209 @@
-<?php 
-        // user \dclass\devups\model\Model;
+<?php
+// user \dclass\devups\model\Model;
+
+/**
+ * @Entity @Table(name="dv_image")
+ * */
+class Dv_image extends ImageCore implements JsonSerializable
+{
+
     /**
-     * @Entity @Table(name="dv_image")
+     * @Id @GeneratedValue @Column(type="integer")
+     * @var int
      * */
-    class Dv_image extends Model implements JsonSerializable{
+    protected $id;
 
-        /**
-         * @Id @GeneratedValue @Column(type="integer")
-         * @var int
-         * */
-        protected $id;
-        /**
-         * @Column(name="reference", type="string" , length=123 )
-         * @var string
-         **/
-        protected $reference;
-        /**
-         * @Column(name="name", type="string" , length=123 )
-         * @var string
-         **/
-        protected $name;
-        /**
-         * @Column(name="description", type="text"  , nullable=true)
-         * @var text
-         **/
-        protected $description;
-        /**
-         * @Column(name="image", type="string" , length=255 )
-         * @var string
-         **/
-        protected $image;
-        /**
-         * @Column(name="size", type="float"  , nullable=true)
-         * @var float
-         **/
-        protected $size;
-        /**
-         * @Column(name="width", type="float"  , nullable=true)
-         * @var float
-         **/
-        protected $width;
-        /**
-         * @Column(name="height", type="float"  , nullable=true)
-         * @var float
-         **/
-        protected $height; 
-        
 
-        
-        public function __construct($id = null){
-            
-                if( $id ) { $this->id = $id; }   
-                          
-}
+    /**
+     * @ManyToOne(targetEntity="\Tree_item")
+     *
+     * @var \Tree_item
+     */
+    public $folder;
 
-        public function getId() {
-            return $this->id;
-        }
-        public function getReference() {
-            return $this->reference;
+
+    public function __construct($id = null)
+    {
+
+        if ($id) {
+            $this->id = $id;
         }
 
-        public function setReference($reference) {
-            $this->reference = $reference;
-        }
-        
-        public function getName() {
-            return $this->name;
-        }
+        $this->folder = new Tree_item();
 
-        public function setName($name) {
-            $this->name = $name;
-        }
-        
-        public function getDescription() {
-            return $this->description;
-        }
+    }
 
-        public function setDescription($description) {
-            $this->description = $description;
-        }
-        
-                        
-        public function uploadImage($file = 'image') {
-            $dfile = self::Dfile($file);
-            if(!$dfile->errornofile){
-            
-                $filedir = 'dv_image/';
-                $url = $dfile
-                    ->hashname()
-                    ->moveto($filedir);
-    
-                if (!$url['success']) {
-                    return 	array(	'success' => false,
-                        'error' => $url);
-                }
-    
-                $this->image = $url['file']['hashname'];            
+    /**
+     * get all image in a specific folder
+     * @param string $foldername
+     * @return array
+     */
+    public static function infolder(string $foldername)
+    {
+        $folder = Tree_item::where(["tree.name" => "folder", "this.name"=> $foldername])->__getOne();
+        return self::where("folder_id", $folder->getId())->__getAll();
+    }
+
+    public function getId()
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return Tree_item
+     */
+    public function getFolder(): Tree_item
+    {
+        return $this->folder;
+    }
+
+    /**
+     * @param Tree_item $folder
+     */
+    public function setFolder(Tree_item $folder): void
+    {
+        $this->folder = $folder;
+    }
+
+    public function getReference()
+    {
+        return $this->reference;
+    }
+
+    public function setReference($reference)
+    {
+        $this->reference = $reference;
+    }
+
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
+
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+
+    public function uploadImage($file = 'image')
+    {
+        $dfile = self::Dfile($file);
+        if (!$dfile->errornofile) {
+
+            $filedir = 'dv_image/';
+            $url = $dfile
+                ->sanitize()
+                ->moveto($filedir);
+
+            if (!$url['success']) {
+                return array('success' => false,
+                    'error' => $url);
             }
-        }     
-             
-        public function srcImage() {
-            return Dfile::show($this->image, 'dv_image');
-        }
-        public function showImage() {
-            $url = Dfile::show($this->image, 'dv_image');
-            return Dfile::fileadapter($url, $this->image);
-        }
-        
-        public function getImage() {
-            return $this->image;
-        }
 
-        public function setImage($image) {
-            $this->image = $image;
+            $this->uploaddir = 'dv_image/';
+            $this->image = $url['file']['hashname'];
+            $this->name = $url['file']['hashname'];
         }
-        
-        public function getSize() {
-            return $this->size;
-        }
+    }
 
-        public function setSize($size) {
-            $this->size = $size;
-        }
-        
-        public function getWidth() {
-            return $this->width;
-        }
+    public function uploadSlide($file = 'image')
+    {
+        $dfile = self::Dfile($file);
+        if (!$dfile->errornofile) {
 
-        public function setWidth($width) {
-            $this->width = $width;
-        }
-        
-        public function getHeight() {
-            return $this->height;
-        }
+            $filedir = 'slider/';
+            $url = $dfile
+                ->sanitize()
+                ->moveto($filedir);
 
-        public function setHeight($height) {
-            $this->height = $height;
+            if (!$url['success']) {
+                return array('success' => false,
+                    'error' => $url);
+            }
+
+            $this->uploaddir = 'slider/';
+            $this->image = $url['file']['hashname'];
+            $this->name = $url['file']['hashname'];
+
         }
-        
-        
-        public function jsonSerialize() {
-                return [
-                    'id' => $this->id,
-                    'reference' => $this->reference,
-                    'name' => $this->name,
-                    'description' => $this->description,
-                    'image' => $this->image,
-                    'size' => $this->size,
-                    'width' => $this->width,
-                    'height' => $this->height,
-                ];
-        }
-        
+    }
+
+    public function showImage()
+    {
+        $url = Dfile::show($this->image, 'dv_image');
+        return Dfile::fileadapter($url, $this->image);
+    }
+
+    public function getImage()
+    {
+        return $this->image;
+    }
+
+    public function setImage($image)
+    {
+        $this->image = $image;
+    }
+
+    public function getSize()
+    {
+        return $this->size;
+    }
+
+    public function setSize($size)
+    {
+        $this->size = $size;
+    }
+
+    public function getWidth()
+    {
+        return $this->width;
+    }
+
+    public function setWidth($width)
+    {
+        $this->width = $width;
+    }
+
+    public function getHeight()
+    {
+        return $this->height;
+    }
+
+    public function setHeight($height)
+    {
+        $this->height = $height;
+    }
+
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+            'reference' => $this->reference,
+            'name' => $this->name,
+            'description' => $this->description,
+            'image' => $this->image,
+            'size' => $this->size,
+            'width' => $this->width,
+            'height' => $this->height,
+        ];
+    }
+
+    public function __delete($exec = true)
+    {
+        Dfile::deleteFile($this->image, $this->uploaddir);
+        return parent::__delete($exec); // TODO: Change the autogenerated stub
+    }
+
 }

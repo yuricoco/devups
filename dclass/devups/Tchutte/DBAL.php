@@ -287,6 +287,7 @@ class DBAL extends Database
                         }
 
                         $sql .= "delete from " . $entityTable . "  where " . $entityName . "_id = " . $entity->getId() . " and " . $this->objectName . "_id = $id; ";
+
                     }
 
                 }
@@ -557,7 +558,8 @@ class DBAL extends Database
         $values = [];
         $parameterQuery = ':' . implode(", :", $this->objectVar);
 
-        $sql = "insert into `" . $this->table . "` (`" . strtolower(implode('` ,`', $this->objectVar)) . "`) values (" . strtolower($parameterQuery) . ")";
+        $sql = "insert into `" . $this->table . "` (`" . strtolower(implode('` ,`', $this->objectVar)) . "`) 
+        values (" . strtolower($parameterQuery) . ")";
 
         $id = $this->executeDbal($sql, $this->objectKeyValue, 1);
         $this->object->setId($id);
@@ -612,19 +614,21 @@ class DBAL extends Database
         endif;
 
         $this->update = true;
-        $parameterQuery = '`' . $this->objectVar[1] . '`=?';
+        //$parameterQuery = '`' . implode("`= :".$this->objectVar.", `", $this->objectVar);
+
+        $parameterQuery = '`' . $this->objectVar[1] . '`= :'. $this->objectVar[1];
         for ($i = 2; $i < $this->nbVar; $i++) {
-            $parameterQuery .= ', `' . $this->objectVar[$i] . '`=?';
+            $parameterQuery .= ', `' . $this->objectVar[$i] . '`= :'.$this->objectVar[$i];
         }
         $values = $this->objectValue;
         array_splice($values, 0, 1);
         $values[] = $this->objectValue[0];
 
-        $sql = "update `" . $this->table . "` set " . strtolower($parameterQuery) . " where id = ? ";
+        $sql = "update `" . $this->table . "` set " . strtolower($parameterQuery) . " where id = :id ";
 
         $query = $this->link->prepare($sql);
 
-        $result = $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
+        $result = $query->execute($this->objectKeyValue) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
         if (dbtransaction) {
             $bd_dump = new \dclass\devups\DB_dumper();
@@ -708,12 +712,12 @@ class DBAL extends Database
         endif;
 
         if ($this->softdelete)
-            $sql = "update " . $this->table . " set deleted_at = NOW() where " . $this->objectVar[0] . " = ?";
+            $sql = "update `" . $this->table . "` set deleted_at = NOW() where " . $this->objectVar[0] . " = ?";
         else
-            $sql = "delete from " . $this->table . " where " . $this->objectVar[0] . " = ?";
+            $sql = "delete from `" . $this->table . "` where " . $this->objectVar[0] . " = ?";
 
         $query = $this->link->prepare($sql);
-        $retour = $query->execute(array($this->objectValue[0])) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo()));
+        $retour = $query->execute(array($this->objectValue[0])) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, array($this->objectValue[0])));
 
         if (dbtransaction) {
             $bd_dump = new \dclass\devups\DB_dumper();

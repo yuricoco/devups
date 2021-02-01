@@ -70,17 +70,17 @@ var model = {
     },
     entity: null,
     _new: function (el, classname) {
-        if ($(el).parents(".dv-top-action").length) {
+        model.init(classname)
+        /*if ($(el).parents(".dv-top-action").length) {
             this.baseurl = $(el).parents(".dv-top-action").data('route') + "services.php";
             this.entity = $(el).parents(".dv-top-action").data('entity');
 
             console.log("top action route", this.baseurl);
-        }
+        }*/
 
-        model.init(classname)
         this._showmodal();
-        Drequest.init(this.baseurl)
-            .param({path: this.entity + "._new"})
+        model.request(this.entity + "._new")
+            //.param({path: this.entity + "._new"})
             .get(function (response) {
                 console.log(response)
                 databinding.checkrenderform(response);
@@ -91,7 +91,8 @@ var model = {
             });
 
     },
-    _edit: function (id, callback) {
+    _edit: function (id, entity) {
+        model.init(entity)
         var regex = /_/gi;
         //string..replace(regex, '-')
         model.init();
@@ -114,12 +115,10 @@ var model = {
     },
     callbackdelete(id, response) {
 
-        $tr.remove();
-        if (callback)
-            callback(response);
     },
-    _delete: function ($this, id, callback) {
-
+    _delete: function ($this, id, entity, callback) {
+        model.init(entity)
+        this.addLoader($($this))
         var $tr = $($this).parents("tr");
         var $td = $($this).parents("td");
 
@@ -131,8 +130,12 @@ var model = {
                 id: id
             })
             .get( (response) => {
+                this.removeLoader();
                 console.log(response)
-                $tr.remove();
+                if($tr.length)
+                    $tr.remove();
+                if (callback)
+                    callback(response);
                 this.callbackdelete(id, response)
             })
             .fail(function (resultat, statut, erreur) {
@@ -141,8 +144,8 @@ var model = {
             });
 
     },
-    _show: function (id, callback) {
-
+    _show: function (id, entity, callback) {
+        model.init(entity)
         this._showmodal();
 
         Drequest.init(this.baseurl)
@@ -228,6 +231,13 @@ var model = {
         return formdata;
     },
 
+    request : function (action) {
+        // var formdata = this._formdata(form);
+        // model.modalbody.append('<div id="loader" style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
+        console.log(this.baseurl)
+        return Drequest.init(this.baseurl+"?path="+action)
+    },
+
     getformvalue: function (field) {
         return this.formentity[this.entity + "_form[" + field + "]"];
     },
@@ -308,15 +318,13 @@ var model = {
     getformfield: function (field) {
         return $("input[name='" + this.entity + "_form[" + field + "]']");
     },
-    init: function (dvdatatable) {
+    init: function (entity) {
 
-        console.log(typeof $);
-        if (typeof $ === 'undefined') {
-            console.log("not ready");
-            return;
-        }
-
-        // model.baseurl = dvdatatable.eq(0).data('route')+"services.php";
+        if(!entity)
+            return ;
+        model.entity = entity;
+        ddatatable.init(entity);
+        model.baseurl = ddatatable.baseurl;
         // model.entity = dvdatatable.eq(0).data('entity');
 
         model.modal = $("#" + model.entity + "modal");
@@ -328,6 +336,6 @@ var model = {
 };
 
 //setTimeout(function () {
-    model.init();
+    // model.init();
 //}, 800)
 

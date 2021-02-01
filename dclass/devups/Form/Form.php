@@ -24,12 +24,12 @@ class Form extends FormFactory{
 
         Form::$classname = get_class($enitty);
         Form::$name = strtolower(Form::$classname);
-        $action = trim($directives["action"]);
-        $directives["action"] = "index.php?path=".Form::$name."/".trim($action);
-        if($overideaction){
-            $directives["action"] = trim($action);
-        }else
-            $action = Form::$name . "/" . $action;
+        $action = str_replace("\\", "/", trim($directives["action"]));
+        //$directives["action"] = "index.php?path=".Form::$name."/".trim($action);
+//        if($overideaction){
+//            $directives["action"] = trim($action);
+//        }else
+//            $action = Form::$name . "/" . $action;
         $formdirective = [];
         foreach ($directives as $key => $value) {
             $formdirective[] = $key ."='" . $value ."'";

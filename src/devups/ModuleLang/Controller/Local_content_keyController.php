@@ -95,7 +95,7 @@ class Local_content_keyController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Local_content_key::where("id")->in($ids)->delete();
+        Local_content_key::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

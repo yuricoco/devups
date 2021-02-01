@@ -3,7 +3,8 @@
 model.updateprivilege = function(){
     console.log("update privilege");
 
-    model._get("dvups_:update", function (response) {
+    model.init("dvups_role");
+    model.request("dvups_:update").get(function (response) {
         console.log(response);
         alert(response.message);
     })

@@ -17,6 +17,22 @@ class Dv_imageForm extends FormManager
 
         //$entitycore->addcss('csspath');
 
+        $entitycore->field['folder'] = [
+            "label" => t('Folder'),
+            "type" => FORMTYPE_SELECT,
+            "value" => $dv_image->folder->getId(),
+            "placeholder" => '--- choose a folder ---',
+            "options" => FormManager::Options_Helper("name", Tree_item::getmainmenu("folder")),
+        ];
+
+        $entitycore->field['image'] = [
+            "label" => t('dv_image.image'),
+            "type" => FORMTYPE_FILE,
+            "filetype" => FILETYPE_IMAGE,
+            "value" => $dv_image->getImage(),
+            "src" => $dv_image->showImage(),
+        ];
+
 
         $entitycore->field['reference'] = [
             "label" => t('dv_image.reference'),
@@ -37,36 +53,6 @@ class Dv_imageForm extends FormManager
             "value" => $dv_image->getDescription(),
         ];
 
-        $entitycore->field['image'] = [
-            "label" => t('dv_image.image'),
-            "type" => FORMTYPE_FILE,
-            "filetype" => FILETYPE_IMAGE,
-            "value" => $dv_image->getImage(),
-            "src" => $dv_image->showImage(),
-        ];
-
-        $entitycore->field['size'] = [
-            "label" => t('dv_image.size'),
-            FH_REQUIRE => false,
-            "type" => FORMTYPE_TEXT,
-            "value" => $dv_image->getSize(),
-        ];
-
-        $entitycore->field['width'] = [
-            "label" => t('dv_image.width'),
-            FH_REQUIRE => false,
-            "type" => FORMTYPE_TEXT,
-            "value" => $dv_image->getWidth(),
-        ];
-
-        $entitycore->field['height'] = [
-            "label" => t('dv_image.height'),
-            FH_REQUIRE => false,
-            "type" => FORMTYPE_TEXT,
-            "value" => $dv_image->getHeight(),
-        ];
-
-
         $entitycore->addDformjs($button);
         $entitycore->addjs(Dv_image::classpath('Resource/js/dv_imageForm'));
 
@@ -86,7 +72,7 @@ class Dv_imageForm extends FormManager
             return [
                 'success' => true,
                 'dv_image' => $dv_image,
-                'action' => "create&tablemodel=frontcustom",
+                'action' => Dv_image::classpath("services.php?path=dv_image.create&tablemodel=frontcustom"),
             ];
         endif;
 
@@ -94,7 +80,7 @@ class Dv_imageForm extends FormManager
         return [
             'success' => true,
             'dv_image' => $dv_image,
-            'action' => "update&tablemodel=frontcustom&id=" . $id,
+            'action' => Dv_image::classpath("services.php?path=dv_image.update&tablemodel=frontcustom&id=" . $id),
         ];
 
     }

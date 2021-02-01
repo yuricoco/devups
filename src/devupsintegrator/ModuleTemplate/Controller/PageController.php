@@ -94,7 +94,7 @@ class PageController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Page::where("id")->in($ids)->delete();
+        Page::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 
