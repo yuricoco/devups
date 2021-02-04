@@ -77,16 +77,16 @@ var dform = {
     _submit: function(el, url, next){
         // var formserialize = $(this).serialize();
         // console.log(formserialize);
-        if (! url){
+        //if (! url){
             // var actionarray = $(el).attr("action").split("/");
             // url = actionarray[1];
-            url = $(el).attr("action");
-        }
+            //url = $(el).attr("action");
+        //}
 
         this.currentform = $(el);
         this.currentbtnsubmit = $(el).find("button[type=submit]");
 
-        this.currentbtnsubmit.attr("disabled", true);
+        // this.currentbtnsubmit.attr("disabled", true);
         this.currentbtnsubmit.prepend('<span class="spinner-border spinner-border-sm mr-2" role="status"></span>');
 
         this.callback = function (response) { console.log(response); };
@@ -102,6 +102,7 @@ var dform = {
 
         this.formdata = model._formdata($(el));
 
+        console.log(url)
         Drequest.init(url)
             .data(this.formdata)
             .post((response)=> {
@@ -217,7 +218,8 @@ var dform = {
     },
 };
 
+console.log(model.entity)
 $("#"+model.entity+"-form").submit(function (e) {
     e.preventDefault();
-    dform._submit(this, $(this).attr("action").split("/")[1])
+    dform._submit(this, $(this).attr("action"))
 });

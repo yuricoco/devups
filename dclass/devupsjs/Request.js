@@ -11,6 +11,7 @@ class Drequest {
     static init(url) {
         let r = new Drequest();
         r.baseurl = url;
+        r.url = "";
         return r;
     }
 
@@ -31,8 +32,10 @@ class Drequest {
     };
 
     post(callback) {
+        console.log(this);
+        console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
         return $.ajax({
-            url: this.baseurl + this.url, //+"?"+ $.param(this._param),
+            url: this.baseurl + this.url, //+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param),
             data: this._data,
             cache: false,
             contentType: false,
@@ -52,8 +55,9 @@ class Drequest {
     };
 
     get(callback) {
+        console.log(this._param)
         return $.ajax({
-            url: this.baseurl + this.url,
+            url: this.baseurl + this.url, //+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param),
             data: this._param,
             method: "GET",
             dataType: "json",

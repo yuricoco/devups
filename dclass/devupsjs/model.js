@@ -95,12 +95,11 @@ var model = {
         model.init(entity)
         var regex = /_/gi;
         //string..replace(regex, '-')
-        model.init();
+
         this._showmodal();
 
-        Drequest.init(this.baseurl)
+        model.request(this.entity + "._edit")
             .param({
-                path: this.entity + "._edit",
                 id: id
             })
             .get(function (response) {
@@ -124,9 +123,8 @@ var model = {
 
         if (!confirm('Voulez-vous Supprimer?')) return false;
 
-        Drequest.init(this.baseurl)
+        model.request(this.entity + "._delete")
             .param({
-                path: this.entity + "._delete",
                 id: id
             })
             .get( (response) => {

@@ -24,14 +24,21 @@ class Dv_imageForm extends FormManager
             "placeholder" => '--- choose a folder ---',
             "options" => FormManager::Options_Helper("name", Tree_item::getmainmenu("folder")),
         ];
-
+        $entitycore->field['position'] = [
+            "label" => t('Position'),
+            "type" => FORMTYPE_SELECT,
+            "value" => $dv_image->position->getId(),
+            "placeholder" => '--- choose a position ---',
+            "options" => FormManager::Options_Helper("name", Tree_item::getmainmenu("position")),
+        ];
+/*
         $entitycore->field['image'] = [
             "label" => t('dv_image.image'),
             "type" => FORMTYPE_FILE,
             "filetype" => FILETYPE_IMAGE,
             "value" => $dv_image->getImage(),
             "src" => $dv_image->showImage(),
-        ];
+        ];*/
 
 
         $entitycore->field['reference'] = [

@@ -231,8 +231,8 @@ class Dfile {
         return $dfile;
     }
 
-    public function sanitize() {
-        $this->file_name = self::wd_remove_accents($this->name);
+    public function sanitize($key = "") {
+        $this->file_name = self::wd_remove_accents($key.$this->name);
         return $this;
     }
 

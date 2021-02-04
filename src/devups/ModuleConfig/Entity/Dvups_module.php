@@ -143,8 +143,10 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
      */
     public function getPrinticon($width = "23")
     {
-        $icone = $this->route("icone.svg");
-        return '<img src="'.$icone.'" width=25 />';
+        if(!file_exists(self::classroot("/icon.svg"))) {
+            $icone = $this->route("icon.svg");
+            return '<img src="' . $icone . '" width=25 />';
+        }
         return '<i class="' . $this->favicon . '"></i>';
     }
 

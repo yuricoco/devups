@@ -1040,7 +1040,7 @@ EOF;
         if ($this->base_url)
             $route = $this->base_url;
         else
-            $route = path('src/' . strtolower($dentity->dvups_module->getProject()) . '/' . $dentity->dvups_module->getName() . '/');
+            $route = $dentity->dvups_module->route();
 
         $directive = \Form::serialysedirective($directive);
         // data-perpage="' . $this->per_page . '" data-filterparam="' . $filterParam . '" data-route="' . $route . '" data-entity="' . $this->class . '"  class="dv_datatable ' . $this->table_class . '"

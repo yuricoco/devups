@@ -29,7 +29,7 @@ class Dv_imageTable extends Datatable
 
         $this->template = "admin.dv_image.gallery_item";
 
-        $this->base_url = __env;
+        //$this->base_url = __env;
 
         $this->per_page = 30;
         $this->order_by = " this.id desc ";

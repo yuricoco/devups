@@ -70,6 +70,25 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
         $this->tree = new Tree();
     }
 
+    public static function position($ref)
+    {
+        $ti = self::mainmenu("position")->andwhere("this.name", $ref)->__firstOrNull();
+        if (!$ti) {
+            if (!Tree::where("name", "position")->count()) {
+                $tree = new Tree();
+                $tree->setName("position");
+                $tree->__insert();
+            }
+            $ti = new Tree_item();
+            $ti->setName($ref);
+            $ti->setMain(1);
+            $ti->setSlug($ref);
+            $ti->tree = $tree;
+            $ti->__insert();
+        }
+        return $ti;
+    }
+
     public function getId()
     {
         return $this->id;
@@ -298,6 +317,20 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
         return $categoryparent->collectChildren(25);
     }
 
+    /**
+     * @param string $tree
+     * @return QueryBuilder
+     */
+    public static function mainmenu($tree = "menu")
+    {
+        return self::where("tree.name", $tree)
+            ->andwhere("main", 1);
+    }
+
+    /**
+     * @param string $tree
+     * @return array
+     */
     public static function getmainmenu($tree = "menu")
     {
         return self::where("tree.name", $tree)

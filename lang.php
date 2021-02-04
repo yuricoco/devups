@@ -52,3 +52,9 @@ function t($ref, $default = "", $local = null ){
     return $translate;
 
 }
+
+function p($ref, $default = "no_image"){
+
+    return Dv_image::templatePosition($ref);
+
+}
