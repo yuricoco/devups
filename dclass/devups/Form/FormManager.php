@@ -47,6 +47,71 @@ abstract class FormManager {
     //put your code here
 //    abstract function __renderForm($entity = null) ;
 
+    public $entity;
+    public $dventity;
+    public $classname;
+    public $name;
+    public $js;
+    public $css;
+    public $formbutton;
+    public $formaction;
+    public $fields = [];
+
+    public function __construct($entity, $action = "")
+    {
+        $this->formaction = $action;
+        $this->formbutton = $action? true : false;
+        $this->entity = $entity;
+        $this->classname = get_class($entity);
+        $this->name = strtolower(get_class($entity));
+        $this->js = [];
+        $this->css = [];
+        $this->dventity = Dvups_entity::getbyattribut("this.name", $this->classname);
+
+    }
+
+    /**
+     * @param $name
+     * @param $option
+     * @return $this
+     */
+    public function addField($name, $option){
+        $this->fields[$name] = $option;
+        return $this;
+    }
+
+    public function addJs($jsfile){
+        $this->js[] = $this->dventity->dvups_module->route($jsfile);
+        return $this;
+    }
+
+    public function addCss($cssfile){
+        $this->css[] = $this->dventity->dvups_module->route($cssfile);
+        return $this;
+    }
+
+    public function addDformjs(){
+        $this->js[] = CLASSJS."dform";
+        return $this;
+    }
+
+    public function buildEntityCore(){
+        return (object) [
+            "entity"=>$this->entity,
+            "classname"=>$this->classname,
+            "name"=>$this->name,
+            "addcss"=>$this->css,
+            "addjs"=>$this->js,
+            "formbutton"=>$this->formbutton,
+            "formaction"=>$this->formaction,
+            "field"=>$this->fields,
+        ];
+    }
+
+    public function renderForm(){
+        return FormFactory::__renderForm($this->buildEntityCore());
+    }
+
     public static function  printHtmlForm($entitycore, $rootdir){
 
         $fichier = fopen($rootdir.'/Ressource/html/' . ucfirst($entitycore->name) . '.html', 'w');
@@ -54,14 +119,14 @@ abstract class FormManager {
         fclose($fichier);
 
     }
-
+/*
     public static function addjs($js){
         $reflection = new ReflectionClass(get_called_class());
         $filename = explode("\src", str_replace(get_called_class().".php", "", $reflection->getFilename()));
         $filename = explode("\\", $filename[1]);
 
         return __env . "src/" .$filename[1]."/". $filename[2] ."/Ressource/js/" . $js;
-    }
+    }*/
 
     static function Options_ToCollect_Helper($value, $entity, $currentcollection, $enablecollectionforminjection = false) {
         

@@ -387,6 +387,23 @@ class BackendGenerator {
         
     }
 
+    public function formView(\$id = null)
+    {
+        \$" . ($name) . " = new " . ucfirst($name) . "();
+        \$action = " . ucfirst($name) . "::classpath(\"services.php?path=" . ($name) . ".create\");
+        if (\$id) {
+            \$action = " . ucfirst($name) . "::classpath(\"services.php?path=" . ($name) . ".update&id=\" . \$id);
+            \$" . ($name) . " = " . ucfirst($name) . "::find(\$id);
+        }
+
+        return ['success' => true,
+            'form' => " . ucfirst($name) . "Form::init(\$" . ($name) . ", \$action)
+                ->buildForm()
+                ->addDformjs()
+                ->renderForm(),
+        ];
+    }
+
     public function createAction($" . $name . "_form = null $contentform){
         extract($" . "_POST);
 
@@ -773,7 +790,7 @@ class " . ucfirst($name) . "Table extends Datatable{
                 continue;
 
             $field .= "
-            $" . "entitycore->field['" . $attribut->name . "'] = [
+            \$this->fields['" . $attribut->name . "'] = [
                 \"label\" => t('" . $entity->name . "." . $attribut->name . "'), \n";
 
             if ($attribut->nullable == 'default') {
@@ -782,65 +799,65 @@ class " . ucfirst($name) . "Table extends Datatable{
 
             if ($attribut->formtype == 'text' or $attribut->formtype == 'float') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_TEXT, 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'integer' or $attribut->formtype == 'number') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_NUMBER, 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),  ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),  ";
             } elseif ($attribut->formtype == 'textarea') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'date') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'time') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'datetime') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'datepicker') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'radio') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), 
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), 
                 \"options\" => " . ucfirst($name) . "::$" . $attribut->name . "s, 
                 ";
             } elseif ($attribut->formtype == 'select') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), 
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), 
                 \"options\" => " . ucfirst($name) . "::$" . $attribut->name . "s, 
                 ";
             } elseif ($attribut->formtype == 'email') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'document') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_FILE,
                 FH_FILETYPE => FILETYPE_" . strtoupper($attribut->formtype) . ",  
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'video') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_FILE,
                 \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'music') {
                 $field .= "\"type\" => FORMTYPE_FILE,
                 \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'image') {
-                $field .= "\t\t\t\"type\" => FORMTYPE_FILE,
-                \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(),
-                \"src\" => $" . $name . "->show" . ucfirst($attribut->name) . "(), ";
+            $field .= "\t\t\"type\" => FORMTYPE_FILE,
+            \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
+            \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+            \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } else {
                 $field .= "\"type\" => FORMTYPE_TEXT,
-                \"value\" => $" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+            \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
             }
 
             $field .= "
-            ];\n";
+        ];\n";
         }
 
         if (!empty($entity->relation)) {
@@ -862,94 +879,61 @@ class " . ucfirst($name) . "Table extends Datatable{
 
                 if ($relation->cardinality == 'manyToOne') {
                     $field .= "
-                $" . "entitycore->field['" . $relation->entity . "'] = [
-                    \"type\" => FORMTYPE_SELECT, 
-                    \"value\" => $" . $name . "->get" . ucfirst($relation->entity) . "()->getId(),
-                    \"label\" => t('entity." . $relation->entity . "'),
-                    \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
-                ];\n";
+        \$this->fields['" . $relation->entity . "'] = [
+            \"type\" => FORMTYPE_SELECT, 
+            \"value\" => \$this->" . $name . "->get" . ucfirst($relation->entity) . "()->getId(),
+            \"label\" => t('entity." . $relation->entity . "'),
+            \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
+        ];\n";
                 } elseif ($relation->cardinality == 'oneToOne') {
                     $field .= "
-                $" . "entitycore->field['" . $relation->entity . "'] = [
-                    \"type\" => FORMTYPE_INJECTION, 
-                    FH_REQUIRE => true,
-                    \"label\" => t('entity." . $relation->entity . "'),
-                    \"imbricate\" => " . ucfirst($relation->entity) . "Form::__renderForm(" . ucfirst($relation->entity) . "Form::getFormData($" . $name . "->" . $relation->entity . "->getId(), false)),
-                ];\n";
+        \$this->fields['" . $relation->entity . "'] = [
+            \"type\" => FORMTYPE_INJECTION, 
+            FH_REQUIRE => true,
+            \"label\" => t('entity." . $relation->entity . "'),
+            \"imbricate\" => " . ucfirst($relation->entity) . "Form::init(\$this->$name->" . ($relation->entity) . ")->buildForm()->renderForm(),
+        ];\n";
                 } elseif ($relation->cardinality == 'manyToMany') {
                     $field .= "
-                $" . "entitycore->field['" . $relation->entity . "'] = [
-                    \"type\" => FORMTYPE_CHECKBOX, 
-                    \"values\" => $" . $name . "->inCollectionOf('" . ucfirst($relation->entity) . "'),
-                    \"label\" => t('entity." . $relation->entity . "'),
-                    \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
-                ];\n";
+        \$this->fields['" . $relation->entity . "'] = [
+            \"type\" => FORMTYPE_CHECKBOX, 
+            \"values\" => \$this->" . $name . "->inCollectionOf('" . ucfirst($relation->entity) . "'),
+            \"label\" => t('entity." . $relation->entity . "'),
+            \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
+        ];\n";
                 }
             }
         }
-
+        $ucfirstname = ucfirst($name);
         $contenu = "<?php \n
         
 use Genesis as g;
 
-    class " . ucfirst($name) . "Form extends FormManager{
+class " . ucfirst($name) . "Form extends FormManager{
 
-        public static function formBuilder($" . "dataform, $" . "button = false) {
-            $" . $name . " = new \\" . ucfirst($name) . "();
-            extract($" . "dataform);
-            $" . "entitycore = new Core($" . $name . ");
-            
-            $" . "entitycore->formaction = $" . "action;
-            $" . "entitycore->formbutton = $" . "button;
-            
-            //$" . "entitycore->addcss('csspath');
-                
-            " . $field . "
-            
-            $" . "entitycore->addDformjs($" . "button);
-            $" . "entitycore->addjs(" . ucfirst($name) . "::classpath('Resource/js/".$name."Form'));
-            
-            return $" . "entitycore;
-        }
-        
-        public static function __renderForm($" . "dataform, $" . "button = false) {
-            return FormFactory::__renderForm(" . ucfirst($name) . "Form::formBuilder($" . "dataform,  $" . "button));
-        }
-        
-        public static function getFormData($" . "id = null, $" . "action = \"create\")
-        {
-            if (!$" . "id):
-                $" . $name . " = new " . ucfirst($name) . "();
-                
-                return [
-                    'success' => true,
-                    '" . $name . "' => $" . $name . ",
-                    'action' => " . ucfirst($name) . "::classpath(\"services.php?path=$name.create\"),
-                ];
-            endif;
-            
-            $" . $name . " = " . ucfirst($name) . "::find($" . "id);
-            return [
-                'success' => true,
-                '" . $name . "' => $" . $name . ",
-                'action' => " . ucfirst($name) . "::classpath(\"services.php?path=$name.update&id=\" . $"."id),
-            ];
+    public \$$name;
 
-        }
-        
-        public static function render($" . "id = null, $" . "action = \"create\")
-        {
-            g::json_encode(['success' => true,
-                'form' => self::__renderForm(self::getFormData($" . "id, $" . "action),true),
-            ]);
-        }
-
-        public static function renderWidget($" . "id = null, $" . "action = \"create\")
-        {
-            Genesis::renderView(\"" . $name . ".formWidget\", self::getFormData($" . "id, $" . "action));
-        }
-        
+    public static function init(\\$ucfirstname \$$name, \$action = \"\"){
+        \$fb = new ".$ucfirstname."Form(\$$name, \$action);
+        \$fb->$name = \$$name;
+        return \$fb;
     }
+
+    public function buildForm()
+    {
+    
+        " . $field . "
+           
+        return  \$this;
+    
+    }
+
+    public static function renderWidget($" . "id = null, $" . "action = \"create\")
+    {
+        Genesis::renderView(\"" . $name . ".formWidget\", self::getFormData($" . "id, $" . "action));
+    }
+    
+}
     ";
         $entityform = fopen('Form/' . ucfirst($name) . 'Form.php', 'w');
         fputs($entityform, $contenu);

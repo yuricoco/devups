@@ -33,9 +33,11 @@ class Drequest {
 
     post(callback) {
         console.log(this);
-        console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
+        //console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
+        var keys = Object.keys(this._param);
+        var param = keys.length? "": "?"+ $.param(this._param);
         return $.ajax({
-            url: this.baseurl + this.url, //+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param),
+            url: this.baseurl + this.url+ param,
             data: this._data,
             cache: false,
             contentType: false,

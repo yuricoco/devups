@@ -3,44 +3,39 @@
 class Dvups_adminForm extends FormManager
 {
 
-    public static function formBuilder(\Dvups_admin $dvups_admin, $action = null, $button = false)
+    public $dvups_admin;
+
+    public static function init(\Dvups_admin $dvups_admin, $action = ""){
+        $fb = new Dvups_adminForm($dvups_admin, $action);
+        $fb->dvups_admin = $dvups_admin;
+        return $fb;
+    }
+
+    public function buildForm()
     {
-        //$entitycore = $dvups_admin->scan_entity_core();
-        $entitycore = new Core($dvups_admin);
 
-        $entitycore->formaction = $action;
-        $entitycore->formbutton = $button;
-
-
-        $entitycore->field['name'] = [
+        $this->fields['name'] = [
             "label" => 'Nom',
             "type" => FORMTYPE_TEXT,
             "directive" => ["require"=>true],
-            "value" => $dvups_admin->getName(),
+            "value" => $this->dvups_admin->getName(),
         ];
 
         // administrator, admin_central, agent_central, admin_center,  agent_center
 
         $dvups_roles = Dvups_role::allrows();
 
-        $entitycore->field['dvups_role'] = [
+        $this->fields['dvups_role'] = [
             "type" => FORMTYPE_RADIO,
-            "value" => $dvups_admin->dvups_role->getId(),
+            "value" => $this->dvups_admin->dvups_role->getId(),
             //"values" => FormManager::Options_Helper('name', $dvups_admin->getDvups_role()),
             "label" => 'Dvups_role',
             "options" => FormManager::Options_Helper('alias', $dvups_roles),
         ];
 
+        return  $this;
+        // return $this->renderForm();
 
-        //if($dvups_admin->getId())
-        $entitycore->addDformjs();
-
-        return $entitycore;
-    }
-
-    public static function __renderForm(\Dvups_admin $dvups_admin, $action = null, $button = false)
-    {
-        return FormFactory::__renderForm(Dvups_adminForm::formBuilder($dvups_admin, $action, $button));
     }
 
     public static function formBuilderImbricate(\Dvups_admin $dvups_admin, $action = null, $button = false)

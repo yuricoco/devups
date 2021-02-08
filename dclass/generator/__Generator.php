@@ -798,13 +798,13 @@ switch (Request::get('path')) {
             $name = strtolower($entity->name);
             $contenu .= "
         case '" . $name . "._new':
-                " . ucfirst($name) . "Form::render();
+                g::json_encode($" . $name . "Ctrl->formView());
                 break;
         case '" . $name . ".create':
                 g::json_encode($" . $name . "Ctrl->createAction());
                 break;
         case '" . $name . "._edit':
-                " . ucfirst($name) . "Form::render(R::get(\"id\"));
+                g::json_encode($" . $name . "Ctrl->formView(R::get(\"id\")));
                 break;
         case '" . $name . ".update':
                 g::json_encode($" . $name . "Ctrl->updateAction(R::get(\"id\")));

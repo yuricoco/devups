@@ -119,20 +119,6 @@ class Dvups_adminController extends Controller
             'detail' => 'detail de l\'action.');
     }
 
-    /**
-     * Data for creation form
-     * @Sequences: controller - genesis - ressource/view/form
-     * @return \Array
-     */
-    public function __newAction()
-    {
-
-        return array('success' => true, // pour le restservice
-            'dvups_admin' => new Dvups_admin(),
-            'action_form' => 'create', // pour le web service
-            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-    }
-
     public function createAction()
     {
         extract($_POST);
@@ -162,24 +148,6 @@ class Dvups_adminController extends Controller
             'redirect' => Dvups_admin::classpath() . 'dvups-admin/added?login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
-    }
-
-    /**
-     * Data for edit form
-     * @Sequences: controller - genesis - ressource/view/form
-     * @param type $id
-     * @return \Array
-     */
-    public function __editAction($id)
-    {
-        //$dvups_adminDao = new Dvups_adminDAO();
-        $dvups_admin = (new DBAL())->findByIdDbal(new Dvups_admin($id));
-        //$dvups_admin->collectDvups_role();
-
-        return array('success' => true, // pour le restservice
-            'dvups_admin' => $dvups_admin,
-            'action_form' => 'update&id=' . $id, // pour le web service
-            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
     }
 
     public function updateAction($id)
@@ -212,11 +180,13 @@ class Dvups_adminController extends Controller
         if ($id) {
             $action = Dvups_admin::classpath("services.php?path=dvups_admin.update&id=" . $id);
             $dvups_admin = Dvups_admin::find($id);
-            //$dvups_admin->collectDvups_role();
         }
 
         return ['success' => true,
-            'form' => Dvups_adminForm::__renderForm($dvups_admin, $action, true),
+            'form' => Dvups_adminForm::init($dvups_admin, $action)
+                ->buildForm()
+                ->addDformjs()
+                ->renderForm(),
         ];
     }
 
