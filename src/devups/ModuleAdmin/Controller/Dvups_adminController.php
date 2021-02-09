@@ -71,10 +71,11 @@ class Dvups_adminController extends Controller
         extract($_POST);
 
         $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
-        //dv_dump($login, $password, $admin);
-        if (!$admin->getId())
-            header("Location: " . __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
-
+        // dv_dump($login, $password, $admin);
+        if (!$admin->getId()) {
+            redirect(__env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
+            //header("Location: " . __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
+        }
         Dvups_roleController::getNavigationAction($admin);
         $_SESSION[ADMIN] = serialize($admin);
         //Local_contentController::buildlocalcachesinglelang($_POST['lang']);

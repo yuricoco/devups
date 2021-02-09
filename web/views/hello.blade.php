@@ -81,7 +81,7 @@
             <a href="#">Contribut</a>
             <a href="#">News</a>
             <a href="#">Forge</a>
-            <a href="#">GitHub</a>
+            <a href="{{route("contact")}}">Contact</a>
         </div>
     </div>
 </div>

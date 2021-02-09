@@ -30,6 +30,7 @@ function setlang($lang) {
 
 function redirect($url = "", $admin = false){
     header('location: '. $url );
+    die;
 }
 
 if(!isset($_SESSION["__lang"] )){
