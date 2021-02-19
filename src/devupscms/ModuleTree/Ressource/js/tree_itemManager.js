@@ -33,18 +33,17 @@ Vue.component("tree_itemForm", {
         update() {
             console.log(this.tree_item);
             //return ;
-            model._apipost('tree-item.update?id=' + this.tree_item.id,
-                JSON.stringify({
+            Drequest.api('tree-item.update?id=' + this.tree_item.id)
+                .data({
                     //"tree_item": model.entitytoformentity(this.tree_item)
                     "tree_item": this.tree_item
-                }),
-                response => {
-                    console.log(response);
-                    // this.tree_item = {};
-
-                    // $.notify("Categorié mise à jour avec succès!", "success");
-
-                }, false);
+                })
+                .raw(
+                    response => {
+                        console.log(response);
+                        this.tree_item = {};
+                        $.notify("mise à jour avec succès!", "success");
+                    });
         },
         createcontent() {
         }
@@ -218,13 +217,13 @@ Vue.component("childrenTree", {
     methods: {
 
         findchildren(el) {
+            Drequest.api("tree-item.lazyloading?dfilters=on&next=1&per_page=25&parent_id:eq=" + this.tree_item.id)
+                .get((response) => {
+                    console.log(response);
 
-            model._apiget("tree-item.lazyloading?dfilters=on&next=1&per_page=25&parent_id:eq=" + this.tree_item.id, (response) => {
-                console.log(response);
-
-                this.children = response.listEntity;
-                this.ll = response;
-            });
+                    this.children = response.listEntity;
+                    this.ll = response;
+                });
 
         },
         edit(el) {
@@ -239,14 +238,13 @@ Vue.component("childrenTree", {
                 this.children.forEach((item) => {
                     toupdate.push([item.id, item.position])
                 })
-
-                model._apipost("tree-item.order",
-                    JSON.stringify({
+                Drequest.api("tree-item.order")
+                    .data({
                         tree_items: toupdate
-                    }), (response) => {
-                        console.log(response);
-
                     })
+                    .raw((response) => {
+                        console.log(response);
+                    });
             }
             // this.$root.$emit("saveorder", this.$parent.children)
 
@@ -254,29 +252,31 @@ Vue.component("childrenTree", {
         changestatus(el, status) {
             el.status = status;
             console.log(el);
-            model._apiget("tree-item.changestatus&id=" + el.id + "&status=" + status, function (response) {
-                console.log(response);
-            });
+            Drequest.api("tree-item.changestatus&id=" + el.id + "&status=" + status)
+                .get(function (response) {
+                    console.log(response);
+                })
         },
         addcontent() {
 
-            model._apiget("tree-item.addcontent?id=" + this.tree_item.id, function (response) {
-                console.log(response);
-                window.location.href = response.redirect;
-            });
+            Drequest.api("tree-item.addcontent?id=" + this.tree_item.id)
+                .get(function (response) {
+                    console.log(response);
+                    window.location.href = response.redirect;
+                });
 
         },
         _delete(el, index) {
             // this.el =el;
-
-            model._apiget("tree-item.delete?id=" + this.tree_item.id, (response) => {
-                console.log(response);
-                if (this.$parent)
-                    this.$parent.tree_items.splice(index, 1)
-                else {
-                    this.$root.$emit("delete", index)
-                }
-            });
+            Drequest.api("tree-item.delete?id=" + this.tree_item.id)
+                .get((response) => {
+                    console.log(response);
+                    if (this.$parent)
+                        this.$parent.tree_items.splice(index, 1)
+                    else {
+                        this.$root.$emit("delete", index)
+                    }
+                })
 
         },
         move(position) {
@@ -611,10 +611,6 @@ var tree_itemview = new Vue({
             console.log(response);
             this.trees = response.listEntity;
         })
-        // model._apiget("tree.lazyloading", (response) => {
-        //     console.log(response);
-        //     this.trees = response.listEntity;
-        // })
 
         this.$root.$emit("saveorder", (tree_items) => {
 
@@ -634,7 +630,7 @@ var tree_itemview = new Vue({
             if (!confirm("confirmer la suppression?"))
                 return;
 
-            Drequest.api("tree.delete?id=" + id).get( (response) => {
+            Drequest.api("tree.delete?id=" + id).get((response) => {
                 console.log(response);
                 this.trees.slice(index, 1)
             });
@@ -651,10 +647,10 @@ var tree_itemview = new Vue({
                         "name": this.treeedit.name
                     }
                 })
-                .raw( (response) => {
-                console.log(response);
-                this.trees.push(response.tree)
-            });
+                .raw((response) => {
+                    console.log(response);
+                    this.trees.push(response.tree)
+                });
         },
 
         update(treeedit) {
@@ -662,8 +658,8 @@ var tree_itemview = new Vue({
                 return null;
 
             if (treeedit.id) {
-                Drequest.api("tree.update")
-                    .param({id: treeedit.id})
+                Drequest.api("tree.update?id="+treeedit.id)
+                    //.param({id: treeedit.id})
                     .data({
                         tree: {
                             "name": treeedit.name
@@ -672,13 +668,7 @@ var tree_itemview = new Vue({
                     .raw((response) => {
                         console.log(response);
                     });
-                /*model._apipost("tree.update?id=" + treeedit.id, JSON.stringify({
-                    tree: {
-                        "name": treeedit.name
-                    }
-                }), (response) => {
-                    console.log(response);
-                }, false);*/
+
             } else {
                 Drequest.api("tree.create")
                     .data({

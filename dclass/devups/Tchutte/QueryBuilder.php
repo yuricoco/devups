@@ -458,6 +458,26 @@ class QueryBuilder extends \DBAL
     public function whereMonth($column){
 
     }
+    private function handleObjectColumnOnWhereClause($column, $operator, $link = "and"){
+
+
+        $attrib = strtolower(get_class($column)) . '_id';
+        if ($this->defaultjoinsetted) {
+            $this->_where .= " " . $link . " " . strtolower(get_class($column)) . '.id';
+        }else
+            $this->_where .= " " . $link . " " . $attrib;
+
+        if ($column->getId()) {
+            if ($operator == "not") {
+                $this->_where .= " != :$attrib";
+            } else {
+                $this->_where .= " = :".$attrib;
+            }
+            $this->parameters[$attrib] = $column->getId();
+        } else {
+            $this->_where .= " is null ";
+        }
+    }
     /**
      * Add a basic where clause to the query.
      *
@@ -487,7 +507,8 @@ class QueryBuilder extends \DBAL
 
         if (is_object($column)) {
 
-            $attrib = strtolower(get_class($column)) . '_id';
+            $this->handleObjectColumnOnWhereClause($column, $operator, $link);
+            /*$attrib = strtolower(get_class($column)) . '_id';
             if ($this->defaultjoinsetted) {
                 $this->_where .= " " . $link . " " . strtolower(get_class($column)) . '.id';
             }else
@@ -502,7 +523,7 @@ class QueryBuilder extends \DBAL
                 $this->parameters[$attrib] = $column->getId();
             } else {
                 $this->_where .= " is null ";
-            }
+            }*/
         }
         elseif (is_array($column)) {
             if (is_array($operator)) {
@@ -518,7 +539,14 @@ class QueryBuilder extends \DBAL
             }*/
             else {
                 foreach ($column as $key => $value) {
-                    $this->andwhere($key, "=", $value);
+                    if(is_object($value)) {
+                        //$this->handleObjectColumnOnWhereClause($value, "=", "and");
+                        if(is_string($key))
+                            $this->andwhere($key."_id", "=", $value->getId());
+                        else
+                            $this->andwhere($value);
+                    }else
+                        $this->andwhere($key, "=", $value);
                 }
             }
         }
@@ -660,6 +688,21 @@ class QueryBuilder extends \DBAL
 
     public function limit($start = 1, $max = null)
     {
+        if ($start < 0) {
+            $qb = $this;
+            $i = (int)$start;
+            $nbel = $qb->__countEl();
+            if($nbel + $i > 0) {
+
+                //$i += $nbel;
+                $this->_where .= " limit " . ($nbel + $i) . ", " . abs($nbel);
+                // return $qb->select()->limit($i - 1, $i)->__getOne($recursif, $collect);
+                return $this;
+            }
+            $start = 0;
+            $max = $nbel;
+        }
+
         if ($max)
             $this->_where .= " limit " . $start . ", " . $max;
         else

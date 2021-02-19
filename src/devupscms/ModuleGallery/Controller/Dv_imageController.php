@@ -52,13 +52,13 @@ class Dv_imageController extends Controller{
 
         $scanpage = new Dv_image();
         $scanpage->setUploaddir("gallery/");
-        $id = $scanpage->__insert();
         $result = $scanpage->uploadImage("image");
+        $id = $scanpage->__insert();
 
         if(!is_null($result))
             return $result;
 
-        $id = $scanpage->__update();
+        //$id = $scanpage->__update();
         return 	array(	'success' => true,
             'dv_image' => $scanpage,
             'tablerow' => Dv_imageTable::init()->router()->getSingleRowRest($scanpage),

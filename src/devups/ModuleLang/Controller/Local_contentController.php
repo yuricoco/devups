@@ -199,7 +199,7 @@ class Local_contentController extends Controller
         $lang = DClass\lib\Util::local();
 
         if (!file_exists(self::$path . $lang . ".json")) {
-            writein(self::$path . $lang . ".json", "");
+            \DClass\lib\Util::writein(self::$path . $lang . ".json", "");
             self::buildlocalcache();
         }
 

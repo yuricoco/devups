@@ -74,6 +74,7 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
     {
         $ti = self::mainmenu("position")->andwhere("this.name", $ref)->__firstOrNull();
         if (!$ti) {
+            $tree = Tree::where("name", "position")->__getOne();
             if (!Tree::where("name", "position")->count()) {
                 $tree = new Tree();
                 $tree->setName("position");
@@ -240,7 +241,16 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
         return self::select()
             ->where("this.parent_id", $this->id)
             //->andwhere("this.id", "!=", $category->getId())
-            ->orderby("this.name")
+            ->orderby("this.position")
+            ->__getAll();
+    }
+
+    public static function childrenOf(string $slug)
+    {
+        return self::select()
+            ->where("this.parent_id")
+            ->in(" select id from tree_item where slug = '$slug' ")
+            ->orderby("this.position")
             ->__getAll();
     }
 

@@ -27,7 +27,7 @@
     <!-- Google Fonts -->
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans' type='text/css'>
 
-    <?php foreach (\dclass\devups\Controller\Controller::$cssfiles as $cssfile){ ?>
+    <?php foreach (App::$cssfiles as $cssfile){ ?>
     <link href="<?= $cssfile ?>" rel="stylesheet">
     <?php } ?>
 

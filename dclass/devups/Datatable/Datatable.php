@@ -1065,14 +1065,15 @@ EOF;
         }
         //return $cvlot;
         if (!$column) {
-            echo "</$el></div></div>";
-            return;
+            echo "</$el>";
+            //return;
         }
 
         if (count($cvlot) != 0 && count($cvlot) < $column) {
             //$collection[] = $cvlot;
             echo "<div class='row'>" . implode("", $cvlot) . "</div>";
         }
+        echo "</div></div>";
 
     }
 

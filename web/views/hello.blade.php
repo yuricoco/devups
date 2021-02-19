@@ -11,6 +11,11 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Raleway:100,600" rel="stylesheet" type="text/css">
 <!-- Styles -->
+
+    <?php foreach (App::$cssfiles as $cssfile){ ?>
+    <link href="<?= $cssfile ?>" rel="stylesheet">
+    <?php } ?>
+
     <style>
         html, body {
             background-color: #fff;
@@ -86,5 +91,8 @@
     </div>
 </div>
 
+<?php foreach (App::$jsfiles as $cssfile){ ?>
+<script src="<?= $cssfile ?>"></script>
+<?php } ?>
 </body>
 </html>

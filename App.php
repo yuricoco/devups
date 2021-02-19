@@ -16,17 +16,18 @@ class App extends \dclass\devups\Controller\FrontController
     public function __construct()
     {
 
-        (new Request('hello'));
-        Request::Route($this, Request::get('path'));
-
-//        self::$jsfiles["jsimport"] = [];
-//        self::$cssfiles["cssimport"] = [];
-
         self::$jsfiles[] = CLASSJS . "devups.js";
         self::$jsfiles[] = CLASSJS . "model.js";
         self::$jsfiles[] = CLASSJS . "ddatatable.js";
         self::$jsfiles[] = CLASSJS . "dform.js";
         self::$cssfiles[] = assets . "css/dv_style.css";
+        self::$cssfiles[] = assets . "css/stylesheet.css";
+
+        (new Request('hello'));
+        Request::Route($this, Request::get('path'));
+
+//        self::$jsfiles["jsimport"] = [];
+//        self::$cssfiles["cssimport"] = [];
 
     }
 
