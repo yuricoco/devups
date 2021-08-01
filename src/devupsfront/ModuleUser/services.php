@@ -12,12 +12,38 @@
         header("Access-Control-Allow-Origin: *");
                 
 
+		$addressCtrl = new AddressController();
 		$userCtrl = new UserController();
 		
      (new Request('hello'));
 
      switch (R::get('path')) {
                 
+        case 'address._new':
+                AddressForm::renderadmin();
+                break;
+        case 'address.create':
+                g::json_encode($addressCtrl->createAction());
+                break;
+        case 'address._edit':
+                AddressForm::renderadmin(R::get("id"));
+                break;
+        case 'address.update':
+                g::json_encode($addressCtrl->updateAction(R::get("id")));
+                break;
+        case 'address._show':
+                $addressCtrl->detailView(R::get("id"));
+                break;
+        case 'address._delete':
+                g::json_encode($addressCtrl->deleteAction(R::get("id")));
+                break;
+        case 'address._deletegroup':
+                g::json_encode($addressCtrl->deletegroupAction(R::get("ids")));
+                break;
+        case 'address.datatable':
+                g::json_encode($addressCtrl->datatable(R::get('next'), R::get('per_page')));
+                break;
+
         case 'user._new':
                 UserForm::render();
                 break;

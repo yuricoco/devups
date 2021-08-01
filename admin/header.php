@@ -17,11 +17,15 @@ require __DIR__ . '/../config/dependanceInjection.php';
 require __DIR__ . '/../lang.php';
 require __DIR__ . '/../src/requires.php';
 
+Request::$system = "admin";
+
 define('VENDOR', __env . 'admin/vendors/');
 define('assets', __env . 'admin/assets/');
 
 define('__cssversion', '1');
 define('__jsversion', '1');
+
+Dvups_adminController::restartsessionAction();
 
 (new Request('dashboard'));
 if ($path = Request::get("dvpath")) {
@@ -39,7 +43,7 @@ if ($path = Request::get("dvpath")) {
             $classname = ucfirst(Request::get("classname"));
             $entity = new $classname;
             $entity->exportCsv($classname); //,
-            $message = $classname . ": Core generated with success";
+            $message = $classname . ": CSV generated with success";
 //            Genesis::json_encode([
 //                "message"=>$message
 //            ]);
@@ -64,7 +68,7 @@ if ($path = Request::get("dvpath")) {
 
 // move comment scope to enable authentication
 if (!isset($_SESSION[ADMIN]) and Request::get('path') != 'connexion') {
-
+    //$token = sha1(\DClass\lib\Util::randomcode());
     header("location: " . __env . 'admin/login.php');
 
 }

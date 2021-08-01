@@ -17,10 +17,10 @@
                     <div class="">
                         <img src="{{$dv_image->srcImage('150_')}}" />
                     </div>
+                    {{$dv_image->getId()}} - {{$dv_image->getImage()}}
                 </div>
                 <div class="widget-content-right">
                     <div class="widget-numbers text-success">
-
                     </div>
                 </div>
             </div>

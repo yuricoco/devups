@@ -329,7 +329,7 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'ctrl' => true, 'form' => false, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false, ['entity' => false, 'table' => false, 'frontctrl' => true, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
     }
 
     /**
@@ -373,7 +373,19 @@ Usage:
 
         $ns = explode("\\", $namespace);
         $entity = __Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__entity($entity, $project, false, ['entity' => true, 'table' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
+        __Generator::__entity($entity, $project, false,
+            ['entity' => true, 'table' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
+    }
+    /**
+     *
+     * @param type $namespace
+     */
+    public static function entityLang($namespace, $project) {
+
+        $ns = explode("\\", $namespace);
+        $entity = __Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::__entity($entity, $project, false,
+            ['lang' => true, 'entity' => false, 'table' => false, 'ctrl' => false, 'form' => false, 'genes' => false, 'views' => false]);
     }
 
     /**
@@ -414,7 +426,7 @@ Usage:
      * 
      * @param type $namespace
      */
-    private static function __entity($entity, $project, $setdependance = false, $crud = ['entity' => true, 'table' => true, 'ctrl' => true, 'form' => true, 'views' => false, 'detailwidget' => false]) {
+    private static function __entity($entity, $project, $setdependance = false, $crud = ['lang' => true, 'entity' => true, 'table' => true, 'ctrl' => true, 'form' => true, 'views' => false, 'detailwidget' => false]) {
 
         $backend = new BackendGenerator();
         $frontend = new AdminTemplateGenerator();
@@ -427,12 +439,17 @@ Usage:
 
         $entity->attribut = (array) $entity->attribut;
 
-
         if ($crud['entity'])
             $backend->entityGenerator($entity);
 
+        if (isset($crud['lang']) && $crud['lang'])
+            $backend->entityLangGenerator($entity);
+
         if ($crud['ctrl'])
-            $backend->controllerGenerator($entity, $project->listmodule);
+            $backend->controllerGenerator($entity);
+
+        if (isset($crud['frontctrl']))
+            $backend->controllerGenerator($entity, true);
 
         if ($crud['table'])
             $backend->tableGenerator($entity, $project->listmodule);
@@ -594,7 +611,7 @@ Usage:
     require 'Form/" . $name . "Form.php';
     require 'Datatable/" . $name . "Table.php';
     require 'Controller/" . $name . "Controller.php';
-    require 'Controller/" . $name . "FrontController.php';\n";
+    //require 'Controller/" . $name . "FrontController.php';\n";
 
         }
 

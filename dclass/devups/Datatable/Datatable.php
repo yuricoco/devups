@@ -10,6 +10,7 @@ namespace dclass\devups\Datatable;
 
 use dclass\devups\Datatable\TableRow;
 use DClass\lib\Util;
+use Request;
 
 /**
  * Description of Datatable
@@ -151,13 +152,13 @@ class Datatable extends Lazyloading
 
     }
 
-    public static function buildtable($lazyloading, $header)
+    /*public static function buildtable($lazyloading, $header)
     {
 
         $datatable = new Datatable($lazyloading, $header);
         return $datatable;
 
-    }
+    }*/
 
     public function Qb(\QueryBuilder $qb)
     {
@@ -216,10 +217,10 @@ class Datatable extends Lazyloading
       <i class="fa fa-angle-down"></i> options
     </button>
     <div class="dropdown-menu text-left" aria-labelledby="btnGroupDrop1">
-        <button type="button" class="dv_export_csv btn btn-default btn-block" >
+        <button data-entity="'.$this->class.'" type="button" class="dv_export_csv btn btn-default btn-block" >
             <i class="fa fa-arrow-down"></i> Export csv
         </button>
-        <button type="button" class="dv_import_csv btn btn-default btn-block" >
+        <button data-entity="'.$this->class.'" type="button" class="dv_import_csv btn btn-default btn-block" >
             <i class="fa fa-arrow-up"></i> Import csv
         </button>
     </div>
@@ -484,6 +485,7 @@ class Datatable extends Lazyloading
         if ($this->enabletopaction)
             $headaction = $this->top_action();
 
+        $groupaction = "";
         if ($this->groupaction) {
             $groupaction = $this->groupactionbuilder();
         }
@@ -571,6 +573,7 @@ EOF;
 
         return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dataTables_wrapper dt-bootstrap4" >' . $html . '</div>
 ' . $this->dialogBox();
+
     }
 
     public function dialogBox()
@@ -633,9 +636,9 @@ EOF;
         return $this;
     }
 
-    public function enablegroupaction()
+    public function enablegroupaction($enable = true)
     {
-        $this->groupaction = true;
+        $this->groupaction = $enable;
         return $this;
     }
 
@@ -860,7 +863,12 @@ EOF;
             $this->classname = strtolower(get_class($entity));
             return $this->buildCustomView($entity);
         }
-        return $this->tablebodybuilder();
+
+        return [
+            'row' => $this->tablebodybuilder(),
+            'tablepagination' => $this->paginationbuilder()
+        ];
+        //return $this->tablebodybuilder();
 
     }
 
@@ -957,7 +965,8 @@ EOF;
 //                }
 
                 if ($valuetd["order"]) {
-                    $thforder = '<div class="torder"><i onclick="ddatatable.orderasc(\'orderjoin=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'orderjoin=' . $value . '\')" class="fa fa-angle-down"></i></div>';
+                    $thforder = 'orderjoin=' . $value ;
+                    //$thforder = '<div class="torder"><i onclick="ddatatable.orderasc(\'orderjoin=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'orderjoin=' . $value . '\')" class="fa fa-angle-down"></i></div>';
                 }
                 //$fields[] = str_replace(".", "-", $value) . ":join";
             } else {
@@ -972,13 +981,17 @@ EOF;
                     $thfvalue = '<input name="' . $thisfield . '" placeholder="' . $valuetd['header'] . '" value="" class="search-field form-control" >';
 
                 if ($valuetd["order"])
-                    $thforder = '<div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
+                    $thforder = 'order=' . $value;
+                //$thforder = '<div class="torder"><i onclick="ddatatable.orderasc(\'order=' . $value . '\')" class="fa fa-angle-up"></i> <i onclick="ddatatable.orderdesc(\'order=' . $value . '\')" class="fa fa-angle-down"></i></div>';
 
                 //$fields[] = $value . ":attr";
             }
             $thf[] = '<th >' . $thfvalue . '</th>';
 
-            $th[] = '<th>' . $valuetd['header'] . $thforder . '</th>';
+            if($valuetd["order"])
+                $th[] = '<th  onclick="ddatatable.toggleorder(\'' . $this->class . '\', \'' . $thforder . '\')" >' . $valuetd['header'] . ' <i class="fa fa-arrow-up" ></i><i class="fa fa-arrow-down" ></i></th>';
+            else
+                $th[] = '<th >' . $valuetd['header'] . ' </th>';
 
         }
 
@@ -989,7 +1002,7 @@ EOF;
             if ($this->enablecolumnaction)
                 $thf[] = '<th>'//<input name="path" value="' . $_GET['path'] . '" hidden >
                     . '<input name="dfilters" value="on" hidden >' //' . implode(",", $fields) . '
-                    . '<button onclick="ddatatable.search(this)" class="' . $this->btnsearch_class . '" >search</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
+                    . '<button onclick="ddatatable.search(\''.$this->classname.'\', this)" class="' . $this->btnsearch_class . '" >search</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
 
             return ["th" => '<tr>' . implode(" ", $th) . '</tr>',
                 "thf" => '<tr class="th-filter">' . implode(" ", $thf) . '</tr>'];
@@ -1000,6 +1013,7 @@ EOF;
     }
 
     public $template = "";
+    public $viewdata = [];
 
     private function buildCustomView($entity)
     {
@@ -1009,10 +1023,10 @@ EOF;
         $customrowaction = $this->buildCustomAction($entity);
 
         return \Genesis::getView($this->template, [
-            $this->classname => $entity,
-            "defaultactions" => $this->defaultaction,
-            "customactions" => $this->customactions,
-        ]);
+                $this->classname => $entity,
+                "defaultactions" => $this->defaultaction,
+                "customactions" => $this->customactions,
+            ]+$this->viewdata);
     }
 
     public function renderCustomBody($el = "", $directive = [], $column = null)
@@ -1064,10 +1078,10 @@ EOF;
 
         }
         //return $cvlot;
-        if (!$column) {
-            echo "</$el>";
-            //return;
-        }
+        //if (!$column) {
+        echo "</$el>";
+        //return;
+        //}
 
         if (count($cvlot) != 0 && count($cvlot) < $column) {
             //$collection[] = $cvlot;
@@ -1321,9 +1335,27 @@ EOF;
          * customaction are use at that moment.
          */
 
-        if (is_string($action))
+        if (is_string($action) || is_callable($action))
             $this->customactions[] = $action;
+
         return $this;
+    }
+
+    /**
+     * @return false|mixed|Datatable
+     */
+    public function router()
+    {
+        $tablemodel = Request::get("tablemodel");
+        if (method_exists($this, "build" . $tablemodel . "table") && $result = call_user_func(array($this, "build" . $tablemodel . "table"))) {
+            return $result;
+        } else
+            switch ($tablemodel) {
+
+                default:
+                    return $this->buildindextable();
+            }
+
     }
 
 }

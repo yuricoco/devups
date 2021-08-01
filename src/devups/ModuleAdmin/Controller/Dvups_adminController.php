@@ -60,22 +60,59 @@ class Dvups_adminController extends Controller
         unset($_SESSION[dv_role_permission]);
         unset($_SESSION[dv_role_navigation]);
         //session_destroy();
+
+        if (isset($_COOKIE[ADMIN])) {
+            \DClass\lib\Util::clearcookie(ADMIN);
+            \DClass\lib\Util::clearcookie(ADMIN."_login");
+            \DClass\lib\Util::clearcookie(ADMIN."_pwd");
+        }
+
         redirect( route('admin/login.php'));
+    }
+
+    public static function initSession(\User $user, $remember_me = null){
+
+    }
+
+    static function restartsessionAction()
+    {
+
+        if (!isset($_COOKIE[ADMIN]) || !isset($_COOKIE[ADMIN."_login"])  || !isset($_COOKIE[ADMIN."_pwd"]) )
+            return 0;
+
+        if(isset($_SESSION[ADMIN]))
+            return 0;
+
+        //$dbal = new DBAL(new User());
+        //$user = $dbal->findOneElementWhereXisY(['user.email', 'user.devupspwd'], [$_COOKIE[USERMAIL], $_COOKIE[USERPASS]]);
+
+        $admin = Dvups_admin::where("this.login", $_COOKIE[ADMIN."_login"])
+            ->andwhere('this.password', $_COOKIE[ADMIN."_pwd"])
+            ->__getOne();
+        if ($admin->getId()) {
+
+            Dvups_roleController::getNavigationAction($admin);
+            $_SESSION[ADMIN] = serialize($admin);
+            return 1;
+            //header("location: " . __env ."/admin". $url);
+        } else {
+            redirect(route("admin/"));
+        }
+        die;
     }
 
     public function connexionAction($login = "", $password = "")
     {
         if (!isset($_POST['login']) and $_POST['login'] != '' and !isset($_POST['password'])) {
-            header("Location: " . __env . "admin/login.php?error=Entré le login et le mot de passe.");
+            redirect( __env . "admin/login.php?error=Entré le login et le mot de passe.");
         }
         extract($_POST);
 
         $admin = Dvups_admin::select()->where('login', $login)->andwhere('password', sha1($password))->__getOne();
-        // dv_dump($login, $password, $admin);
-        if (!$admin->getId()) {
-            redirect(__env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
-            //header("Location: " . __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
-        }
+        //dv_dump($login, $password, $admin);
+        if (!$admin->getId())
+            redirect( __env . "admin/login.php?err=" . 'Login ou mot de passe incorrect.');
+
         Dvups_roleController::getNavigationAction($admin);
         $_SESSION[ADMIN] = serialize($admin);
         //Local_contentController::buildlocalcachesinglelang($_POST['lang']);
@@ -84,11 +121,17 @@ class Dvups_adminController extends Controller
         $admin->__update(["lastlogin_at"=> date("Y-m-d H:i:s")]);
 
         if ($admin->getFirstconnexion()) {
-
-            header("location: " . Dvups_admin::classpath() . "dvups-admin/complete-registration?id=" . $admin->getId());
-
+            redirect(Dvups_admin::classpath() . "dvups-admin/complete-registration?id=" . $admin->getId());
             return;
         }
+
+        if (isset($remember_me)) {
+            //set cookie
+            \DClass\lib\Util::setcookie(ADMIN, 1);
+            \DClass\lib\Util::setcookie(ADMIN."_login", $admin->getLogin());
+            \DClass\lib\Util::setcookie(ADMIN."_pwd", $admin->getPassword());
+        }
+
         //return array('success' => false, "err" => 'Login ou mot de passe incorrect.');
 
         //$admin->collectDvups_role();
@@ -96,7 +139,7 @@ class Dvups_adminController extends Controller
         $_SESSION[CSRFTOKEN] = serialize($admin);
         //$_SESSION[LANG] = $_POST['lang'];
 
-        header("location: " . __env . "admin/");
+        redirect(__env . "admin/");
 
 //        return array('success' => true,
 //            'url' => 'index.php',
@@ -118,6 +161,20 @@ class Dvups_adminController extends Controller
             //'url' => 'index.php?path=dvups_admin/show&id='.$id,
             'dvups_admin' => $dvups_admin,
             'detail' => 'detail de l\'action.');
+    }
+
+    /**
+     * Data for creation form
+     * @Sequences: controller - genesis - ressource/view/form
+     * @return \Array
+     */
+    public function __newAction()
+    {
+
+        return array('success' => true, // pour le restservice
+            'dvups_admin' => new Dvups_admin(),
+            'action_form' => 'create', // pour le web service
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
     }
 
     public function createAction()
@@ -151,6 +208,24 @@ class Dvups_adminController extends Controller
 
     }
 
+    /**
+     * Data for edit form
+     * @Sequences: controller - genesis - ressource/view/form
+     * @param type $id
+     * @return \Array
+     */
+    public function __editAction($id)
+    {
+        //$dvups_adminDao = new Dvups_adminDAO();
+        $dvups_admin = (new DBAL())->findByIdDbal(new Dvups_admin($id));
+        //$dvups_admin->collectDvups_role();
+
+        return array('success' => true, // pour le restservice
+            'dvups_admin' => $dvups_admin,
+            'action_form' => 'update&id=' . $id, // pour le web service
+            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
+    }
+
     public function updateAction($id)
     {
         extract($_POST);
@@ -181,13 +256,11 @@ class Dvups_adminController extends Controller
         if ($id) {
             $action = Dvups_admin::classpath("services.php?path=dvups_admin.update&id=" . $id);
             $dvups_admin = Dvups_admin::find($id);
+            //$dvups_admin->collectDvups_role();
         }
 
         return ['success' => true,
-            'form' => Dvups_adminForm::init($dvups_admin, $action)
-                ->buildForm()
-                ->addDformjs()
-                ->renderForm(),
+            'form' => Dvups_adminForm::__renderForm($dvups_admin, $action, true),
         ];
     }
 

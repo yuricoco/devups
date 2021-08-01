@@ -59,6 +59,7 @@ var model = {
         if (server)
             model.modalboxcontainer.html('<div style="height: 150px; text-align: center; padding: 5%">Loading ...</div>');
         model.modalbox.css('display', "inline-flex");
+        model.modalbox.find(".swal2-modal").css('display', "inline-flex");
     },
     _dismissmodal: function (empty = true) {
         // model.modalbody.html("");
@@ -66,6 +67,7 @@ var model = {
         if (empty)
             model.modalboxcontainer.html('');
         model.modalbox.css('display', "none");
+        model.modalbox.find(".swal2-modal").css('display', "none");
         this.init();
     },
     entity: null,
@@ -79,7 +81,7 @@ var model = {
         }*/
 
         this._showmodal();
-        model.request(this.entity + "._new")
+        model.request(this.entity + "._new"+ddatatable.urlparam)
             //.param({path: this.entity + "._new"})
             .get(function (response) {
                 console.log(response)

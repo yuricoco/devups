@@ -13,18 +13,29 @@ use Request;
 
 class Lazyloading implements \JsonSerializable
 {
-    protected $success = true;
-    protected $classname = "";
-    protected $listentities = [];
-    protected $listentity = [];
-    protected $nb_element = 0;
-    protected $per_page = 30;
-    protected $pagination = 1;
-    protected $current_page = 1;
-    protected $next = 1;
-    protected $previous = 0;
-    protected $remain = 0;
-    protected $detail = 0;
+    public $success = true;
+    public $classname = "";
+    public $listentities = [];
+    public $listentity = [];
+    public $nb_element = 0;
+    public $per_page = 30;
+    public $pagination = 1;
+    public $current_page = 1;
+    public $next = 1;
+    public $previous = 0;
+    public $remain = 0;
+    public $detail = 0;
+
+    public function setPerPage($page)
+    {
+        $this->per_page = $page;
+        return $this;
+    }
+    public function setNext($next)
+    {
+        $this->next = $next;
+        return $this;
+    }
 
     public function lazyloading2($listEntity, $classname = "")
     {
@@ -77,6 +88,12 @@ class Lazyloading implements \JsonSerializable
             case "lkl":
                 $this->currentqb->andwhere($attr)->_like($value);
                 break;
+            case "isNull":
+                $this->currentqb->andwhere($attr)->isNull();
+                break;
+            case "notNull":
+                $this->currentqb->andwhere($attr)->isNotNull();
+                break;
             case "btw":
                 // todo : add constraint of integrity
                 $btw = explode('_', $value);
@@ -89,17 +106,18 @@ class Lazyloading implements \JsonSerializable
 
     }
 
-    public function extractXJoin($join, $attr){
+    public function extractXJoin($join, $attr)
+    {
         //$value = '[This] is a [test] string, [eat] my [shorts].';
 //        preg_match_all("/\<([^\>]*)\>/", $value, $matches);
 //        $join = $matches[1][0];
 //        $this->currentqb->leftjoin($join);
 //        return str_replace($matches[0][0], "", $value);
         //$pos = strpos($value, "<");
-        if(strpos($join, "<") !== false){
+        if (strpos($join, "<") !== false) {
             $lj = explode("<", $join);
             $this->currentqb->leftjoin($lj[0], $lj[1]);
-            return str_replace("<".$lj[1], "", $attr);
+            return str_replace("<" . $lj[1], "", $attr);
         }
         return $attr;
     }
@@ -136,7 +154,58 @@ class Lazyloading implements \JsonSerializable
         // return (new Controller())->lazyloading($entity, $this->next, $this->per_page, $qbcustom, $order);
     }
 
+    public $qb;
     const maxpagination = 12;
+    protected $render_query = false;
+    public  $debug = false;
+
+    // for retro compatibility
+    public function renderQuery(){
+        $this->render_query = true;
+        $this->debug = true;
+        return $this;
+    }
+    private $entity;
+    public function __construct($entity = null, $qbcustom = null)
+    {
+        if($entity) {
+            $this->entity = $entity;
+            $classname = strtolower(get_class($entity));
+            $this->classname = $classname;
+            $this->class = $classname;
+        }
+    }
+
+    public function sortBy($attr, $sort = "ASC"){
+
+    }
+    private $qbcustom;
+    private $dfilters;
+    public function start(\QueryBuilder $qbcustom = null){
+        $this->dfilters = Request::get("dfilters", false);
+        if($this->dfilters == "on")
+            $this->dfilters = true;
+
+        if ($qbcustom != null) {
+
+            if ($this->dfilters)
+                $qbcustom = $this->filter($this->entity, $qbcustom);
+
+            $this->nb_element = $qbcustom->__countEl(false, false); //false
+        } else {
+            $qb = new QueryBuilder($this->entity);
+            if ($this->dfilters) {
+
+                $qbcustom = $this->filter($this->entity, $qb);
+                $this->nb_element = $qbcustom->__countEl(false, true);
+            } else {
+                //$qb->handlesoftdelete();
+                $this->nb_element = $qb->selectcount()->handlesoftdelete()->count();
+            }
+        }
+        $this->qbcustom = $qbcustom;
+        return $this;
+    }
 
     /***
      * @param \stdClass $entity the instance of the entity
@@ -144,50 +213,59 @@ class Lazyloading implements \JsonSerializable
      * @param int $this ->per_page the number of element per page
      * @param \QueryBuilder|null $qbcustom if the developer want to customise the request
      * @param string $order
-     * @return void
+     * @return int | $this
      */
-    public function lazyloading(\stdClass $entity, \QueryBuilder $qbcustom = null, $order = "")
+    public function lazyloading(\stdClass $entity = null, \QueryBuilder $qbcustom = null, $order = "")
     {//
-        $remain = true;
-        $qb = new QueryBuilder($entity);
-        $classname = strtolower(get_class($entity));
+        if($entity){
+            $this->entity = $entity;
+            $classname = strtolower(get_class($entity));
+            $this->classname = $classname;
+            $this->class = $classname;
+            $this->start($qbcustom);
+        }
+
+        if($qbcustom)
+            $this->qbcustom = $qbcustom;
+
+        $qbcustom = $this->qbcustom;
+
         if (Request::get("next") && Request::get('per_page')) {
             extract(Request::$uri_get_param);
             $this->next = $next;
             $this->per_page = $per_page;
         }
 
-        if (Request::get('order')) {
-            $order = Request::get('order');
-            if ($entity->inrelation())
-                $order = $classname . "." . $order;//$_GET['order'];
-        } elseif (Request::get('orderjoin'))
-            $order = strtolower(Request::get('orderjoin'));
-
-
-        if ($qbcustom != null) {
-
-            if (Request::get("dfilters"))
-                $qbcustom = $this->filter($entity, $qbcustom);
-
-            $nb_element = $qbcustom->__countEl(false, false); //false
-        } else {
-
-            if (Request::get("dfilters")) {
-
-                $qbcustom = $this->filter($entity, $qb);
-                $nb_element = $qbcustom->__countEl(false, true);
-            } else {
-                //$qb->handlesoftdelete();
-                $nb_element = $qb->selectcount()->handlesoftdelete()->__countEl(false);
+        if (Request::get('dcount'))
+            return $this;
+        if ($dsum = Request::get('dsum')) {
+            if ($qbcustom != null)
+                $this->nb_element = $qbcustom->sum($dsum);
+            else{
+                $qb = new QueryBuilder($this->entity);
+                $this->nb_element = $qb->sum($dsum);
             }
+            return $this;
         }
 
+        if (Request::get('dsort')) {
+            $order = Request::get('dsort');
+//            if ($this->entity->inrelation())
+//                $order = $this->classname . "." . $order;//$_GET['order'];
+        } elseif (Request::get('dsortjoin'))
+            $order = strtolower(Request::get('dsortjoin'));
+
+        $remain = true;
+        $nb_element = $this->nb_element;
         if ($this->per_page != "all") {
             if (!($nb_element % $this->per_page)) {
                 $pagination = $nb_element / $this->per_page;
             } else {
                 $pagination = intval($nb_element / $this->per_page) + 1;
+            }
+
+            if ($this->next == "last_page") {
+                $this->next = $pagination;
             }
 
             if ($this->next > 0) {
@@ -199,16 +277,21 @@ class Lazyloading implements \JsonSerializable
 
             if ($qbcustom != null) {
 
-                if ($order) {
-                    $listEntity = $qbcustom->orderby($order)->limit($this->next, $this->per_page)->__getAll();
+                if (Request::get("drand") == 1) {
+                    $qbcustom->select()->handlesoftdelete()->rand()->limit($this->next, $this->per_page);
+                }elseif ($order) {
+                    $qbcustom->orderby($order)->limit($this->next, $this->per_page);
                 } else
-                    $listEntity = $qbcustom->limit($this->next, $this->per_page)->__getAll();
+                    $qbcustom->limit($this->next, $this->per_page);
 
             } else {
-                if ($order)
-                    $listEntity = $qb->select()->handlesoftdelete()->orderby($order)->limit($this->next, $this->per_page)->__getAll();
+                $qb = new QueryBuilder($this->entity);
+                if (Request::get("drand") == 1) {
+                    $qb->select()->handlesoftdelete()->rand()->limit($this->next, $this->per_page);
+                }elseif ($order)
+                    $qb->select()->handlesoftdelete()->orderby($order)->limit($this->next, $this->per_page);
                 else
-                    $listEntity = $qb->select()->handlesoftdelete()->limit($this->next, $this->per_page)->__getAll();
+                    $qb->select()->handlesoftdelete()->limit($this->next, $this->per_page);
 
             }
 
@@ -223,21 +306,36 @@ class Lazyloading implements \JsonSerializable
             $page = 1;
             $remain = 0;
             if ($qbcustom != null) {
-                if ($order) {
-                    $listEntity = $qbcustom->orderby($order)->__getAll();
-                } else {
-                    $listEntity = $qbcustom->__getAll();
+                if (Request::get("drand") == 1) {
+                    $qbcustom->select()->handlesoftdelete()->rand();
+                }elseif ($order) {
+                    $qbcustom->orderby($order);
                 }
+                /*else {
+                    $qbcustom;
+                }*/
             } else {
+                $qb = new QueryBuilder($this->entity);
                 //$qb->handlesoftdelete();
-                if ($order) {
-                    $listEntity = $qb->select()->handlesoftdelete()->orderby($order)->__getAll();
+                if (Request::get("drand") == 1) {
+                    $qb->select()->handlesoftdelete()->rand();
+                }elseif ($order) {
+                    $qb->select()->handlesoftdelete()->orderby($order);
                 } else {
-                    $listEntity = $qb->select()->handlesoftdelete()->__getAll();
+                    $qb->select()->handlesoftdelete();
                 }
             }
             $this->per_page = $nb_element;
         }
+
+        if($this->debug)
+            return $qbcustom ? $qbcustom->getSqlQuery() : $qb->getSqlQuery();
+
+        if ($qbcustom != null)
+            $listEntity = $qbcustom->get();
+        else
+            $listEntity = $qb->get();
+
 
         $paginationcustom = [];
         if ($pagination >= self::maxpagination) {
@@ -276,8 +374,6 @@ class Lazyloading implements \JsonSerializable
             }
         }
 
-        $this->classname = $classname;
-        $this->class = $classname;
         $this->listentity = $listEntity;
         $this->nb_element = $nb_element;
         $this->pagination = $pagination;
@@ -286,6 +382,8 @@ class Lazyloading implements \JsonSerializable
         $this->previous = (int)$page - 1;
         $this->next += 1;
         $this->remain = (int)$remain;
+
+        return $this;
 
     }
 
@@ -301,13 +399,13 @@ class Lazyloading implements \JsonSerializable
         return array('success' => true, // pour le restservice
             'classname' => $this->classname,
             'listEntity' => $this->listentity,
-            'nb_element' => $this->nb_element,
-            'per_page' => $this->per_page,
-            'pagination' => $this->pagination,
-            'current_page' => $this->current_page,
-            'next' => $this->next,
-            'previous' => $this->previous,
-            'remain' => $this->remain,
+            'nb_element' => (int)$this->nb_element,
+            'per_page' => (int)$this->per_page,
+            'pagination' => (int)$this->pagination,
+            'current_page' => (int)$this->current_page,
+            'next' => (int)$this->next,
+            'previous' => (int)$this->previous,
+            'remain' => (int)$this->remain,
             'detail' => $this->detail);
     }
 

@@ -14,7 +14,7 @@
 class QueryBuilder extends \DBAL
 {
 
-//    private $table;    
+//    private $table;
     private $query = "";
     private $sequence = "";
     private $parameters = [];
@@ -458,26 +458,6 @@ class QueryBuilder extends \DBAL
     public function whereMonth($column){
 
     }
-    private function handleObjectColumnOnWhereClause($column, $operator, $link = "and"){
-
-
-        $attrib = strtolower(get_class($column)) . '_id';
-        if ($this->defaultjoinsetted) {
-            $this->_where .= " " . $link . " " . strtolower(get_class($column)) . '.id';
-        }else
-            $this->_where .= " " . $link . " " . $attrib;
-
-        if ($column->getId()) {
-            if ($operator == "not") {
-                $this->_where .= " != :$attrib";
-            } else {
-                $this->_where .= " = :".$attrib;
-            }
-            $this->parameters[$attrib] = $column->getId();
-        } else {
-            $this->_where .= " is null ";
-        }
-    }
     /**
      * Add a basic where clause to the query.
      *
@@ -493,6 +473,8 @@ class QueryBuilder extends \DBAL
 //
 //        }
 //        $this->columns = is_array($columns) ? $columns : func_get_args();
+        if($this->initwhereclause && $link == "where")
+            $link = "and";
 
         if ($this->softdelete && $link == "where") {
 //            if($pos = strpos($sql, " where "))
@@ -507,8 +489,7 @@ class QueryBuilder extends \DBAL
 
         if (is_object($column)) {
 
-            $this->handleObjectColumnOnWhereClause($column, $operator, $link);
-            /*$attrib = strtolower(get_class($column)) . '_id';
+            $attrib = strtolower(get_class($column)) . '_id';
             if ($this->defaultjoinsetted) {
                 $this->_where .= " " . $link . " " . strtolower(get_class($column)) . '.id';
             }else
@@ -523,7 +504,7 @@ class QueryBuilder extends \DBAL
                 $this->parameters[$attrib] = $column->getId();
             } else {
                 $this->_where .= " is null ";
-            }*/
+            }
         }
         elseif (is_array($column)) {
             if (is_array($operator)) {
@@ -539,14 +520,7 @@ class QueryBuilder extends \DBAL
             }*/
             else {
                 foreach ($column as $key => $value) {
-                    if(is_object($value)) {
-                        //$this->handleObjectColumnOnWhereClause($value, "=", "and");
-                        if(is_string($key))
-                            $this->andwhere($key."_id", "=", $value->getId());
-                        else
-                            $this->andwhere($value);
-                    }else
-                        $this->andwhere($key, "=", $value);
+                    $this->andwhere($key, "=", $value);
                 }
             }
         }
@@ -628,8 +602,9 @@ class QueryBuilder extends \DBAL
      */
     public function in($values)
     {
-        if (is_array($values))
-            $this->_where .= " in (" . implode(",", $values) . ")";
+        if (is_array($values)) {
+            $this->_where .= " in (" . implode(",", array_map("qb_sanitize", $values)) . ")";
+        }
         else
             $this->_where .= " in ( $values )";
 
@@ -642,6 +617,19 @@ class QueryBuilder extends \DBAL
             $this->_where .= " not in (" . implode(",", $values) . ")";
         else
             $this->_where .= " not in ( $values )";
+
+        return $this;
+    }
+
+    public function isNull()
+    {
+        $this->_where .= " IS NULL ";
+
+        return $this;
+    }
+    public function isNotNull()
+    {
+        $this->_where .= " IS NOT NULL ";
 
         return $this;
     }
@@ -683,6 +671,12 @@ class QueryBuilder extends \DBAL
     public function orderby($critere)
     {
         $this->_where .= " order by " . $critere;
+        return $this;
+    }
+
+    public function rand()
+    {
+        $this->_where .= " order by RAND() ";
         return $this;
     }
 
@@ -794,6 +788,12 @@ class QueryBuilder extends \DBAL
         $this->setCollect($collect);
         return $this->limit(1)->__getOne($recursif);
     }
+
+    /**
+     * @param bool $recursif
+     * @param array $collect
+     * @return type|null
+     */
     public function __firstOrNull($recursif = true, $collect = [])
     {
         $model = $this->__first($recursif, $collect);
@@ -907,6 +907,22 @@ class QueryBuilder extends \DBAL
         endif;
 
         return $this->__count($this->querysanitize($this->initquery($this->columnscount) . $this->defaultjoin . $this->query.$this->_where), $this->parameters, false, $recursif);
+    }
+
+    /**
+     *
+     * @param string $order
+     * @return \dclass\devups\Datatable\Lazyloading
+     */
+    public function lazyloading($order = "", $debug = false)
+    {
+        $ll = new \dclass\devups\Datatable\Lazyloading($this->object);
+        $ll->start($this->object);
+        if ($debug)
+            return $ll->renderQuery()->lazyloading($this->object, $this, $order);
+
+        return $ll->lazyloading($this->object, $this, $order);
+
     }
 
 }

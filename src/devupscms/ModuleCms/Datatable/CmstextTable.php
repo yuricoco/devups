@@ -21,17 +21,16 @@ class CmstextTable extends Datatable
         return $dt;
     }
 
-    public function buildhometable()
+    public function buildarticletable()
     {
 
-//        global $viewdir, $moduledata;
-//        $viewdir[] = Cmstext::classroot("") . '/Resource/views';
+        $this->template = "_partial.post_item_comment";
 
-        $this->template = "_partial.blog_item";
-
+        $this->table_class = "";
         $this->base_url = __env;
 
-        $this->per_page = 3;
+        $this->qbcustom = Cmstext::getActiveCmstext();
+        $this->per_page = 12;
         $this->order_by = " this.id desc ";
         return $this;
 
@@ -45,7 +44,7 @@ class CmstextTable extends Datatable
         $this->datatablemodel = [
             ['header' => t('cmstext.titre', 'Titre'), 'value' => 'title'],
             ['header' => t('cmstext.reference', 'Reference'), 'value' => 'slug'],
-            ['header' => t('cmstext.lang', 'Lang'), 'value' => 'lang'],
+            ['header' => t('Active'), 'value' => 'active'],
         ];
 
         return $this;
@@ -57,7 +56,6 @@ class CmstextTable extends Datatable
             ['label' => t('cmstext.titre'), 'value' => 'titre'],
             ['label' => t('cmstext.reference'), 'value' => 'reference'],
             ['label' => t('cmstext.content'), 'value' => 'content'],
-            ['label' => t('cmstext.lang'), 'value' => 'lang'],
             ['label' => t('cmstext.creationdate'), 'value' => 'creationdate']
         ];
         // TODO: overwrite datatable attribute for this view

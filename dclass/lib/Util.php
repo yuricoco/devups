@@ -111,12 +111,12 @@ class Util
     /**
      * @param mixed
      */
-    public static function randomcode()
+    public static function randomcode($length = 8)
     {
-        $list = "0123456789abcdefghijklmnopqrstvwxyz+-@%";
+        $list = "0123456789abcdefghijklmnopqrstvwxyzABCDEFGHIJKLMNOPQRSTVWXYZ+-@%*$";
         mt_srand((double)microtime() * 1000000);
         $password = "";
-        while (strlen($password) < 8) {
+        while (strlen($password) < $length) {
             $password .= $list[mt_rand(0, strlen($list) - 1)];
         }
         return $password;
@@ -142,8 +142,19 @@ class Util
         $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str); // pour les ligatures e.g. '&oelig;'
         $str = preg_replace('#&[^;]+;#', '', $str); // supprime les autres caractères
         $str = str_replace(' ', '-', $str); // supprime les autres caractères
+        $str = str_replace(',', '', $str); // supprime les autres caractères
+        $str = str_replace('\'', '', $str); // supprime les autres caractères
 
         return strtolower($str);
+    }
+
+    public static function setcookie($key, $value)
+    {
+        setcookie($key, $value, time() + 365 * 24 * 3600, null, null, false, true); // On écrit un cookie
+    }
+    public static function clearcookie($key)
+    {
+        setcookie($key, null, -1, null, null, false, true);
     }
 
 }

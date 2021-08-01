@@ -35,8 +35,6 @@ class Form extends FormFactory{
             $formdirective[] = $key ."='" . $value ."'";
         }
 
-        //return "<form id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
-        // onsubmit=\"return dform._submit(this, '".Form::$name."/$action' )\"
         return "<form action='" . $action . "' id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
 
     }
@@ -49,8 +47,9 @@ class Form extends FormFactory{
 
 //        $_SESSION[Form::$name ] = Form::$fields;
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
-        $dvups_form = "<textarea style='display:none;' name='dvups_form[".Form::$name."]' >".json_encode(Form::$fields)."</textarea>";
-        return $dvups_form."</form>";
+//        $dvups_form = "<textarea style='display:none;' name='dvups_form[".Form::$name."]' >".json_encode(Form::$fields)."</textarea>";
+//        return $dvups_form."</form>";
+        return "</form>";
     }
 
     public static function imbricate($enitty) {
@@ -61,12 +60,12 @@ class Form extends FormFactory{
 
     public static function closeimbricate() {
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
-        $dvups_form = "<textarea style='display: none' name='dvups_form[".Form::$name."]' >".json_encode(Form::$fields)."</textarea>";
+        //$dvups_form = "<textarea style='display: none' name='dvups_form[".Form::$name."]' >".json_encode(Form::$fields)."</textarea>";
 
         Form::$name = Form::$savestate[0];
         //Form::$fields = Form::$savestate[1];
 
-        return $dvups_form;
+        return "" ; //$dvups_form;
     }
 
     public static function addDevupsjs(){
@@ -87,7 +86,7 @@ class Form extends FormFactory{
     }
 
     public static function addcss($css){
-        return "<link href='$css.css?v="._cssversion."' rel='stylesheet' />";
+        return "<link href='$css.css?v=".__cssversion."' rel='stylesheet' />";
     }
 
     public static function submit($name = "submit", $directive = []) {
@@ -116,7 +115,7 @@ class Form extends FormFactory{
 
     }
 
-    public static function checkbox($name, $options, $values, $directive = [], $setter = "", $callback = null) {
+    public static function checkbox($name, $options, $values, $directive = [], $setter = [], $callback = null) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -132,7 +131,7 @@ class Form extends FormFactory{
 
     }
 
-    public static function textarea($name, $value, $directive = [], $setter = "") {
+    public static function textarea($name, $value, $directive = [], $setter = []) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -144,7 +143,7 @@ class Form extends FormFactory{
 
     }
 
-    public static function select($name, $options, $value, $directive = [], $setter = "") {
+    public static function select($name, $options, $value, $directive = [], $setter = []) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -161,7 +160,7 @@ class Form extends FormFactory{
 
     }
 
-    public static function file($name, $value, $directive = [], $filetype = "image", $setter = "") {
+    public static function file($name, $value, $directive = [], $filetype = "image", $setter = []) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -212,7 +211,7 @@ class Form extends FormFactory{
         return Form::$name."_form[".$name.']';
     }
 
-    public static function input($name, $value, $directive = [], $type = FORMTYPE_TEXT, $setter = "") {
+    public static function input($name, $value, $directive = [], $type = FORMTYPE_TEXT, $setter = []) {
 
         FormFactory::$fieldname = Form::fieldnamesanitize($name);
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -250,12 +249,12 @@ class Form extends FormFactory{
     /**
      * @return mixed
      */
-    public static function number($name, $value, $directive = [], $setter = "")
+    public static function number($name, $value, $directive = [], $setter = [])
     {
         return self::input($name, $value, $directive, FORMTYPE_NUMBER, $setter);
     }
 
-    public static function email($name, $value, $directive = [], $setter = "") {
+    public static function email($name, $value, $directive = [], $setter = []) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -268,7 +267,7 @@ class Form extends FormFactory{
 
     }
 
-    public static function password($name, $value, $directive = [], $setter = "") {
+    public static function password($name, $value, $directive = [], $setter = []) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -283,13 +282,10 @@ class Form extends FormFactory{
 
     private static function inputfield($name, $value, $setter) {
 
-        if(!$setter)
-            $setter = $name;
+        if(!isset($setter["setter"]))
+            $setter["setter"] = $name;
 
-        Form::$fields[$name] = [
-            //"value" => $value,
-            "setter" => $setter
-        ];
+        Form::$fields[$name] = $setter;
 
     }
 

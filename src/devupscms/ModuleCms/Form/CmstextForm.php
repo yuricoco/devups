@@ -74,6 +74,7 @@ class CmstextForm extends FormManager
                 'success' => true,
                 'cmstext' => $cmstext,
                 'tree_item' => $tree_item,
+                'api' => Cmstext::classpath("services.php?path=cmstext.create"),
                 'action' => Cmstext::classpath("cmstext/create"),
             ];
         endif;
@@ -83,6 +84,7 @@ class CmstextForm extends FormManager
             'success' => true,
             'tree_item' => $tree_item,
             'cmstext' => $cmstext,
+            'api' => Cmstext::classpath("services.php?path=cmstext.update&id=".$cmstext->getId()),
             'action' => Cmstext::classpath("cmstext/update?id=") . $id,
         ];
 

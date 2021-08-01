@@ -123,7 +123,7 @@ class Dvups_roleController extends Controller
                 'action' => 'create',
                 'error' => $this->error);
         }
-
+        //return compact("dvups_role", "dvups_role_form");
         $id = $dvups_role->__insert();
         return array('success' => true, // pour le restservice
             'dvups_role' => $dvups_role,

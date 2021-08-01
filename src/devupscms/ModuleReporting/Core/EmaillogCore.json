@@ -1,0 +1,1 @@
+{"id":9,"name":"emaillog","module":{"id":4},"attribut":{"1":{"name":"object","visibility":"","datatype":"string","size":"255","nullable":"not","formtype":"text","$$hashKey":"object:3521"},"3":{"name":"log","visibility":"","datatype":"text","size":"","nullable":"default","formtype":"text","$$hashKey":"object:3577"}},"relation":[],"$$hashKey":"object:1362"}

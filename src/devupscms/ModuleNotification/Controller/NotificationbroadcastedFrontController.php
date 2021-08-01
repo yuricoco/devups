@@ -4,25 +4,14 @@
 class NotificationbroadcastedFrontController extends NotificationbroadcastedController{
 
     public function ll($next = 1, $per_page = 10){
-
-            return $this->lazyloading(new Notificationbroadcasted(), $next, $per_page);
-
-    }
-
-    public function listView($next = 1, $per_page = 10){
-
-        $lazyloading = $this->lazyloading(new Notificationbroadcasted(), $next, $per_page, null, " this.id desc ");
-
-        self::$jsfiles[] = Notificationbroadcasted::classpath('Ressource/js/notificationbroadcastedCtrl.js');
-
-        $this->entitytarget = 'Notificationbroadcasted';
-        $this->title = "Manage Notificationbroadcasted";
-
-        return $this->renderListView(NotificationbroadcastedTable::init($lazyloading)->buildindexfronttable(), true);
+        
+            $ll = new Lazyloading();
+            $ll->lazyloading(new Notificationbroadcasted());
+            return $ll;
 
     }
 
-    public function createAction($notificationbroadcasted_form = null){
+    public function createAction($notificationbroadcasted_form = null ){
         $rawdata = \Request::raw();
         $notificationbroadcasted = $this->hydrateWithJson(new Notificationbroadcasted(), $rawdata["notificationbroadcasted"]);
  

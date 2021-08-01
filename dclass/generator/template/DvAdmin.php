@@ -23,14 +23,14 @@ class DvAdmin
         foreach ($entity->attribut as $attribut) {
             if ($attribut->formtype == 'image') {
 //                $listview[] = "'src:" . $attribut->name . "'";
-                $listview[] = "\n['label' => t('" . $entity->name . "." . $attribut->name . "'), 'value' => 'src:" . $attribut->name . "']";
+                $listview[] = "\n['label' => t('" . $attribut->name . "'), 'value' => 'src:" . $attribut->name . "']";
 //                        }elseif($entity->attribut[$i]->formtype == 'document'){
 //                        }elseif($entity->attribut[$i]->formtype == 'document'){
 //                        }elseif($entity->attribut[$i]->formtype == 'document'){
-                $listview[] = "\n['label' => t('" . $entity->name . "." . $attribut->name . "'), 'value' => 'src:" . $attribut->name . "']";
-                $listview[] = "\n['label' => t('" . $entity->name . "." . $attribut->name . "'), 'value' => '" . $attribut->name . "']";
+                $listview[] = "\n['label' => t('" . $attribut->name . "'), 'value' => 'src:" . $attribut->name . "']";
+                $listview[] = "\n['label' => t('" . $attribut->name . "'), 'value' => '" . $attribut->name . "']";
             } else {
-                $listview[] = "\n['label' => t('" . $entity->name . "." . $attribut->name . "'), 'value' => '" . $attribut->name . "']";
+                $listview[] = "\n['label' => t('" . $attribut->name . "'), 'value' => '" . $attribut->name . "']";
 //                $listview[] = "'" . $attribut->name . "'";
             }
         }
@@ -54,7 +54,7 @@ class DvAdmin
                     $entitylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $listview[] = "\n['label' => t('entity." . $relation->entity . "'), 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
+                $listview[] = "\n['label' => t('" . $relation->entity . "'), 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
 
             }
         }
@@ -71,10 +71,11 @@ class DvAdmin
         $listview[] = "\n['header' => t('" . $entity->name . ".id', '#'), 'value' => 'id']";
         foreach ($entity->attribut as $attribut) {
             if ($attribut->formtype == 'image') {
-                $listview[] = "\n['header' => t('" . $entity->name . "." . $attribut->name . "', '" . ucfirst($attribut->name) . "'), 'value' => 'src:" . $attribut->name . "']";
-                $listview[] = "\n['header' => t('" . $entity->name . "." . $attribut->name . "', '" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
+                // '" . $entity->name . "." . $attribut->name . "',
+                $listview[] = "\n['header' => t('" . ucfirst($attribut->name) . "'), 'value' => 'src:" . $attribut->name . "']";
+                $listview[] = "\n['header' => t('" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
             } else {
-                $listview[] = "\n['header' => t('" . $entity->name . "." . $attribut->name . "', '" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
+                $listview[] = "\n['header' => t('" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
             }
         }
 
@@ -98,7 +99,7 @@ class DvAdmin
                     $entitylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $listview[] = "\n['header' => t('entity." . $relation->entity . "', '" . $entrel . "') , 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
+                $listview[] = "\n['header' => t('" . $entrel . "') , 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
             }
         }
 

@@ -1,44 +1,84 @@
-<?php 
-        // user \dclass\devups\model\Model;
+<?php
+// user \dclass\devups\model\Model;
+
+/**
+ * @Entity @Table(name="imagecms")
+ * */
+class Imagecms extends Model implements JsonSerializable
+{
+
     /**
-     * @Entity @Table(name="imagecms")
+     * @Id @GeneratedValue @Column(type="integer")
+     * @var int
      * */
-    class Imagecms extends Model implements JsonSerializable{
+    protected $id;
+    /**
+     * OneToOne
+     * @ManyToOne(targetEntity="\Dv_image")
+     * @JoinColumn(onDelete="cascade")
+     * @var \Dv_image
+     */
+    public $image;
+    /**
+     * OneToOne
+     * @ManyToOne(targetEntity="\Cmstext")
+     * @JoinColumn(onDelete="cascade")
+     * @var \Cmstext
+     */
+    public $cmstext;
 
-        /**
-         * @Id @GeneratedValue @Column(type="integer")
-         * @var int
-         * */
-        protected $id;
-        /**
-         * @Column(name="width_size", type="string" , length=255 )
-         * @var string
-         **/
-        protected $width_size;
+    public function __construct($id = null)
+    {
 
-        public function __construct($id = null){
-            
-                if( $id ) { $this->id = $id; }   
-                          
-}
+        if ($id) {
+            $this->id = $id;
+        }
+        $this->cmstext = new Cmstext();
+        $this->image = new Dv_image();
+    }
 
-        public function getId() {
-            return $this->id;
-        }
-        public function getWidth_size() {
-            return $this->width_size;
-        }
+    public function getId()
+    {
+        return $this->id;
+    }
 
-        public function setWidth_size($width_size) {
-            $this->width_size = $width_size;
-        }
-        
-        
-        public function jsonSerialize() {
-                return [
-                        'id' => $this->id,
-                                'width_size' => $this->width_size,
-                ];
-        }
-        
+    /**
+     * @return Dv_image
+     */
+    public function getImage(): Dv_image
+    {
+        return $this->image->__show();
+    }
+
+    /**
+     * @param Dv_image $image
+     */
+    public function setImage(Dv_image $image): void
+    {
+        $this->image = $image;
+    }
+
+    /**
+     * @return Cmstext
+     */
+    public function getCmstext(): Cmstext
+    {
+        return $this->cmstext;
+    }
+
+    /**
+     * @param Cmstext $cmstext
+     */
+    public function setCmstext(Cmstext $cmstext): void
+    {
+        $this->cmstext = $cmstext;
+    }
+
+    public function jsonSerialize()
+    {
+        return [
+            'id' => $this->id,
+        ];
+    }
+
 }

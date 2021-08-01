@@ -54,8 +54,9 @@ function url_format($str, $charset='utf-8')
     $str = preg_replace('#&([A-za-z]{2})(?:lig);#', '\1', $str); // pour les ligatures e.g. '&oelig;'
     $str = preg_replace('#&[^;]+;#', '', $str); // supprime les autres caractères
     $str = str_replace(' ', '-', $str); // supprime les autres caractères
+    $str = str_replace('+', '', $str); // supprime les autres caractères
 
-    return '/' .strtolower($str);
+    return strtolower($str);
 }
 
 function remove_accents($str, $charset='utf-8')
@@ -96,7 +97,10 @@ function setadmin($id) {
 function d_url($path, $id = "", $title = "") {
     global $__lang;
 
-    $path = $__lang . $path;
+    if(Request::$system != "admin") {
+        $lang = local();
+        $path = $lang . "/" . $path;
+    }
     if ($id) {
         $path .= "/" . $id;
     }
@@ -118,11 +122,18 @@ function route($path, $id = "", $title = "") {
 }
 
 function dv_dump(... $args){
-    echo json_encode($args);
-
+    //echo json_encode($args);
+    var_dump($args);
     die(1);
 }
 
 function randomtoken(){
     $randomtoken = base64_encode( openssl_random_pseudo_bytes(32));
+}
+
+function qb_sanitize($value){
+    if(is_string($value))
+        return "'$value'";
+
+    return $value;
 }

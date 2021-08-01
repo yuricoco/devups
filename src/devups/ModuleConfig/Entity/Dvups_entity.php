@@ -12,6 +12,11 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
      * */
     protected $id;
 
+    /**
+     * @Column(name="enablenotification", type="integer")
+     * @var string
+     **/
+    protected $enablenotification = 0;
 
     /**
      * @ManyToOne(targetEntity="\Dvups_module")
@@ -165,6 +170,7 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
         $dbal->executeDbal($sql);
 
     }
+
     public function countRow()
     {
         if(!$this->exist())
@@ -173,8 +179,15 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
         return ucfirst($this->getLabel())::count();
     }
 
-    public static function menu() {
+    public static function menu()
+    {
         return self::where("name", "menu");
+    }
+
+    public function alert()
+    {
+        if ($this->enablenotification == 1)
+            return Notificationbroadcasted::of($this->name);
     }
 
 }

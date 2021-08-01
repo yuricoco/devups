@@ -1,0 +1,40 @@
+{
+  "name": "ModuleDatabase",
+  "project": "devups",
+  "id": 5,
+  "listentity": [
+    {
+      "attribut": [
+        {
+          "name": "id",
+          "designation": "",
+          "visibility": "",
+          "datatype": "integer",
+          "size": "",
+          "nullable": "not",
+          "formtype": "",
+          "comment": ""
+        },
+        {
+          "name": "query",
+          "designation": "",
+          "visibility": "",
+          "datatype": "text",
+          "size": "",
+          "nullable": "not",
+          "formtype": "text",
+          "comment": ""
+        }
+      ],
+      "relation": [],
+      "name": "request_history",
+      "id": 1,
+      "module": {
+        "id": 5,
+        "name": "ModuleDatabase"
+      },
+      "relations": []
+    }
+  ],
+  "currentIndex": 0
+}

@@ -38,11 +38,17 @@
                 <div class="input-holder">
                     <input type="text" class="search-input" placeholder="Type to search">
                     <button class="search-icon"><span></span></button>
+
                 </div>
                 <button class="close"></button>
             </div>
             <ul class="header-menu nav">
-
+                <li>
+                    <a href="{{__env}}" target="_blank">
+                        <i class="fa fa-share"></i>
+                        aller sur le site
+                    </a>
+                </li>
             </ul>
         </div>
         <div class="app-header-right">

@@ -1,0 +1,38 @@
+{
+  "id": 8,
+  "name": "notificationtype",
+  "mowdule": {
+    "id": 2
+  },
+  "ref": null,
+  "attribut": {
+    "1": {
+      "name": "_key",
+      "visibility": "",
+      "datatype": "string",
+      "size": "55",
+      "nullable": "not",
+      "formtype": "text",
+      "$$hashKey": "object:3258"
+    },
+    "2": {
+      "name": "content",
+      "visibility": "",
+      "datatype": "integer",
+      "size": "",
+      "nullable": "not",
+      "formtype": "text",
+      "$$hashKey": "object:3286"
+    }
+  },
+  "relation": [
+    {
+      "entity": "dvups_entity",
+      "cardinality": "manyToOne",
+      "nullable": "default",
+      "ondelete": "cascade",
+      "onupdate": "cascade"
+    }
+  ],
+  "$$hashKey": "object:1361"
+}

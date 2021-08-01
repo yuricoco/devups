@@ -11,6 +11,9 @@ use Request as R;
 
 header("Access-Control-Allow-Origin: *");
 
+global $viewdir, $moduledata;
+$viewdir[] = __DIR__ . '/Ressource/views';
+
 
 $cmstextCtrl = new CmstextController();
 $imagecmsCtrl = new ImagecmsController();
@@ -27,6 +30,9 @@ switch (R::get('path')) {
         break;
     case 'cmstext._edit':
         CmstextForm::render(R::get("id"));
+        break;
+    case 'cmstext/update':
+        g::json_encode($cmstextCtrl->updateAction(R::get("id")));
         break;
     case 'cmstext.update':
         g::json_encode($cmstextCtrl->updateAction(R::get("id")));
@@ -54,13 +60,13 @@ switch (R::get('path')) {
         break;
 
     case 'imagecms._new':
-        ImagecmsForm::render();
+        ImagecmsForm::renderWidget();
         break;
     case 'imagecms.create':
         g::json_encode($imagecmsCtrl->createAction());
         break;
     case 'imagecms._edit':
-        ImagecmsForm::render(R::get("id"));
+        ImagecmsForm::renderWidget(R::get("id"));
         break;
     case 'imagecms.update':
         g::json_encode($imagecmsCtrl->updateAction(R::get("id")));

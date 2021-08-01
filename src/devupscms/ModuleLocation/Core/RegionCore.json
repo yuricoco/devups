@@ -1,0 +1,1 @@
+{"id":473,"name":"region","attribut":{"2":{"name":"name","nullable":"not","size":"255","formtype":"text","datatype":"string"}},"relation":[{"entity":"country","cardinality":"manyToOne","nullable":"default","ondelete":"cascade","onupdate":"cascade"}],"module":{"id":5}}

@@ -7,41 +7,58 @@ class Local_content_keyController extends Controller{
 
     public function listView($next = 1, $per_page = 10){
 
-            $lazyloading = $this->lazyloading(new Local_content_key(), $next, $per_page);
+        $this->datatable = Local_content_keyTable::init(new Local_content_key())->buildindextable();
 
-        self::$jsfiles[] = Local_content_key::classpath('Ressource/js/local_content_keyCtrl.js');
+        self::$jsfiles[] = Local_content_key::classpath('Resource/js/local_content_keyCtrl.js');
 
         $this->entitytarget = 'Local_content_key';
         $this->title = "Manage Local_content_key";
         
-        $this->renderListView(Local_content_keyTable::init($lazyloading)->buildindextable()->render());
+        $this->renderListView();
 
     }
 
     public function datatable($next, $per_page) {
-        $lazyloading = $this->lazyloading(new Local_content_key(), $next, $per_page);
+    
         return ['success' => true,
-            'datatable' => Local_content_keyTable::init($lazyloading)->buildindextable()->getTableRest(),
+            'datatable' => Local_content_keyTable::init(new Local_content_key())->router()->getTableRest(),
+        ];
+        
+    }
+
+    public function formView($id = null)
+    {
+        $local_content_key = new Local_content_key();
+        $action = Local_content_key::classpath("services.php?path=local_content_key.create");
+        if ($id) {
+            $action = Local_content_key::classpath("services.php?path=local_content_key.update&id=" . $id);
+            $local_content_key = Local_content_key::find($id);
+        }
+
+        return ['success' => true,
+            'form' => Local_content_keyForm::init($local_content_key, $action)
+                ->buildForm()
+                ->addDformjs()
+                ->renderForm(),
         ];
     }
 
-    public function createAction($local_content_key_form = null){
+    public function createAction($local_content_key_form = null ){
         extract($_POST);
 
         $local_content_key = $this->form_fillingentity(new Local_content_key(), $local_content_key_form);
- 
-
         if ( $this->error ) {
             return 	array(	'success' => false,
                             'local_content_key' => $local_content_key,
                             'action' => 'create', 
                             'error' => $this->error);
-        }
+        } 
         
+
         $id = $local_content_key->__insert();
         return 	array(	'success' => true,
                         'local_content_key' => $local_content_key,
-                        'tablerow' => Local_content_keyTable::init()->buildindextable()->getSingleRowRest($local_content_key),
+                        'tablerow' => Local_content_keyTable::init()->router()->getSingleRowRest($local_content_key),
                         'detail' => '');
 
     }
@@ -50,8 +67,7 @@ class Local_content_keyController extends Controller{
         extract($_POST);
             
         $local_content_key = $this->form_fillingentity(new Local_content_key($id), $local_content_key_form);
-
-                    
+     
         if ( $this->error ) {
             return 	array(	'success' => false,
                             'local_content_key' => $local_content_key,
@@ -62,7 +78,7 @@ class Local_content_keyController extends Controller{
         $local_content_key->__update();
         return 	array(	'success' => true,
                         'local_content_key' => $local_content_key,
-                        'tablerow' => Local_content_keyTable::init()->buildindextable()->getSingleRowRest($local_content_key),
+                        'tablerow' => Local_content_keyTable::init()->router()->getSingleRowRest($local_content_key),
                         'detail' => '');
                         
     }
@@ -85,8 +101,9 @@ class Local_content_keyController extends Controller{
     }
     
     public function deleteAction($id){
-      
-            Local_content_key::delete($id);
+    
+        Local_content_key::delete($id);
+        
         return 	array(	'success' => true, 
                         'detail' => ''); 
     }
@@ -95,7 +112,7 @@ class Local_content_keyController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Local_content_key::delete()->where("id")->in($ids)->exec();
+        Local_content_key::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

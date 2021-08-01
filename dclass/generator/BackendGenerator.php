@@ -1,8 +1,10 @@
 <?php
 
-class BackendGenerator {
+class BackendGenerator
+{
 
-    public function entityGenerator($entity) {
+    public function entityGenerator($entity)
+    {
 
         $name = strtolower($entity->name);
 
@@ -34,23 +36,23 @@ class BackendGenerator {
                 if ($relation->cardinality == 'manyToMany') {
 
                     $manytomany = [
-                        "name" => $name."_".$relation->entity,
+                        "name" => $name . "_" . $relation->entity,
                         "ref" => null,
                         "attribut" => [],
                         "relation" => [
                             [
-                            "entity" => $relation->entity,
-                            "cardinality" => "manyToOne",
-                            "nullable" => "not",
-                            "ondelete" => "cascade",
-                            "onupdate" => "cascade"
+                                "entity" => $relation->entity,
+                                "cardinality" => "manyToOne",
+                                "nullable" => "not",
+                                "ondelete" => "cascade",
+                                "onupdate" => "cascade"
                             ],
                             [
-                            "entity" => $name,
-                            "cardinality" => "manyToOne",
-                            "nullable" => "not",
-                            "ondelete" => "cascade",
-                            "onupdate" => "cascade"
+                                "entity" => $name,
+                                "cardinality" => "manyToOne",
+                                "nullable" => "not",
+                                "ondelete" => "cascade",
+                                "onupdate" => "cascade"
                             ],
                         ]
                     ];
@@ -64,7 +66,7 @@ class BackendGenerator {
          */
         public $" . $relation->entity . ";\n";
 
-                $method .= "
+                    $method .= "
         /**
          *  " . $relation->cardinality . "
          *	@return " . $antislash . ucfirst($relation->entity) . "
@@ -87,7 +89,7 @@ class BackendGenerator {
         }
         
                         ";
-                } elseif ($relation->cardinality == 'oneToOne' ) { // or $relation->nullable == 'DEFAULT'
+                } elseif ($relation->cardinality == 'oneToOne') { // or $relation->nullable == 'DEFAULT'
 
                     $construteur .= "\n\t$" . "this->" . $relation->entity . " = new " . ucfirst($relation->entity) . "();";
 
@@ -95,18 +97,18 @@ class BackendGenerator {
         /**
          * " . ucfirst($relation->cardinality) . "
          * @ManyToOne(targetEntity=\"" . $antislash . ucfirst($relation->entity) . "\")
-         * @JoinColumn(onDelete=\"".$relation->ondelete."\")
+         * @JoinColumn(onDelete=\"" . $relation->ondelete . "\")
          * @var " . $antislash . ucfirst($relation->entity) . "
          */
         public $" . $relation->entity . ";\n";
 
-                $method .= "
+                    $method .= "
         /**
          *  " . $relation->cardinality . "
          *	@return " . $antislash . ucfirst($relation->entity) . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            $" . "this->". $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
+            $" . "this->" . $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -125,13 +127,13 @@ class BackendGenerator {
          */
         public $" . $relation->entity . ";\n";
 
-                $method .= "
+                    $method .= "
         /**
          *  " . $relation->cardinality . "
          *	@return " . $antislash . ucfirst($relation->entity) . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            $" . "this->". $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
+            $" . "this->" . $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -159,7 +161,7 @@ class BackendGenerator {
 
         foreach ($entity->attribut as $attribut) {
 
-            if($attribut->name == "id")
+            if ($attribut->name == "id")
                 continue;
 
             $length = "";
@@ -167,9 +169,9 @@ class BackendGenerator {
 
             if (in_array($attribut->formtype, ["radio", "checkbox", "select"])) {
                 $staticenum = [];
-                if(isset($attribut->enum)){
-                    foreach ($attribut->enum as $key => $enum){
-                        if(is_string($enum))
+                if (isset($attribut->enum)) {
+                    foreach ($attribut->enum as $key => $enum) {
+                        if (is_string($enum))
                             $staticenum[] = "'$enum'";
                         else
                             $staticenum[] = $enum;
@@ -179,7 +181,7 @@ class BackendGenerator {
 
                 $construt .= "
         /* enum */
-        public static $" . $attribut->name. "s = [".implode(",", $staticenum)."];";
+        public static $" . $attribut->name . "s = [" . implode(",", $staticenum) . "];";
 
             }
 
@@ -214,27 +216,27 @@ class BackendGenerator {
         if ($otherattrib) {
             foreach ($entity->attribut as $attribut) {
 
-                if($attribut->name == "id")
+                if ($attribut->name == "id")
                     continue;
 
                 if (in_array($attribut->formtype, ['document', 'image', 'music', 'video'])) {
                     $construt .= "
                         
-        public function upload" . ucfirst($attribut->name) . "($"."file = '" . $attribut->name . "') {
-            $"."dfile = self::Dfile($"."file);
-            if(!$"."dfile->errornofile){
+        public function upload" . ucfirst($attribut->name) . "($" . "file = '" . $attribut->name . "') {
+            $" . "dfile = self::Dfile($" . "file);
+            if(!$" . "dfile->errornofile){
             
-                $"."filedir = '" . $name . "/';
-                $"."url = $"."dfile
-                    ->hashname()
-                    ->moveto($"."filedir);
+                $" . "filedir = '" . $name . "/';
+                $" . "url = $" . "dfile
+                    ->sanitize()
+                    ->moveto($" . "filedir);
     
-                if (!$"."url['success']) {
+                if (!$" . "url['success']) {
                     return 	array(	'success' => false,
-                        'error' => $"."url);
+                        'error' => $" . "url);
                 }
     
-                $"."this->" . $attribut->name . " = $"."url['file']['hashname'];            
+                $" . "this->" . $attribut->name . " = $" . "url['file']['hashname'];            
             }
         }     
              
@@ -242,8 +244,8 @@ class BackendGenerator {
             return Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
         }
         public function show" . ucfirst($attribut->name) . "() {
-            $"."url = Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
-            return Dfile::fileadapter($"."url, $"."this->" . $attribut->name . ");
+            $" . "url = Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
+            return Dfile::fileadapter($" . "url, $" . "this->" . $attribut->name . ");
         }
         
         public function get" . ucfirst($attribut->name) . "() {
@@ -321,20 +323,122 @@ class BackendGenerator {
         fputs($fichier, "\n}\n");
 
         fclose($fichier);
-        
-        
-        if(isset($manytomany)){
-            $entitycollection = (object) $manytomany;
-            $entitycollection->relation[0] = (object) $entitycollection->relation[0];
-            $entitycollection->relation[1] = (object) $entitycollection->relation[1];
-            
+
+
+        if (isset($manytomany)) {
+            $entitycollection = (object)$manytomany;
+            $entitycollection->relation[0] = (object)$entitycollection->relation[0];
+            $entitycollection->relation[1] = (object)$entitycollection->relation[1];
+
             $this->entityGenerator($entitycollection);
         }
-        
+
+    }
+
+    public function entityLangGenerator($entity)
+    {
+
+        if (!isset($entity->lang) || !$entity->lang)
+            return 0;
+
+        $name = strtolower($entity->name);
+
+        unset($entity->attribut[0]);
+
+        $fichier = fopen('Entity/' . ucfirst($name) . '_lang.php', 'w');
+
+        fputs($fichier, "<?php 
+        // user \dclass\devups\model\Model;
+    /**
+     * @Entity @Table(name=\"" . $name . "_lang\")
+     * */
+    class " . ucfirst($name) . "_lang extends Dv_langCore {\n");
+        $method = "";
+        $construteur = "
+        public function __construct($" . "id = null){
+            
+                if( $" . "id ) { $" . "this->id = $" . "id; }   
+        }
+      ";
+        $attrib = "";
+
+        $construt = "
+        /**
+         * @Id @GeneratedValue @Column(type=\"integer\")
+         * @var int
+         * */
+        protected $" . "id;";
+        $otherattrib = false;
+
+        foreach ($entity->attribut as $attribut) {
+            if (!isset($attribut->lang) || !$attribut->lang) {
+                continue;
+            }
+            $length = "";
+            $nullable = "";
+
+            if ($attribut->datatype == "string") {
+                $length = ', length=' . $attribut->size . '';
+            }
+
+            if ($attribut->nullable == 'default') {
+                $nullable = ", nullable=true";
+            }
+            $defaultvalue = "";
+
+            $construt .= "
+            /**
+             * @Column(name=\"" . $attribut->name . "\", type=\"" . $attribut->datatype . "\" $length $nullable)
+             * @var " . $attribut->datatype . "
+             **/
+            protected $" . $attribut->name . "$defaultvalue;";
+        }
+
+        $construt .= "
+            /**
+             * @Column(name=\"" . $name . "_id\", type=\"integer\" )
+             * @var integer
+             **/
+            protected $" . $name . "_id;";
+
+//        }
+
+        $construt .= " 
+        " . $attrib . "
+
+        " . $construteur . "
+        public function getId() {
+            return $" . "this->id;
+        }";
+
+        foreach ($entity->attribut as $attribut) {
+            if (!isset($attribut->lang) || !$attribut->lang) {
+                continue;
+            }
+            $construt .= "
+        public function get" . ucfirst($attribut->name) . "() {
+            return $" . "this->" . $attribut->name . ";
+        }
+
+        public function set" . ucfirst($attribut->name) . "($" . $attribut->name . ") {
+            $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
+        }
+        ";
+
+
+        }
+        $construt .= $method . "  ";
+
+        fputs($fichier, $construt);
+        fputs($fichier, "\n}\n");
+
+        fclose($fichier);
+
     }
 
     /* 	CREATION DU CONTROLLER 	 */
-    private function defaultCtrlContent($name, $entity){
+    private function defaultCtrlContent($name, $entity)
+    {
 
         $contentono = "";
         $contentform = "";
@@ -347,7 +451,7 @@ class BackendGenerator {
             foreach ($entity->relation as $relation) {
 
                 if ($relation->cardinality == "oneToOne") {
-                    $contentform .= ", $".$relation->entity."_form = null";
+                    $contentform .= ", $" . $relation->entity . "_form = null";
                     $contentono .= "
                     
         $" . $relation->entity . " = $" . "this->form_fillingentity(new " . ucfirst($relation->entity) . "(), $" . $relation->entity . "_form);
@@ -356,14 +460,14 @@ class BackendGenerator {
                             '" . $relation->entity . "' => $" . $relation->entity . ",
                             'error' => $" . "this->error);
         }";
-        $onoinsert[] = "
+                    $onoinsert[] = "
         $" . $relation->entity . "->__insert();
         $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . ");";
                 }
             }
         }
 
-        $onoinsert = "\n" . implode($onoinsert, "");
+        $onoinsert = "\n" . implode("", $onoinsert);
         $otherattrib = false;
 
         $contenu = "public function listView($" . "next = 1, $" . "per_page = 10){
@@ -492,7 +596,8 @@ class BackendGenerator {
 
     }
 
-    private function frontCtrlContent($name, $entity){
+    private function frontCtrlContent($name, $entity)
+    {
 
         $contentono = "";
         $contentform = "";
@@ -535,21 +640,21 @@ class BackendGenerator {
                 }
             }
         }
-        $contenu .= "\n" . implode($mtm, "\n");
+        $contenu .= "\n" . implode("\n", $mtm);
         $otherattrib = false;
 //        if (isset($entity->attribut[1])) {
 //            $otherattrib = true;
         foreach ($entity->attribut as $attribut) {
 //			for($i = 1; $i < count($entity->attribut); $i++){
-            if (in_array($attribut->formtype, ['document', 'music', 'video', 'image'])){
+            if (in_array($attribut->formtype, ['document', 'music', 'video', 'image'])) {
                 $otherattrib = true;
                 $contenu .= "
-        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
+        $" . $name . "->upload" . ucfirst($attribut->name) . "();\n";
             }
 
-            if (in_array($attribut->datatype, ['date', 'datetime', 'time']) && isset($attribut->defaultvalue)){
+            if (in_array($attribut->datatype, ['date', 'datetime', 'time']) && isset($attribut->defaultvalue)) {
                 $contenu .= "
-        $".$name ."->set" . ucfirst($attribut->name) . "(new DateTime());\n";
+        $" . $name . "->set" . ucfirst($attribut->name) . "(new DateTime());\n";
             }
 
         }
@@ -575,7 +680,7 @@ class BackendGenerator {
 //                            for($i = 1; $i < count($entity->attribut); $i++){
                 if (in_array($attribut->formtype, ['document', 'music', 'video', 'image']))
                     $contenu .= "
-                        $".$name ."->upload" . ucfirst($attribut->name) . "();\n";
+                        $" . $name . "->upload" . ucfirst($attribut->name) . "();\n";
             }
         endif;
         $contenu .= "      
@@ -604,17 +709,22 @@ class BackendGenerator {
 
     }
 
-    public function controllerGenerator($entity, $listmodule) {
+    public function controllerGenerator($entity, $front = false)
+    {
         //$datatablemodel = DvAdmin::buildindexdatatable($listmodule, $entity);
         $name = strtolower($entity->name);
 
         //if(__Generator::$ctrltype == 'front' || __Generator::$ctrltype == 'both'){
+        if($front) {
+
             $ctrlname = '' . ucfirst($name) . 'FrontController';
             $classController = fopen('Controller/' . $ctrlname . '.php', 'w');
             $extend = ucfirst($name) . 'Controller';
+
             $content = $this->frontCtrlContent($name, $entity);
 
             $contenu = "<?php \n
+use dclass\devups\Datatable\Lazyloading;
 
 class " . $ctrlname . " extends $extend{
 
@@ -625,15 +735,17 @@ class " . $ctrlname . " extends $extend{
             //fputs($classController, "\n}\n");
             fclose($classController);
 
+            return 0;
+        }
         //}
 
         //if(__Generator::$ctrltype == 'both'){
-            $ctrlname = '' . ucfirst($name) . 'Controller';
-            $classController = fopen('Controller/' . $ctrlname . '.php', 'w');
-            $extend = 'Controller';
-            $content = $this->defaultCtrlContent($name, $entity);
+        $ctrlname = '' . ucfirst($name) . 'Controller';
+        $classController = fopen('Controller/' . $ctrlname . '.php', 'w');
+        $extend = 'Controller';
+        $content = $this->defaultCtrlContent($name, $entity);
 
-            $contenu = "<?php \n
+        $contenu = "<?php \n
             
 use dclass\devups\Controller\Controller;
 
@@ -642,11 +754,11 @@ class " . $ctrlname . " extends $extend{
     $content
 
 }\n";
-            fputs($classController, $contenu);
-            //fputs($classController, "\n}\n");
-            fclose($classController);
+        fputs($classController, $contenu);
+        //fputs($classController, "\n}\n");
+        fclose($classController);
 
-       // }
+        // }
 
     }
 
@@ -668,31 +780,31 @@ use dclass\devups\Datatable\Datatable as Datatable;
 class " . ucfirst($name) . "Table extends Datatable{
     
 
-    public function __construct(\$$name = null, $"."datatablemodel = [])
+    public function __construct(\$$name = null, $" . "datatablemodel = [])
     {
-        parent::__construct(\$$name, $"."datatablemodel);
+        parent::__construct(\$$name, $" . "datatablemodel);
     }
 
     public static function init(\\" . ucfirst($name) . " \$$name = null){
     
-        $"."dt = new " . ucfirst($name) . "Table(\$$name);
+        $" . "dt = new " . ucfirst($name) . "Table(\$$name);
         \$dt->entity = \$$name;
         
-        return $"."dt;
+        return $" . "dt;
     }
 
     public function buildindextable(){
 
-        $"."this->datatablemodel = $datatablemodel;
+        $" . "this->datatablemodel = $datatablemodel;
 
-        return $"."this;
+        return $" . "this;
     }
     
     public function builddetailtable()
     {
-        $"."this->datatablemodel = $detailview;
+        $" . "this->datatablemodel = $detailview;
         // TODO: overwrite datatable attribute for this view
-        return $"."this;
+        return $" . "this;
     }
 
     public function router()
@@ -720,23 +832,24 @@ class " . ucfirst($name) . "Table extends Datatable{
 
     /* CREATION OF CORE */
 
-    public function coreGenerator($entityname) {
+    public function coreGenerator($entityname)
+    {
         require ROOT . 'src/requires.php';
         global $em;
 
-        $classmetadata = (array) $em->getClassMetadata("\\". $entityname);
+        $classmetadata = (array)$em->getClassMetadata("\\" . $entityname);
 
         $classdevupsmetadata = [];
         $name = strtolower($entityname);
 
         $classdevupsmetadata["name"] = $name;
-        foreach ($classmetadata["fieldMappings"] as $field){
+        foreach ($classmetadata["fieldMappings"] as $field) {
             $length = "";
-            if($field["length"])
+            if ($field["length"])
                 $length = $field["length"];
 
             $nullable = "not";
-            if($field["nullable"])
+            if ($field["nullable"])
                 $nullable = "default";
 
             $dvfield = [
@@ -750,7 +863,7 @@ class " . ucfirst($name) . "Table extends Datatable{
             $classdevupsmetadata["attribut"][] = $dvfield;
         }
 
-        foreach ($classmetadata["associationMappings"] as $field){
+        foreach ($classmetadata["associationMappings"] as $field) {
             $dvfield = [
                 "entity" => $field["fieldName"],
                 "cardinality" => "manyToOne",
@@ -774,7 +887,8 @@ class " . ucfirst($name) . "Table extends Datatable{
 
     /* CREATION DU FORM */
 
-    public function formGenerator($entity, $listmodule) {
+    public function formGenerator($entity, $listmodule)
+    {
 
         $name = strtolower($entity->name);
         $traitement = new Traitement();
@@ -786,7 +900,7 @@ class " . ucfirst($name) . "Table extends Datatable{
 
         foreach ($entity->attribut as $attribut) {
 
-            if($attribut->formtype == "none")
+            if ($attribut->formtype == "none")
                 continue;
 
             $field .= "
@@ -847,7 +961,7 @@ class " . ucfirst($name) . "Table extends Datatable{
                 \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
                 \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'image') {
-            $field .= "\t\t\"type\" => FORMTYPE_FILE,
+                $field .= "\t\t\"type\" => FORMTYPE_FILE,
             \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
             \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
             \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
@@ -864,13 +978,13 @@ class " . ucfirst($name) . "Table extends Datatable{
             foreach ($entity->relation as $relation) {
 
                 $entitylink = $traitement->relation($listmodule, $relation->entity);
-                if(is_null($entitylink))
+                if (is_null($entitylink))
                     continue;
 
                 $entrel = ucfirst(strtolower($relation->entity));
                 $key = 0;
                 $enititylinkattrname = "id";
-                $entitylink->attribut = (array) $entitylink->attribut;
+                $entitylink->attribut = (array)$entitylink->attribut;
 
                 if (isset($entitylink->attribut[1])) {
                     $key = 1;
@@ -879,15 +993,15 @@ class " . ucfirst($name) . "Table extends Datatable{
 
                 if ($relation->cardinality == 'manyToOne') {
                     $field .= "
-        \$this->fields['" . $relation->entity . "'] = [
+        \$this->fields['" . $relation->entity . ".id'] = [
             \"type\" => FORMTYPE_SELECT, 
             \"value\" => \$this->" . $name . "->get" . ucfirst($relation->entity) . "()->getId(),
-            \"label\" => t('entity." . $relation->entity . "'),
+            \"label\" => t('" . $relation->entity . "'),
             \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
         ];\n";
                 } elseif ($relation->cardinality == 'oneToOne') {
                     $field .= "
-        \$this->fields['" . $relation->entity . "'] = [
+        \$this->fields['" . $relation->entity . ".id'] = [
             \"type\" => FORMTYPE_INJECTION, 
             FH_REQUIRE => true,
             \"label\" => t('entity." . $relation->entity . "'),
@@ -895,10 +1009,10 @@ class " . ucfirst($name) . "Table extends Datatable{
         ];\n";
                 } elseif ($relation->cardinality == 'manyToMany') {
                     $field .= "
-        \$this->fields['" . $relation->entity . "'] = [
+        \$this->fields['" . $relation->entity . "::values'] = [
             \"type\" => FORMTYPE_CHECKBOX, 
             \"values\" => \$this->" . $name . "->inCollectionOf('" . ucfirst($relation->entity) . "'),
-            \"label\" => t('entity." . $relation->entity . "'),
+            \"label\" => t('" . $relation->entity . "'),
             \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
         ];\n";
                 }
@@ -914,7 +1028,7 @@ class " . ucfirst($name) . "Form extends FormManager{
     public \$$name;
 
     public static function init(\\$ucfirstname \$$name, \$action = \"\"){
-        \$fb = new ".$ucfirstname."Form(\$$name, \$action);
+        \$fb = new " . $ucfirstname . "Form(\$$name, \$action);
         \$fb->$name = \$$name;
         return \$fb;
     }
@@ -943,14 +1057,15 @@ class " . ucfirst($name) . "Form extends FormManager{
 
     /* CREATION DU FORM FIELD */
 
-    private function formwidget($entity, $listmodule, $onetoone = true){
+    private function formwidget($entity, $listmodule, $onetoone = true)
+    {
         $field = '';
         $traitement = new Traitement();
         $name = strtolower($entity->name);
 
         foreach ($entity->attribut as $attribut) {
 
-            if($attribut->formtype == "none")
+            if ($attribut->formtype == "none")
                 continue;
 
             $field .= "<div class='form-group'>
@@ -981,7 +1096,7 @@ class " . ucfirst($name) . "Form extends FormManager{
                 $field .= "\t<?= Form::select('" . $attribut->name . "', " . ucfirst($name) . "::$" . $attribut->name . "s, $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'email') {
                 $field .= "\t<?= Form::email('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
-            } elseif (in_array($attribut->formtype, ['document', 'image', 'musique', 'video'])){
+            } elseif (in_array($attribut->formtype, ['document', 'image', 'musique', 'video'])) {
 
                 $field .= "\t<?= Form::filepreview($" . $name . "->get" . ucfirst($attribut->name) . "(),
                 $" . $name . "->show" . ucfirst($attribut->name) . "(),
@@ -1020,7 +1135,7 @@ class " . ucfirst($name) . "Form extends FormManager{
                 $entitylink = $traitement->relation($listmodule, $relation->entity);
 
                 $enititylinkattrname = "id";
-                $entitylink->attribut = (array) $entitylink->attribut;
+                $entitylink->attribut = (array)$entitylink->attribut;
 
                 if (isset($entitylink->attribut[1])) {
                     $key = 1;
@@ -1063,7 +1178,8 @@ class " . ucfirst($name) . "Form extends FormManager{
 
     /* CREATION DU FORM FIELD */
 
-    private function detailwidget($entity, $listmodule, $onetoone = true, $mother = false){
+    private function detailwidget($entity, $listmodule, $onetoone = true, $mother = false)
+    {
 
         $name = strtolower($entity->name);
         //$detailview = DvAdmin::builddetaildatatable($entity, $listmodule, $onetoone, $mother);
@@ -1078,7 +1194,8 @@ class " . ucfirst($name) . "Form extends FormManager{
 
     }
 
-    public function detailWidgetGenerator($entity, $listmodule) {
+    public function detailWidgetGenerator($entity, $listmodule)
+    {
 
         $name = strtolower($entity->name);
 
@@ -1094,7 +1211,8 @@ class " . ucfirst($name) . "Form extends FormManager{
         fclose($entityform);
     }
 
-    public function formWidgetGenerator($entity, $listmodule) {
+    public function formWidgetGenerator($entity, $listmodule)
+    {
 
         $name = strtolower($entity->name);
 
@@ -1105,7 +1223,7 @@ class " . ucfirst($name) . "Form extends FormManager{
 
         $contenu = "
     <?php //use dclass\devups\Form\Form; ?>
-    <?php //Form::addcss(" . ucfirst($name) . " ::classpath('Resource/js/".$name."')) ?>
+    <?php //Form::addcss(" . ucfirst($name) . " ::classpath('Resource/js/" . $name . "')) ?>
     
     <?= Form::open($" . $name . ", [\"action\"=> \"$" . "action\", \"method\"=> \"post\"]) ?>
 
@@ -1116,10 +1234,10 @@ class " . ucfirst($name) . "Form extends FormManager{
     <?= Form::close() ?>
     
     <?= Form::addDformjs() ?>    
-    <?= Form::addjs(" . ucfirst($name) . "::classpath('Resource/js/".$name."Form')) ?>
+    <?= Form::addjs(" . ucfirst($name) . "::classpath('Resource/js/" . $name . "Form')) ?>
     ";
 
-        if(!file_exists('Resource/views/admin/' . $name . ''))
+        if (!file_exists('Resource/views/admin/' . $name . ''))
             mkdir('Resource/views/admin/' . $name . '', 777, true);
 
         $entityform = fopen('Resource/views/admin/' . $name . '/formWidget.blade.php', 'w');
@@ -1130,7 +1248,8 @@ class " . ucfirst($name) . "Form extends FormManager{
 
     /* CREATION DU DAO */
 
-    public function daoGenerator($entity) {
+    public function daoGenerator($entity)
+    {
         $name = strtolower($entity->name);
 
         /* if($name == 'utilisateur')

@@ -19,57 +19,82 @@ class UserForm extends FormManager
 
 
         $entitycore->field['firstname'] = [
-            "label" => t('user.firstname'),
+            "label" => 'Firstname',
+            FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
             "value" => $user->getFirstname(),
         ];
 
         $entitycore->field['lastname'] = [
-            "label" => t('user.lastname'),
+            "label" => 'Lastname',
+            FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
             "value" => $user->getLastname(),
         ];
 
         $entitycore->field['email'] = [
-            "label" => t('user.email'),
+            "label" => 'Email',
             FH_REQUIRE => false,
-            "type" => FORMTYPE_EMAIL,
+            "type" => FORMTYPE_TEXT,
             "value" => $user->getEmail(),
         ];
 
-        $entitycore->field['sex'] = [
-            "label" => t('user.sex'),
+        $entitycore->field['sexe'] = [
+            "label" => 'Sexe',
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
-            "value" => $user->getSex(),
+            "value" => $user->getSexe(),
         ];
 
         $entitycore->field['phonenumber'] = [
-            "label" => t('user.phonenumber'),
+            "label" => 'Phonenumber',
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
             "value" => $user->getPhonenumber(),
         ];
 
-        $entitycore->field['password'] = [
-            "label" => t('user.password'),
+        $entitycore->field['professional'] = [
+            "label" => 'Is professional',
+            FH_REQUIRE => false,
+            "type" => FORMTYPE_RADIO,
+            "options" => ["No", 'Yes'],
+            "value" => $user->getProfessional(),
+        ];
+
+        $entitycore->field['updatePassword'] = [
+            "label" => 'Password',
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
-            "value" => $user->getPassword(),
+            "value" => "",
+        ];
+        $entitycore->field['country'] = [
+            "label" => 'Country',
+            FH_REQUIRE => false,
+            "type" => FORMTYPE_SELECT,
+            "value" => $user->country->getId(),
+            "options" => FormManager::Options_Helper("name", Country::allrows()),
+        ];
+
+        $entitycore->field['is_activated'] = [
+            "label" => 'Is_activated',
+            FH_REQUIRE => false,
+            "type" => FORMTYPE_RADIO,
+            "options" => ["No", 'Yes'],
+            "value" => $user->getIs_activated(),
+        ];
+
+
+        $entitycore->field['lang'] = [
+            "label" => 'Lang',
+            FH_REQUIRE => false,
+            "type" => FORMTYPE_TEXT,
+            "value" => $user->getLang(),
         ];
 
         $entitycore->field['username'] = [
-            "label" => t('user.username'),
-            FH_REQUIRE => false,
+            "label" => 'Username',
             "type" => FORMTYPE_TEXT,
             "value" => $user->getUsername(),
-        ];
-
-        $entitycore->field['country'] = [
-            "type" => FORMTYPE_SELECT,
-            "value" => $user->getCountry()->getId(),
-            "label" => t('entity.country'),
-            "options" => FormManager::Options_Helper('name', Country::allrows()),
         ];
 
         $entitycore->addDformjs($button);
@@ -91,7 +116,7 @@ class UserForm extends FormManager
             return [
                 'success' => true,
                 'user' => $user,
-                'action' => "create",
+                'action' => User::classpath("services.php?path=user.create"),
             ];
         endif;
 
@@ -99,7 +124,7 @@ class UserForm extends FormManager
         return [
             'success' => true,
             'user' => $user,
-            'action' => "update&id=" . $id,
+            'action' => User::classpath("services.php?path=user.update&id=" . $id),
         ];
 
     }

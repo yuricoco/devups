@@ -6,16 +6,18 @@ use dclass\devups\Datatable\Datatable as Datatable;
 class NotificationbroadcastedTable extends Datatable
 {
 
-    public $entity = "notificationbroadcasted";
 
-    public function __construct($lazyloading = null, $datatablemodel = [])
+    public function __construct($notificationbroadcasted = null, $datatablemodel = [])
     {
-        parent::__construct($lazyloading, $datatablemodel);
+        parent::__construct($notificationbroadcasted, $datatablemodel);
     }
 
-    public static function init($lazyloading = null)
+    public static function init(\Notificationbroadcasted $notificationbroadcasted = null)
     {
-        $dt = new NotificationbroadcastedTable($lazyloading);
+
+        $dt = new NotificationbroadcastedTable($notificationbroadcasted);
+        $dt->entity = $notificationbroadcasted;
+
         return $dt;
     }
 
@@ -23,39 +25,57 @@ class NotificationbroadcastedTable extends Datatable
     {
 
         $this->datatablemodel = [
-            ['header' => t('notificationbroadcasted.viewedat', 'Viewedat'), 'value' => 'viewedat'],
-            ['header' => t('notificationbroadcasted.status', 'Status'), 'value' => 'status'],
-            ['header' => t('entity.notification', 'Notification'), 'value' => 'Notification.entity'],
-            ['header' => t('entity.user', 'User'), 'value' => 'User.firstname']
+            ['header' => t('#'), 'value' => 'id'],
+            ['header' => t('Viewedat'), 'value' => 'viewedat'],
+            ['header' => t('Status'), 'value' => 'status'],
+            ['header' => t('Notification'), 'value' => 'Notification.entity']
         ];
-
+        $this->setModel("buil");
         return $this;
     }
-    public function buildindexfronttable()
+    public function buildcustomertable()
     {
 
-        $this->disableColumnAction();
-        $this->disableDefaultaction();
-
+        $this->groupaction = false;
+        $this->enabletopaction = false;
+        $this->searchaction = false;
+        $this->enablecolumnaction = false;
+        $this->base_url = __env."api/";
         $this->datatablemodel = [
-            ['header' => "#", 'value' => 'id'],
-            ['header' => t('Date'), 'value' => 'createdAt'],
-            ['header' => t('entity.notification', 'Notification'), 'value' => 'Notification.content'],
+            //['header' => t('#'), 'value' => 'id'],
+            ['header' => t('Status'), 'value' => 'status'],
+            ['header' => t('Viewedat'), 'value' => 'viewedat'],
+            ['header' => t('Notification'), 'value' => function(\Notificationbroadcasted $item){
+                return $item->notification->getContent();
+            }]
         ];
-
+        $this->setModel("customer");
         return $this;
     }
 
     public function builddetailtable()
     {
         $this->datatablemodel = [
-            ['label' => 'Viewedat', 'value' => 'viewedat'],
-            ['label' => 'Status', 'value' => 'status'],
-            ['label' => 'Notification', 'value' => 'Notification.entity'],
-            ['label' => 'User', 'value' => 'User.firstname']
+            ['label' => t('notificationbroadcasted.viewedat'), 'value' => 'viewedat'],
+            ['label' => t('notificationbroadcasted.status'), 'value' => 'status'],
+            ['label' => t('entity.notification'), 'value' => 'Notification.entity']
         ];
         // TODO: overwrite datatable attribute for this view
         return $this;
+    }
+
+    public function router()
+    {
+        $tablemodel = Request::get("tablemodel", null);
+        if ($tablemodel && method_exists($this, "build" . $tablemodel . "table") && $result = call_user_func(array($this, "build" . $tablemodel . "table"))) {
+            return $result;
+        } else
+            switch ($tablemodel) {
+                // case "": return this->
+                default:
+                    return $this->buildindextable();
+            }
+
     }
 
 }

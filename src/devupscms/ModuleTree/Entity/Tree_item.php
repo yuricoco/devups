@@ -23,10 +23,10 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
      **/
     protected $name;
     /**
-     * @Column(name="description", type="text"  , nullable=true)
+     * @Column(name="content", type="text"  , nullable=true)
      * @var text
      **/
-    protected $description;
+    protected $content;
     /**
      * @Column(name="slug", type="string" , length=55 , nullable=true)
      * @var string
@@ -74,6 +74,7 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
     {
         $ti = self::mainmenu("position")->andwhere("this.name", $ref)->__firstOrNull();
         if (!$ti) {
+            return new Tree_item();
             $tree = Tree::where("name", "position")->__getOne();
             if (!Tree::where("name", "position")->count()) {
                 $tree = new Tree();
@@ -155,14 +156,14 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
         $this->slug = $slug;
     }
 
-    public function getDescription()
+    public function getContent()
     {
-        return $this->description;
+        return $this->content;
     }
 
-    public function setDescription($description)
+    public function setContent($content)
     {
-        $this->description = $description;
+        $this->content = $content;
     }
 
     public function getParent_id()
@@ -213,24 +214,23 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
     public function jsonSerialize()
     {
         $namelangs = [];
-        $namelangs[] = $this->__getdvlang("name", "fr", $this->name);
-        $namelangs[] = $this->__getdvlang("name", "en", $this->name);
-
+        foreach (Dvups_lang::otherLangs() as $lang) {
+            $namelangs["name_".$lang->getIso_code()] = $this->__gettranslate("name", $lang->getIso_code(), $this->name);
+        }
         return [
             'id' => $this->id,
             'name' => $this->name,
             'slug' => $this->slug,
             'position' => (int)$this->position,
-            'description' => $this->description,
+            'content' => $this->content,
             'parent_id' => $this->parent_id,
             'main' => $this->main,
             'status' => $this->status,
             'chain' => $this->chain,
             'tree' => $this->tree,
-            'namelangs' => $namelangs,
-            'content_id' => $this->getContent()->getId(),
+            'content_id' => $this->getCmstext()->getId(),
             'children' => (int)self::where("parent_id", $this->id)->__countEl(),
-        ];
+        ]+$namelangs;
     }
 
     public function getChildren($category = null)
@@ -339,6 +339,16 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
 
     /**
      * @param string $tree
+     * @return QueryBuilder
+     */
+    public static function mainmenus($trees = ["menu"])
+    {
+        return self::where("tree.name")->in($trees)
+            ->andwhere("main", 1);
+    }
+
+    /**
+     * @param string $tree
      * @return array
      */
     public static function getmainmenu($tree = "menu")
@@ -350,15 +360,40 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
             ->__getAll();
     }
 
-    public function getContent()
+    public function getCmstext()
     {
         return Cmstext::where($this)
             ->__getOne();
     }
 
+    public static function children($id)
+    {
+
+        return self::select()
+            ->where("this.parent_id", $id)
+            ->orderby("this.position")
+            ->__getAll();
+    }
+
     public function dvupsTranslate()
     {
         // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
+
+        $this->__inittranslate([
+            "name" => $this->name
+        ], Dvups_lang::defaultLang());
+
+        $langs = \Dvups_lang::otherLangs();
+        foreach ($langs as $lang) {
+            if(!isset(Request::$uri_raw_param["tree_item"]["name_".$lang->getIso_code()]))
+                continue;
+
+            $this->__inittranslate([
+                "name" => Request::$uri_raw_param["tree_item"]["name_".$lang->getIso_code()]
+            ], $lang);
+
+        }
+/*
         if (!isset(Request::$uri_raw_param["tree_item"]["namelangs"])) {
 
             $namelangs[] = $this->__inittranslate("name", $this->name, "fr");
@@ -367,8 +402,23 @@ class Tree_item extends Model implements JsonSerializable, DvupsTranslation
         } else
             foreach (Request::$uri_raw_param["tree_item"]["namelangs"] as $namelang) {
                 $this->__inittranslate("name", $namelang["content"], $namelang["lang"]);
-            }
+            }*/
 
+    }
+
+    public function images()
+    {
+        $items = $this->__hasmany(Tree_item_image::class, true, null, true);
+        $success = true;
+        return compact("items", "success");
+    }
+
+    /**
+     * @return Tree_item_image|null
+     */
+    public function firstImage()
+    {
+        return $this->__hasmany(Tree_item_image::class, false)->__getFirst(true);
     }
 
 }

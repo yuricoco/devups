@@ -2,7 +2,7 @@
                 
 define('PROJECT_NAME', 'devupstuto');
 
-define ('dbname', 'devupstest5_bd');
+define ('dbname', 'devupstest6_bd');
 //define ('dbname', 'devupstest3_bd');
 
 //define ('dbname', 'devupstest_bd');

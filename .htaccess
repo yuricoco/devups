@@ -1,37 +1,90 @@
 
-
 RewriteEngine On
 
+#RewriteCond %{HTTP_HOST} ^3ag-edition.com [NC]
+#RewriteRule ^(.*)$ http://www.3ag-edition.com/fr/$1 [L,R=301]	
+
+	# chemin vers le fichier index ex : /dev/projet/index.php
+	# ici on suppose que le fichier index est a la racine du serveur
+#	ErrorDocument 404 /3agedition2.1/index.php
+
+RewriteRule    ^/?$    index.php    [NC,L]    # Process all products
+RewriteRule    ^([a-z-]+)/?$    index.php?lang=$1    [NC,L]    # Process all products
+
+RewriteRule    ^services/?$    services.php    [NC,L]    # Process all products
+RewriteRule    ^services/([A-Za-z0-9-]+)/?$    services.php?path=$1   [NC,L]    # Process all products
+RewriteRule    ^services/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    services.php?path=$1&view=$2   [NC,L]    # Process all products
 
 RewriteRule    ^api/?$    services.php    [NC,L]
+RewriteRule    ^api/create.([A-Za-z0-9-]+)?$    services.php?path=create&dclass=$1    [NC,L]
+RewriteRule    ^api/upload.([A-Za-z0-9-]+)?$    services.php?path=upload&dclass=$1    [NC,L]
+RewriteRule    ^api/update.([A-Za-z0-9-]+)?$    services.php?path=update&dclass=$1    [NC,L]
+RewriteRule    ^api/delete.([A-Za-z0-9-]+)?$    services.php?path=delete&dclass=$1    [NC,L]
+RewriteRule    ^api/detail.([A-Za-z0-9-]+)?$    services.php?path=detail&dclass=$1    [NC,L]
+RewriteRule    ^api/lazyloading.([A-Za-z0-9-]+)?$    services.php?path=lazyloading&dclass=$1    [NC,L]
+
 RewriteRule    ^api/([A-Za-z0-9-]+)/?$    services.php?path=$1    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+).([A-Za-z0-9-]+)?$    services.php?path=$1.$2    [NC,L]
 RewriteRule    ^api/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)?$    services.php?path=$1.$2    [NC,L]
 
-RewriteRule    ^/?$    index.php    [NC,L]
-#RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1    [NC,L]    # Process all products
-RewriteRule    ^([A-Za-z0-9-]+)/?$    index.php?path=$1   [NC,L]    # Process all products
-RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?path=$1&ref=$2   [NC,L]    # Process all products
+RewriteRule    ^([a-z-]+)/api/([A-Za-z0-9-]+)/?$    services.php?lang=$1&path=$2    [NC,L]
+RewriteRule    ^([a-z-]+)/api/([A-Za-z0-9-]+).([A-Za-z0-9-]+)?$    services.php?lang=$1&path=$2.$3    [NC,L]
+RewriteRule    ^([a-z-]+)/api/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)?$    services.php?lang=$1&path=$2.$3    [NC,L]
 
-#<IfModule mod_headers.c>
-#    Header always set X-FRAME-OPTIONS "DENY"
+RewriteRule    ^([a-z-]+)/([A-Za-z0-9-]+)/?$    index.php?lang=$1&path=$2    [NC,L]    # Process all products
+RewriteRule    ^([a-z-]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/?$    index.php?lang=$1&path=$2&id=$3    [NC,L]
+
+
+<IfModule mod_headers.c>
+    Header always set X-FRAME-OPTIONS "DENY"
+    #Header set Content-Security-Policy "script-src 'self' "
+
+#https://www.google.com
+    Header always set X-XSS-Protection "1; mode=block" 
+
+# seulement pour Apache > 2.2.4:
+Header edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure
+
+# Servir des fichiers CSS compressés avec gzip, s'ils existent, et
+    # si le client accepte gzip.
+    RewriteCond "%{HTTP:Accept-encoding}" "gzip"
+    RewriteCond "%{REQUEST_FILENAME}\.gz" "-s"
+    RewriteRule "^(.*)\.css"              "$1\.css\.gz" [QSA]
+
+    # Servir des fichiers JS compressés avec gzip, s'ils existent, et
+    # si le client accepte gzip.
+    RewriteCond "%{HTTP:Accept-encoding}" "gzip"
+    RewriteCond "%{REQUEST_FILENAME}\.gz" "-s"
+    RewriteRule "^(.*)\.js"               "$1\.js\.gz" [QSA]
+
+
+    # Servir des types de contenus corrects, et empêcher mod_deflate
+    # d'effectuer un double gzip.
+    RewriteRule "\.css\.gz$" "-" [T=text/css,E=no-gzip:1]
+    RewriteRule "\.js\.gz$"  "-" [T=text/javascript,E=no-gzip:1]
+
+
+    <FilesMatch "(\.js\.gz|\.css\.gz)$">
+      # Servir le type de codage correct.
+      Header append Content-Encoding gzip
+
+      # Force les mandataires à mettre en cache séparément les fichiers
+      # css/js gzippés & non gzippés.
+      Header append Vary Accept-Encoding
+    </FilesMatch>
+
+</IfModule> 
+
+#Prise en compte des serveurs mandataires
+#Header set Vary *
+
+#<IfModule mod_expires.c>
+#ExpiresActive On
+#ExpiresDefault "access plus 1 month"
+#ExpiresByType image/x-icon "access plus 1 year"
+#ExpiresByType image/gif "access plus 1 month"
+#ExpiresByType image/png "access plus 1 month"
+#ExpiresByType image/jpeg "access plus 1 month"
+#ExpiresByType text/css "access plus 1 year"
+#ExpiresByType application/javascript "access plus 1 year"
 #</IfModule>
-
-#<IfModule mod_rewrite.c>
-#  RewriteEngine On
-#  RewriteBase /
-#  RewriteRule ^index\.php$ - [L]
-#  RewriteCond %{REQUEST_FILENAME} !-f
-#  RewriteCond %{REQUEST_FILENAME} !-d
-#  RewriteRule . /index.php [L]
-#</IfModule>
-
-#Options +FollowSymLinks -Indexes
-#RewriteEngine On
-#
-#RewriteCond %{HTTP:Authorization} .
-#RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
-#
-#RewriteCond %{REQUEST_FILENAME} !-d
-#RewriteCond %{REQUEST_FILENAME} !-f
-#RewriteRule ^ index.php [L]

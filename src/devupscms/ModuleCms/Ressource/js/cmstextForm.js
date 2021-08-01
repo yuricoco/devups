@@ -15,3 +15,15 @@ tinymce.init({
         // '//www.tiny.cloud/css/codepen.min.css'
     ]
 });
+
+var cmstext = {
+    submit(el) {
+        tinymce.triggerSave();
+        //model.addLoader($(el))
+        var form = $("#cmstext-form");
+        dform._submit(form, form.data("api"), (response)=>{
+            console.log(response);
+            $.notify("Modification enregistrées", "info")
+        })
+    }
+}

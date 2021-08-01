@@ -1,48 +1,64 @@
-<?php
+<?php 
 
-
+            
 use dclass\devups\Controller\Controller;
 
 class MessageController extends Controller{
 
     public function listView($next = 1, $per_page = 10){
 
-        $lazyloading = $this->lazyloading(new Message(), $next, $per_page);
+        $this->datatable = MessageTable::init(new Message())->buildindextable();
 
-        self::$jsfiles[] = Message::classpath('Ressource/js/messageCtrl.js');
+        self::$jsfiles[] = Message::classpath('Resource/js/messageCtrl.js');
 
         $this->entitytarget = 'Message';
         $this->title = "Manage Message";
         
-        $this->renderListView(MessageTable::init($lazyloading)->buildindextable()->render());
+        $this->renderListView();
 
     }
 
     public function datatable($next, $per_page) {
-        $lazyloading = $this->lazyloading(new Message(), $next, $per_page);
+    
         return ['success' => true,
-            'datatable' => MessageTable::init($lazyloading)->buildindextable()->getTableRest(),
+            'datatable' => MessageTable::init(new Message())->router()->getTableRest(),
+        ];
+        
+    }
+
+    public function formView($id = null)
+    {
+        $message = new Message();
+        $action = Message::classpath("services.php?path=message.create");
+        if ($id) {
+            $action = Message::classpath("services.php?path=message.update&id=" . $id);
+            $message = Message::find($id);
+        }
+
+        return ['success' => true,
+            'form' => MessageForm::init($message, $action)
+                ->buildForm()
+                ->addDformjs()
+                ->renderForm(),
         ];
     }
 
-    public function createAction($message_form = null){
+    public function createAction($message_form = null ){
         extract($_POST);
 
         $message = $this->form_fillingentity(new Message(), $message_form);
- 
-
         if ( $this->error ) {
             return 	array(	'success' => false,
-                            'message' => $message,
-                            'action' => 'create', 
+                            'detail' => t('Oups!! Une erreur est survenue. vérifiez que les champs sont bien rempli svp!'),
                             'error' => $this->error);
-        }
+        } 
         
+
         $id = $message->__insert();
         return 	array(	'success' => true,
                         'message' => $message,
-                        'tablerow' => MessageTable::init()->buildindextable()->getSingleRowRest($message),
-                        'detail' => '');
+                        //'tablerow' => MessageTable::init()->router()->getSingleRowRest($message),
+                        'detail' => t("Message enregistré avec succès. Merci! Nous prendrons contact avec vous au plus tôt."));
 
     }
 
@@ -50,8 +66,7 @@ class MessageController extends Controller{
         extract($_POST);
             
         $message = $this->form_fillingentity(new Message($id), $message_form);
-
-                    
+     
         if ( $this->error ) {
             return 	array(	'success' => false,
                             'message' => $message,
@@ -62,7 +77,7 @@ class MessageController extends Controller{
         $message->__update();
         return 	array(	'success' => true,
                         'message' => $message,
-                        'tablerow' => MessageTable::init()->buildindextable()->getSingleRowRest($message),
+                        'tablerow' => MessageTable::init()->router()->getSingleRowRest($message),
                         'detail' => '');
                         
     }
@@ -85,8 +100,9 @@ class MessageController extends Controller{
     }
     
     public function deleteAction($id){
-      
-            Message::delete($id);
+    
+        Message::delete($id);
+        
         return 	array(	'success' => true, 
                         'detail' => ''); 
     }

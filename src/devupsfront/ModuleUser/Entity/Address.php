@@ -23,17 +23,17 @@ class Address extends Model implements JsonSerializable
      **/
     protected $description;
     /**
-     * @Column(name="phonenumber", type="integer"  )
+     * @Column(name="phonenumber", type="string", length=150, nullable=true  )
      * @var integer
      **/
     protected $phonenumber;
     /**
-     * @Column(name="lastname", type="string" , length=255 )
+     * @Column(name="lastname", type="string" , length=255 , nullable=true )
      * @var string
      **/
     protected $lastname;
     /**
-     * @Column(name="address", type="string" , length=255 )
+     * @Column(name="address", type="string" , length=255, nullable=true )
      * @var string
      **/
     protected $address;
@@ -43,22 +43,17 @@ class Address extends Model implements JsonSerializable
      **/
     protected $postalcode;
     /**
-     * @Column(name="_type", type="integer", nullable=true  )
-     * @var integer
-     **/
-    protected $_type;
-    /**
-     * @Column(name="label", type="string" , length=255 )
+     * @Column(name="label", type="string" , length=255, nullable=true )
      * @var string
      **/
     protected $label;
     /**
-     * @Column(name="town", type="string" , length=255 )
+     * @Column(name="town", type="string" , length=255 , nullable=true )
      * @var string
      **/
     protected $town;
     /**
-     * @Column(name="town_slug", type="string" , length=255 )
+     * @Column(name="town_slug", type="string" , length=255 , nullable=true )
      * @var string
      **/
     protected $town_slug;
@@ -67,6 +62,11 @@ class Address extends Model implements JsonSerializable
      * @var string
      **/
     protected $region;
+    /**
+     * @Column(name="email", type="string" , length=255, nullable=true )
+     * @var string
+     **/
+    protected $email;
 
     /**
      * @ManyToOne(targetEntity="\User")
@@ -75,22 +75,45 @@ class Address extends Model implements JsonSerializable
      */
     public $user;
 
+    /**
+     * @ManyToOne(targetEntity="\Country")
+     * , inversedBy="reporter"
+     * @var \Country
+     */
+    public $country;
 
     public function __construct($id = null)
     {
 
+        $this->dvsoftdelete = true;
         if ($id) {
             $this->id = $id;
         }
 
         $this->user = new User();
-        // $this->country = new Country();
+        $this->country = new Country();
 
     }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
     }
 
     /**
@@ -132,6 +155,8 @@ class Address extends Model implements JsonSerializable
 
     public function setFirstname($firstname)
     {
+        if(!$firstname)
+            return t("Le champ nom est important!");
         $this->firstname = $firstname;
     }
 
@@ -185,16 +210,6 @@ class Address extends Model implements JsonSerializable
         $this->postalcode = $postalcode;
     }
 
-    public function get_type()
-    {
-        return $this->_type;
-    }
-
-    public function set_type($_type)
-    {
-        $this->_type = $_type;
-    }
-
     public function getLabel()
     {
         return $this->label;
@@ -228,6 +243,10 @@ class Address extends Model implements JsonSerializable
         return $this->town;
     }
 
+    public function setTown_slug($town)
+    {
+        $this->town_slug = $town;
+    }
     public function getTown_slug()
     {
         return $this->town_slug;
@@ -263,7 +282,6 @@ class Address extends Model implements JsonSerializable
             'lastname' => $this->lastname,
             'address' => $this->address,
             'postalcode' => $this->postalcode,
-            '_type' => $this->_type,
             'label' => $this->label,
             'user' => $this->user,
             'country' => $this->user->country,
@@ -271,6 +289,28 @@ class Address extends Model implements JsonSerializable
             'town_slug' => $this->town_slug,
             'region' => $this->region,
         ];
+    }
+
+    function configAddress(){
+        if($this->address)
+            return $this->address;
+
+        return t("bs24.address","Central Square, 22 Hoi Wing Road, New Delhi, India");
+
+    }
+    function configPhonenumber(){
+        if($this->phonenumber)
+            return $this->phonenumber;
+
+        return t("bs24.telephone","(+237) 233 41 63 48 ");
+
+    }
+    function configEmail(){
+        if($this->email)
+            return $this->email;
+
+        return t("bs24.email","info@buyamsellam24.com");
+
     }
 
 }

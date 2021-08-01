@@ -20,7 +20,7 @@ function tt($ref, $default = "", $local = null){
 }
 
 function t($ref, $default = "", $local = null ){
-
+    $params = [$ref,$default, $local];
     $lang = Local_contentController::getdata();
     $matcher = [];
     if(is_array($default)){
@@ -37,6 +37,7 @@ function t($ref, $default = "", $local = null ){
 
     if(!isset($lang[$ref])){
         Local_contentController::newdatacollection($ref, $default);
+        // t($params[0], $params[1], $params[2]);
         return $default;
     }
 

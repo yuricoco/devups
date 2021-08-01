@@ -5,6 +5,11 @@ require '../../../admin/header.php';
 global $viewdir, $moduledata;
 $viewdir[] = __DIR__ . '/Ressource/views';
 $moduledata = Dvups_module::init("ModuleAdmin");
+//require 'header.php';
+//require 'App.php';
+
+//$module = new \devups\ModuleAdmin\ModuleAdmin();
+//die;
 
 define('CHEMINMODULE', ' ');
 

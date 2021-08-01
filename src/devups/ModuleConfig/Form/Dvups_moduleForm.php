@@ -15,7 +15,7 @@ use Genesis as g;
             
             //$entitycore->addcss('csspath');
 
-            $entitycore->field['dvups_component'] = [
+            $entitycore->field['dvups_component.id'] = [
                 "type" => FORMTYPE_SELECT,
                 "value" => $dvups_module->dvups_component->getId(),
                 "label" => t('entity.dvups_component'),
@@ -44,6 +44,7 @@ use Genesis as g;
             $entitycore->field['label'] = [
                 "label" => 'Label',
                 "type" => FORMTYPE_TEXT,
+                "lang" => true,
                 "value" => $dvups_module->getLabel(),
             ];
             $entitycore->field['favicon'] = [
@@ -71,7 +72,7 @@ use Genesis as g;
                 return [
                     'success' => true,
                     'dvups_module' => $dvups_module,
-                    'action' => "create",
+                    'action' => Dvups_module::classpath("services.php?path=dvups_module.create"),
                 ];
             endif;
             
@@ -79,7 +80,7 @@ use Genesis as g;
             return [
                 'success' => true,
                 'dvups_module' => $dvups_module,
-                'action' => "update&id=" . $id,
+                'action' => Dvups_module::classpath("services.php?path=dvups_module.update&id=") . $id,
             ];
 
         }

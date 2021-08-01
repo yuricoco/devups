@@ -31,7 +31,7 @@ class Dvups_entityTable extends Datatable
             ['header' => 'Url', 'value' => 'url', 'search' => true],
             ['header' => 'Dvups_module', 'value' => 'Dvups_module.name'],
             ['header' => 'Label', 'value' => 'label', 'get' => 'labelform', 'search' => false,],
-            ['header' => 'Rows', 'value' => function(\Dvups_entity $entity){ return ucfirst($entity->getLabel())::count(); },]
+            //['header' => 'Rows', 'value' => function(\Dvups_entity $entity){ return ucfirst($entity->getLabel())::count(); },]
         ];
         $this->enablefilter();
         $this->customactions[] = function (\Dvups_entity $entity){

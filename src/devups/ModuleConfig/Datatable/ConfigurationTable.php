@@ -15,7 +15,7 @@ class ConfigurationTable extends Datatable
     public static function init(\Configuration $configuration = null)
     {
 
-        $dt = new ConfigurationTable();
+        $dt = new ConfigurationTable(new Configuration());
         $dt->entity = $configuration;
 
         return $dt;
@@ -36,6 +36,23 @@ class ConfigurationTable extends Datatable
         //$this->enablefilter(false);
 
         $this->per_page = 50;
+        return $this;
+    }
+
+    public function buildconfigtable()
+    {
+        $this->searchaction = false;
+        $this->groupaction = false;
+
+        $this->datatablemodel = [
+            ['header' => t('configuration.id', '#'), 'value' => 'id'],
+            ['header' => t('configuration._key', '_key'), 'value' => '_key', "search"=>true],
+            ['header' => t('configuration._value', '_value'), 'value' => '_value'],
+            ['header' => t('configuration.comment', 'Comment'), 'value' => 'comment'],
+        ];
+        $this->disablepagination();
+        //$this->enablefilter(false);
+        $this->per_page = "all";
         return $this;
     }
 

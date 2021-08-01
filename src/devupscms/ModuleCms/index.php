@@ -13,10 +13,6 @@ $viewdir[] = __DIR__ . '/Ressource/views';
 
 $moduledata = Dvups_module::init('ModuleCms');
 
-
-define('CHEMINMODULE', ' ');
-
-
 $cmstextCtrl = new CmstextController();
 $imagecmsCtrl = new ImagecmsController();
 

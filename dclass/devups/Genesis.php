@@ -103,7 +103,8 @@ class Genesis
             $_end = microtime(true);
             $value["exectime"] = $_end - $_start;
         }
-        echo json_encode($value, $options, $depth);
+        echo json_encode($value, JSON_UNESCAPED_UNICODE , $depth);
+        die;
     }
 
     public static function renderBladeView($view, $data = [], $action = "list", $redirect = false)
@@ -144,6 +145,7 @@ class Genesis
         $blade = new BladeD([web_dir . "views", admin_dir . 'views'], ROOT . "cache/views");
 
         echo $blade->view()->make($view, $compilate)->render();
+        return 1;
         //die;
     }
 

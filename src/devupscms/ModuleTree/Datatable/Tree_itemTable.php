@@ -27,7 +27,7 @@ class Tree_itemTable extends Datatable
         $this->datatablemodel = [
             ['header' => t('tree_item.id', '#'), 'value' => 'id'],
             ['header' => t('tree_item.name', 'Name'), 'value' => 'name'],
-            ['header' => t('tree_item.description', 'Description'), 'value' => 'description'],
+            ['header' => t('Content'), 'value' => 'content'],
             ['header' => t('tree_item.parent_id', 'Parent_id'), 'value' => 'parent_id'],
             ['header' => t('tree_item.main', 'Main'), 'value' => 'main'],
             ['header' => t('Position'), 'value' => 'position'],

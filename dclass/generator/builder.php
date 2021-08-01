@@ -69,10 +69,57 @@ function recurse_copy_dir(string $src, string $dest) : int {
 
     return $count;
 }
+
 if ($argv[1] === 'schema:update') {
 
     $result = [];
     exec("bin\doctrine orm:schema:update --dump-sql", $result);
+
+    //
+    /*$em = DBAL::getEntityManager();
+
+    $listentities = ["Cmstext"];
+    foreach ($listentities as $entity){
+        $lc_entity = strtolower($entity);
+        $migrationlang = ROOT."database/langs/migration_$lc_entity.json";
+        if(!file_exists($migrationlang)) {
+            \DClass\lib\Util::writein("{}", $migrationlang);
+        }
+        $dbal = new DBAL();
+        $sql = "";
+        $tableexist = $dbal->tableExists($lc_entity."_lang");
+        if(!$tableexist){
+            // todo: create table
+            $sql = "
+CREATE TABLE `$lc_entity\_lang` (
+  `$lc_entity\_id` int(10) UNSIGNED NOT NULL,
+  `lang_id` int(10) UNSIGNED NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+";
+            $dbal->executeDbal($sql);
+        }
+        $migrationlang = json_decode(file_get_contents($migrationlang), true);
+        $attrs = $migrationlang["attrs"];
+        if($attrs != $entity::langs)
+            continue;
+
+        $sql .= "ALTER TABLE $lc_entity\_lang ";
+        $ec = $em->getClassMetadata("\\" . $entity);
+        $attribtodelete = array_diff($attrs, $entity::langs);
+        $attribtoadd = array_diff($entity::langs, $attrs);
+        foreach($attribtodelete as $attr){
+            // todo: alter table drop
+            $sql .= " DROP COLUMN $attr varchar(255)";
+        }
+        foreach($attribtoadd as $attr){
+            // todo: alter table
+            $sql .= " ADD $attr varchar(255)";
+        }
+        $sql .= ";";
+
+        $dbal->executeDbal($sql);
+
+    }*/
 
     $action = "--dump-sql";
     if(isset($argv[2]))
@@ -205,12 +252,17 @@ if (isset($argv[2])) {
             break;
 
         case 'core:g:entity':
+
             if(isset($argv[3])){
-                if(isset($argv[4])){
-                    __Generatorjava::entity($argv[2], $project, $argv[4]); //,$argv[4] for package
-                    echo $argv[2] . ": Entity java generated with success";
+                if($argv[3] == "--lang"){
+                    __Generator::entityLang($argv[2], $project); //,
+                    echo $argv[2] . ": Entity lang generated with success";
+//                }
+//                elseif(isset($argv[4])){
+//                    __Generatorjava::entity($argv[2], $project, $argv[4]); //,$argv[4] for package
+//                    echo $argv[2] . ": Entity java generated with success";
                 }else
-                    echo "warning: package missing!";
+                    echo "warning: did you mean --lang?";
             }else{
                 __Generator::entity($argv[2], $project); //,
                 echo $argv[2] . ": Entity generated with success";
@@ -279,11 +331,15 @@ if (isset($argv[2])) {
 }
 else {
 
+    require __DIR__ . '/../../src/devups/ModuleLang/Entity/Dvups_lang.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_component.php';
+    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_component_lang.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_module.php';
+    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_module_lang.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_entity.php';
+    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_entity_lang.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_component.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';

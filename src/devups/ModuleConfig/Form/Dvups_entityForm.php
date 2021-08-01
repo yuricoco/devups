@@ -35,15 +35,21 @@ class Dvups_entityForm extends FormManager
             "type" => FORMTYPE_TEXT,
             "value" => $dvups_entity->getLabel(),
         ];
+//        $entitycore->field['enablenotification'] = [
+//            "label" => t('Activer les notifications'),
+//            "type" => FORMTYPE_RADIO,
+//            "options" => ["no", "yes"],
+//            "value" => $dvups_entity->getEnablenotification(),
+//        ];
 
-        $entitycore->field['dvups_module'] = [
+        $entitycore->field['dvups_module.id'] = [
             "type" => FORMTYPE_SELECT,
             "value" => $dvups_entity->getDvups_module()->getId(),
             "label" => t('entity.dvups_module'),
             "options" => FormManager::Options_Helper('name', Dvups_module::allrows()),
         ];
 
-        $entitycore->field['dvups_right'] = [
+        $entitycore->field['dvups_right::values'] = [
             "type" => FORMTYPE_CHECKBOX,
             "values" => $dvups_entity->inCollectionOf('Dvups_right'),
             "label" => t('entity.dvups_right'),

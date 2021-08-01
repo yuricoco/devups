@@ -72,11 +72,10 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
     /**
      * @return string
      */
-    public function getLabel()
+    public function getLabel($lang = __lang)
     {
-        if (!$this->label)
-            return $this->name;
 
+        return $this->__gettranslate( "label", $lang, $this->name);
         return $label = $this->__gettranslate("label", $this->label);
         if ($label)
             return $label;
@@ -178,8 +177,9 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
     public function dvupsTranslate()
     {
         // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
-        $this->__inittranslate("label", $this->label, "en");
-        $this->__inittranslate("label", $this->label, "fr");
+//        $this->__inittranslate("label", $this->label, "en");
+//        $this->__inittranslate("label", $this->label, "fr");
+        $this->__persistlang(["label"=>$this->name]);
     }
 
     public function route($path = ""){

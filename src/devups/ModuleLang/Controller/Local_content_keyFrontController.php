@@ -1,15 +1,19 @@
-<?php 
+<?php
 
+
+use dclass\devups\Datatable\Lazyloading;
 
 class Local_content_keyFrontController extends Local_content_keyController{
 
     public function ll($next = 1, $per_page = 10){
-
-            return $this->lazyloading(new Local_content_key(), $next, $per_page);
+        
+            $ll = new Lazyloading();
+            $ll->lazyloading(new Local_content_key());
+            return $ll;
 
     }
 
-    public function createAction($local_content_key_form = null){
+    public function createAction($local_content_key_form = null ){
         $rawdata = \Request::raw();
         $local_content_key = $this->hydrateWithJson(new Local_content_key(), $rawdata["local_content_key"]);
  

@@ -4,12 +4,14 @@
 class ImagecmsFrontController extends ImagecmsController{
 
     public function ll($next = 1, $per_page = 10){
-
-            return $this->lazyloading(new Imagecms(), $next, $per_page);
+        
+            $ll = new Lazyloading();
+            $ll->lazyloading(new Imagecms());
+            return $ll;
 
     }
 
-    public function createAction($imagecms_form = null){
+    public function createAction($imagecms_form = null ){
         $rawdata = \Request::raw();
         $imagecms = $this->hydrateWithJson(new Imagecms(), $rawdata["imagecms"]);
  

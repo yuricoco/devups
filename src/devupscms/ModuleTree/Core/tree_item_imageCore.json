@@ -1,0 +1,1 @@
+{"id":910,"name":"tree_item_image","attribut":{"2":{"name":"width_size","nullable":"default","size":"255","formtype":"text","datatype":"string"}},"relation":[{"entity":"tree_item","name":"tree_item","ondelete":"cascade","cardinality":"manyToOne"},{"entity":"dv_image","name":"image","ondelete":"set null","cardinality":"manyToOne"}],"module":{"id":5}}

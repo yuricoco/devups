@@ -4,76 +4,44 @@
 /**
  * @Entity @Table(name="user")
  * */
-class User extends Model implements JsonSerializable
+class User extends UserCore implements JsonSerializable
 {
 
+    public static $currentid;
     /**
      * @Id @GeneratedValue @Column(type="integer")
      * @var int
      * */
     protected $id;
-    /**
-     * @Column(name="firstname", type="string" , length=55 )
-     * @var string
-     **/
-    protected $firstname;
-    /**
-     * @Column(name="lastname", type="string" , length=55)
-     * @var string
-     **/
-    protected $lastname;
+
 
     /**
-     * @Column(name="email", type="string" , length=55 , nullable=true)
+     * @Column(name="spacekola_ref", type="integer" , nullable=true)
      * @var string
      **/
-    protected $email;
-    /**
-     * @Column(name="sex", type="string" , length=5 , nullable=true)
-     * @var string
-     **/
-    protected $sex;
-    /**
-     * @Column(name="telephone", type="string" , length=25 , nullable=true)
-     * @var string
-     **/
-    protected $telephone;
-    /**
-     * @Column(name="password", type="string" , length=255 , nullable=true)
-     * @var string
-     **/
-    protected $password;
-    /**
-     * @Column(name="resettingpassword", type="integer"  , nullable=true)
-     * @var integer
-     **/
-    protected $resettingpassword;
-    /**
-     * @Column(name="is_activated", type="integer"  , nullable=true)
-     * @var integer
-     **/
-    protected $is_activated = 1;
+    protected $spacekola_ref;
 
     /**
-     * @Column(name="activationcode", type="string" , length=255 , nullable=true)
+     * @Column(name="sexe", type="string" , length=5 , nullable=true)
      * @var string
      **/
-    protected $activationcode;
+    protected $sexe;
+    /**
+     * @Column(name="phonenumber", type="string" , length=25 , nullable=true)
+     * @var string
+     **/
+    protected $phonenumber;
+
     /**
      * @Column(name="birthdate", type="date"  , nullable=true)
      * @var date
      **/
     protected $birthdate;
     /**
-     * @Column(name="lang", type="string" , length=15 , nullable=true)
-     * @var string
-     **/
-    protected $lang;
-    /**
-     * @Column(name="username", type="string" , length=55 , nullable=true )
-     * @var string
-     **/
-    protected $username;
+     * @ManyToOne(targetEntity="\Country")
+     * @var \Country
+     */
+    public $country;
 
 
     public function __construct($id = null)
@@ -83,11 +51,80 @@ class User extends Model implements JsonSerializable
             $this->id = $id;
         }
 
+        $this->country = new Country();
     }
 
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getApiKey()
+    {
+        return $this->api_key;
+    }
+
+    /**
+     * @param string $api_key
+     */
+    public function setApiKey($api_key)
+    {
+        $this->api_key = $api_key;
+    }
+
+    public function getLastLogin()
+    {
+        return $this->last_login;
+    }
+
+    /**
+     * @param date $last_login
+     */
+    public function setLastLogin($last_login)
+    {
+        $this->last_login = $last_login;
+    }
+
+    public function setConfirm($confirm){
+
+        if($this->getPassword() != md5($confirm))
+            return t("Mot de passe incorrect. veuillez reessayer svp!");
+
+    }
+
+    /**
+     * @return string
+     */
+    public function getSpacekolaRef()
+    {
+        return $this->spacekola_ref;
+    }
+
+    /**
+     * @param string $spacekola_ref
+     */
+    public function setSpacekola_ref($spacekola_ref)
+    {
+        $this->spacekola_ref = $spacekola_ref;
+    }
+
+    /**
+     * @return Status
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @param Status $status
+     */
+    public function setStatus(Status $status)
+    {
+        $this->status = $status;
     }
 
 
@@ -98,11 +135,12 @@ class User extends Model implements JsonSerializable
 
     public function setFirstname($firstname)
     {
-        // code de validation
-        if ($firstname == "")
-            return "the firstname field is important!";
-
         $this->firstname = $firstname;
+    }
+    public function setUpdatePassword($pwd)
+    {
+        if($pwd)
+            $this->password = md5(sha1($pwd));
     }
 
     public function getLastname()
@@ -122,38 +160,27 @@ class User extends Model implements JsonSerializable
 
     public function setEmail($email)
     {
-        $nb = User::where("email", $email);
-        if ($nb->__countEl()) {
-            if ($nb->__getOne()->getId() != $this->id)
-                return "a user with this email already exist";
-        }
         $this->email = $email;
     }
 
-
-    public function getSex()
+    public function getSexe()
     {
-        return $this->sex;
+        return $this->sexe;
     }
 
-    public function setSex($sex)
+    public function setSexe($sexe)
     {
-        $this->sex = $sex;
+        $this->sexe = $sexe;
     }
 
-    public function getTelephone()
+    public function getPhonenumber()
     {
-        return $this->telephone;
+        return $this->phonenumber;
     }
 
-    public function setTelephone($telephone)
+    public function setPhonenumber($phonenumber)
     {
-        $nb = User::where("telephone", $telephone);
-        if ($nb->__countEl()) {
-            if ($nb->__getOne()->getId() != $this->id)
-                return "a user with this email already exist";
-        }
-        $this->telephone = $telephone;
+        $this->phonenumber = $phonenumber;
     }
 
     public function getPassword()
@@ -166,18 +193,10 @@ class User extends Model implements JsonSerializable
         $this->password = $password;
     }
 
-    public function setConfirmpassword($password)
-    {
-
-        if ($this->password != $password)
-            return "You may enter the same password";
-
-    }
-
-    public function getResettingpassword()
+   /* public function getResettingpassword()
     {
         return $this->resettingpassword;
-    }
+    }*/
 
     public function setResettingpassword($resettingpassword)
     {
@@ -194,6 +213,11 @@ class User extends Model implements JsonSerializable
         $this->is_activated = $is_activated;
     }
 
+    public function setCountry_iso($iso_code)
+    {
+        $this->country = Country::getbyattribut("iso", $iso_code);
+    }
+
     public function getActivationcode()
     {
         return $this->activationcode;
@@ -201,7 +225,10 @@ class User extends Model implements JsonSerializable
 
     public function setActivationcode($activationcode)
     {
+
         $this->activationcode = sha1($activationcode);
+        $this->activationcode_expired_at = date("Y-m-d H:i:s", strtotime("+3 hours", strtotime(date("Y-m-d H:i:s"))));
+
     }
 
 
@@ -215,11 +242,6 @@ class User extends Model implements JsonSerializable
         $this->birthdate = $birthdate;
     }
 
-    public function getCreationdate()
-    {
-        return $this->creationdate;
-    }
-
     public function getLang()
     {
         return $this->lang;
@@ -230,15 +252,6 @@ class User extends Model implements JsonSerializable
         $this->lang = $lang;
     }
 
-    public function getUsername()
-    {
-        return $this->username;
-    }
-
-    public function setUsername($username)
-    {
-        $this->username = $username;
-    }
 
     /**
      *  manyToOne
@@ -255,28 +268,62 @@ class User extends Model implements JsonSerializable
         $this->country = $country;
     }
 
+    public static function sanitizePhonenumber($phonenumber, $phone_code){
+        $telephone = str_replace("+".$phone_code,"", "+".$phonenumber);
+        return str_replace("+","", $telephone);
+    }
+
+    public function setTelephone($telephone)
+    {
+        if (!$telephone)
+            return null;
+
+        $telephone = self::sanitizePhonenumber($telephone, $this->country->getPhonecode());
+
+        $nb = User::where("phonenumber", $telephone);
+        if ($nb->__countEl()) {
+            if ($nb->__getOne()->getId() != $this->id)
+                return t("a user with this :attribute already exist", ["attribute" => "telephone"]);
+        }
+        $this->phonenumber = $telephone;
+    }
+
     /**
+     *  manyToOne
+     * @return \Town
      */
     function getTown()
     {
+        $this->town = $this->town->__show();
         return $this->town;
     }
 
-    function setTown($town)
+    function setTown(\Town $town)
     {
         $this->town = $town;
     }
 
+    function userdata()
+    {
+        return [
+            'id' => $this->id,
+            'firstname' => $this->firstname,
+            'lastname' => $this->lastname,
+            'username' => $this->username,
+            'spacekola_ref' => $this->spacekola_ref,
+        ];
+    }
 
     public function jsonSerialize()
     {
         return [
             'id' => $this->id,
             'firstname' => $this->firstname,
+            'spacekola_ref' => $this->spacekola_ref,
             'lastname' => $this->lastname,
             'email' => $this->email,
-            'sex' => $this->sex,
-            'telephone' => $this->telephone,
+            'sexe' => $this->sexe,
+            'phonenumber' => $this->phonenumber,
             'password' => $this->password,
             'resettingpassword' => $this->resettingpassword,
             'is_activated' => $this->is_activated,
@@ -284,7 +331,16 @@ class User extends Model implements JsonSerializable
             'birthdate' => $this->birthdate,
             'lang' => $this->lang,
             'username' => $this->username,
+            'country' => $this->country,
+            'api_key' => $this->api_key,
+            'session_token' => $this->session_token,
         ];
+    }
+
+    public function __insert()
+    {
+        $this->is_activated = 0;
+        return parent::__insert(); // TODO: Change the autogenerated stub
     }
 
     /**
@@ -292,16 +348,68 @@ class User extends Model implements JsonSerializable
      */
     public static function userapp()
     {
-
         if (isset($_SESSION[USER]))
             return unserialize($_SESSION[USER]);
 
         return new \User();
     }
 
+    /**
+     * @return \Transporter
+     */
+    public function transporter()
+    {
+        return $this->__hasone(Transporter::class);
+    }
+    /**
+     * @return \Transporter
+     */
+    public function affiliate()
+    {
+        return $this->__hasone(Affiliate::class);
+    }
+
+    public function updateSession()
+    {
+        $_SESSION[USER] = serialize(User::find($this->id));
+    }
+
     public function isActivated()
     {
-        return boolval($this->is_activated);
+        return boolval((int) $this->is_activated);
+    }
+
+    public function addresses()
+    {
+        return $this->__hasmany(Address::class);
+    }
+
+    public static function currentCountry()
+    {
+        $user = self::userapp();
+        if ($user->getId()) {
+            return $user->country->getIso();
+        }
+
+        return Country::current();
+
+    }
+
+    /**
+     * return the phonenumber with the country phone code.
+     * @return string
+     */
+    public function getTelephone(){
+        return $this->country->getPhonecode().$this->phonenumber;
+    }
+
+    /**
+     * return the phonenumber with the country phone code.
+     * @return string
+     */
+    public function getPendingOrder($transporter){
+        return Order::where(Status::get("pending"))
+            ->andwhere($this)->andwhere($transporter)->__getOne();
     }
 
 }

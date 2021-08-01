@@ -295,6 +295,8 @@ class Dfile {
 
         return array("success" => true,
             "file" => [
+                'hashname' => $this->file_name,
+                'imagesize' => $this->imagesize,
                 //'error' => $this->error,
             ],
             'detail' => 'upload success');
@@ -393,6 +395,8 @@ class Dfile {
                 if (!imagejpeg($newimage, $filename, $quality)) {
                     $this->message[] = 'Le jpeg n\'a pas pu etre converti correctement';
                 }
+//                else
+//                    chmod($filename, 755);
             }
         } elseif ($this->extension == 'png') {
 
@@ -410,11 +414,15 @@ class Dfile {
 
             if (!imagepng($newimage, $filename, 8))
                 $this->message[] = 'Le png n\'a pas pu etre converti correctement';
+//            else
+//                chmod($filename, 755);
         } elseif ($this->extension == 'gif') {
 
             $image = imagecreatefromgif($source_url);
             if (!imagegif($image, $filename, $quality))
                 $this->message[] = 'Le png n\'a pas pu etre converti correctement';
+//            else
+//                chmod($filename, 755);
         }
     }
 
@@ -506,7 +514,7 @@ class Dfile {
                 self::d_rename("tmp_".$this->file_name, $this->file_name, $this->uploaddir);
 
             }
-
+            //chmod($path . $this->file_name, 755);
             return array("success" => true,
                 "file" => [
                     'name' => $this->name,

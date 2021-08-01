@@ -41,7 +41,7 @@ class ConfigurationController extends Controller{
         $id = $configuration->__insert();
         return 	array(	'success' => true,
                         'configuration' => $configuration,
-                        'tablerow' => ConfigurationTable::init()->buildindextable()->getSingleRowRest($configuration),
+                        'tablerow' => ConfigurationTable::init()->router()->getSingleRowRest($configuration),
                         'detail' => '');
 
     }
@@ -61,7 +61,7 @@ class ConfigurationController extends Controller{
         $configuration->__update();
         return 	array(	'success' => true,
                         'configuration' => $configuration,
-                        'tablerow' => ConfigurationTable::init()->buildindextable()->getSingleRowRest($configuration),
+                        'tablerow' => ConfigurationTable::init()->router()->getSingleRowRest($configuration),
                         'detail' => '');
                         
     }

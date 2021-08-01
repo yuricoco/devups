@@ -65,7 +65,7 @@ class ConfigurationForm extends FormManager
             return [
                 'success' => true,
                 'configuration' => $configuration,
-                'action' => "create",
+                'action' => Configuration::classpath("services.php?path=configuration.create"),
             ];
         endif;
 
@@ -73,7 +73,7 @@ class ConfigurationForm extends FormManager
         return [
             'success' => true,
             'configuration' => $configuration,
-            'action' => "update&id=" . $id,
+            'action' => Configuration::classpath("services.php?path=configuration.update&id=" . $id),
         ];
 
     }

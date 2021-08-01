@@ -4,7 +4,7 @@
 /**
  * @Entity @Table(name="cmstext")
  * */
-class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
+class Cmstext extends Model implements JsonSerializable, DatatableOverwrite, DvupsTranslation
 {
 
     /**
@@ -18,7 +18,7 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
      **/
     protected $title;
     /**
-     * @Column(name="reference", type="string" , length=25 , nullable=true)
+     * @Column(name="reference", type="string" , length=125 , nullable=true)
      * @var string
      **/
     protected $reference;
@@ -36,13 +36,6 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
      **/
     public static $LANGS = ['en' => 'En', 'fr' => 'Fr'];
     public static $ACTIVES = ['non', 'yes'];
-
-    /**
-     * @Column(name="lang", type="string" , length=2 , nullable=true)
-     * @var string
-     **/
-    protected $lang = 'en';
-
 
     /**
      * @Column(name="sommary", type="text", nullable=true  )
@@ -84,8 +77,9 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
         return $this->id;
     }
 
-    public function getTitle()
+    public function getTitle($lang = null)
     {
+        //return self::__gettranslate( "title", $lang, $this->title);
         return $this->title;
     }
 
@@ -130,16 +124,6 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
         $this->content = $content;
     }
 
-    public function getLang()
-    {
-        return $this->lang;
-    }
-
-    public function setLang($lang)
-    {
-        $this->lang = $lang;
-    }
-
     /**
      * @return text
      */
@@ -180,6 +164,14 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
         return $this->position;
     }
 
+    public function getLink()
+    {
+        if($this->reference)
+            return $this->reference;
+        else
+            return route("publications?id=".$this->id);
+    }
+
     /**
      * @param text $position
      */
@@ -211,7 +203,6 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
             'title' => $this->title,
             'reference' => $this->reference,
             'content' => $this->content,
-            'lang' => $this->lang,
         ];
     }
 
@@ -237,5 +228,30 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite
     public function deleteAction($btarray)
     {
         // TODO: Implement deleteAction() method.
+    }
+
+    public static function getActiveCmstext(){
+        return Cmstext::where(Tree_item::getbyattribut("this.name", "news"))
+            ->andwhere("active", 1);
+    }
+
+    const langs = ["title", "content"];
+    public function dvupsTranslate()
+    {
+
+        $lang = \Dvups_lang::defaultLang();
+        $this->__inittranslate([
+            "title" => self::post("title"),
+            "content" => self::post("content"),
+        ], $lang);
+
+        $langs = \Dvups_lang::otherLangs();
+        foreach ($langs as $lang) {
+            $this->__inittranslate([
+                "title" => self::post("title_".$lang->getIso_code()),
+                "content" => self::post("content_".$lang->getIso_code(), $this->content),
+            ], $lang);
+        }
+
     }
 }

@@ -115,8 +115,8 @@ class Dvups_config_item extends Model implements JsonSerializable, DvupsTranslat
     public function dvupsTranslate()
     {
         // we can iterate on howmuch lang the system may have to initiate all the lang of the new entry
-        self::inittranslate($this,"label", $this->label, "en");
-        self::inittranslate($this,"label", $this->label, "fr");
+//        self::inittranslate($this,"label", $this->label, "en");
+//        self::inittranslate($this,"label", $this->label, "fr");
     }
 
 }

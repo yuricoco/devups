@@ -27,16 +27,32 @@ class RegistrationController extends Controller {
             ->__countEl();
 
         if($nbuser)
-            return ["success" => false, "detail" => t("email address already use")];
+            return ["success" => false, "detail" => t("Cette adresse mail existe déjà!")];
 
-        self::resendactivationcode();
+        $user = User::find(Request::get("user_id"));
+        $activationcode = RegistrationController::generatecode();
+        $user->setActivationcode($activationcode);
+
+        $user->__update();
+
+        $_SESSION[USER] = serialize($user);
+
+        // send mail with activation code $codeactivation
+        $data = [
+            "activationcode" => route('login').'?vld='.$activationcode.'&u_id='.$user->getId(),
+            "activation_code" => $activationcode,
+            "username" => $user->getFirstname(),
+        ];
+        Reportingmodel::init("change_email")
+            ->addReceiver($email, $user->getUsername())
+            ->sendMail($data);
 
         return ["success" => true, "detail" => t("code d'activation envoyé")];
 
     }
 
     public static function changeemailAction(){
-        global  $user;
+        $user = User::find(Request::get("user_id"));
         $code = sha1(Request::post("activationcode"));
 
         if($user->getActivationcode() !==  $code )
@@ -47,7 +63,7 @@ class RegistrationController extends Controller {
 
         $user->setEmail(Request::post("email"));
 
-        $user->__update();
+        $user->__update(["email" => Request::post("email")]);
 
         $_SESSION[USER] = serialize($user);
 
@@ -57,25 +73,37 @@ class RegistrationController extends Controller {
 
     public static function checktelephoneAction()
     {
-        $email = Request::post("phonenumber");
+        if(isset($_POST['phonecode']))
+            $country = Country::getbyattribut("phonecode", Request::post("phonecode"));
+        else
+            $country = Country::getbyattribut("iso", Request::post("country_iso"));
+
+        $phonenumber = User::sanitizePhonenumber(Request::post("phonenumber"), $country->getPhonecode());
 
         $nbuser = User::select()
-            ->where('user.phonenumber', "=", $email)
+            ->where('user.phonenumber', "=", $phonenumber)
             ->__countEl();
 
         if($nbuser)
-            return ["success" => false, "detail" => t("Phonenumber address already use")];
+            return ["success" => false, "detail" => t("Ce numéro de téléphone existe déjà")];
 
-        self::resendactivationcode();
+        $userhydrate = User::find(Request::get("user_id"));
 
-        return ["success" => true, "detail" => t("code d'activation envoyé")];
+        $activationcode = RegistrationController::generatecode();
+        $userhydrate->setActivationcode($activationcode);
+        $userhydrate->__update();
+
+        Notification::on($userhydrate, "change_telephone", ["username"=>$userhydrate->getFirstname(), "code"=>$activationcode])
+            //->send([$userhydrate])
+            ->sendSMS([$country->getPhonecode().$phonenumber]);
+
+        return ["success" => true, "detail" => t("code d'activation vous a été envoyé. Utilisez le pour confirmer le changement de votre numéro.")];
 
     }
 
     public static function changetelephoneAction()
     {
-
-        global  $user;
+        $user = User::find(Request::get("user_id"));
         $code = sha1(Request::post("activationcode"));
 
         if($user->getActivationcode() !==  $code )
@@ -132,38 +160,131 @@ class RegistrationController extends Controller {
         return substr($generate, 0, 5);
     }
 
+    protected function updatesetting(\User $userhydrate){
 
-    public function register($user_form, \User $userhydrate) {
+            $nbuser = User::select()
+                ->where('user.email', "=", $userhydrate->getEmail())
+                ->__countEl();
+
+            if($nbuser)
+                return ["success" => false, "detail" => "email address already use"];
+
+            $nbuser = User::select()
+                ->where('phonenumber', "=", $userhydrate->getPhonenumber())
+                ->andwhere('country.phonecode', "=", $userhydrate->country->__get("phonecode"))
+                ->andwhere('user.id', "!=", $userhydrate->getId())
+                ->__countEl();
+
+            if($nbuser)
+                return ["success" => false, "detail" => "phonenumber already use"];
+
+
+        $userhydrate->setUsername($_POST['user_form']['username']);
+        $userhydrate->setEmail($_POST['user_form']['emailorphonenumber']);
+
+        $userhydrate->__update();
+
+        //updatesession($userhydrate);
+        return ["success" => true, "detail" => "success", "user" => $userhydrate];
+
+    }
+
+    public function register($id = null) {
+        extract($_POST);
+
+        // check if username is free
+        //$userhydrate = Controller::form_generat(new User($id), $user_form, null, true);
+        $userhydrate = new User($id);
+        if ( ! is_null($id)){
+            $userhydrate = $this->form_generat(new User($id), $user_form);
+
+            if($userhydrate->getPassword() != md5($confirm))
+                return ["success" => false, "detail" => "le mot de passe est incorrect"];
+
+            $userhydrate->__update();
+            return ["success" => true, "detail" => "success", "user" => $userhydrate];
+
+        }
+
+        $userhydrate = $this->form_generat(new User(), $user_form);
+
+        $qb = new QueryBuilder(new User());
+        $qb->select();
+
+        $qb->where('this.phonenumber', "=", $userhydrate->getPhonenumber());
+
+            $nbuser = $qb
+                //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
+                ->__countEl();
+
+            if($nbuser) {
+                $nbuser = User::select()
+                    ->where('this.phonenumber', "=", $userhydrate->getPhonenumber())
+                    //->andwhere('country.phonecode', "=", $userhydrate->country->__get("phonecode"))
+                    ->__countEl();
+
+                if ($nbuser)
+                    return ["success" => false, "detail" => "phonenumber already use"];
+            }
+
+        if($userhydrate->getEmail()){
+
+            $qb = User::where('this.email', "=", $userhydrate->getEmail());
+
+            $nbuser = $qb
+                //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
+                ->__countEl();
+
+            if($nbuser) {
+                $nbuser = User::select()
+                    ->where('user.email', "=", $userhydrate->getEmail())
+                    ->__countEl();
+
+                if($nbuser)
+                    return ["success" => false, "detail" => "email address already use"];
+
+            }
+        }
 
         $userhydrate->setPassword(md5($user_form['password']));
+        //$userhydrate->setUsername($user_form['username']);
 
         $activationcode = RegistrationController::generatecode();
         $userhydrate->setActivationcode($activationcode);
 
         // todo: handle it better
         $userhydrate->setIs_activated(1);
+        $userhydrate->setApiKey(\DClass\lib\Util::randomcode());
 
-        $userhydrate->__update();
+        $userhydrate->__insert();
 
         $_SESSION[USER] = serialize($userhydrate);
         $_SESSION[USERID] = $userhydrate->getId();
 
+        if($userhydrate->getEmail()) {
+            $data = [
+                "activationcode" => $activationcode,
+                "username" => $userhydrate->getFirstname(),
+            ];
+            Reportingmodel::init("registered")
+                ->addReceiver($userhydrate->getEmail(), $userhydrate->getUsername())
+                ->sendMail($data);
+        }
 
-        if($userhydrate->getEmail())
-            // send mail with activation code $codeactivation
-            Emailmodel::model( "registration")->sendMail($userhydrate, $activationcode);
-//        else
-//            // send sms with activation code $codeactivation
-//            RegistrationController::sendsms($activationcode, null, $userhydrate);
+        // todo: send notification to seller
+        Notification::on($userhydrate, "registered", ["username"=>$userhydrate->getFirstname(), "code"=>$activationcode])
+            ->send([$userhydrate])
+            ->sendSMS([$userhydrate->getTelephone()]);
 
-        return ["success" => true, "activationcode" => $activationcode, "detail" => "success", "user" => $userhydrate];
+        return ["success" => true,
+            //"activationcode" => $activationcode,
+            "detail" => "success", "user" => $userhydrate];
 
     }
 
     public static function resendactivationcode() {
-        
-        global $user;
 
+        $user = User::find(Request::get("user_id"));
         $activationcode = RegistrationController::generatecode();
         $user->setActivationcode($activationcode);
 
@@ -172,111 +293,153 @@ class RegistrationController extends Controller {
         $_SESSION[USER] = serialize($user);
 
         // send mail with activation code $codeactivation
-        RegistrationController::sendmail($activationcode, $user);
+        if($user->getEmail()) {
+            $data = [
+                "activation_link" => route('login') . '?vld=' . $activationcode . '&u_id=' . $user->getId(),
+                "username" => $user->getFirstname(),
+            ];
+            Reportingmodel::init("verify_account")
+                ->addReceiver($user->getEmail(), $user->getUsername())
+                ->sendMail($data);
+        }
+
+        Notification::on($user, "verify_account", ["username"=>$user->getFirstname(), "code"=>$activationcode])
+            //->send([$userhydrate])
+            ->sendSMS([$user->getTelephone()]);
 
         // send sms with activation code $codeactivation
         //RegistrationController::sendsms($activationcode, null, $user);
 
-        return ["success" => true, "activationcode" => $activationcode, "detail" => "un nouveau code d'activation vous a ete renvoyé par mal."];
-    }
+        return [
+            "success" => true,
+            //"activationcode" => $activationcode,
+            "detail" => t("un nouveau code d'activation vous a été renvoyé.")
+        ];
 
-    /**
-     * implementation of swiftmailler
-     * 
-     * @param type $activationcode
-     * @param \User $userhydrate
-     */
-    public static function sendmail($activationcode, $userhydrate)
-    {
-
-        // create curl resource
-        if (!__prod)
-            return 0;
-
-        include __DIR__ . '/../Ressource/emailtemplate/mail.php';
-
-        //$mail = $userhydrate->getEmail(); // Déclaration de l'adresse de destination.
-        $message_html = getmailtemplate($activationcode, $userhydrate);
-// Instantiation and passing `true` enables exceptions
-        $mail = new PHPMailer(true);
-        $subject = t("Bienvenu sur Buyamsellam24. Votre code d'activation.");
-
-        try {
-            //Server settings
-            //$mail->SMTPDebug = false;                                       // Enable verbose debug output ->SMTPDebug = false;
-            $mail->isSMTP();                                            // Set mailer to use SMTP
-            $mail->Host = sm_smtp;  // Specify main and backup SMTP servers
-            $mail->SMTPAuth = true;                                   // Enable SMTP authentication
-            $mail->Username = sm_username;                     // SMTP username
-            $mail->Password = sm_password;                               // SMTP password
-            $mail->SMTPSecure = sm_smtpsecurity;                                  // Enable TLS encryption, `ssl` also accepted
-            $mail->Port = sm_port;                                    // TCP port to connect to
-
-            //Recipients
-            $mail->setFrom(sm_from, t("email.title", 'Buyamsellam24'));
-            $mail->addAddress($userhydrate->getEmail(), $userhydrate->getFirstname());     // Add a recipient
-            //$mail->addAddress('ellen@example.com');               // Name is optional
-            $mail->addReplyTo(sm_from, t("email.title", 'Buyamsellam24'));
-//            $mail->addCC('cc@example.com');
-//            $mail->addBCC('bcc@example.com');
-
-            // Attachments
-//            $mail->addAttachment('/var/tmp/file.tar.gz');         // Add attachments
-//            $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
-
-            // Content
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = $subject;
-            $mail->Body = $message_html;
-            $mail->AltBody = 'Bonjour, ' . $userhydrate->getFirstname() . '
-							Bien vouloir utiliser le code d\'activation ci-après pour activer votre compte Buyamsellam24.
-							Code d\'activation: [' . $activationcode . ']';
-
-            //echo 'Message has been sent';
-            return [
-                "success" => true,
-                "result" => $mail->send(),
-                "user" => 'Message has been sent'
-            ];
-        } catch (Exception $e) {
-            //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
-            return [
-                "success" => false,
-                "result" => "Message could not be sent. Mailer Error: {$mail->ErrorInfo}"
-            ];
-        }
     }
 
     public static function activateaccount() {
 //        global $appuser;
-        $appuser = userapp();
+        $appuser = User::find(Request::get("user_id"));
 
         //return $_POST;
         if ($appuser->isActivated())
-            return ["success" => true, "url" => d_url('home')];
+            return ["success" => true, "url" => route('home')];
         else {
             $code = sha1($_POST['user_form']["activationcode"]);
             if ($code == $appuser->getActivationcode()) {
             //if (substr($code, 0, 5) == $appuser->getActivationcode()) {
 
-                $appuser->setIs_activated(true);
+                $appuser->setIs_activated(1);
                 //$appuser->setLocked(false);
                 $appuser->__update();
                 //updatesession($appuser);
                 $_SESSION[USERAPP] = serialize($appuser);
 
-                return ["success" => true, "url" => d_url("customer-dashboard")];
+                return ["success" => true, "url" => route("user-profile")];
             }
         }
 
         return [
             "success" => false,
-            'error' => "Activation code not valide. ensure that there is no space"
+            'error' => t("Le code d'activation n'est pas valide. Veuillez entrer de nouveau ou alors renvoyer un autre code")
+        ];
+
+    }
+
+    public static function step3Action() {
+        extract($_POST);
+
+        $userapp = userapp();
+
+        $userapp->setRegistered(4);
+        $userapp->setEnabled(true);
+        $userapp->setLocked(false);
+
+        (new DBAL())->executeDbal("update user set registered = 4, enabled = 1 where id = " . $_SESSION[USERID]);
+
+        updatesession($userapp);
+
+        return ['success' => true];
+    }
+
+    public static function step1Action() {
+        extract($_POST);
+
+        if(isset($_POST['activationcode'])){
+            $activated = self::activateaccount();
+            if(!$activated["success"])
+                return $activated;
+
+        }
+
+        $userapp = userapp();
+
+        $userapp->setRegistered(2);
+
+        (new DBAL())->executeDbal("update user set registered = 2 where id = " . $userapp->getId());
+        updatesession($userapp);
+
+        return ['success' => true];
+
+    }
+
+    public static function step2Action($user_form = []) {
+        extract($_POST);
+
+        $userhydrate = userapp();
+
+        if(isset($user_form['email'])){
+
+            $user = User::select()->where("user.email", $user_form['email'])->__getOne(false);
+            if ($user->getId() && $userhydrate->getId() != $user->getId()) {
+                return ['success' => false, "error" => "this email already exist"];
+            }
+
+            $userhydrate->setEmail($user_form['email']); // next step
+        }elseif(isset($user_form['userphonenumber'])){
+
+            $user = User::select()
+                ->where('userphonenumber', "=", $user_form['userphonenumber'])
+                ->andwhere('countrylight.phonecode', "=", $userhydrate->countrylight->__get("phonecode"))
+                ->__getOne(false);
+
+            if ($user->getId() && $userhydrate->getId() != $user->getId() && $userhydrate->getUserphonenumber())
+                return ["success" => false, "error" => "phonenumber already use"];
+
+            $userhydrate->setUserphonenumber($user_form['userphonenumber']); // next step
+
+        }
+
+        //$userhydrate = Controller::form_generat($userapp, $user_form);
+        $userhydrate->setUsername($user_form['username']); // next step
+        //$userhydrate->setUsername_canonical(clean(remove_accents($user_form['username']))); // next step
+        $userhydrate->setRegistered(3); // next step
+
+//        if (!isset($user_form['professionalstatut_id'])) {
+//            $userhydrate->setProfessionalstatut(new Professionalstatut());
+//        }
+
+        $userhydrate->__update();
+        updatesession($userhydrate);
+        User::$jsonmodel = 1;
+        return [
+            'success' => true,
+            'user' => $userhydrate
         ];
     }
 
-    public function listView($next = 1, $per_page = 10)
+    public function complation($id)
     {
-        // TODO: Implement listView() method.
+        extract($_POST);
+
+        $user = $this->form_fillingentity(new User($id), $user_form);
+
+        $user->__update();
+        return 	array(	'success' => true,
+            'user' => $user,
+            'detail' => '');
+
     }
+
 }

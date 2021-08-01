@@ -11,23 +11,26 @@
 @section('content')
 
     <div class="row">
-        <div class="col-lg-12 col-md-12  stretch-card">
+        <div class="col-lg-9 col-md-12  stretch-card">
             <div class="card">
                 <div class="card-header-tab card-header">
                     <div class="card-header-title">
                         <i class="header-icon lnr-rocket icon-gradient bg-tempting-azure"> </i>
-                        FOrmulaire
+                        Formulaire
                     </div>
                     <div class="btn-actions-pane-right">
-                        <div class="nav">
-                            <button onclick="model.dialogbox('imagecms')" class="nav">
-                                Images
-                            </button>
-                        </div>
+
                     </div>
                 </div>
                 <div class="card-body">
                     @include("admin.cmstext.formWidget")
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-12  stretch-card">
+            <div class="card">
+                <div class="card-body">
+                    {!! ImagecmsTable::init()->buildindextable()->render() !!}
                 </div>
             </div>
         </div>
@@ -53,6 +56,7 @@
 
 @section('jsimport')
 
+    <?= Form::addDformjs() ?>
     {!! Form::addjs(__admin.'plugins/tinymce.min') !!}
     <?= Form::addjs(Cmstext::classpath('Ressource/js/cmstextForm')) ?>
 

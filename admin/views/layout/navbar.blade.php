@@ -67,6 +67,9 @@
                                     <li>
                                         <a href="{{ $entity->route() }}">
                                             <i class="metismenu-icon"></i> {{$entity->getLabel()}}
+                                            @if($nb = $entity->alert())
+                                              (  {{$nb}} )
+                                            @endif
                                         </a>
                                     </li>
                                 @endforeach

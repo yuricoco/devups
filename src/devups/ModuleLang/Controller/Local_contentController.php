@@ -13,7 +13,7 @@ class Local_contentController extends Controller
 
         $this->datatable = Local_contentTable::init(new Local_content())->buildindextable();
 
-        self::$jsfiles[] = Local_content::classpath('Ressource/js/local_contentCtrl.js');
+        self::$jsfiles[] = Local_content::classpath('Resource/js/local_contentCtrl.js');
 
         $this->entitytarget = 'Local_content';
         $this->title = "Manage Local_content";
@@ -24,7 +24,8 @@ class Local_contentController extends Controller
 
     public function datatable($next, $per_page) {
         return ['success' => true,
-            'datatable' => Local_contentTable::init(new Local_content())->router()->getTableRest(),
+            'datatable' => Local_contentTable::init(new Local_content())->buildindextable()->getTableRest(),
+           // 'datatable' => Local_contentTable::init(new Local_content())->router()->getTableRest(),
         ];
     }
 
@@ -143,7 +144,9 @@ class Local_contentController extends Controller
     public static function buildlocalcache()
     {
 
-        foreach (["en", "fr"] as $lang) {
+        $lans = Dvups_lang::all();
+        foreach ($lans as $lang) {
+            $lang = $lang->getIso_code();
 
             $lcs = Local_content::where("lang", $lang)->__getAllRow();
 
@@ -176,7 +179,9 @@ class Local_contentController extends Controller
         $lck->setReference($ref);
         $lck->__insert();
 
-        foreach (["en", "fr"] as $lang) {
+        $lans = Dvups_lang::all();
+        foreach ($lans as $lang) {
+            $lang = $lang->getIso_code();
 
             $lc = new Local_content();
             $lc->setLang($lang);

@@ -7,37 +7,61 @@ class ImagecmsController extends Controller{
 
     public function listView($next = 1, $per_page = 10){
 
-            $lazyloading = $this->lazyloading(new Imagecms(), $next, $per_page);
+        $this->datatable = ImagecmsTable::init(new Imagecms())->buildindextable();
 
-        self::$jsfiles[] = Imagecms::classpath('Ressource/js/imagecmsCtrl.js');
+        self::$jsfiles[] = Imagecms::classpath('Resource/js/imagecmsCtrl.js');
 
         $this->entitytarget = 'Imagecms';
         $this->title = "Manage Imagecms";
         
-        $this->renderListView(ImagecmsTable::init($lazyloading)->buildindextable()->render());
+        $this->renderListView();
 
     }
 
     public function datatable($next, $per_page) {
-        $lazyloading = $this->lazyloading(new Imagecms(), $next, $per_page);
+    
         return ['success' => true,
-            'datatable' => ImagecmsTable::init($lazyloading)->buildindextable()->getTableRest(),
+            'datatable' => ImagecmsTable::init(new Imagecms())->router()->getTableRest(),
+        ];
+        
+    }
+
+    public function formView($id = null)
+    {
+        $imagecms = new Imagecms();
+        $action = Imagecms::classpath("services.php?path=imagecms.create");
+        if ($id) {
+            $action = Imagecms::classpath("services.php?path=imagecms.update&id=" . $id);
+            $imagecms = Imagecms::find($id);
+        }
+
+        return ['success' => true,
+            'form' => ImagecmsForm::init($imagecms, $action)
+                ->buildForm()
+                ->addDformjs()
+                ->renderForm(),
         ];
     }
 
-    public function createAction($imagecms_form = null){
+    public function createAction($imagecms_form = null ){
         extract($_POST);
 
         $imagecms = $this->form_fillingentity(new Imagecms(), $imagecms_form);
- 
-
         if ( $this->error ) {
             return 	array(	'success' => false,
-                            'imagecms' => $imagecms,
-                            'action' => 'create', 
                             'error' => $this->error);
         }
-        
+
+        $dv_image = $this->form_fillingentity(new Dv_image(), $dv_image_form);
+        if ( $this->error ) {
+            return 	array(	'success' => false,
+                'dv_image' => $dv_image,
+                'error' => $this->error);
+        }
+        $dv_image->uploadImagecontent();
+        $dv_image->__insert();
+
+        $imagecms->setImage($dv_image);
         $id = $imagecms->__insert();
         return 	array(	'success' => true,
                         'imagecms' => $imagecms,
@@ -50,8 +74,7 @@ class ImagecmsController extends Controller{
         extract($_POST);
             
         $imagecms = $this->form_fillingentity(new Imagecms($id), $imagecms_form);
-
-                    
+     
         if ( $this->error ) {
             return 	array(	'success' => false,
                             'imagecms' => $imagecms,
@@ -62,7 +85,7 @@ class ImagecmsController extends Controller{
         $imagecms->__update();
         return 	array(	'success' => true,
                         'imagecms' => $imagecms,
-                        'tablerow' => ImagecmsTable::init()->buildindextable()->getSingleRowRest($imagecms),
+                        'tablerow' => ImagecmsTable::init()->router()->getSingleRowRest($imagecms),
                         'detail' => '');
                         
     }
@@ -85,8 +108,9 @@ class ImagecmsController extends Controller{
     }
     
     public function deleteAction($id){
-      
-            Imagecms::delete($id);
+    
+        Imagecms::delete($id);
+        
         return 	array(	'success' => true, 
                         'detail' => ''); 
     }
@@ -95,7 +119,7 @@ class ImagecmsController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Imagecms::delete()->where("id")->in($ids)->exec();
+        Imagecms::where("id")->in($ids)->delete();
 
         return array('success' => true,
                 'detail' => ''); 

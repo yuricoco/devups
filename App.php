@@ -12,9 +12,12 @@ class App extends \dclass\devups\Controller\FrontController
 {
 
     protected $layout = "layout.app";
+    public static $user;
 
     public function __construct()
     {
+
+        // self::$user = User::find(userapp()->getId());
 
         self::$jsfiles[] = CLASSJS . "devups.js";
         self::$jsfiles[] = CLASSJS . "model.js";
@@ -26,13 +29,40 @@ class App extends \dclass\devups\Controller\FrontController
         (new Request('hello'));
         Request::Route($this, Request::get('path'));
 
-//        self::$jsfiles["jsimport"] = [];
-//        self::$cssfiles["cssimport"] = [];
+
+    }
+
+    public static function isGuest(){
+        return is_null(self::$user->getId());
+    }
+
+    public static function needsession($message = "")
+    {
+        if (!self::$user->getId()) {
+            redirect(route("login?message=" . $message));
+            die;
+        }
+
+        return true;
+
+    }
+
+    public static function noneedsession()
+    {
+        if (self::$user->getId()) {
+            redirect(route("home"));
+            die;
+        }
 
     }
 
     public function helloView(){
         Genesis::render("hello", []);
+    }
+
+    public function tableView(){
+        $datatable = ProductTable::init(new Product())->buildindextable();
+        Genesis::render("table", compact("datatable"));
     }
 
 }

@@ -19,18 +19,18 @@ class Dvups_roleForm extends FormManager
         //dv_dump($dvups_role->inCollectionOf("dvups_right"), $dvups_role);
 
         $entitycore->field['name'] = [
-            "label" => t('dvups_role.name'),
+            "label" => t('Name role'),
             "type" => FORMTYPE_TEXT,
             "value" => $dvups_role->getName(),
         ];
 
         $entitycore->field['alias'] = [
-            "label" => t('dvups_role.alias'),
+            "label" => t('Alias for commun name'),
             "type" => FORMTYPE_TEXT,
             "value" => $dvups_role->getAlias(),
         ];
 
-        $entitycore->field['dvups_right'] = [
+        $entitycore->field['dvups_right::values'] = [
             "type" => FORMTYPE_CHECKBOX,
             //"values" => FormManager::Options_Helper('name', $dvups_role->getDvups_right()),
             "values" => $dvups_role->inCollectionOf("dvups_right"),
@@ -38,7 +38,7 @@ class Dvups_roleForm extends FormManager
             "options" => FormManager::Options_Helper('name', Dvups_right::all()),
         ];
 
-        $entitycore->field['dvups_module'] = [
+        $entitycore->field['dvups_module::values'] = [
             "type" => FORMTYPE_CHECKBOX,
             "values" => $dvups_role->inCollectionOf("dvups_module"),
             //"values" => FormManager::Options_Helper('name', $dvups_role->getDvups_module()),
@@ -46,7 +46,7 @@ class Dvups_roleForm extends FormManager
             "options" => FormManager::Options_Helper('name', Dvups_module::all()),
         ];
 
-        $entitycore->field['dvups_entity'] = [
+        $entitycore->field['dvups_entity::values'] = [
             "type" => FORMTYPE_CHECKBOX,
             "values" => $dvups_role->inCollectionOf("dvups_entity"),
             //"values" => FormManager::Options_Helper('name', $dvups_role->getDvups_entity()),
@@ -98,9 +98,10 @@ class Dvups_roleForm extends FormManager
 
         $data = self::getFormData($id, $action);
         $data["rights"] = Dvups_right::all();
-        $data["modules"] = Dvups_module::all();
+        $data["components"] = Dvups_component::all();
 
         $data["value_rights"] = $data["dvups_role"]->inCollectionOf("dvups_right");
+        $data["value_components"] = $data["dvups_role"]->inCollectionOf("dvups_component");
         $data["value_modules"] = $data["dvups_role"]->inCollectionOf("dvups_module");
         $data["value_entities"] = $data["dvups_role"]->inCollectionOf("dvups_entity");
 

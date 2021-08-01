@@ -9,44 +9,53 @@ class UserController extends Controller{
 
         $this->datatable = UserTable::init(new User())->buildindextable();
 
-        self::$jsfiles[] = User::classpath('Ressource/js/userCtrl.js');
+        self::$jsfiles[] = User::classpath('Resource/js/userCtrl.js');
 
         $this->entitytarget = 'User';
         $this->title = "Manage User";
-        
+
         $this->renderListView();
+
 
     }
 
     public function datatable($next, $per_page) {
-    
         return ['success' => true,
-            'datatable' => UserTable::init(new User())->buildindextable()->getTableRest(),
+            'datatable' => UserTable::init(new User())->router()->getTableRest(),
         ];
-        
+
     }
 
-    public function createAction($user_form = null , $enterprise_form = null){
+    public function formView($id = null)
+    {
+        $user = new User();
+        $action = User::classpath("services.php?path=user.create");
+        if ($id) {
+            $action = User::classpath("services.php?path=user.update&id=" . $id);
+            $user = User::find($id);
+        }
+
+        return ['success' => true,
+            'form' => UserForm::init($user, $action)
+                ->buildAdminForm()
+                ->addDformjs()
+                ->renderForm(),
+        ];
+    }
+
+    public function createAction($user_form = null){
         extract($_POST);
 
         $user = $this->form_fillingentity(new User(), $user_form);
+ 
 
         if ( $this->error ) {
             return 	array(	'success' => false,
                             'user' => $user,
                             'action' => 'create', 
                             'error' => $this->error);
-        } 
-                    
-//        $enterprise = $this->form_fillingentity(new Enterprise(), $enterprise_form);
-//        if ( $this->error ) {
-//            return 	array(	'success' => false,
-//                            'enterprise' => $enterprise,
-//                            'error' => $this->error);
-//        }
-//
-//        $enterprise->__insert();
-//        $user->setEnterprise($enterprise);
+        }
+        
         $id = $user->__insert();
         return 	array(	'success' => true,
                         'user' => $user,
@@ -57,21 +66,20 @@ class UserController extends Controller{
 
     public function updateAction($id, $user_form = null){
         extract($_POST);
-            
+
         $user = $this->form_fillingentity(new User($id), $user_form);
-     
+
         if ( $this->error ) {
             return 	array(	'success' => false,
                             'user' => $user,
-                            'action_form' => 'update&id='.$id,
                             'error' => $this->error);
         }
         
         $user->__update();
         return 	array(	'success' => true,
                         'user' => $user,
-                        'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
-                        'detail' => '');
+                        //'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
+                        'detail' => t('Information mis à jour avec succès'));
                         
     }
     
@@ -103,7 +111,7 @@ class UserController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        User::delete()->where("id")->in($ids)->exec();
+        User::delete()->where("id")->in($ids);
 
         return array('success' => true,
                 'detail' => ''); 

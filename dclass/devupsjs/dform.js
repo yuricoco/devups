@@ -4,48 +4,50 @@
 
 var entityid = 0;
 var dform = {
-    geterror(error){
+    geterror(error) {
         var errorarray = [];
         var keys = Object.keys(error);
         var values = Object.values(error);
         for (var i = 0; i < keys.length; i++) {
-            errorarray.push( "<b>" + keys[i] + "</b> : " + values[i]+ "");
+            errorarray.push("<b>" + keys[i] + "</b> : " + values[i] + "");
         }
 
-        return  '<div class="alert alert-danger alert-dismissable">\n' +
+        return '<div class="alert alert-danger alert-dismissable">\n' +
             '                                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>\n' +
-            '                                '+ errorarray.join("<br>") +'.\n' +
+            '                                ' + errorarray.join("<br>") + '.\n' +
             '                            </div>';
     },
-    binderror: function(error){
+    binderror: function (error) {
 
-        if(!error)
+        if (!error)
             return 0;
 
         //model.modalbody.find("#loader").remove();
         //model.modalboxcontainer.find("#loader").remove();
         //console.log(response.error);
 
-        if($("#form-error").length){
+        if ($("#form-error").length) {
             $("#form-error").html(this.geterror(error));
-            return ;
+            return;
         }
 
         model.modalboxcontainer.append(this.geterror(error));
 
     },
-    callbackcreate : function (response){
+    callbackcreate: function (response) {
         console.log(response, "create");
 
-        if(response.success){
-            if(response.redirect)
+        if (response.success) {
+            if (response.redirect)
                 window.location.href = response.redirect;
 
-            else if(response.reload)
+            else if (response.reload)
                 window.location.reload();
 
             $.notify("Nouvelle ligne ajoutée avec succès!", "success");
-            ddatatable.addrow(response.tablerow);
+            ddatatable.addrow(response.tablerow.row);
+            //$("#dv_pagination").replaceWith(response.tablerow.tablepagination);
+
             //$("#dv_table").find("tbody").prepend(response.tablerow);
             model._dismissmodal();
             return;
@@ -53,17 +55,18 @@ var dform = {
 
         dform.binderror(response.error);
     },
-    callbackupdate : function (response){
+    callbackupdate: function (response) {
         console.log(response, "update");
-        if(response.success){
-            if(response.redirect)
+        if (response.success) {
+            if (response.redirect)
                 window.location.href = response.redirect;
 
-            else if(response.reload)
+            else if (response.reload)
                 window.location.reload();
 
             $.notify("Nouvelle ligne mise à jour avec succès!", "success");
-            ddatatable.replacerow(dform.entityid, response.tablerow);
+            ddatatable.replacerow(dform.entityid, response.tablerow.row);
+            // ddatatable.addrow(response.tablerow.row);
             //$("#dv_table").find("#"+entityid).replaceWith(response.tablerow);
             model._dismissmodal();
             return;
@@ -71,67 +74,72 @@ var dform = {
 
         dform.binderror(response.error);
     },
-    callback:null,
-    formdata:null,
-    currentform:null,
-    _submit: function(el, url, next){
+    callback: null,
+    formdata: null,
+    currentform: null,
+    _submit: function (el, url, next) {
         // var formserialize = $(this).serialize();
         // console.log(formserialize);
-        //if (! url){
-            // var actionarray = $(el).attr("action").split("/");
-            // url = actionarray[1];
-            //url = $(el).attr("action");
-        //}
-
         this.currentform = $(el);
+        if (!url) {
+            url = this.currentform.attr("action");
+        }
+
         this.currentbtnsubmit = $(el).find("button[type=submit]");
 
         // this.currentbtnsubmit.attr("disabled", true);
         this.currentbtnsubmit.prepend('<span class="spinner-border spinner-border-sm mr-2" role="status"></span>');
 
-        this.callback = function (response) { console.log(response); };
+        this.callback = function (response) {
+            console.log(response);
+        };
         dform.entityid = $(el).data("id");
 
-        if(dform.entityid){
+        if (dform.entityid) {
             //action = actionarray[1];
             //action = "update&id="+entityid;
             this.callback = dform.callbackupdate;
-        }else{
+        } else {
             this.callback = dform.callbackcreate;
         }
 
-        this.formdata = model._formdata($(el));
+        this.formdata = model._formdata($(el), this.formdata);
 
         console.log(url)
         Drequest.init(url)
             .data(this.formdata)
-            .post((response)=> {
+            .post((response) => {
 
-            this.currentbtnsubmit.attr("disabled", false);
-            this.currentbtnsubmit.find(".spinner-border").remove();
+                this.currentbtnsubmit.attr("disabled", false);
+                this.currentbtnsubmit.find(".spinner-border").remove();
 
-            this.callback(response);
+                if (next)
+                    next(response);
+                else
+                    this.callback(response);
 
-        });
+            });
 
         return false;
     },
-    _apisubmit: function(el, url, next){
+    _apisubmit: function (el, url, next) {
         // var formserialize = $(this).serialize();
         // console.log(formserialize);
-        if (! url){
+        if (!url) {
             var actionarray = $(el).attr("action").split("/");
             url = actionarray[1];
         }
 
-        this.callback = function (response) { console.log(response); };
+        this.callback = function (response) {
+            console.log(response);
+        };
         dform.entityid = $(el).data("id");
 
-        if(dform.entityid){
+        if (dform.entityid) {
             //action = actionarray[1];
             //action = "update&id="+entityid;
             this.callback = dform.callbackupdate;
-        }else{
+        } else {
             this.callback = dform.callbackcreate;
         }
 
@@ -148,7 +156,7 @@ var dform = {
     findsuggestion(e) {
 
         $("input[name='product_form[name]']").val(this.productname);
-        if (e.keyCode === 13 ) { //|| product.id
+        if (e.keyCode === 13) { //|| product.id
             return;
         }
 
@@ -163,9 +171,9 @@ var dform = {
             }
             // else
             console.log(this.productname, this.lastquery)
-            if(this.productname.length === 3 && this.productname !== this.lastquery){
+            if (this.productname.length === 3 && this.productname !== this.lastquery) {
                 this.lastquery = this.productname;
-                model._apiget(model.entity+".list", {search: devups.escapeHtml(this.productname)},
+                model._apiget(model.entity + ".list", {search: devups.escapeHtml(this.productname)},
                     (response) => {
                         console.log(response);
                         //self.showlist = true;
@@ -219,7 +227,7 @@ var dform = {
 };
 
 console.log(model.entity)
-$("#"+model.entity+"-form").submit(function (e) {
+$("#" + model.entity + "-form").submit(function (e) {
     e.preventDefault();
     dform._submit(this, $(this).attr("action"))
 });

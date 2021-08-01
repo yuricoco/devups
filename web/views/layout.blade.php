@@ -78,7 +78,6 @@
 
     <div class="d-block d-md-flex intro-engage">
         <div class="">
-            <?= ProductTable::init($lazyloading)->buildfronttable()->render() ?>
         </div>
         <div class="">
             <h2>Rescue An Orphan</h2>

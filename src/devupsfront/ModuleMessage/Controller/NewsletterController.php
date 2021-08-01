@@ -95,7 +95,7 @@ class NewsletterController extends Controller{
     public function deletegroupAction($ids)
     {
 
-        Newsletter::where("id")->in($ids)->delete();
+        Newsletter::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true,
                 'detail' => ''); 

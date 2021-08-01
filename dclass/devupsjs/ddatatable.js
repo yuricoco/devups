@@ -82,7 +82,8 @@ var ddatatable = {
         });
         callback(ids, $trs);
     },
-    search: function (el) {
+    search: function (entity, el) {
+        ddatatable.init(entity);
         var form = $(el).parents("tr.th-filter");
         var $input = form.find('input');
         var $selects = form.find('select');
@@ -128,7 +129,28 @@ var ddatatable = {
     callback: function (response) {
         console.log(response);
     },
-    orderasc: function (param) {
+    orderingup: true,
+    toggleorder(entity, param){
+        ddatatable.init(entity);
+        this.setloader();
+        this.orderingup = !this.orderingup;
+        if(this.orderingup)
+            this.order = "&" + param + " asc";
+        else
+            this.order = "&" + param + " desc";
+
+        console.log(this.geturl());
+        $.get(this.geturl(), (response) => {
+            console.log(response);
+            ddatatable.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
+            removeloader();
+        }, 'json').fail(function (resultat, statut, erreur) {
+            console.log(statut, erreur);
+            //$("#"+model.entity+"modal").modal("show");
+            databinding.bindmodal(resultat.responseText);
+        });
+    },
+    orderasc: function (entity, param) {
         console.log(param);
         this.setloader();
         //this.per_page = $("#dt_nbrow").val();
@@ -233,7 +255,7 @@ var ddatatable = {
         return $("#dv_" + entity + "_table");
     },
     exportcsv(entity) {
-
+        model.init(entity)
         var dialog = new dialogbox();
         dialog.title = model.entity;
         dialog.export = function () {
@@ -259,8 +281,8 @@ var ddatatable = {
         dialog.show()
 
     },
-    importcsv() {
-
+    importcsv(entity) {
+        model.init(entity)
         var dialog = new dialogbox();
         dialog.title = model.entity;
         dialog.import = function () {
@@ -300,9 +322,9 @@ var ddatatable = {
         dialog.footercontent = `
             <button onclick="self.import()" type="button" class="btn btn-default">import data!</button>
         `;
-        //dialog.init()
+        dialog.init()
         dialog.show()
-        dialog.setcontent()
+        //dialog.setcontent()
 
     },
     init: function (entity) {
@@ -336,18 +358,6 @@ function removeloader() {
 
 setTimeout(function () {
 
-    ddatatable.init(model.entity);
-    ddatatable.dtinstance.find("#dt_nbrow").change(function () {
-        console.log($(this).val());
-        ddatatable.per_page = $(this).val();
-        ddatatable.page(1);
-    });
-
-    ddatatable.dtinstance.find("#datatable-form").submit(function (e) {
-        e.preventDefault();
-        ddatatable.search($(this));
-    });
-
     ddatatable.pagination = function (el, page) {
 
         model.baseurl = $("#dv_pagination").data('route') + "services.php";
@@ -360,37 +370,13 @@ setTimeout(function () {
 
     };
 
-    ddatatable.dtinstance.find(".dv_export_csv").click(function () {
-        ddatatable.exportcsv();
+    $(".dv_datatable_container").find(".dv_export_csv").click(function () {
+        ddatatable.exportcsv($(this).data("entity"));
     });
-    ddatatable.dtinstance.find(".dv_import_csv").click(function () {
-        ddatatable.importcsv();
+    $(".dv_datatable_container").find(".dv_import_csv").click(function () {
+        ddatatable.importcsv($(this).data("entity"));
     });
-    ddatatable.dtinstance.find("#deletegroup").click(function () {
-        ddatatable.groupdelete();
-    });
-    ddatatable.dtinstance.find("#checkall").click(function () {
-        ddatatable.checkall();
-    });
-    ddatatable.dtinstance.find(".dcheckbox").click(function () {
-        ddatatable.uncheckall();
-    });
-    ddatatable.dtinstance.find(".search-field").keyup(function (event) {
-        var key = event.keyCode;
-        if (key === 13)
-            ddatatable.search(this)
-    });
-
-    /*$("#dv_main_container").on('mouseenter', ".dv_datatable_container", function () {
-
-        model.baseurl = $(this).find("#dv_table").eq(0).data('route') + "services.php";
-        model.entity = $(this).find("#dv_table").eq(0).data('entity');
-        ddatatable.init(model.entity);
-        console.log(model.entity);
-        //model.init($(this).find("#dv_table"));
-        // ddatatable.init(model.entity);
-
-    })*/
 
 }, 800)
+
 

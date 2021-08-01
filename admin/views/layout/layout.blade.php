@@ -28,7 +28,9 @@
     <script>
         var __env = '<?= __env ?>';
         var __lang = '<?= __lang ?>';
+        /*
         var _local_content = <?= Local_contentController::getdatajs() ?>;
+         */
     </script>
 </head>
 

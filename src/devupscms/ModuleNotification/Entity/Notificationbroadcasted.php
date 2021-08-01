@@ -51,19 +51,22 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
         $this->notification = new Notification();
         $this->user = new User();
+
     }
 
     public static function unreaded($user)
     {
-        return self::where($user)->andwhere("this.status", "=", 'un')->__countEl();
+        return self::where($user)->andwhere("this.status", "=", 0)->__countEl();
     }
 
 
-    public function to(){
+    public function to()
+    {
 
     }
 
-    public function broadcast(){
+    public function broadcast()
+    {
         // $this->user =
 
         // todo: send mail and notification for order
@@ -93,10 +96,7 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
     public function setViewedat($viewedat)
     {
-        if (is_object($viewedat))
-            $this->viewedat = $viewedat;
-        else
-            $this->viewedat = new DateTime($viewedat);
+        $this->viewedat = $viewedat;
     }
 
     public function getStatus()
@@ -163,15 +163,68 @@ class Notificationbroadcasted extends Model implements JsonSerializable
             'status' => $this->status,
             'notification' => $this->notification,
             'user' => $this->user,
-            'dvups_admin' => $this->dvups_admin,
         ];
     }
 
 
-    public function widgetModel(){
-        switch ($this->entity){
+    public function getWidgetmodel()
+    {
+        return $this->widgetModel();
+    }
+
+    public function widgetModel()
+    {
+        if ($this->status == 0)
+            $route = route("notification?read=" . $this->id . "&redirect=" . $this->notification->notificationtype->getRedirect() . "?id=" . $this->notification->getEntityid());
+        elseif($redirect = $this->notification->notificationtype->getRedirect())
+            $route = route($redirect . "?id=" . $this->notification->getEntityid());
+        else
+            $route = route("notifications");
+
+
+        return '<a href="' . $route . '"><span class="pull-right">'
+            . $this->created_at . '</span><br>'
+            . $this->notification->getContent() . '</a>';
+
+
+    }
+
+    public static function send($notification, $receivers = null)
+    {
+        foreach ($receivers as $receiver) {
+
+            $nb = new Notificationbroadcasted();
+            $nb->notification = $notification;
+            $nb->setStatus(0);
+            $nb->setUser($receiver);
+            $nb->__insert();
 
         }
+
+    }
+
+    public static function of($entity)
+    {
+        return Notificationbroadcasted::where("notification.entity", $entity)
+            ->andwhere("viewedat")->isNull()
+            ->count();
+    }
+
+    public static function onPackageDelivered(Package $package)
+    {
+
+        $notif = new Notification();
+        $notif->setEntity(Package::class);
+        $notif->setEntityid($package->getId());
+        $notif->setContent(t("event.packagedelivered", "Le paquet n° " . $package->getId() . " a bien été Receptionné. Votre le colis est cloture et les fond sont desormais disponible."));
+        $notif->__insert();
+
+        $nb = new Notificationbroadcasted();
+        $nb->notification = $notif;
+        $nb->shop = $package->shop;
+        $nb->user = $package->shop->user->__show();
+        return $nb;
+
     }
 
 }

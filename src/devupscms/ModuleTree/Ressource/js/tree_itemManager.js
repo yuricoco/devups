@@ -11,15 +11,6 @@ Vue.component("tree_itemForm", {
     props: ["tree_item"],
     mounted() {
 
-        /*model._apiget("tree-item.detail?id=" + this.tree_item.id, (response) => {
-            console.log(response);
-            //this.tree_item = response.tree_item;
-
-            // this.tree_itemtree = response.data.tree_itemtree;
-            // this.tree_itemparent = response.data.tree_itemparent;
-
-        })*/
-
         var url = $("#content").data('url')
         console.log(url);
         if (this.tree_item.content_id)
@@ -30,7 +21,7 @@ Vue.component("tree_itemForm", {
     },
     methods: {
 
-        update() {
+        update(quit) {
             console.log(this.tree_item);
             //return ;
             Drequest.api('tree-item.update?id=' + this.tree_item.id)
@@ -41,7 +32,8 @@ Vue.component("tree_itemForm", {
                 .raw(
                     response => {
                         console.log(response);
-                        this.tree_item = {};
+                        if(quit)
+                            this.tree_item = {};
                         $.notify("mise à jour avec succès!", "success");
                     });
         },
@@ -55,69 +47,106 @@ Vue.component("tree_itemForm", {
             <div class="card-header ">Edit item</div>
             <div class="card-body">
                 <form id="frmEdit" class="form-horizontal">
-                            <div class="form-group">
-                                <label for="text">Nom</label>
-
-                                <input autocomplete="off" v-model="tree_item.name" type="text"
-                                       class="form-control " name="text" id="text"
-                                       placeholder="Text">
-
+                
+                    <div class="panel">
+                        <ul class="nav nav-tabs" id="myTab" role="tablist">
+                            <li class="nav-item">
+                                <a class="nav-link active" id="home-tab" data-toggle="tab" href="#general-tab" role="tab"
+                                   aria-controls="home" aria-selected="true">General</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="cont-tab" data-toggle="tab" href="#content-tab" role="tab"
+                                   aria-controls="content" aria-selected="false">Quick content</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" id="profile-tab" data-toggle="tab" href="#image-tab" role="tab"
+                                   aria-controls="profile" aria-selected="false">Image</a>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="myTabContent">
+                            <div class="tab-pane active" id="general-tab" role="tabpanel"
+                                 aria-labelledby="home-tab"> 
+                                    <div class="form-group">
+                                        <label for="text">Nom</label>
+                                        <input autocomplete="off" v-model="tree_item.name" type="text"
+                                               class="form-control " name="text" id="text"
+                                               placeholder="Text">
+        
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="text">en</label>
+                                        <input autocomplete="off" v-model="tree_item.name_en" type="text"
+                                               class="form-control " 
+                                               placeholder="Text">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="text">Url</label>
+        
+                                        <input autocomplete="off" v-model="tree_item.slug" type="text"
+                                               class="form-control " name="text" id="text"
+                                               placeholder="Text">
+        
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="text">chain</label>
+        
+                                        <input autocomplete="off" v-model="tree_item.chain" type="text"
+                                               class="form-control " name="text" id="text"
+                                               placeholder="Text">
+        
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="text">Menu principal</label>
+                                        <div class="form-check form-check-inline">
+                                            <input v-model="tree_item.main" value="1" class="form-check-input" type="radio"
+                                                   name="exampleRadios" id="exampleRadios1" checked>
+                                            <label class="form-check-label" for="exampleRadios1">
+                                                Oui
+                                            </label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input v-model="tree_item.main" value="0" class="form-check-input" type="radio"
+                                                   name="exampleRadios" id="exampleRadios2">
+                                            <label class="form-check-label" for="exampleRadios2">
+                                                Non
+                                            </label>
+                                        </div>
+        
+                                    </div>
+                                    <div v-if="tree_item.main == 0" class="form-group">
+                                        <label for="href">Parent / @{{tree_itemparent ? tree_itemparent.name : ""}}</label>
+                                        <select v-model="tree_item.parent_id" class="form-control item-menu">
+                                            <option :value="0">
+                                                --- Sélectionner le parent ---
+                                            </option>
+                                            <optgroup label="Hierarchie supérieur">
+                                            <option v-for="(hopcat, $index) in tree_itemtree"
+                                                    v-bind:value="hopcat.id">
+                                                @{{hopcat.name}}
+                                            </option>
+                                            </optgroup>
+                                            <optgroup label="Définir comme enfant de :">
+                                            <option v-for="(parentcat, $index) in chain"
+                                                    v-bind:value="parentcat.id">
+                                                @{{parentcat.name}}
+                                            </option>
+                                            </optgroup>
+                                        </select>
+                                    </div>
+                                
                             </div>
-                            <div v-for="(lang, $index) in tree_item.namelangs" :key="$index" class="form-group">
-                                <label for="text">{{lang.lang}}</label>
-
-                                <input autocomplete="off" v-model="lang.content" type="text"
-                                       class="form-control " 
-                                       placeholder="Text">
-
-                            </div>
-                            <div class="form-group">
-                                <label for="text">Url</label>
-
-                                <input autocomplete="off" v-model="tree_item.slug" type="text"
-                                       class="form-control " name="text" id="text"
-                                       placeholder="Text">
-
-                            </div>
-                            <div class="form-group">
-                                <label for="text">Menu principal</label>
-                                <div class="form-check form-check-inline">
-                                    <input v-model="tree_item.main" value="1" class="form-check-input" type="radio"
-                                           name="exampleRadios" id="exampleRadios1" checked>
-                                    <label class="form-check-label" for="exampleRadios1">
-                                        Oui
-                                    </label>
+                            <div class="tab-pane fade" id="content-tab" role="tabpanel" aria-labelledby="content-tab">
+                                <div class="form-group">
+                                    <label for="text">Content</label>
+                                    <textarea style="min-height: 300px" class="form-control" v-model="tree_item.content" ></textarea>
                                 </div>
-                                <div class="form-check form-check-inline">
-                                    <input v-model="tree_item.main" value="0" class="form-check-input" type="radio"
-                                           name="exampleRadios" id="exampleRadios2">
-                                    <label class="form-check-label" for="exampleRadios2">
-                                        Non
-                                    </label>
-                                </div>
-
                             </div>
-                            <div v-if="tree_item.main == 0" class="form-group">
-                                <label for="href">Parent / @{{tree_itemparent ? tree_itemparent.name : ""}}</label>
-                                <select v-model="tree_item.parent_id" class="form-control item-menu">
-                                    <option :value="0">
-                                        --- Sélectionner le parent ---
-                                    </option>
-                                    <optgroup label="Hierarchie supérieur">
-                                    <option v-for="(hopcat, $index) in tree_itemtree"
-                                            v-bind:value="hopcat.id">
-                                        @{{hopcat.name}}
-                                    </option>
-                                    </optgroup>
-                                    <optgroup label="Définir comme enfant de :">
-                                    <option v-for="(parentcat, $index) in chain"
-                                            v-bind:value="parentcat.id">
-                                        @{{parentcat.name}}
-                                    </option>
-                                    </optgroup>
-                                </select>
+                            <div class="tab-pane fade" id="image-tab" role="tabpanel" aria-labelledby="profile-tab">
+                                    <tree_item_image :tree_item="tree_item" ></tree_item_image>
                             </div>
-                        </form>
+                        </div>
+                    </div>
+                </form>
                         
                 <a :href="contenturl" target="_blank" class="btn btn-primary">
                     <i class="fas fa-edit"></i> advanced content
@@ -128,6 +157,10 @@ Vue.component("tree_itemForm", {
                 <button v-if="tree_item.id" @click="update()" type="button" id="btnUpdate"
                         class="btn btn-primary">
                     <i class="fas fa-sync-alt"></i> Update
+                </button>
+                <button v-if="tree_item.id" @click="update(true)" type="button" id="btnUpdate"
+                        class="btn btn-primary">
+                    <i class="fas fa-sync-alt"></i> Update & quit
                 </button>
                 <button v-if="!tree_item.id" @click="create()" type="button" id="btnAdd" class="btn btn-success">
                     <i class="fas fa-plus"></i> Add
@@ -290,8 +323,8 @@ Vue.component("childrenTree", {
                 <button style="width: 120px; overflow: hidden"  class="btn btn-light">
                 <span v-html="tree_item.name"></span> {{tree_item.position}} {{nbitem}}
                 ({{tree_item.children}})</button>
-                <button v-if="tree_item.position" @click="move(1)" class="btn btn-info"><i class="fa fa-angle-up"></i></button> 
-                <button v-if="tree_item.position >= nbitem - 1" @click="move(-1)" class="btn btn-info"><i class="fa fa-angle-down"></i></button> 
+                <button v-if="tree_item.position" @click="move(1)" class="btn btn-info btn-sm"><i class="fa fa-angle-down"></i></button> 
+                <button v-if="tree_item.position <= nbitem - 1" @click="move(-1)" class="btn btn-info btn-sm"><i class="fa fa-angle-up"></i></button> 
 
                 <span class="pull-right fs11 fw600">
                     <a v-if="parseInt(tree_item.status)" @click="changestatus(tree_item, 0)"
@@ -393,11 +426,31 @@ Vue.component("tree_item", {
             this.currentpage = next;
 
             Drequest
-                .api("tree-item.nextchildren")
-                .param({id: catid, next: next})
+                .api("tree-item.nextchildren?id="+catid+"&next="+next)
+                //.param({id: catid, next: next})
                 .get((response) => {
                     console.log(response);
                     this.ll = response.data.ll;
+                    this.tree_items = this.ll.listEntity;
+                });
+
+            //xhrObj.abort();
+        },
+        nextitems(next) {
+
+            this.currentpage = next;
+
+            Drequest.api("tree-item.lazyloading")
+                .param({
+                    dfilters: "on",
+                    next: next,
+                    per_page: 10,
+                    "main:eq": 1,
+                    "tree.id:eq": this.tree.id,
+                })
+                .get((response) => {
+                    console.log(response);
+                    this.ll = response;
 
                     this.tree_items = this.ll.listEntity;
                 });
@@ -569,6 +622,7 @@ Vue.component("tree_item", {
                             <li is="childrenTree" v-for="(tree_item, $index) in orderedItems"
                                 v-bind:key="tree_item.id" :tree="tree" 
                                 :tree_item="tree_item" 
+                                :nbitem="orderedItems.length" 
                                 :index="$index" 
                                 class="list-group-item"></li>
                             
@@ -578,7 +632,7 @@ Vue.component("tree_item", {
 
                                 <li v-for="n in ll.pagination" :class="'page-item '+ highlight(n) ">
                                     <a class="page-link"
-                                       v-on:click="nextchildren(n)"
+                                       v-on:click="nextitems(n)"
                                        href="#"
                                        data-next="1">@{{ n }}</a>
                                 </li>
@@ -658,7 +712,7 @@ var tree_itemview = new Vue({
                 return null;
 
             if (treeedit.id) {
-                Drequest.api("tree.update?id="+treeedit.id)
+                Drequest.api("tree.update?id=" + treeedit.id)
                     //.param({id: treeedit.id})
                     .data({
                         tree: {
@@ -667,6 +721,7 @@ var tree_itemview = new Vue({
                     })
                     .raw((response) => {
                         console.log(response);
+                        $.notify("Updated with success");
                     });
 
             } else {

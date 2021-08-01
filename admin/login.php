@@ -61,7 +61,14 @@ $action = 'index.php?path=connexion';
                                            type="password"
                                            value=""/>
                                 </div>
-
+                                <div class="remember">
+                                    <div class="checkbox">
+                                        <label>
+                                            <input name="remember_me" type="checkbox">
+                                            Remember me
+                                        </label>
+                                    </div>
+                                </div>
                                 <button type="submit" class="btn btn-lg btn-success btn-block">Se
                                     connecter
                                 </button>

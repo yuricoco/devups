@@ -54,6 +54,18 @@ class Dv_imageTable extends Datatable
         return $this;
     }
 
+    public function buildgallerytable($page = "all")
+    {
+
+        $this->qbcustom = Dv_image::folderhas("gallery");
+        $this->per_page = $page;
+        $this->table_class = "";
+        $this->order_by = " this.id DESC ";
+        $this->template = "_partial._gallery_item";
+        return $this;
+
+    }
+
     public function builddetailtable()
     {
         $this->datatablemodel = [

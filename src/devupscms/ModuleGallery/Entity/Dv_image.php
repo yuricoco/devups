@@ -13,7 +13,6 @@ class Dv_image extends ImageCore implements JsonSerializable
      * */
     protected $id;
 
-
     /**
      * @ManyToOne(targetEntity="\Tree_item")
      *
@@ -37,6 +36,7 @@ class Dv_image extends ImageCore implements JsonSerializable
 
         $this->folder = new Tree_item();
         $this->position = new Tree_item();
+        // $this->tree_item = new Tree_item();
 
     }
 
@@ -49,6 +49,46 @@ class Dv_image extends ImageCore implements JsonSerializable
     {
         $folder = Tree_item::where(["tree.name" => "folder", "this.name" => $foldername])->__getOne();
         return self::where("folder_id", $folder->getId())->__getAll();
+    }
+    /**
+     * get all image in a specific folder
+     * @param string $foldername
+     * @return QueryBuilder
+     */
+    public static function folderhas(string $foldername)
+    {
+        $folder = Tree_item::where(["tree.name" => "folder", "this.name" => $foldername])->__getOne();
+        return self::where("folder_id", $folder->getId());
+    }
+
+    public static $image_attribut;
+
+    public static function uploaded(Model $entity, \Dv_image $old_image, $url, $filedir, $sizes = [])
+    {
+        $dv_image = new Dv_image();
+
+        $dv_image->folder = Tree_item::mainmenu("folder")
+            ->andwhere("this.name", "fund")->__getOne();
+        $dv_image->setImage($url["file"]["hashname"]);
+        $dv_image->setUploaddir($filedir);
+        $dv_image->setSize($url["file"]["imagesize"]);
+        $dv_image->__save();
+
+        if(!self::$image_attribut)
+            die(print_r("you must specify the Dv_image::\$image_attribut"));
+
+        $entity->__update([
+            self::$image_attribut."_id" => $dv_image->getId()
+        ]);
+
+        if ($old_image->getId()
+            && $old_image->getName() != $dv_image->getName()
+        ) {
+            $old_image->__show()->__deleteImage($sizes);
+        }
+
+        return $dv_image;
+
     }
 
     public function getId()
@@ -130,7 +170,8 @@ class Dv_image extends ImageCore implements JsonSerializable
             $url = $dfile
                 ->sanitize($this->id . "_")
                 ->addresize([150, 150], "150_", "", true)
-                ->addresize([50, 50], "50_", "", false)
+                ->addresize([270, 270], "270_", "", true)
+                ->addresize([50, 50], "50_", "", true)
                 ->moveto($filedir);
 
             if (!$url['success']) {
@@ -138,6 +179,73 @@ class Dv_image extends ImageCore implements JsonSerializable
                     'error' => $url);
             }
 
+            $this->uploaddir = $filedir;
+            $this->image = $url['file']['hashname'];
+            $this->name = $url['file']['hashname'];
+            $this->reference = $url['file']['hashname'];
+
+            $this->setName(Request::post("name"));
+//            $this->setWidth($url["file"]["width"]);
+//            $this->setHeight($url["file"]["height"]);
+            $this->setSize($url["file"]["imagesize"]);
+            $this->setImage($url["file"]["hashname"]);
+
+        }
+    }
+
+    public function uploadImagecontent($file = 'image')
+    {
+        $dfile = self::Dfile($file);
+        if (!$dfile->errornofile) {
+
+            $filedir = 'gallery/';
+            $url = $dfile
+                ->sanitize($this->id . "_")
+                ->addresize([150, 150], "150_", "", true)
+                ->addresize([270, 270], "270_", "", true)
+                ->addresize([700, 500], "700_", "", false)
+                ->addresize([50, 50], "50_", "", true)
+                ->moveto($filedir);
+
+            if (!$url['success']) {
+                return array('success' => false,
+                    'error' => $url);
+            }
+
+            $this->uploaddir = $filedir;
+            $this->image = $url['file']['hashname'];
+            $this->name = $url['file']['hashname'];
+            $this->reference = $url['file']['hashname'];
+
+            $this->setName(Request::post("name"));
+//            $this->setWidth($url["file"]["width"]);
+//            $this->setHeight($url["file"]["height"]);
+            $this->setSize($url["file"]["imagesize"]);
+            $this->setImage($url["file"]["hashname"]);
+
+        }
+    }
+
+    public function uploadImagepost($file = 'image')
+    {
+        $dfile = self::Dfile($file);
+        if (!$dfile->errornofile) {
+
+            $filedir = 'gallery/';
+            $url = $dfile
+                ->hashname()
+                ->addresize([150, 150], "150_", "", true)
+                ->addresize([270, 270], "270_", "", true)
+                ->addresize([800, 500], "700_", "", false)
+                ->addresize([50, 50], "50_", "", true)
+                ->moveto($filedir);
+
+            if (!$url['success']) {
+                return array('success' => false,
+                    'error' => $url);
+            }
+
+            $this->uploaddir = $filedir;
             $this->image = $url['file']['hashname'];
             $this->name = $url['file']['hashname'];
             $this->reference = $url['file']['hashname'];
@@ -173,9 +281,15 @@ class Dv_image extends ImageCore implements JsonSerializable
         }
     }
 
-    public function showImage()
+    public function showImage($prefix = "")
     {
-        $url = Dfile::show($this->image, 'dv_image');
+        if(is_array($prefix)) {
+            if($prefix)
+                $prefix = $prefix[0];
+            else
+                $prefix = "";
+        }
+        $url = Dfile::show($prefix.$this->image, $this->uploaddir);
         return Dfile::fileadapter($url, $this->image);
     }
 
@@ -224,10 +338,10 @@ class Dv_image extends ImageCore implements JsonSerializable
     {
         return [
             'id' => $this->id,
-            'reference' => $this->reference,
+            'reference' => $this->uploaddir,
             'name' => $this->name,
             'description' => $this->description,
-            'position' => $this->position,
+            //'position' => $this->position,
             'image' => $this->image,
             'size' => $this->size,
             'width' => $this->width,
@@ -239,9 +353,21 @@ class Dv_image extends ImageCore implements JsonSerializable
     {
         Dfile::deleteFile($this->image, $this->uploaddir);
         Dfile::deleteFile("150_" . $this->image, $this->uploaddir);
+        Dfile::deleteFile("270_" . $this->image, $this->uploaddir);
         Dfile::deleteFile("50_" . $this->image, $this->uploaddir);
+        Dfile::deleteFile("700_" . $this->image, $this->uploaddir);
 
         return parent::__delete($exec); // TODO: Change the autogenerated stub
+    }
+
+    public function __deleteImage($sizes)
+    {
+        Dfile::deleteFile($this->image, $this->uploaddir);
+        foreach ($sizes as $size){
+            Dfile::deleteFile($size . $this->image, $this->uploaddir);
+        }
+
+        return parent::__delete(); // TODO: Change the autogenerated stub
     }
 
     public static function templatePosition($ref)

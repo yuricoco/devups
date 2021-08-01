@@ -142,6 +142,7 @@ class DBAL extends Database
 
         // obtaining the entity manager
         return EntityManager::create($conn, $config);
+
     }
 
 
@@ -573,6 +574,18 @@ class DBAL extends Database
             $this->manyToManyAdd($id, false, null);
         }
 
+        $eventListners = \dclass\devups\Controller\Controller::$eventListners["after"]["create"];
+
+        if(isset($eventListners[$this->objectName])){
+            $methods = $eventListners[$this->objectName];
+            foreach ($methods as $method) {
+                if(is_array($method))
+                    $this->object->{$method[0]}();
+                else
+                    $this->object->{$method}();
+            }
+        }
+
         return $this->object->getId();
     }
     /**
@@ -589,7 +602,7 @@ class DBAL extends Database
         $objectvar = array_keys($keyvalue);
         $parameterQuery = ':' . implode(", :", $objectvar);
 
-        $sql = "insert into `" . $object . "` (`" . strtolower(implode('` ,`', $objectvar)) . "`) values (" . strtolower($parameterQuery) . ")";
+        $sql = "insert into `" . strtolower($object) . "` (`" . strtolower(implode('` ,`', $objectvar)) . "`) values (" . strtolower($parameterQuery) . ")";
 
         $db = new DBAL();
         return $db->executeDbal($sql, $keyvalue, 1);
@@ -731,7 +744,7 @@ class DBAL extends Database
     {
 
         $query = $this->link->prepare($sql);
-        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $query->errorInfo()));
+        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__,  $query->errorInfo(), $sql, $values));
 
         return $query->fetchColumn();
     }
