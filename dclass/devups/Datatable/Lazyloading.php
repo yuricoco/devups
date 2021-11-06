@@ -8,6 +8,7 @@
 
 namespace dclass\devups\Datatable;
 
+use Dvups_lang;
 use QueryBuilder;
 use Request;
 
@@ -158,6 +159,7 @@ class Lazyloading implements \JsonSerializable
     const maxpagination = 12;
     protected $render_query = false;
     public  $debug = false;
+    public  $id_lang = null;
 
     // for retro compatibility
     public function renderQuery(){
@@ -194,8 +196,8 @@ class Lazyloading implements \JsonSerializable
             $this->nb_element = $qbcustom->__countEl(false, false); //false
         } else {
             $qb = new QueryBuilder($this->entity);
+            $qb->select();
             if ($this->dfilters) {
-
                 $qbcustom = $this->filter($this->entity, $qb);
                 $this->nb_element = $qbcustom->__countEl(false, true);
             } else {
@@ -215,15 +217,21 @@ class Lazyloading implements \JsonSerializable
      * @param string $order
      * @return int | $this
      */
-    public function lazyloading(\stdClass $entity = null, \QueryBuilder $qbcustom = null, $order = "")
+    public function lazyloading(\stdClass $entity = null, \QueryBuilder $qbcustom = null, $order = "", $id_lang = null)
     {//
         if($entity){
             $this->entity = $entity;
             $classname = strtolower(get_class($entity));
             $this->classname = $classname;
             $this->class = $classname;
+            // $this->id_lang = $id_lang;
             $this->start($qbcustom);
         }
+
+//        if ($this->entity->dvtranslate) {
+//            if (!$this->id_lang)
+//                $this->id_lang = Dvups_lang::defaultLang()->getId();
+//        }
 
         if($qbcustom)
             $this->qbcustom = $qbcustom;
@@ -276,7 +284,8 @@ class Lazyloading implements \JsonSerializable
             }
 
             if ($qbcustom != null) {
-
+                if ($this->id_lang)
+                    $qbcustom->setLang($this->id_lang);
                 if (Request::get("drand") == 1) {
                     $qbcustom->select()->handlesoftdelete()->rand()->limit($this->next, $this->per_page);
                 }elseif ($order) {
@@ -286,6 +295,8 @@ class Lazyloading implements \JsonSerializable
 
             } else {
                 $qb = new QueryBuilder($this->entity);
+                if ($this->id_lang)
+                    $qb->setLang($this->id_lang);
                 if (Request::get("drand") == 1) {
                     $qb->select()->handlesoftdelete()->rand()->limit($this->next, $this->per_page);
                 }elseif ($order)
@@ -326,6 +337,11 @@ class Lazyloading implements \JsonSerializable
                 }
             }
             $this->per_page = $nb_element;
+        }
+
+        if($this->debug == 2) {
+            $data = $qbcustom ? $qbcustom->getSqlQuery() : $qb->getSqlQuery();
+            dv_dump($data);
         }
 
         if($this->debug)

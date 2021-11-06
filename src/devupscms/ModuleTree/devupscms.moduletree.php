@@ -11,7 +11,6 @@
     require 'Controller/Tree_itemController.php';
     require 'Controller/Tree_itemFrontController.php';
 
-    require 'Entity/Tree_item_lang.php';
     require 'Form/Tree_item_langForm.php';
     require 'Datatable/Tree_item_langTable.php';
     require 'Controller/Tree_item_langController.php';

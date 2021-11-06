@@ -1,20 +1,19 @@
 <?php
 
 
-class Dv_langCore extends \Model implements JsonSerializable
+class Dv_langCore extends \stdClass
 {
 
     /**
-     * @Id @GeneratedValue @Column(type="integer")
-     * @var int
-     * */
-    protected $id;
+     * @Id @ManyToOne(targetEntity="\Dvups_lang")
+     * @JoinColumn(onDelete="cascade")
+     * @var \Dvups_lang
+     */
+    public $lang;
 
-    /**
-     * @Column(name="lang_id", type="integer"  )
-     * @var integer
-     **/
-    protected $lang_id;
-
+    public static function langvalues($entityname, $id, $key){
+        $sql = "SELECT $key FROM {$entityname}_lang WHERE {$entityname}_id = $id ";
+        return (new DBAL())->executeDbal($sql, [], DBAL::$NOTHING);
+    }
 
 }

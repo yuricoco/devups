@@ -17,6 +17,7 @@ define('FORMTYPE_DATE', 'date');
 define('FORMTYPE_DATETIME', 'datetime');
 define('FORMTYPE_TEXTAREA', 'textarea');
 define('FORMTYPE_SELECT', 'select');
+define('FORMTYPE_SELECTGROUP', 'selectgroup');
 define('FORMTYPE_CHECKBOX', 'checkbox');
 define('FORMTYPE_RADIO', 'radio');
 define('FORMTYPE_FILE', 'file');
@@ -109,6 +110,7 @@ abstract class FormManager {
     }
 
     public function renderForm(){
+        FormFactory::$langs = Dvups_lang::allrows();
         return FormFactory::__renderForm($this->buildEntityCore());
     }
 
@@ -217,7 +219,8 @@ abstract class FormManager {
                         $key_value[call_user_func(array($entity, 'get' . ucfirst($key)))] = call_user_func(array($entityjoin, 'get' . ucfirst($join[1])));
                     
 //                    }
-                } else {
+                }
+                else {
                     $key_value[call_user_func(array( $entity, 'get' . ucfirst($key)))] = call_user_func(array($entity, 'get' . ucfirst($value)));
                 }
                 $entitylist2[call_user_func(array($entity, 'getId' ) )] = $entity; 

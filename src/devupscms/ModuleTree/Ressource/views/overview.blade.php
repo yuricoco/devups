@@ -4,7 +4,7 @@
 @section('layout_content')
     <div class="row">
         @foreach($moduledata->dvups_entity as $entity)
-            @include("default.entitywidget")
+            @ include("default.entitywidget")
         @endforeach
     </div>
 
@@ -32,7 +32,7 @@
                                         </li>
                                         <li v-for="(cat, $index) in trees" class="nav-item">
                                             <div class="input-group mb-3">
-                                                <input v-model="cat.name" type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                <input v-model="cat.name['en']" type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
                                                 <div class="input-group-append">
                                                     <span @click="_delete(cat.id, $index)" class="input-group-text" >supp.</span>
                                                     <span @click="update(cat)" class="input-group-text" >editer</span>
@@ -42,7 +42,7 @@
                                         </li>
                                         <li  class="nav-item">
                                             <div class="input-group mb-3">
-                                                <input v-model="treeedit.name" type="text" class="form-control" placeholder="Nouvelle racine" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                <input v-model="treeedit.name['en']" type="text" class="form-control" placeholder="Nouvelle racine" aria-label="Recipient's username" aria-describedby="basic-addon2">
                                                 <div class="input-group-append">
                                                     <span @click="update(treeedit)" class="btn btn-primary input-group-text" >cree</span>
                                                 </div>
@@ -57,7 +57,7 @@
                     </div>
                     <div class="col-lg-9">
 
-                        <tree_item :key="tree.id" v-if="tree.id" :tree="tree"></tree_item>
+                        <tree_item :key="tree.id" v-if="tree.id" :langs="langs" :tree="tree"></tree_item>
 
                     </div>
                 </div>

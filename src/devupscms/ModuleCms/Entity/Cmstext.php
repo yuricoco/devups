@@ -13,6 +13,7 @@ class Cmstext extends Model implements JsonSerializable, DatatableOverwrite, Dvu
      * */
     protected $id;
     /**
+     * @Dvups(multilang=true)
      * @Column(name="title", type="string" , length=255 , nullable=true)
      * @var string
      **/

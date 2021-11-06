@@ -28,9 +28,7 @@
     <script>
         var __env = '<?= __env ?>';
         var __lang = '<?= __lang ?>';
-        /*
-        var _local_content = <?= Local_contentController::getdatajs() ?>;
-         */
+        var langs = {!! json_encode(Dvups_lang::allrows()) !!};
     </script>
 </head>
 

@@ -46,7 +46,7 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
         if(class_exists($this->name))
             return true;
 
-        parent::__delete();
+        //parent::__delete();
         return  false;
     }
 

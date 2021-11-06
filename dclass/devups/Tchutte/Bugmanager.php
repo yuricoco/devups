@@ -13,7 +13,7 @@
  */
 class Bugmanager {
     
-    static function getError($class, $methode, $line, $error = null, $sql = null, $entity = null, $values = []) {
+    static function getError($class, $methode, $line, $error = null, $sql = null, $values = [],$entity = null) {
         $debug = [
             "success"=> false,
             'class' => $class,

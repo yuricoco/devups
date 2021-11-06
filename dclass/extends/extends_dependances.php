@@ -11,3 +11,6 @@ require __DIR__ . '/ImageCore.php';
 require __DIR__ . '/Dv_langCore.php';
 require __DIR__ . '/UserCore.php';
 require __DIR__ . '/StatusTrait.php';
+require __DIR__ . '/Item.php';
+require __DIR__ . '/OrderCore.php';
+require __DIR__ . '/Shop_order.php';

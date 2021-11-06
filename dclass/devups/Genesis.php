@@ -103,7 +103,7 @@ class Genesis
             $_end = microtime(true);
             $value["exectime"] = $_end - $_start;
         }
-        echo json_encode($value, JSON_UNESCAPED_UNICODE , $depth);
+        echo json_encode($value, JSON_INVALID_UTF8_IGNORE , $depth);
         die;
     }
 

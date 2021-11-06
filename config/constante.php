@@ -31,6 +31,8 @@ define('__project_id', 'devupstuto');
 
 
 define('ROOT', __DIR__  . '/../');
+define('CLASS_EXTEND', ROOT . "dclass/extends");
+// define('CLASS_LANG', ROOT . "dclass/lang");
 define('UPLOAD_DIR', __DIR__. '/../uploads/');
 define('RESSOURCE', __DIR__ . '/../admin/Ressource/');
 define('admin_dir', __DIR__ . '/../admin/');

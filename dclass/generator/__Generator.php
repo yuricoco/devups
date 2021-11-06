@@ -156,9 +156,14 @@ Usage:
         else $ns = $namespace;
         
         $mn = explode("/", $ns);
-        
-        $module = json_decode(file_get_contents(__DIR__ . "/../../src/" . $ns . "/" . strtolower($mn[1]) . "Core.json"));
-        
+
+        $file = __DIR__ . "/../../src/" . $ns . "/" . strtolower($mn[1]) . "Core.json";
+        if(!file_exists($file)) {
+            echo "!!! Oops the modulev '".$mn[1]."' has not been founded !!!";
+            die();
+        }
+        $module = json_decode(file_get_contents($file));
+
         __Generator::$modulecore = $module;
         __Generator::$projectcore = $project;
         __Generator::__module($module);

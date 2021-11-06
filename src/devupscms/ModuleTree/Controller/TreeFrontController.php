@@ -31,8 +31,6 @@ class TreeFrontController extends TreeController{
             
         $tree = $this->hydrateWithJson(new Tree($id), $rawdata["tree"]);
 
-                  
-        
         $tree->__update();
         return 	array(	'success' => true,
                         'tree' => $tree,

@@ -219,6 +219,7 @@ class Request
 
     public $_data = [];
     public $_response = [];
+    public $_header = [];
     public $url = "";
     public $_method = "GET";
     public $_log = false;
@@ -235,38 +236,65 @@ class Request
         $this->_data = $post;
         $this->_method = "POST";
     }
+    public function addHeader($key, $value){
+        $this->_header[] = "$key: $value";
+        return $this;
+    }
     public function raw_data($post){
         $this->_data = json_encode($post);
         $this->_method = "POST";
+        $this->_header[] = "Content-Type: application/json";
+        return $this;
     }
     public function parameters($data){
-        $this->_parameter = $data;
+        $this->_data = http_build_query($data);
+        $this->_method = "GET";
+        return $this;
     }
     public function send(){
         $curl = curl_init();
 
-        curl_setopt_array($curl, array(
+        $data = array(
             CURLOPT_URL => $this->url,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
             CURLOPT_TIMEOUT => 0,
             CURLOPT_FOLLOWLOCATION => true,
+            //CURLOPT_FAILONERROR => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-            CURLOPT_CUSTOMREQUEST => $this->_method,
-            CURLOPT_POSTFIELDS => $this->_data
-        ));
+            CURLOPT_CUSTOMREQUEST => $this->_method
+        );
+        if($this->_data && $this->_method == 'POST')
+            $data[CURLOPT_POSTFIELDS] = $this->_data;
+
+        if($this->_header)
+            $data[CURLOPT_HTTPHEADER] = $this->_header;
+
+        curl_setopt_array($curl, $data);
 
         $this->_response = curl_exec($curl);
+
+        /*if (curl_errno($curl)) {
+            $this->_response = curl_error($curl);
+            die(var_dump($this->_data, $this->url, $this->_header, $this->_response));
+        }*/
+
         curl_close($curl);
 
-        if($this->_log)
-            \DClass\lib\Util::log($this->_response, "curl_log");
+        //if($this->_log)
+        \DClass\lib\Util::log($this->_response, "curl_log.text");
 
+        //dv_dump($this->url, $this->_method, $this->_data, $this->_response);
         return $this;
     }
+
+    /**
+     * @return \stdClass
+     */
     public function json(){
-        return json_encode($this->_response);
+        return json_decode($this->_response);
     }
+
 
 }

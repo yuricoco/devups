@@ -23,6 +23,26 @@ var model = {
 
     spinner: '<span class="spinner-border spinner-border-sm mr-2" role="status"></span>',
     btnactive: null,
+    separator: function (value, b) {
+
+        if (!value)
+            return 0;
+
+        var a = '' + value + "".replace(/ /g, '');
+        b = b || ' ';
+        var c = '',
+            d = 0;
+        while (a.match(/^0[0-9]/)) {
+            a = a.substr(1);
+        }
+        for (var i = a.length - 1; i >= 0; i--) {
+            c = (d != 0 && d % 3 == 0) ? a[i] + b + c : a[i] + c;
+            d++;
+        }
+
+        return c;
+
+    },
     addLoader(btn) {
         this.btnactive = btn;
         this.btnactive.attr("disabled", true);

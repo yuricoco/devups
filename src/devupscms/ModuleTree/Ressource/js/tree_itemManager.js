@@ -8,7 +8,7 @@ Vue.component("tree_itemForm", {
             tree_itemtree: [],
         }
     },
-    props: ["tree_item"],
+    props: ["tree_item", 'langs'],
     mounted() {
 
         var url = $("#content").data('url')
@@ -66,18 +66,12 @@ Vue.component("tree_itemForm", {
                         <div class="tab-content" id="myTabContent">
                             <div class="tab-pane active" id="general-tab" role="tabpanel"
                                  aria-labelledby="home-tab"> 
-                                    <div class="form-group">
-                                        <label for="text">Nom</label>
-                                        <input autocomplete="off" v-model="tree_item.name" type="text"
+                                    <div v-for="lang in langs" class="form-group">
+                                        <label for="text">Nom {{lang.iso_code}}</label>
+                                        <input autocomplete="off" v-model="tree_item.name[lang.iso_code]" type="text"
                                                class="form-control " name="text" id="text"
                                                placeholder="Text">
         
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="text">en</label>
-                                        <input autocomplete="off" v-model="tree_item.name_en" type="text"
-                                               class="form-control " 
-                                               placeholder="Text">
                                     </div>
                                     <div class="form-group">
                                         <label for="text">Url</label>
@@ -176,7 +170,7 @@ Vue.component("tree_itemForm", {
 Vue.component("addchild", {
     data() {
         return {
-            tree_item: {},
+            tree_item: {name:{}},
             nameparent: "main branche",
         }
     },
@@ -228,7 +222,7 @@ Vue.component("addchild", {
         <li class="list-group-item">
             <div class="input-group center">
             <input type="text" class="filter datepicker date-input form-control hasDatepicker" 
-              v-model="tree_item.name" :placeholder="'Ajouter un enfant a ' +nameparent"  >
+              v-model="tree_item.name['en']" :placeholder="'Ajouter un enfant a ' +nameparent['en']"  >
             <span  @click="create()" class="btn btn-default input-group-addon">
             <i class="fa fa-plus"></i>
             </span>
@@ -244,7 +238,7 @@ Vue.component("childrenTree", {
             chain: [],
         }
     },
-    props: ["tree_item", "tree", "index", "nbitem"],
+    props: ["tree_item", "tree", "langs", "index", "nbitem"],
     mounted() {
     },
     methods: {
@@ -321,7 +315,7 @@ Vue.component("childrenTree", {
         <li class="list-group-item">
             <div class="dd-handle dd-primary">
                 <button style="width: 120px; overflow: hidden"  class="btn btn-light">
-                <span v-html="tree_item.name"></span> {{tree_item.position}} {{nbitem}}
+                <span v-html="tree_item.name['en']"></span> {{tree_item.position}} {{nbitem}}
                 ({{tree_item.children}})</button>
                 <button v-if="tree_item.position" @click="move(1)" class="btn btn-info btn-sm"><i class="fa fa-angle-down"></i></button> 
                 <button v-if="tree_item.position <= nbitem - 1" @click="move(-1)" class="btn btn-info btn-sm"><i class="fa fa-angle-up"></i></button> 
@@ -357,6 +351,7 @@ Vue.component("childrenTree", {
                 <li v-if="children.length" is="childrenTree" v-for="(child, $index) in children"
                     v-bind:key="child.id" :tree="tree"  
                     :tree_item="child" 
+                    :langs="langs" 
                     :nbitem="children.length" 
                     :index="$index" 
                     class="list-group-item"></li>
@@ -379,7 +374,7 @@ Vue.component("tree_item", {
             componentkey: 1,
         }
     },
-    props: ["tree"],
+    props: ["tree", "langs"],
     mounted() {
 
         Drequest
@@ -576,14 +571,14 @@ Vue.component("tree_item", {
                                 <div class="topbar-left">
                                     <ol class="breadcrumb">
                                         <li class="breadcrumb-link">
-                                            <strong class="">{{tree.name}} | </strong>
+                                            <strong class="">{{tree.name['en']}} | </strong>
                                         </li>
                                         <li class="breadcrumb-link">
                                             <a @click="init(tree_item, $index)">Main</a>
                                         </li>
                                         <li v-for="(cat, $index) in tree_itemtree" class="breadcrumb-link">
                                             <i class="fa fa-angle-right"></i>
-                                            <a @click="backtoparent(cat, $index)">@{{cat.name}}</a>
+                                            <a @click="backtoparent(cat, $index)">@{{cat.name['en']}}</a>
                                             
                                             <span class="material-icons" data-toggle="modal" data-target="#exampleModal">create</span>
                                         </li>
@@ -622,6 +617,7 @@ Vue.component("tree_item", {
                             <li is="childrenTree" v-for="(tree_item, $index) in orderedItems"
                                 v-bind:key="tree_item.id" :tree="tree" 
                                 :tree_item="tree_item" 
+                                :langs="langs" 
                                 :nbitem="orderedItems.length" 
                                 :index="$index" 
                                 class="list-group-item"></li>
@@ -644,7 +640,7 @@ Vue.component("tree_item", {
             </div>
 
             <div style=" position: sticky;  top: 150px;" class="col-md-5">
-                <tree_itemForm :key="tree_item.id" v-if="tree_item.id" :tree_item="tree_item" ></tree_itemForm>
+                <tree_itemForm :langs="langs" :key="tree_item.id" v-if="tree_item.id" :tree_item="tree_item" ></tree_itemForm>
             </div>
 
         </div>
@@ -658,7 +654,8 @@ var tree_itemview = new Vue({
         trees: [],
         attributes: [],
         tree: {},
-        treeedit: {},
+        langs: langs,
+        treeedit: {name:{}},
     },
     mounted() {
         Drequest.api("tree.lazyloading").get((response) => {

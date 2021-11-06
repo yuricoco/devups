@@ -126,7 +126,7 @@ class UserCore extends \Model implements JsonSerializable
         $this->email = $email;
     }
 
-    public function setTelephone($phonenumber)
+    public function setPhonenumber($phonenumber)
     {
         if (!$phonenumber)
             return null;

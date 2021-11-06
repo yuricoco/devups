@@ -143,7 +143,7 @@ class Form extends FormFactory{
 
     }
 
-    public static function select($name, $options, $value, $directive = [], $setter = []) {
+    public static function select($name, $options, $value, $directive = [], $setter = [], $callback = null) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
         FormFactory::$fieldid = Form::$name."-".$name.'';
@@ -156,7 +156,7 @@ class Form extends FormFactory{
 
         Form::optionsfield($name, $value, $options, $setter);
 
-        return Form::__select("", $field, Form::serialysedirective($directive));
+        return Form::__select("", $field, Form::serialysedirective($directive), $callback);
 
     }
 

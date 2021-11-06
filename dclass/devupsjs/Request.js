@@ -81,7 +81,27 @@ class Drequest {
 
     raw(callback) {
         this._data = JSON.stringify(this._data);
-        return this.post(callback);
+        console.log(this);
+        //console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
+        var keys = Object.keys(this._param);
+        var param = (!keys.length) ? "": "?"+ $.param(this._param);
+        return $.ajax({
+            url: this.baseurl + this.url+ param,
+            data: this._data,
+            cache: false,
+            contentType: false,
+            processData: false,
+            method: "POST",
+            "headers": {
+                "Content-Type": "application/json",
+                // "Cookie": "PHPSESSID=6e3493f4e1e185cd94f35ef9488ef63e"
+            },
+            dataType: "json",
+            success: callback,
+            error: function (e) {
+                console.log(e);//responseText
+            }
+        });
     };
 
     get(callback) {

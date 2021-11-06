@@ -92,7 +92,7 @@ class Controller
         return $classname;
     }
 
-    public function createCore()
+    public function createCore($persist = true)
     {
         $classname = self::getclassname();
         $newclass = ucfirst($classname);
@@ -107,6 +107,9 @@ class Controller
             $entity = $this->form_fillingentity($entity, $_POST[$classname . "_form"]);
         } else
             $entity = $this->hydrateWithJson($entity, $rawdata[$classname]);
+
+        if (!$persist)
+            return $entity;
 
         if (isset($_FILES[$classname . "_form"])) {
             foreach ($_FILES[$classname . "_form"]['name'] as $key_form => $value_form) {
@@ -210,6 +213,41 @@ class Controller
 
     }
 
+    public function dcollection()
+    {
+        $rawdata = Request::raw();
+        $result = [];
+        foreach ($rawdata as $entityaction => $filter) {
+            $option = explode(".", $entityaction);
+            if (!isset($option[1])) {
+                $result[$entityaction] = [
+                    "success" => false,
+                    "detail" => t("action " . $entityaction . " not supported. available option are: lazyloadin or detail"),
+                ];
+                continue;
+            }
+            $entity = $option[1];
+            if ($option[0] == "lazyloading") {
+                Request::$uri_get_param['dclass'] = $entity;
+                Request::collectUrlParam($filter);
+                $result[$entity . "_ll"] = $this->ll();
+            } elseif ($option[0] == "detail") {
+                Request::$uri_get_param['dclass'] = $entity;
+                $result[$entity] = $this->detailCore($filter);
+            } else {
+                $result[$entityaction] = [
+                    "success" => false,
+                    "detail" => t("action " . $entityaction . " not supported. available option are: lazyloadin or detail"),
+                ];
+            }
+            // we reset static variable with the one in the url  so that next time
+            // default filter set in the url can be apply to other lazyloadin.
+            Request::$uri_get_param = [];
+            (new Request("hello"));
+        }
+        $result["success"] = true;
+        return $result;
+    }
 
     public function ll()
     {
@@ -283,7 +321,7 @@ class Controller
      * @param bool $deeper
      * @return mixed
      */
-    public function form_fillingentity($object, $data = null, $deeper = false)
+    public function form_fillingentity($object, $data = null)
     {
         $this->error = [];
         if (!is_object($object))
@@ -293,7 +331,12 @@ class Controller
         if (isset($_FILES[$classname . '_form'])) {
             //self::addEventListenerAfterCreate(strtolower(get_class($object)), "");
             //$data = $_FILES[strtolower(get_class($object)) . '_form'];
-
+            if ($object->getId()) {
+//                if($object->dvtranslate)
+//                    $object = $object->__show($deeper, \Dvups_lang::defaultLang()->getId());
+//                else
+                $object = $object->hydrate();
+            }
             foreach ($_FILES[$classname . "_form"]['name'] as $key_form => $value_form) {
                 if (!method_exists($object, 'upload' . ucfirst($key_form))) {
                     $this->error[$key_form] = " You may create method " . 'upload' . ucfirst($key_form) . " in entity. ";
@@ -307,17 +350,21 @@ class Controller
                 return $object;
             }
 
+        } elseif ($object->getId()) {
+//            if($object->dvtranslate)
+//                $object = $object->__show($deeper, \Dvups_lang::defaultLang()->getId());
+//            else
+            $object = $object->hydrate();
         }
-
         if (!$data) {
-            return $object->__show($deeper);
+            return $object->hydrate();
         }
 
         global $_ENTITY_FORM;
         $_ENTITY_FORM = $data;
 
         if ($object->getId()) {
-            $object = $object->__show($deeper);
+            //$object = $object->__show($deeper);
             $object->setUpdatedAt(date(\DClass\lib\Util::dateformat));
         } else
             $object->setCreatedAt(date(\DClass\lib\Util::dateformat));
@@ -356,6 +403,12 @@ class Controller
         //$entitycore = new \stdClass();
         //$entitycore->field = json_decode($_POST["dvups_form"][strtolower(get_class($object))], true);
         //$entitycore->field = $object->entityKeyForm();
+
+        global $em;
+        $classlang = get_class($object);
+        $metadata = $em->getClassMetadata("\\" . $classlang);
+        $fieldNames = array_keys($metadata->fieldNames);
+        $fieldNames = array_merge($fieldNames, $object->dvtranslated_columns);
 
         foreach ($_ENTITY_FORM as $key_form => $value_form) {
             $result = explode(":", $key_form);
@@ -461,7 +514,8 @@ class Controller
                 } elseif ($error = call_user_func(array($object, $currentfieldsetter), $collection))
                     $this->error[$key] = $error;
 
-            } else
+            } else {
+
                 if (strpos($key_form, ".id")) {
                     // && is_object ($value['options'][0])
 
@@ -474,22 +528,23 @@ class Controller
                         $classtype = $entitname;
 
                     $currentfieldsetter = 'set' . ucfirst($entitname);
-                    //dv_dump($currentfieldsetter);
-                    if (!class_exists($entitname))
+                    if (!class_exists(ucfirst($classtype)))
                         continue;
 
                     if (!is_numeric($value_form)) {
                         continue;
                     }
-
                     $reflect = new \ReflectionClass($classtype);
                     $value2 = $reflect->newInstance();
 
                     $value2->setId($value_form);
 
                     if (!method_exists($object, $currentfieldsetter)) {
-                        $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
-                    } elseif ($error = call_user_func(array($object, $currentfieldsetter), $value2->__show(false)))
+                        if (in_array($key, $fieldNames))
+                            $object->{$key} = $value2;
+                        else
+                            $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
+                    } elseif ($error = call_user_func(array($object, $currentfieldsetter), $value2)) //$value2->__show(false)
                         $this->error[$key] = $error;
 
                 } else {
@@ -501,13 +556,16 @@ class Controller
 //                                    $this->error[$key] = $error;
 //                        } else
                     if (!method_exists($object, $currentfieldsetter)) {
-                        $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
+                        if (in_array($key, $fieldNames))
+                            $object->{$key} = $_ENTITY_FORM[$key];
+                        else
+                            $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity. ";
                     } elseif ($error = call_user_func(array($object, $currentfieldsetter), $_ENTITY_FORM[$key]))
                         $this->error[$key] = $error;
                     //}
 
                 }
-            //}
+            }
 
         }
 //        }
@@ -534,15 +592,17 @@ class Controller
     {
 
         if ($object->getId()) {
-            $object = $object->__show($deeper);
+            $object = $object->hydrate();
         }
 
         $this->entity = $object;
+        global $em;
+        $classlang = get_class($object);
+        $metadata = $em->getClassMetadata("\\" . $classlang);
+        $fieldNames = array_keys($metadata->fieldNames);
+        $fieldNames = array_merge($fieldNames, $object->dvtranslated_columns);
 
         foreach ($jsonform as $field => $value) {
-
-            if (!is_string($value) && !is_numeric($value))
-                continue;
 
             $meta = explode(":", $field);
 
@@ -559,18 +619,19 @@ class Controller
             } else
                 $setter = "set" . ucfirst($meta[0]);
 
-            if (is_array($value)) {
+            /*if (is_array($value)) {
                 dv_dump($value);
                 $setter = "add" . ucfirst($meta[0]);
                 if (!method_exists($this->entity, $setter)) {
                     $this->error[$field] = " You may create method " . $setter . " in entity. ";
                 } elseif ($error = call_user_func(array($this->entity, $setter), $value))
                     $this->error[$field] = $error;
-            }
+            }*/
 
             // $imbricate[0]: represent the name of the attribute of the imbricated entity in its owner
             // $imbricate[1]: represent the name of the attribute of the imbricated entity. by default it's id
-            else if (isset($imbricate[1])) {
+            //else
+            if (isset($imbricate[1])) {
 
                 $classtype = explode("\\", $imbricate[0]);
                 if (count($classtype) > 1)
@@ -591,12 +652,15 @@ class Controller
                 $entityimbricate->setId($value);
                 if (!method_exists($this->entity, $setter)) {
                     $this->error[$field] = " You may create method " . $setter . " in entity ";
-                } elseif ($error = call_user_func(array($this->entity, $setter), $entityimbricate->__show(false)))
+                } elseif ($error = call_user_func(array($this->entity, $setter), $entityimbricate->hydrate(false)))
                     $this->error[$field] = $error;
 
             } else {
                 if (!method_exists($this->entity, $setter)) {
-                    $this->error[$field] = " You may create method " . $setter . " in entity. ";
+                    if (in_array($field, $fieldNames))
+                        $this->entity->{$field} = $value;
+                    else
+                        $this->error[$field] = " You may create method " . $setter . " in entity. ";
                 } elseif ($error = call_user_func(array($this->entity, $setter), $value))
                     $this->error[$field] = $error;
             }

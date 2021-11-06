@@ -1094,6 +1094,7 @@ EOF;
     private function tablebodybuilder()
     {
 
+        \DBAL::$id_lang_static = $this->id_lang;
         foreach ($this->listentity as $entity) {
             $tr = [];
 
@@ -1170,10 +1171,12 @@ EOF;
                         }
                         $tdcontent = call_user_func(array($entityjoin, 'get' . ucfirst($join[1])), $param);
                     } else {
-                        $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])), $param);
-
+                        //$entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])), $param);
+                        //dv_dump($join[0]);
+                        $entityjoin = $entity->{strtolower($join[0])}->hydrate();
                         // todo: perform this option next time
                         $dventity = \Dvups_entity::getbyattribut("this.name", ucfirst($join[0]));
+                        //$tdcontent = $entityjoin->{strtolower($join[1])};
                         $tdcontent = "<a class='".$join[0]."' href='".$dventity->route()."' target='_blank'>" .
                             call_user_func(array($entityjoin, 'get' . ucfirst($join[1])), $param). "</a>";
 

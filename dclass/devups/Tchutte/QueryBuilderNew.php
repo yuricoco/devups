@@ -93,20 +93,6 @@ class QueryBuilderNew extends \DBAL
         $this->query = " select $columns from `" . $this->table . "` ";
         $this->_where = "";
 
-        if ($defaultjoin) {
-
-            if (!empty($this->entity_link_list)) {
-                $entity_links = array_keys($this->entity_link_list);
-                foreach ($entity_links as $entity_link) {
-                    $class_attrib = explode(":", $entity_link);
-                    if( $class_attrib[0] != $class_attrib[1])
-                        $this->query .= " left join `" . $class_attrib[0]."` ".$class_attrib[1] . " on " . $class_attrib[1] . ".id = " . $this->table . "." . $class_attrib[1] . "_id";
-                    else
-                        $this->query .= " left join `" . $class_attrib[0]."` on " . $class_attrib[0] . ".id = " . $this->table . "." . $class_attrib[0] . "_id";
-                }
-            }
-        }
-
         return $this;
     }
 

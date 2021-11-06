@@ -32,6 +32,9 @@ class BackendGenerator
 
             $construteur .= "";
             foreach ($entity->relation as $relation) {
+                $entitytype = ucfirst($relation->entity);
+                if(isset($relation->entitytype))
+                    $entitytype = ucfirst($relation->entitytype);
 
                 if ($relation->cardinality == 'manyToMany') {
 
@@ -89,55 +92,57 @@ class BackendGenerator
         }
         
                         ";
-                } elseif ($relation->cardinality == 'oneToOne') { // or $relation->nullable == 'DEFAULT'
+                }
+                elseif ($relation->cardinality == 'oneToOne') { // or $relation->nullable == 'DEFAULT'
 
-                    $construteur .= "\n\t$" . "this->" . $relation->entity . " = new " . ucfirst($relation->entity) . "();";
+                    $construteur .= "\n\t$" . "this->" . $relation->entity . " = new $entitytype();";
 
                     $attrib .= "
         /**
          * " . ucfirst($relation->cardinality) . "
-         * @ManyToOne(targetEntity=\"" . $antislash . ucfirst($relation->entity) . "\")
+         * @ManyToOne(targetEntity=\"" . $antislash . $entitytype . "\")
          * @JoinColumn(onDelete=\"" . $relation->ondelete . "\")
-         * @var " . $antislash . ucfirst($relation->entity) . "
+         * @var " . $antislash . $entitytype . "
          */
         public $" . $relation->entity . ";\n";
 
                     $method .= "
         /**
          *  " . $relation->cardinality . "
-         *	@return " . $antislash . ucfirst($relation->entity) . "
+         *	@return " . $antislash . $entitytype . "
          */
         function get" . ucfirst($relation->entity) . "() {
             $" . "this->" . $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
-        function set" . ucfirst($relation->entity) . "(" . $antislash . ucfirst($relation->entity) . " $" . $relation->entity . " = null) {
+        function set" . ucfirst($relation->entity) . "(" . $antislash . $entitytype . " $" . $relation->entity . " = null) {
             $" . "this->" . $relation->entity . " = $" . $relation->entity . ";
         }
                         ";
                 } else {
 
-                    $construteur .= "\n\t$" . "this->" . $relation->entity . " = new " . ucfirst($relation->entity) . "();";
+                    $construteur .= "\n\t$" . "this->" . $relation->entity . " = new " . $entitytype . "();";
 
                     $attrib .= "
         /**
-         * @" . ucfirst($relation->cardinality) . "(targetEntity=\"" . $antislash . ucfirst($relation->entity) . "\")
-         * @var " . $antislash . ucfirst($relation->entity) . "
+         * @" . ucfirst($relation->cardinality) . "(targetEntity=\"" . $antislash . $entitytype . "\")
+         * @JoinColumn(onDelete=\"" . $relation->ondelete . "\")
+         * @var " . $antislash . $entitytype . "
          */
         public $" . $relation->entity . ";\n";
 
                     $method .= "
         /**
          *  " . $relation->cardinality . "
-         *	@return " . $antislash . ucfirst($relation->entity) . "
+         *	@return " . $antislash . $entitytype . "
          */
         function get" . ucfirst($relation->entity) . "() {
             $" . "this->" . $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
-        function set" . ucfirst($relation->entity) . "(" . $antislash . ucfirst($relation->entity) . " $" . $relation->entity . ") {
+        function set" . ucfirst($relation->entity) . "(" . $antislash . $entitytype . " $" . $relation->entity . ") {
             $" . "this->" . $relation->entity . " = $" . $relation->entity . ";
         }
                         ";
