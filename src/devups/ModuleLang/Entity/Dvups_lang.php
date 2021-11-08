@@ -175,21 +175,26 @@ class Dvups_lang extends Model implements JsonSerializable
     }
 
     public static function defaultLang(){
-        $lang = self::where("main", 1)->__firstOrNull();
+        if ($iso = Request::get('lang'))
+            $lang = self::where("this.iso_code", $iso)->firstOrNull();
+        else
+            $lang = self::where("this.main", 1)->firstOrNull();
+
         if (!$lang)
             $lang = self::first();
 
         return $lang;
     }
+
     public static function otherLangs($default = __lang){
-        return self::where("iso_code", "!=", $default)->__getAll();
+        return self::where("iso_code", "!=", $default)->get();
     }
 
     /**
      * @return $this
      */
     public static function currentLang(){
-        return self::where("iso_code", local())->__getFirst();
+        return self::where("iso_code", local())->first();
     }
 
 }

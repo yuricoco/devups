@@ -81,6 +81,19 @@ class Model extends \stdClass
         $dirname = str_replace("Entity", "", $dirname[1]);
         return str_replace("\\", "/", $route . "src" . $dirname . $src);
     }
+    /**
+     * static method gives the path of the module where the entity is/
+     * @return string the path of the module where the class is.
+     */
+    public static function services($src = "", $route = __env)
+    {
+        //return get_called_class();
+        $reflector = new ReflectionClass(get_called_class());
+        $fn = $reflector->getFileName();
+        $dirname = explode("src", dirname($fn));
+        $dirname = str_replace("Entity", "", $dirname[1]);
+        return str_replace("\\", "/", $route . "src" . $dirname ."services.php?path=". $src);
+    }
 
     public static function classroot($src)
     {
@@ -127,14 +140,14 @@ class Model extends \stdClass
         $table = strtolower(get_class($entity));
         $ref = $table . "_" . $id . "_" . $column;
 
-        $dvlang = Dvups_lang::select()->where("ref", $ref)->__getOne();
+        $dvlang = Dvups_lang::select()->where("ref", $ref)->getInstance();
         $dvcontentlang = new Dvups_contentlang();
 
         if ($dvlang->getId()) {
             $dvcontentlang = Dvups_contentlang::select()
                 ->where("dvups_lang.ref", $dvlang->getRef())
                 ->andwhere("lang", $lang)
-                ->__getOne();
+                ->getInstance();
             if (!$dvcontentlang->getId()) {
                 $dvcontentlang = new Dvups_contentlang();
 
@@ -200,7 +213,7 @@ class Model extends \stdClass
         $data["lang_id"] = $lang->getId();
         $data[$ltable . "_id"] = $this->getId();
 
-        $translation = (get_class($this) . "_lang")::where([$ltable . "_id" => $this->id, "lang_id" => $lang->getId()])->__getOne();
+        $translation = (get_class($this) . "_lang")::where([$ltable . "_id" => $this->id, "lang_id" => $lang->getId()])->getInstance();
         if ($translation->getId()) {
             (get_class($this) . "_lang")::where("id", $translation->getId())->update($data);
         } else {
@@ -327,12 +340,12 @@ class Model extends \stdClass
 
         $qb = new QueryBuilder($entity);
         if (is_null($parameter))
-            return $qb->select()->__countEl();
+            return $qb->select()->count();
 
         if (is_object($parameter) || is_array($parameter))
-            return $qb->select()->where($parameter)->__countEl(false);
+            return $qb->select()->where($parameter)->count();
 
-        return $qb->select()->where($parameter, "=", $value)->__countEl(false);
+        return $qb->select()->where($parameter, "=", $value)->count();
 
     }
 
@@ -343,14 +356,15 @@ class Model extends \stdClass
      * @param type $id
      * @return $this
      */
-    public static function first($recursif = true, $collect = [])
+    public static function first($id_lang = null)
     {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->limit(1)->__getOne($recursif, $collect);
+        $qb->setLang($id_lang);
+        return $qb->select()->limit(1)->getInstance();
     }
 
     /**
@@ -359,14 +373,15 @@ class Model extends \stdClass
      * @param type $id
      * @return $this
      */
-    public static function last($recursif = true, $collect = [])
+    public static function last($id_lang = null)
     {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->orderby($qb->getTable() . ".id desc")->limit(1)->__getOne($recursif, $collect);
+        $qb->setLang($id_lang);
+        return $qb->select()->orderby($qb->getTable() . ".id desc")->limit(1)->getInstance();
     }
 
     /**
@@ -382,7 +397,7 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->orderby("id desc")->limit(1)->__getOneRow();
+        return $qb->select()->orderby("id desc")->limit(1)->getInstance();
     }
 
     /**
@@ -404,18 +419,18 @@ class Model extends \stdClass
                 return $entity;
 
             $i += $nbel;
-            return $qb->select()->limit($i - 1, $i)->__getOne($recursif, $collect);
+            return $qb->select()->limit($i - 1, $i)->getInstance($recursif, $collect);
         }
 
-        return $qb->select()->limit($i - 1, $i)->__getOne($recursif, $collect);
+        return $qb->select()->limit($i - 1, $i)->getInstance($recursif, $collect);
     }
 
     /**
      * return the attribut as design in the database
      * @example http://easyprod.spacekola.com description
-     * @param Str $attribut
+     * @param string $attribut
      * @param int $id
-     * @return $this
+     * @return mixed
      */
     public static function getattribut($attribut, $id)
     {
@@ -424,7 +439,7 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select($attribut)->where("this.id", $id)->exec(DBAL::$FETCH)[0];
+        return $qb->select($attribut)->where("this.id", $id)->getValue();
     }
 
     /**
@@ -441,7 +456,7 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select()->where($attribut, $value)->__getOne($recusif);
+        return $qb->select()->where($attribut, $value)->getInstance();
     }
 
     /**
@@ -468,9 +483,9 @@ class Model extends \stdClass
                 //->leftjoinrecto($classname . "_lang")
                 ->where("this.id", "=", $id)
                 //->where($classname . "_lang.lang_id", "=", $id_lang)
-                ->__getOneRow();
+                ->getInstance();
         } else
-            return $qb->select()->where("id", "=", $id)->__getOneRow();
+            return $qb->select()->where("id", "=", $id)->getInstance();
 
     }
 
@@ -482,7 +497,7 @@ class Model extends \stdClass
      * @param boolean $recursif [true] tell the DBAL to find all the data of the relation
      * @return $this | array
      */
-    public static function find($id, $recursif = true, $collect = [], $id_lang = null)
+    public static function find($id, $id_lang = null)
     {
         $classname = get_called_class();
         $reflection = new ReflectionClass(get_called_class());
@@ -490,6 +505,7 @@ class Model extends \stdClass
         $entity->setId($id);
 
         $qb = new QueryBuilder($entity);
+        $qb->setLang($id_lang);
         if (is_array($id)) {
 
             return $qb->where("this.id")->in($id)->get();
@@ -500,12 +516,11 @@ class Model extends \stdClass
 //                $id_lang = Dvups_lang::defaultLang()->getId();
             $qb->setLang($id_lang);
             return $qb->select()->where("this.id", "=", $id)
-                ->__getOne($recursif, $collect);
+                ->getInstance();
 
         } else {
             $dbal = new DBAL();
-            $dbal->setCollect($collect);
-            return $dbal->findByIdDbal($entity, $recursif);
+            return $dbal->findByIdDbal($entity);
         }
     }
 
@@ -550,15 +565,15 @@ class Model extends \stdClass
 
         $qb = new QueryBuilder($entity);
         if ($entity->dvtranslate) {
-            if (!$id_lang)
-                $id_lang = Dvups_lang::defaultLang()->getId();
+//            if (!$id_lang)
+//                $id_lang = Dvups_lang::defaultLang()->getId();
 
             $qb->setLang($id_lang);
         }
         if ($sort == 'id')
             $sort = $qb->getTable() . "." . $sort;
 
-        return $qb->select()->handlesoftdelete()->orderby($sort . " " . $order)->__getAll();
+        return $qb->select()->handlesoftdelete()->orderby($sort . " " . $order)->get();
 
     }
 
@@ -576,15 +591,15 @@ class Model extends \stdClass
 
         $qb = new QueryBuilder($entity);
         if ($entity->dvtranslate) {
-            if (!$id_lang)
-                $id_lang = Dvups_lang::defaultLang()->getId();
+//            if (!$id_lang)
+//                $id_lang = Dvups_lang::defaultLang()->getId();
 
             $qb->setLang($id_lang);
         }
         if ($sort == 'id')
             $sort = $qb->getTable() . "." . $sort;
 
-        return $qb->select()->handlesoftdelete()->orderby($sort . " " . $order)->__getAllRow();
+        return $qb->select()->handlesoftdelete()->orderby($sort . " " . $order)->get();
     }
 
 
@@ -601,8 +616,8 @@ class Model extends \stdClass
 
         $qb = new QueryBuilder($entity);
         if ($entity->dvtranslate) {
-            if (!$id_lang)
-                $id_lang = Dvups_lang::defaultLang()->getId();
+//            if (!$id_lang)
+//                $id_lang = Dvups_lang::defaultLang()->getId();
 
             $qb->setLang($id_lang);
         }
@@ -618,6 +633,16 @@ class Model extends \stdClass
     public static function where($column, $operator = null, $value = null, $id_lang = null)
     {
         return self::select("*", $id_lang)->where($column, $operator, $value);
+    }
+
+    /**
+     * @param $column
+     * @param $collection
+     * @return QueryBuilder
+     */
+    public static function whereIn($column, $collection)
+    {
+        return self::select()->whereIn($column, $collection);
     }
 
     public static function join($classname, $classnameon = null, $id_lang = null)
@@ -665,19 +690,17 @@ class Model extends \stdClass
     /**
      * return instance of \QueryBuilder white the select request sequence.
      * @param string $columns
-     * @return \QueryBuilder
+     * @return float
      * @example name, description, category if none has been set, all will be take.
      */
-    public static function sum($columns, $as = "")
+    public static function sum($columns)
     {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if ($as)
-            $as = "AS " . $as;
+        return $qb->sum($columns);
 
-        return $qb->select(" SUM($columns) $as ");
     }
 
     public static function avg($columns, $as = "")
@@ -686,10 +709,8 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if ($as)
-            $as = "AS " . $as;
 
-        return $qb->select(" AVG($columns) $as ");
+        return $qb->avg($columns, $as);
     }
 
     public static function max($columns, $as = "")
@@ -698,10 +719,7 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        if ($as)
-            $as = "AS " . $as;
-
-        return $qb->select(" MAX($columns) $as ");
+        return $qb->max($columns, $as);
     }
 
     public static function distinct($columns)
@@ -710,7 +728,7 @@ class Model extends \stdClass
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
-        return $qb->select(" DISTINCT($columns) ");
+        return $qb->distinct("$columns");
     }
 
     /**
@@ -783,7 +801,7 @@ class Model extends \stdClass
     public function __findrow()
     {
         $qb = new QueryBuilder($this);
-        return $qb->select()->where("id", "=", $this->id)->__getOneRow();
+        return $qb->select()->where("id", "=", $this->id)->getInstance();
     }
 
     public function __delete($exec = true)
@@ -798,7 +816,7 @@ class Model extends \stdClass
         }
     }
 
-    public function __getall($att = 'id', $order = "asc")
+    /*public function __getall($att = 'id', $order = "asc")
     {
         $qb = new QueryBuilder($this);
         if ($att == 'id')
@@ -814,7 +832,7 @@ class Model extends \stdClass
             $att = $qb->getTable() . "." . $att;
 
         return $qb->select()->orderby($att . " " . $order)->__getAll();
-    }
+    }*/
 
     public function __hasmany($collection, $exec = true, $incollectionof = null, $recursif = false)
     {
@@ -875,7 +893,7 @@ class Model extends \stdClass
 
         $qb = new QueryBuilder($relation);
         if ($get)
-            return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId())->__getOne($recursif);
+            return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId())->getInstance($recursif);
 
         return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId());
     }
@@ -1379,7 +1397,7 @@ class Model extends \stdClass
     {
         $entity = strtolower(get_called_class());
         $admin = getadmin();
-        $de = Dvups_role_dvups_entity::where($admin->dvups_role)->andwhere("dvups_entity.name", $entity)->__getOne();
+        $de = Dvups_role_dvups_entity::where($admin->dvups_role)->andwhere("dvups_entity.name", $entity)->getInstance();
 
         if ($de->getId()) {
             return $de->dvups_entity->route($path);

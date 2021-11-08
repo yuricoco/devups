@@ -58,22 +58,9 @@ class App extends \dclass\devups\Controller\FrontController
 
     public function helloView(){
 
-        //$tree = new Tree();
-        //$tree = new \dclass\devups\Datatable\Lazyloading(new Tree_item());
-        //$tree = $tree->lazyloading();
-        $tree = Tree_item::findrow(1);
-        /*$tree = (new Dvups_role(1))->__hasmany('dvups_entity', false)
-            ->where("dvups_entity.dvups_module_id", 1)
-            ->__getAll()
-        ;*/
-        //$tree->slug = "update !";
-        //$tree->name = ["fr"=>"en FR", "en"=>"en EN"];
-        //$tree->name = "just FR";
-        //$tree->__update();
-        //var_dump($tree );
-        var_dump($tree);
-        //var_dump($tree );
-//        var_dump($tree->tree->created_at );
+        $products = Product::all("id", "asc", 2);
+        foreach ($products as $product)
+            var_dump($product->name);
 
         die;
         Genesis::render("hello", []);

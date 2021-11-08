@@ -153,22 +153,24 @@ class Core extends stdClass {
                 $projectname = ($project->name);
                 $qb = new QueryBuilder(new Dvups_component());
                 $dvcomponent = $qb->select()->where("name", '=', $projectname )
-                    ->__getOne();
+                    ->firstOr(function () use ($projectname, &$updated){
 
-                if(!$dvcomponent->getId()){
+                        $dvcomponent = new Dvups_component();
+                        $dvcomponent->setName($projectname);
+                        $dvcomponent->setLabel($projectname);
+                        $dvcomponent->__insert();
 
-                    $dvcomponent->setName($projectname);
-                    $dvcomponent->setLabel($projectname);
-                    $dvcomponent->__insert();
+                        $rolecomponent = new Dvups_role_dvups_component();
+                        $rolecomponent->setDvups_component($dvcomponent);
+                        $rolecomponent->setDvups_role(new Dvups_role(1));
+                        $rolecomponent->__insert();
 
-                    $rolecomponent = new Dvups_role_dvups_component();
-                    $rolecomponent->setDvups_component($dvcomponent);
-                    $rolecomponent->setDvups_role(new Dvups_role(1));
-                    $rolecomponent->__insert();
+                        $updated = true;
 
-                    $updated = true;
+                        return $rolecomponent;
 
-                }
+                    });
+
 
                 foreach ($project->listmodule as $key => $module) {
 
@@ -177,7 +179,7 @@ class Core extends stdClass {
                     }
                     $modulename = ucfirst($module->name);
                     $qb = new QueryBuilder(new Dvups_module());
-                    $dvmodule = $qb->select()->where("this.name", '=', $modulename )->__getOne();
+                    $dvmodule = $qb->select()->where("this.name", '=', $modulename )->first();
 
                     $dvmodule->setProject($project->name);
                     $dvmodule->dvups_component = $dvcomponent;
@@ -201,7 +203,7 @@ class Core extends stdClass {
 
                         $entityname = strtolower($entity->name);
                         $qb = new QueryBuilder(new Dvups_entity());
-                        $dventity = $qb->select()->where("dvups_entity.name", '=', $entityname )->__getOne();
+                        $dventity = $qb->select()->where("dvups_entity.name", '=', $entityname )->first();
 
                         $dventity->setDvups_module($dvmodule);
                         if(!$dventity->getId()){

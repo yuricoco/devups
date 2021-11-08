@@ -46,6 +46,10 @@ function path($src){
     return __env . $src;
 }
 
+function services($service){
+    return __env ."admin/api/". $service;
+}
+
 function url_format($str, $charset='utf-8')
 {
     $str = htmlentities($str, ENT_NOQUOTES, $charset);

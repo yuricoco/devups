@@ -13,7 +13,6 @@ header("Access-Control-Allow-Origin: *");
 
 
 $statusCtrl = new StatusController();
-$status_entityCtrl = new Status_entityController();
 
 (new Request('hello'));
 

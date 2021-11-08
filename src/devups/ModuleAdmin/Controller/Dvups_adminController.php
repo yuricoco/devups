@@ -118,7 +118,7 @@ class Dvups_adminController extends Controller
         //Local_contentController::buildlocalcachesinglelang($_POST['lang']);
 
         $admin->setLastloginAt(date("Y-m-d H:i:s"));
-        $admin->__update(["lastlogin_at"=> date("Y-m-d H:i:s")]);
+        $admin->__update(["lastlogin_at" => date("Y-m-d H:i:s")]);
 
         if ($admin->getFirstconnexion()) {
             redirect(Dvups_admin::classpath() . "dvups-admin/complete-registration?id=" . $admin->getId());

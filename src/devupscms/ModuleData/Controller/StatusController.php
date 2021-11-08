@@ -10,9 +10,9 @@ class StatusController extends Controller{
         $this->datatable = StatusTable::init(new Status())->buildindextable();
 
         self::$cssfiles[] = __admin."plugins/jquery-ui-1.12.1/jquery-ui.min.css";
-        self::$cssfiles[] = Status::classpath('Ressource/css/status.css');
+        self::$cssfiles[] = Status::classpath('Resource/css/status.css');
         self::$jsfiles[] = __admin."plugins/jquery-ui-1.12.1/jquery-ui.min.js";
-        self::$jsfiles[] = Status::classpath('Ressource/js/statusCtrl.js');
+        self::$jsfiles[] = Status::classpath('Resource/js/statusCtrl.js');
 
         $this->entitytarget = 'Status';
         $this->title = "Manage Status";

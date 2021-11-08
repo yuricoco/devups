@@ -11,6 +11,7 @@ class Tree_itemFrontController extends Tree_itemController
 
         $ll = new Lazyloading();
         $ll->lazyloading(new Tree_item());
+
         return $ll;
 
     }

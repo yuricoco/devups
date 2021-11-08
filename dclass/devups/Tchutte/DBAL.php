@@ -238,17 +238,7 @@ class DBAL extends Database
 
                 } else {
 
-                    /*$reflect = new ReflectionClass($entityTable);
-                    $object = $reflect->newInstance();
-                    $obarr = (array)$object;
-                    $obarr[$this->objectName] = $this->object;
-                    $obarr[strtolower(get_class($entity))] = $entity;
-
-                    $entitycol = Bugmanager::cast((object)$obarr, $entityTable);
-
-                    $success = $entitycol->__save();*/
-
-                    $keyvalue[strtolower(get_class($entity))."_id"] = $entity->getId();
+                    $keyvalue[strtolower(get_class($entity)) . "_id"] = $entity->getId();
                     $keyvalue[$this->table . "_id"] = $this->object->getId();
                     DBAL::_createDbal($entityTable, $keyvalue);
 
@@ -376,7 +366,7 @@ class DBAL extends Database
                 );
 
             if ($exec)
-                return $qb->__getAll($recursif);
+                return $qb->get();
             else
                 return $qb;
 
@@ -394,7 +384,7 @@ class DBAL extends Database
                     ->where($entity);
 
                 if ($exec)
-                    return $qb->__getAll($recursif);
+                    return $qb->get();
                 else
                     return $qb;
             }
@@ -413,7 +403,7 @@ class DBAL extends Database
 
 
         if ($exec)
-            return $qb->__getAll($recursif);
+            return $qb->get();
         else
             return $qb;
     }
@@ -571,26 +561,28 @@ class DBAL extends Database
         $values = [];
         $parameterQuery = ':' . implode(", :", $this->objectVar);
 
-        $sql = "insert into `" . $this->table . "` (`" . strtolower(implode('` ,`', $this->objectVar)) . "`) 
-        values (" . strtolower($parameterQuery) . ")";
+        $sql = " INSERT INTO `" . $this->table . "` (`" . strtolower(implode('` ,`', $this->objectVar)) . "`) 
+        VALUES (" . strtolower($parameterQuery) . ")";
 
         $id = $this->executeDbal($sql, $this->objectKeyValue, 1);
         $this->object->setId($id);
 
         // implement translation if anabled in class
         if ($this->object->dvtranslate) {
-            //if (method_exists($this->object, 'dvupsTranslate')) {
-            // $this->object->dvupsTranslate();
+
             $objarray = (array)$this->object;
-            //$df = Dvups_lang::defaultLang();
+
             $langs = Dvups_lang::allrows();
             foreach ($langs as $lang) {
 
                 $keyvalue = [];
-                    foreach ($this->object->dvtranslated_columns as $key) {
-                        if (!isset($objarray[$key]))
-                            continue;
-                    $keyvalue[$key] = $objarray[$key][$lang->getIso_code()];
+                foreach ($this->object->dvtranslated_columns as $key) {
+                    if (!isset($objarray[$key]))
+                        continue;
+                    if(isset($objarray[$key][$lang->getIso_code()]))
+                        $keyvalue[$key] = $objarray[$key][$lang->getIso_code()];
+                    else
+                        $keyvalue[$key] = $id."_".$lang->getIso_code();
                     // $this->object->{$key} = $objarray[$key][$lang->getIso_code()];
                 }
                 $keyvalue["lang_id"] = $lang->getId();
@@ -667,7 +659,7 @@ class DBAL extends Database
         array_splice($values, 0, 1);
         $values[] = $this->objectValue[0];
 
-        $sql = "update `" . $this->table . "` set " . strtolower($parameterQuery) . " where id = :id ";
+        $sql = " UPDATE `" . $this->table . "` SET " . strtolower($parameterQuery) . " WHERE id = :id ";
 
         $query = $this->link->prepare($sql);
 
@@ -771,9 +763,8 @@ class DBAL extends Database
         return $flowBD;
     }
 
-    protected function initdefaultjoin()
+    /*protected function initdefaultjoin()
     {
-
         if (!empty($this->entity_link_list)) {
             $entity_links = array_keys($this->entity_link_list);
             foreach ($entity_links as $entity_link) {
@@ -784,7 +775,7 @@ class DBAL extends Database
                     $this->defaultjoin .= " left join `" . $class_attrib[0] . "` on " . $class_attrib[0] . ".id = " . $this->table . "." . $class_attrib[0] . "_id";
             }
         }
-    }
+    }*/
 
     public function findByIdDbal($object = null, $recursif = true, $collection = false, $id_lang = null)
     {
@@ -939,7 +930,10 @@ class DBAL extends Database
 
         if (empty($this->entity_link_list) and empty($this->objectCollection)) {
             $flowBD = $req->fetchObject($this->objectName);
-            $this->getLangValues($flowBD, $this->object->dvtranslated_columns);
+
+            if ($this->object->dvtranslate)
+                $this->getLangValues($flowBD, $this->object->dvtranslated_columns);
+
             return $flowBD;
         }
 
@@ -960,7 +954,7 @@ class DBAL extends Database
         if ($this->id_lang)
             return null;
 
-        //var_dump($flowBD->id);
+        // var_dump($flowBD->id);
         $sql = " SELECT a." . implode(', a.', $columns) . ", dl.iso_code FROM {$this->table }_lang a 
             LEFT JOIN  dvups_lang dl ON dl.id = a.lang_id
             WHERE {$this->table }_id = {$flowBD->id} ";

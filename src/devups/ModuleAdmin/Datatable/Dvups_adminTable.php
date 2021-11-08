@@ -30,7 +30,7 @@ class Dvups_adminTable extends Datatable
         $this->addcustomaction("callbackbtn");
 
         $this->qbcustom = Dvups_admin::select()
-            ->where("login", "!=", "dv_admin");
+            ->where("this.login", "!=", "dv_admin");
         //->andwhere("password", "!=", sha1("admin"));
         $this->order_by = "dvups_admin.id desc";
         // $this->lazyloading(new Dvups_admin(), $qb,"dvups_admin.id desc");

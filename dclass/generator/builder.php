@@ -333,13 +333,10 @@ else {
 
     require __DIR__ . '/../../src/devups/ModuleLang/Entity/Dvups_lang.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_component.php';
-    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_component_lang.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_module.php';
-    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_module_lang.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_right.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_entity.php';
-    require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_entity_lang.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_component.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_entity.php';
     require __DIR__ . '/../../src/devups/ModuleAdmin/Entity/Dvups_role_dvups_module.php';

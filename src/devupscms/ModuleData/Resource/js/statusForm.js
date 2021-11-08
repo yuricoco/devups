@@ -4,3 +4,5 @@
             * on 2021/03/31
             */
 
+
+$(".color_picker").colorpicker();

@@ -26,7 +26,8 @@ var ddatatable = {
         });
         return ids;
     },
-    checkall: function () {
+    checkall: function (el, entity) {
+        ddatatable.init(entity);
         var $input = this.getcheckbox();
         if (this.allchecked) {
             this.allchecked = false;
@@ -48,7 +49,8 @@ var ddatatable = {
             this.allchecked = false;
         }
     },
-    groupdelete: function () {
+    groupdelete: function (el, entity) {
+        ddatatable.init(entity);
         var thisclass = this;
         this.groupaction(function (ids, $trs) {
 
@@ -58,9 +60,10 @@ var ddatatable = {
             }
 
             if (!confirm('Voulez-vous Supprimer les éléments selectionnés?')) return false;
-
-            $.get(ddatatable.baseurl + "?path=" + model.entity + "._deletegroup&ids=" + ids.join(),
+            model.addLoader($(el))
+            $.get(ddatatable.baseurl + "?path=" + entity + "._deletegroup&ids=" + ids.join(),
                 (response) => {
+                    model.removeLoader();
                     console.log(response);
                     $.each($trs, function (i, tr) {
                         tr.remove();
@@ -130,11 +133,11 @@ var ddatatable = {
         console.log(response);
     },
     orderingup: true,
-    toggleorder(entity, param){
+    toggleorder(entity, param) {
         ddatatable.init(entity);
         this.setloader();
         this.orderingup = !this.orderingup;
-        if(this.orderingup)
+        if (this.orderingup)
             this.order = "&" + param + " asc";
         else
             this.order = "&" + param + " desc";
@@ -212,13 +215,13 @@ var ddatatable = {
             this.entity + ".datatable&next=" +
             this.currentpage + "&per_page=" +
             this.per_page + this.searchparam +
-            this.order + this.urlparam;
+            this.order + this.urlparam ;
     },
     _reload() {
         this.page()
     },
     urlparam: "",
-    callbackpaginaison(response){
+    callbackpaginaison(response) {
         this.dtinstance.find("#dv_table").find("tbody").html(response.datatable.tablebody);
         this.dtinstance.find("#dv_pagination").replaceWith(response.datatable.tablepagination);
 
@@ -292,7 +295,7 @@ var ddatatable = {
             var formdata = new FormData();
             formdata.append("fixture", $("input.dv_import_form")[0].files[0])
             $.ajax({
-                url: __env+"admin/header.php?dvpath=dvimport&classname=" + model.entity,
+                url: __env + "admin/header.php?dvpath=dvimport&classname=" + model.entity,
                 data: formdata,
                 cache: false,
                 contentType: false,

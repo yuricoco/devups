@@ -48,7 +48,7 @@ class StatusForm extends FormManager
         $entitycore->addDformjs($button);
         $entitycore->addcss(__admin.'plugins/colorpicker/css/evol-colorpicker.min');
         $entitycore->addjs(__admin.'plugins/colorpicker/js/evol-colorpicker.min');
-        $entitycore->addjs(Status::classpath('Ressource/js/statusForm'));
+        $entitycore->addjs(Status::classpath('Resource/js/statusForm'));
 
         return $entitycore;
     }

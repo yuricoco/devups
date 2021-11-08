@@ -178,7 +178,7 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
     }*/
 
     public function route($path = ""){
-        return route('src/' . strtolower($this->getProject()) . '/' . $this->getName() . '/'.$path);
+        return route('src/' . strtolower($this->project) . '/' . $this->name . '/'.$path);
     }
 
 }

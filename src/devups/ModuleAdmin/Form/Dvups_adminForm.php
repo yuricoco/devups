@@ -21,7 +21,7 @@ class Dvups_adminForm extends FormManager
 
         // administrator, admin_central, agent_central, admin_center,  agent_center
 
-        $dvups_roles = Dvups_role::allrows();
+        $dvups_roles = Dvups_role::where("this.name", "!=", "admin")->get();
 
         $entitycore->field['dvups_role.id'] = [
             "type" => FORMTYPE_RADIO,

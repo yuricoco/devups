@@ -4,6 +4,14 @@ RewriteEngine On
 RewriteRule    ^/?$    index.php    [NC,L] 
 RewriteRule    ^/login?$    login.php?    [NC,L] 
 
+RewriteRule    ^api/?$    services.php    [NC,L]
+RewriteRule    ^api/create.([A-Za-z0-9-]+)?$    services.php?path=create&dclass=$1    [NC,L]
+RewriteRule    ^api/upload.([A-Za-z0-9-]+)?$    services.php?path=upload&dclass=$1    [NC,L]
+RewriteRule    ^api/update.([A-Za-z0-9-]+)?$    services.php?path=update&dclass=$1    [NC,L]
+RewriteRule    ^api/delete.([A-Za-z0-9-]+)?$    services.php?path=delete&dclass=$1    [NC,L]
+RewriteRule    ^api/detail.([A-Za-z0-9-]+)?$    services.php?path=detail&dclass=$1    [NC,L]
+RewriteRule    ^api/lazyloading.([A-Za-z0-9-]+)?$    services.php?path=lazyloading&dclass=$1    [NC,L]
+
 <IfModule mod_headers.c>
     Header always set X-FRAME-OPTIONS "DENY"
 </IfModule>

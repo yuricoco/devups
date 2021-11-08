@@ -68,19 +68,19 @@ class Tree_item extends Model implements JsonSerializable
 
     public static function position($ref)
     {
-        $ti = self::mainmenu("position")->andwhere("tree_item_lang.name", $ref)
-            ->__firstOrNull();
+        $ti = self::mainmenu("position")->andwhere("name", $ref)
+            ->firstOrNull();
         // dv_dump($ti);
         if (!$ti) {
             return new Tree_item();
             $tree = Tree::where("name", "position")->__getOne();
             if (!Tree::where("name", "position")->count()) {
                 $tree = new Tree();
-                $tree->setName("position");
+                $tree->setName(["en"=>"position", "fr"=>"position"]);
                 $tree->__insert();
             }
             $ti = new Tree_item();
-            $ti->setName($ref);
+            $ti->name = ["en"=>$ref, "fr"=>$ref];
             $ti->setMain(1);
             $ti->setSlug($ref);
             $ti->tree = $tree;
@@ -216,7 +216,7 @@ class Tree_item extends Model implements JsonSerializable
             'status' => $this->status,
             'chain' => $this->chain,
             'content_id' => $this->getCmstext()->getId(),
-            'children' => (int)self::where("parent_id", $this->id)->__countEl(),
+            'children' => (int)self::where("parent_id", $this->id)->count(),
         ];
 
     }
@@ -321,9 +321,10 @@ class Tree_item extends Model implements JsonSerializable
      */
     public static function mainmenu($tree = "menu")
     {
-        return self::select()->leftjoin(Tree::class)
-            ->leftjoinrecto(Tree_lang::class, Tree::class)
-            ->where("tree_lang.name", $tree)
+        return self::select("*", Dvups_lang::defaultLang()->id)
+            //->leftjoin(Tree::class)
+            //->leftjoinrecto(Tree_lang::class, Tree::class)
+            ->where("name", $tree)
             ->where("main", 1);
     }
 

@@ -176,6 +176,8 @@ class Lazyloading implements \JsonSerializable
             $this->classname = $classname;
             $this->class = $classname;
         }
+
+        //$this->id_lang = Dvups_lang::defaultLang()->getId();
     }
 
     public function sortBy($attr, $sort = "ASC"){
@@ -193,16 +195,16 @@ class Lazyloading implements \JsonSerializable
             if ($this->dfilters)
                 $qbcustom = $this->filter($this->entity, $qbcustom);
 
-            $this->nb_element = $qbcustom->__countEl(false, false); //false
+            $this->nb_element = $qbcustom->count(); //false
         } else {
             $qb = new QueryBuilder($this->entity);
             $qb->select();
             if ($this->dfilters) {
                 $qbcustom = $this->filter($this->entity, $qb);
-                $this->nb_element = $qbcustom->__countEl(false, true);
+                $this->nb_element = $qbcustom->count();
             } else {
                 //$qb->handlesoftdelete();
-                $this->nb_element = $qb->selectcount()->handlesoftdelete()->count();
+                $this->nb_element = $qb->select()->handlesoftdelete()->count();
             }
         }
         $this->qbcustom = $qbcustom;
@@ -229,8 +231,8 @@ class Lazyloading implements \JsonSerializable
         }
 
 //        if ($this->entity->dvtranslate) {
-//            if (!$this->id_lang)
-//                $this->id_lang = Dvups_lang::defaultLang()->getId();
+            if ($id_lang)
+                $this->id_lang = $id_lang;
 //        }
 
         if($qbcustom)

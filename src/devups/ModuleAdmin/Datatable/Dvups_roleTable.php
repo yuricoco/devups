@@ -28,7 +28,7 @@ class Dvups_roleTable extends Datatable
             ['header' => t( "dv_name", 'Name'), 'value' => 'name'],
             ['header' => t("dv_alias", 'Alias'), 'value' => 'alias']
         ];
-        $this->topactions[] = "updateprivilege";
+        $this->topactions[] = Dvups_role::updateprivilegeAction();
 
         return $this;
     }
