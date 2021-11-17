@@ -26,6 +26,22 @@ class Request
         return str_replace(array_keys($replace), array_values($replace), $subject);
     }
 
+    public static function collectUrlParam($url){
+        $param = explode('&', $url);
+        //$param = explode('&', $uri[1]);
+        foreach ($param as $el) {
+            $kv = explode("=", $el);
+            if (isset($kv[1])) {
+                $defaulthttpgetkey = str_replace(".", "_", $kv[0]);
+                if (isset($_GET[$defaulthttpgetkey])) {
+                    Request::$uri_get_param[$kv[0]] = $_GET[$defaulthttpgetkey];
+                    unset($_GET[$defaulthttpgetkey]);
+                } else
+                    Request::$uri_get_param[$kv[0]] = $kv[1];
+            }
+        }
+    }
+
     function __construct($default_path = 'hello')
     {
 

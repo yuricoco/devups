@@ -23,6 +23,7 @@ class Dvups_entityTable extends Datatable
     public function buildindextable()
     {
 
+        // $this->mainrowaction = "show";
         $this->groupaction = true;
         $this->enablegroupaction();
         $this->datatablemodel = [

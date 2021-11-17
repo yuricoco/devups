@@ -405,6 +405,22 @@ class Lazyloading implements \JsonSerializable
 
     }
 
+    public function paginationData(){
+
+        return array('success' => true, // pour le restservice
+            'classname' => $this->classname,
+            'dynamicpagination' => $this->dynamicpagination,
+            'nb_element' => (int)$this->nb_element,
+            'per_page' => (int)$this->per_page,
+            'pagination' => (int)$this->pagination,
+            'current_page' => (int)$this->current_page,
+            'next' => (int)$this->next,
+            'previous' => (int)$this->previous,
+            'remain' => (int)$this->remain,
+            'detail' => $this->detail);
+
+    }
+
     /**
      * Specify data which should be serialized to JSON
      * @link https://php.net/manual/en/jsonserializable.jsonserialize.php

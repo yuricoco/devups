@@ -38,6 +38,9 @@ switch (Request::get('path')) {
     case 'lazyloading':
         g::json_encode((new dclass\devups\Controller\Controller())->ll());
         break;
+    case 'dcollection':
+        g::json_encode((new dclass\devups\Controller\Controller())->dcollection());
+        break;
 
     default :
         g::json_encode(["success" => false, "message" => "404 :".Request::get('path')." page note found"]);

@@ -624,7 +624,7 @@ class DBAL extends Database
         $objectvar = array_keys($keyvalue);
         $parameterQuery = ':' . implode(", :", $objectvar);
 
-        $sql = "insert into `" . strtolower($object) . "` (`" . strtolower(implode('` ,`', $objectvar)) . "`) values (" . strtolower($parameterQuery) . ")";
+        $sql = "INSERT INTO `" . strtolower($object) . "` (`" . strtolower(implode('` ,`', $objectvar)) . "`) VALUES (" . strtolower($parameterQuery) . ")";
 
         $db = new DBAL();
         return $db->executeDbal($sql, $keyvalue, 1);
