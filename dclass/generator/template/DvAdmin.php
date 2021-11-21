@@ -68,14 +68,14 @@ class DvAdmin
         $traitement = new Traitement();
         $listview = [];
 
-        $listview[] = "\n['header' => t('" . $entity->name . ".id', '#'), 'value' => 'id']";
+        $listview[] = "\n'id' => ['header' => t('#'),]";
         foreach ($entity->attribut as $attribut) {
             if ($attribut->formtype == 'image') {
                 // '" . $entity->name . "." . $attribut->name . "',
-                $listview[] = "\n['header' => t('" . ucfirst($attribut->name) . "'), 'value' => 'src:" . $attribut->name . "']";
-                $listview[] = "\n['header' => t('" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
+                $listview[] = "\n'{$attribut->name}' => ['header' => t('" . ucfirst($attribut->name) . "'), 'value' => 'src:" . $attribut->name . "']";
+                $listview[] = "\n'{$attribut->name}' => ['header' => t('" . ucfirst($attribut->name) . "'), ]";
             } else {
-                $listview[] = "\n['header' => t('" . ucfirst($attribut->name) . "'), 'value' => '" . $attribut->name . "']";
+                $listview[] = "\n'{$attribut->name}' => ['header' => t('" . ucfirst($attribut->name) . "'),]";
             }
         }
 
@@ -99,7 +99,7 @@ class DvAdmin
                     $entitylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $listview[] = "\n['header' => t('" . $entrel . "') , 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
+                $listview[] = "\n'{$entrel}_id' => ['header' => t('" . $entrel . "') , 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
             }
         }
 

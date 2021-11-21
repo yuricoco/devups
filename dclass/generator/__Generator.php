@@ -447,7 +447,7 @@ Usage:
         if ($crud['entity'])
             $backend->entityGenerator($entity);
 
-        if (isset($crud['lang']) && $crud['lang'])
+        if (isset($crud['lang']) && $crud['lang'] && isset($entity->lang))
             $backend->entityLangGenerator($entity);
 
         if ($crud['ctrl'])
@@ -759,6 +759,8 @@ switch (Request::get('path')) {
         //foreach ($modulelistentity as $entity) {
         $name = ucfirst(strtolower($entity->name));
         $requiremanytomany = "";
+        if(isset($entity->lang))
+            $requiremanytomany .= "\nrequire 'Entity/" . $name."_lang.php';";
 
         foreach ($entity->relation as $relation) {
             if ($relation->cardinality == 'manyToMany') {

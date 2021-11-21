@@ -743,6 +743,9 @@ EOF;
         foreach ($this->datatablemodel as $key => $valuetd) {
             $thforder = "";
 
+            if(!isset($valuetd["value"]))
+                $valuetd["value"] = $key;
+
             $value = $valuetd["value"];
             if (is_callable($value)) {
 
@@ -944,10 +947,10 @@ EOF;
                      * Nb: at the moment I wrote the comment I defined a getter for the null attribute to avoid notice
                      * while datatable is rendering
                      */
-                    if(isset($entityarray[$valuetd["value"]])){
-                        $tr[] = "<td>" . $entityarray[$valuetd["value"]] . "</td>";
+                    if(isset($entity->{$attrib})){
+                        $tr[] = "<td>" . $entity->{$attrib} . "</td>";
                     }else
-                        $tr[] = "<td>null</td>"; // maybe we can activate debug mode so that when we are on this we show a notice!
+                        $tr[] = "<td>".$entity->{$attrib}."</td>"; // maybe we can activate debug mode so that when we are on this we show a notice!
 
                     continue;
                 }
