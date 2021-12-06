@@ -9,15 +9,13 @@ if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
 }
 
 global $viewdir, $moduledata;
-$viewdir[] = __DIR__ . '/Ressource/views';
+$viewdir[] = __DIR__ . '/Resource/views';
 
 $moduledata = Dvups_module::init('ModuleUser');
 
 
 define('CHEMINMODULE', ' ');
 
-
-$addressCtrl = new AddressController();
 $userCtrl = new UserController();
 
 
@@ -27,10 +25,6 @@ switch (Request::get('path')) {
 
     case 'layout':
         Genesis::renderView("overview");
-        break;
-
-    case 'address/index':
-        $addressCtrl->listView();
         break;
 
     case 'user/index':

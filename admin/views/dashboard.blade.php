@@ -16,15 +16,13 @@
                         </div>
                     </div>
                 </div>
-                <div class="page-title-actions">
-                    <button type="button" data-toggle="tooltip" title="Example Tooltip" data-placement="bottom" class="btn-shadow mr-3 btn btn-dark">
-                        <i class="fa fa-star"></i>
-                    </button>
-                </div>
+
             </div>
         </div>
-
+<br>
+<br>
         @foreach($modules as $module)
+            <br>
             <h3><i class="">
                     {!! $module->getPrinticon(35) !!}
                 </i>
@@ -37,5 +35,12 @@
                 @endif
             @endforeach
         </div>
-        @endforeach
+    @endforeach
+
+@endsection
+
+@section("jsimport")
+    <script src="<?= CLASSJS ?>devups.js"></script>
+    <script src="<?= CLASSJS ?>model.js"></script>
+
 @endsection

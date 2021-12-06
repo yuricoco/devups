@@ -44,8 +44,8 @@ use Genesis as g;
             $entitycore->field['label'] = [
                 "label" => 'Label',
                 "type" => FORMTYPE_TEXT,
-                "lang" => true,
-                "value" => $dvups_module->getLabel(),
+                //"lang" => true,
+                "value" => $dvups_module->label,
             ];
             $entitycore->field['favicon'] = [
                 "label" => 'Favicon',

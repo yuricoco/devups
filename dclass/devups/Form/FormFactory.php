@@ -352,7 +352,7 @@ class FormFactory
             FormFactory::$fieldid = $entitycore->name . "-" . $key . '';
             FormFactory::$entityattrib = $key;
 
-            if (in_array($field['type'], [FORMTYPE_TEXT, FORMTYPE_EMAIL, FORMTYPE_NUMBER, FORMTYPE_PASSWORD])) {
+            if (in_array($field['type'], [FORMTYPE_DATE,FORMTYPE_TEXT, FORMTYPE_EMAIL, FORMTYPE_NUMBER, FORMTYPE_PASSWORD])) {
 
                 if (isset($field["lang"]) && $field["lang"]) {
                     $formfield = FormFactory::__input($entitycore, $field, $field['directive'], true);

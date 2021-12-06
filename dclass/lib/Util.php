@@ -157,4 +157,9 @@ class Util
         setcookie($key, null, -1, null, null, false, true);
     }
 
+    public static function dateadd($duration, $period, $from)
+    {
+        return date("Y-m-d H:i:s", strtotime($duration . " $period", strtotime($from)));
+    }
+
 }

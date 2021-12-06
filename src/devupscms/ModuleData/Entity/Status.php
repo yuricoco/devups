@@ -62,16 +62,15 @@ class Status extends Model implements JsonSerializable
     /**
      * @return Dvups_entity
      */
-    public function getEntity(): Dvups_entity
+    public function getEntity()
     {
-        $this->entity = $this->entity->__show();
         return $this->entity;
     }
 
     /**
      * @param Dvups_entity $entity
      */
-    public function setEntity(Dvups_entity $entity): void
+    public function setEntity(Dvups_entity $entity)
     {
         $this->entity = $entity;
     }
@@ -215,7 +214,7 @@ class Status extends Model implements JsonSerializable
     public static function getStatus($key, $entityname = null)
     {
         if ($entityname)
-            return self::where("this._key", $key)->where("entity.name", $entityname)->__first(false);
+            return self::where("this._key", $key)->where("entity.name", $entityname)->first();
         return self::getbyattribut("this._key", $key);
     }
 

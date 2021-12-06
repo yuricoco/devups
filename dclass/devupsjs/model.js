@@ -227,6 +227,9 @@ var model = {
             } else if ($(input).attr('type') === "email") {
                 formdata.append($(input).attr('name'), $(input).val());
                 formentity[$(input).attr('name')] = $(input).val();
+            } else if ($(input).attr('type') === "date") {
+                formdata.append($(input).attr('name'), $(input).val());
+                formentity[$(input).attr('name')] = $(input).val();
             } else if ($(input).attr('type') === "number") {
                 formdata.append($(input).attr('name'), $(input).val());
                 formentity[$(input).attr('name')] = $(input).val();

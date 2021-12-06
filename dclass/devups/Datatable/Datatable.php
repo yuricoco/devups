@@ -41,6 +41,8 @@ class Datatable extends Lazyloading
     protected $header = []; // describe the model of the table (available column and metadata of row)
     protected $tablebody = "";
 
+    public $trattribut_callback = null;
+
     protected $defaultaction = [
         "edit" => [
             //'type' => 'btn',
@@ -119,7 +121,7 @@ class Datatable extends Lazyloading
         $this->id_lang = \Dvups_lang::defaultLang()->id;
         $this->createaction = [
             //'type' => 'btn',
-            'content' => '<i class="fa fa-plus" ></i> create',
+            'content' => '<i class="fa fa-plus" ></i> '.t('create'),
             'class' => 'btn btn-success',
             'action' => 'onclick="model._new(this, \'' . $this->class . '\')"',
             'habit' => 'stateless',
@@ -180,8 +182,10 @@ class Datatable extends Lazyloading
 //        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" >
 // <i class="fa fa-retweet"></i> Reload</button>
 // ';
-
-        if (getadmin()->getId()) {
+/*
+ *
+ */
+        if (getadmin()->getId() && false) {
             $top_action .= '<div class="btn-group" role="group">
     <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       <i class="fa fa-angle-down"></i> options
@@ -401,18 +405,14 @@ class Datatable extends Lazyloading
         }
 
         $html = <<<EOF
-
-<div class="card-header-tab card-header">
-                        <div class="card-header-title">
-                            <i class="header-icon lnr-rocket icon-gradient bg-tempting-azure"> </i>
-                            $groupaction
-                        </div>
-                        <div class="btn-actions-pane-right">
-                            <div class="nav">
-                            $headaction
-                            </div>
-                        </div>
-                    </div>
+<div class="d-sm-flex justify-content-between align-items-start">
+                                <div>
+                                    $groupaction
+                                </div>
+                                <div>
+                                    $headaction
+                                </div>
+                            </div> 
 EOF;
 
         $html .= ' ';//.$this->openform;
@@ -483,7 +483,7 @@ EOF;
 
         $html .= "";//</div> $this->closeform.
 
-        return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dataTables_wrapper dt-bootstrap4" >' . $html . '</div>
+        return '<div id="dv_' . $this->class . '_table" class="dv_datatable_container dt-bootstrap4 card card-rounded" >' . $html . '</div>
 ' . $this->dialogBox();
 
     }
@@ -592,7 +592,7 @@ EOF;
 
 <div class="col-lg-8 col-md-12">
 <div class="btn-group" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
       Action groupe
     </button>
     <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
@@ -798,7 +798,7 @@ EOF;
             $thf[] = '<th >' . $thfvalue . '</th>';
 
             if ($valuetd["order"])
-                $th[] = '<th  onclick="ddatatable.toggleorder(\'' . $this->class . '\', \'' . $thforder . '\')" >' . $valuetd['header'] . ' <i class="fa fa-arrow-up" ></i><i class="fa fa-arrow-down" ></i></th>';
+                $th[] = '<th  onclick="ddatatable.toggleorder(\'' . $this->class . '\', \'' . $thforder . '\')" >' . $valuetd['header'] . ' <i class="mdi mdi-debug-step-out" ></i><i class="mdi mdi-debug-step-into" ></i></th>';
             else
                 $th[] = '<th >' . $valuetd['header'] . ' </th>';
 
@@ -811,7 +811,7 @@ EOF;
             if ($this->enablecolumnaction)
                 $thf[] = '<th>'
                     . '<input name="dfilters" value="on" hidden >'
-                    . '<button onclick="ddatatable.search(\'' . $this->classname . '\', this)" class="' . $this->btnsearch_class . '" >search</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
+                    . '<button onclick="ddatatable.search(\'' . $this->classname . '\', this)" class="' . $this->btnsearch_class . '" >'.t("search").'</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
 
             return ["th" => '<tr>' . implode(" ", $th) . '</tr>',
                 "thf" => '<tr class="th-filter">' . implode(" ", $thf) . '</tr>'];
@@ -1100,9 +1100,15 @@ EOF;
                 $tr[] = '<td style="padding: .3rem;" >' . $actionbutton . '</td>';
 
             }
+            if(is_callable($this->trattribut_callback)){
+                $callable = $this->trattribut_callback;
+                $trattr = $callable($entity);
+            }else
+                $trattr = "";
 
             // onclick="ddatatable.rowselect(this, ' . $entity->getId() . ')"
-            $tb[] = '<tr id="' . $entity->getId() . '" >' . implode(" ", $tr) . '</tr>';
+            $tb[] = '<tr id="' . $entity->getId() . '" '.$trattr.' >' . implode(" ", $tr) . '</tr>';
+
         }
 
         return implode(" ", $tb);

@@ -37,11 +37,6 @@ class User extends UserCore implements JsonSerializable
      * @var date
      **/
     protected $birthdate;
-    /**
-     * @ManyToOne(targetEntity="\Country")
-     * @var \Country
-     */
-    public $country;
 
 
     public function __construct($id = null)
@@ -51,7 +46,6 @@ class User extends UserCore implements JsonSerializable
             $this->id = $id;
         }
 
-        $this->country = new Country();
     }
 
     public function getId()
@@ -331,7 +325,6 @@ class User extends UserCore implements JsonSerializable
             'birthdate' => $this->birthdate,
             'lang' => $this->lang,
             'username' => $this->username,
-            'country' => $this->country,
             'api_key' => $this->api_key,
             'session_token' => $this->session_token,
         ];

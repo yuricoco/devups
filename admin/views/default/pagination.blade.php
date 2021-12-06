@@ -1,5 +1,5 @@
 @if (!$ll->nb_element)
-    <div id="dv_pagination" class="alert alert-info"> no item founded</div>
+    <div id="dv_pagination" class="alert alert-info text-center"> @tt("no item founded")</div>
 @else
 
     <div id="dv_pagination" data-entity="{{$entityname}}" data-route="{{$base_url}}" style="width: 100%"
@@ -12,29 +12,26 @@
         </div>
 
         <div class="col-lg-6 col-md-8">
-            <div class="dataTables_paginate paging_simple_numbers" id="dataTable_paginate">
-                <ul class="pagination">
+            <div class="btn-group-sm" role="group" aria-label="Basic example">
                     @if ($ll->previous > 0)
-                        <li class="paginate_button page-item previous">
-                            <a class="page-link"
-                               href="javascript:ddatatable.firstpage(this)"><i
-                                        class="fa fa-angle-double-left"></i></a>
-                        </li>
-                        <li class="paginate_button page-item previous">
-                            <a class="page-link"
-                               href="javascript:ddatatable.previous(this)"><i
-                                        class="fa fa-angle-left"></i></a>
-                        </li>
+                        <button onclick="ddatatable.firstpage(this)" type="button" class="btn btn-outline-secondary">
+                            <i class="mdi mdi-page-first"></i>
+                        </button>
+                        <button onclick="ddatatable.previous(this)" type="button" class="btn btn-outline-secondary">
+                            <i class="mdi mdi-chevron-double-left"></i>
+                        </button>
                     @else
-                        <li class="paginate_button page-item previous disabled"><a class="page-link" href="#"><i
-                                        class="fa fa-angle-double-left"></i></a></li>
-                        <li class="paginate_button page-item previous disabled"><a class="page-link" href="#"><i
-                                        class="fa fa-angle-left"></i></a></li>
+                        <button disabled type="button" class="btn ">
+                            <i class="mdi mdi-page-first"></i>
+                        </button>
+                        <button disabled type="button" class="btn ">
+                            <i class="mdi mdi-chevron-double-left"></i>
+                        </button>
                     @endif
 
                     @if ($ll->pagination > 10 && !$ll->dynamicpagination)
 
-                        <li class="paginate_button page-item ">
+                        <span class="paginate_button page-item ">
                             <select class=" form-control"
                                     onchange="ddatatable.pagination(this, this.value)">
                                 @for ($page = 1; $page <= $ll->pagination; $page++)
@@ -46,85 +43,65 @@
                                     @endif
                                 @endfor
                             </select>
-                        </li>
+                        </span>
                     @else
                         @if ($ll->dynamicpagination)
 
                             @foreach ($ll->paginationcustom['firsts'] as $key => $page)
                                 @if ($page == $ll->current_page)
-                                    <li class="paginate_button page-item  active ">
-                                        <a class="page-link"
-                                           href="javascript:ddatatable.pagination(this, {{$page}});"
-                                           data-next="{{$page}}">{{$page}}</a>
-                                    </li>
+                                    <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                            type="button" class="btn btn-outline-secondary active">{{$page}}</button>
                                 @else
-                                    <li class="paginate_button page-item ">
-                                        <a class="page-link"
-                                           href="javascript:ddatatable.pagination(this, {{$page}});"
-                                           data-next="{{$page}}">{{$page}}</a>
-                                    </li>
+                                    <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                            type="button" class="btn btn-outline-secondary">{{$page}}</button>
                                 @endif
                             @endforeach
 
                             @if ($ll->current_page < 3 || $ll->current_page >= 7)
-                                <li class="paginate_button page-item ">
-                                    <a class="page-link"
-                                       href="javascript:ddatatable.pagination(this, {{$ll->paginationcustom['middleleft']}});"
-                                       data-next="{{$ll->paginationcustom['middleleft']}}">...</a>
-                                </li>
-
+                                <button onclick="ddatatable.pagination(this, {{$ll->paginationcustom['middleleft']}})"
+                                        data-next="{{$ll->paginationcustom['middleleft']}}"
+                                        type="button" class="btn btn-outline-secondary"> ...
+                                </button>
                                 @foreach ($ll->paginationcustom['middles'] as $key => $page)
                                     @if ($page == $ll->current_page)
-                                        <li class="paginate_button page-item active "><a class="page-link"
-                                                                                         href="javascript:ddatatable.pagination(this, {{$page}});"
-                                                                                         data-next="{{$page}}">{{$page}}</a>
-                                        </li>
+                                        <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                                type="button"
+                                                class="btn btn-outline-secondary active">{{$page}}</button>
                                     @else
-                                        <li class="paginate_button page-item "><a class="page-link"
-                                                                                  href="javascript:ddatatable.pagination(this, {{$page}});"
-                                                                                  data-next="{{$page}}">{{$page}}</a>
-                                        </li>
+                                        <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                                type="button" class="btn btn-outline-secondary">{{$page}}</button>
                                     @endif
                                 @endforeach
 
                                 @if ($ll->paginationcustom['lasts'])
-
-                                    <li class="paginate_button page-item ">
-                                        <a class="page-link"
-                                           href="javascript:ddatatable.pagination(this, {{$ll->paginationcustom['middleright']}});"
-                                           data-next="{{$ll->paginationcustom['middleright']}}">...</a>
-                                    </li>
-
+                                    <button onclick="ddatatable.pagination(this, {{$ll->paginationcustom['middleright']}})"
+                                            data-next="{{$ll->paginationcustom['middleright']}}"
+                                            type="button" class="btn btn-outline-secondary"> ...
+                                    </button>
                                     @foreach ($ll->paginationcustom['lasts'] as $key => $page)
                                         @if ($page == $ll->current_page)
-                                            <li class="paginate_button page-item active ">
-                                                <a class="page-link"
-                                                   href="javascript:ddatatable.pagination(this, {{$page}});"
-                                                   data-next="{{$page}}">{{$page}}</a>
-                                            </li>
+                                            <button onclick="ddatatable.pagination(this, {{$page}})"
+                                                    data-next="{{$page}}"
+                                                    type="button"
+                                                    class="btn btn-outline-secondary active">{{$page}}</button>
                                         @else
-                                            <li class="paginate_button page-item ">
-                                                <a class="page-link"
-                                                   href="javascript:ddatatable.pagination(this, {{$page}});"
-                                                   data-next="{{$page}}">{{$page}}</a></li>
+                                            <button onclick="ddatatable.pagination(this, {{$page}})"
+                                                    data-next="{{$page}}"
+                                                    type="button" class="btn btn-outline-secondary">{{$page}}</button>
                                         @endif
                                     @endforeach
 
                                 @else
                                     @for ($page = 1; $page <= $ll->pagination; $page++)
                                         @if ($page == $ll->current_page)
-                                            <li class="paginate_button page-item active ">
-                                                <a class="page-link"
-                                                   href="javascript:ddatatable.pagination(this, {{$page}});"
-                                                   data-next="{{$page}}"> {{$page}}
-                                                </a>
-                                            </li>
+                                            <button onclick="ddatatable.pagination(this, {{$page}})"
+                                                    data-next="{{$page}}"
+                                                    type="button"
+                                                    class="btn btn-outline-secondary active">{{$page}}</button>
                                         @else
-                                            <li class="paginate_button page-item ">
-                                                <a class="page-link"
-                                                   href="javascript:ddatatable.pagination(this, {{$page}});"
-                                                   data-next="{{$page}}"> {{$page}} </a>
-                                            </li>
+                                            <button onclick="ddatatable.pagination(this, {{$page}})"
+                                                    data-next="{{$page}}"
+                                                    type="button" class="btn btn-outline-secondary">{{$page}}</button>
                                         @endif
                                     @endfor
 
@@ -134,11 +111,9 @@
 
                         @else
                             @for ($page = 1; $page <= $ll->pagination; $page++)
-
-                                <li class="paginate_button page-item @if ($page == $ll->current_page) active  @endif ">
-                                    <a class="page-link" href="javascript:ddatatable.pagination(this,  {{$page}} );"
-                                       data-next="{{$page}}">{{$page}}</a>
-                                </li>
+                                <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                        type="button"
+                                        class="btn @if ($page == $ll->current_page) btn-primary @else  btn-outline-secondary @endif btn-sm">{{$page}}</button>
 
                             @endfor
                         @endif
@@ -146,26 +121,21 @@
                     @endif
 
                     @if ($ll->remain)
-                        <li class="paginate_button page-item next">
-                            <a class="page-link" href="javascript:ddatatable.next();">
-                                <i class="fa fa-angle-right"></i></a>
-                        </li>
-                        <li class="paginate_button page-item next">
-                            <a class="page-link"
-                               href="javascript:ddatatable.lastpage(this,  {{$ll->pagination}} );">
-                                <i class="fa fa-angle-double-right"></i></a>
-                        </li>
+                        <button onclick="ddatatable.next();" type="button" class="btn btn-outline-secondary">
+                            <i class="mdi mdi-page-last"></i>
+                        </button>
+                        <button onclick="ddatatable.lastpage(this,  {{$ll->pagination}} )" type="button"
+                                class="btn btn-outline-secondary">
+                            <i class="mdi mdi-chevron-double-right"></i>
+                        </button>
                     @else
-                        <li class="paginate_button page-item next disabled">
-                            <a class="page-link" href="#">
-                                <i class="fa fa-angle-right"></i></a>
-                        </li>
-                        <li class="paginate_button page-item next disabled">
-                            <a class="page-link" href="#">
-                                <i class="fa fa-angle-double-right"></i></a>
-                        </li>
+                        <button disabled type="button" class="btn">
+                            <i class="mdi mdi-page-last"></i>
+                        </button>
+                        <button disabled type="button" class="btn ">
+                            <i class="mdi mdi-chevron-double-right"></i>
+                        </button>
                     @endif
-                </ul>
             </div>
         </div>
 

@@ -325,7 +325,7 @@ class Dvups_adminController extends Controller
 
         self::$sidebar = false;
         $action = Dvups_admin::classpath("dvups-admin/complete?id=" . $id);
-        Genesis::renderView('dvups_admin.complete_registration', compact("admin", "action", "error"));
+        Genesis::renderView('admin.dvups_admin.complete_registration', compact("admin", "action", "error"));
     }
 
 }

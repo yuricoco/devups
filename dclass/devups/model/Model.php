@@ -903,12 +903,12 @@ class Model extends \stdClass
             return $this;
 
         global $em;
-        $classlang = get_class($this);
+        $classlang = strtolower(get_class($this));
         $metadata = $em->getClassMetadata("\\" . $classlang);
         $fieldNames = $metadata->fieldNames;
         $assiactions = array_keys($metadata->associationMappings);
 
-        $sql = " SELECT * FROM $classlang WHERE id = ".$this->id;
+        $sql = " SELECT * FROM `$classlang` WHERE id = ".$this->id;
         $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
         //var_dump($classlang." - ".$attribut, $data, $fieldNames);
         foreach ($fieldNames as $k => $val) {
@@ -932,6 +932,7 @@ class Model extends \stdClass
                 return null;
 
             $classlang = get_class($this) . "_lang";
+            $cnl = strtolower($classlang);
             if (property_exists($classlang, $attribut)) {
                 $idlang = DBAL::$id_lang_static;
                 if(!$idlang) {
@@ -939,7 +940,7 @@ class Model extends \stdClass
                     (new DBAL())->setClassname(get_class($this))->getLangValues($this, [$attribut]);
                     return $this->{$attribut};
                 }
-                $sql = " SELECT $attribut FROM $classlang WHERE lang_id = $idlang AND ".strtolower(get_class($this))."_id = ".$this->id;
+                $sql = " SELECT $attribut FROM $cnl WHERE lang_id = $idlang AND ".strtolower(get_class($this))."_id = ".$this->id;
                 $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
                 $this->{$attribut} = $data[0];
                 return $data[0];
@@ -972,8 +973,8 @@ class Model extends \stdClass
                 $metadata = $em->getClassMetadata("\\" . $classlang);
                 $fieldNames = $metadata->fieldNames;
                 $assiactions = array_keys($metadata->associationMappings);
-
-                $sql = " SELECT * FROM $classlang WHERE id = ".$this->id;
+                $cn = strtolower($classlang);
+                $sql = " SELECT * FROM $cn WHERE id = ".$this->id;
                 $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
                 //var_dump($classlang." - ".$attribut, $data, $fieldNames);
                 foreach ($fieldNames as $k => $val) {

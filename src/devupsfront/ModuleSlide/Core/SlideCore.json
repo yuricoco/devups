@@ -1,1 +1,0 @@
-{"id":624,"name":"slide","attribut":{"1":{"name":"activated","nullable":"default","size":"105","formtype":"text","datatype":"string"},"9":{"name":"targeturl","nullable":"default","size":"150","formtype":"text","datatype":"string"}},"relation":[{"entity":"dv_image","cardinality":"oneToOne","nullable":"default","ondelete":"cascade","onupdate":"cascade"}],"module":{"id":5}}

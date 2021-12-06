@@ -24,12 +24,6 @@ function userapp() {
     return new User();
 }
 
-require 'Entity/Address.php';
-require 'Form/AddressForm.php';
-require 'Datatable/AddressTable.php';
-require 'Controller/AddressController.php';
-require 'Controller/AddressFrontController.php';
-
 require 'Entity/User.php';
 require 'Form/UserForm.php';
 require 'Datatable/UserTable.php';

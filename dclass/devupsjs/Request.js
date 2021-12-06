@@ -8,17 +8,18 @@ class Drequest {
 
     }
 
-    static localstorage(){
+    static localstorage() {
         if (localStorage.getItem('edition3ag')) {
             try {
-                return  JSON.parse(localStorage.getItem('edition3ag'));
-            } catch(e) {
+                return JSON.parse(localStorage.getItem('edition3ag'));
+            } catch (e) {
                 localStorage.removeItem('edition3ag');
             }
         }
         return {};
     }
-    static localsave(database){
+
+    static localsave(database) {
         localStorage.setItem('edition3ag', JSON.stringify(database))
     }
 
@@ -31,7 +32,7 @@ class Drequest {
 
     static api(url) {
         let r = new Drequest();
-        r.baseurl = __env+"api/"+url;
+        r.baseurl = __env + "api/" + url;
         return r;
     };
 
@@ -44,6 +45,7 @@ class Drequest {
         this._data = _data;
         return this;
     };
+
     toFormdata(_data) {
         var keys = Object.keys(_data);
         var values = Object.values(_data);
@@ -63,9 +65,9 @@ class Drequest {
         console.log(this);
         //console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
         var keys = Object.keys(this._param);
-        var param = (!keys.length) ? "": "?"+ $.param(this._param);
+        var param = (!keys.length) ? "" : "?" + $.param(this._param);
         return $.ajax({
-            url: this.baseurl + this.url+ param,
+            url: this.baseurl + this.url + param,
             data: this._data,
             cache: false,
             contentType: false,
@@ -81,20 +83,44 @@ class Drequest {
 
     raw(callback) {
         this._data = JSON.stringify(this._data);
+
+
         console.log(this);
         //console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
         var keys = Object.keys(this._param);
-        var param = (!keys.length) ? "": "?"+ $.param(this._param);
+        var params = (!keys.length) ? "" : "?" + $.param(this._param);
+
+
+        var request = new XMLHttpRequest();
+// var params = "action=something";
+        request.open('POST', this.baseurl + this.url + params, true);
+        request.onreadystatechange = function () {
+            console.log(request.response);
+            if (request.readyState == 4) {
+                //alert("It worked!")
+                callback(JSON.parse(request.response))
+            }
+        };
+        request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+//request.setRequestHeader("Content-length", params.length);
+//request.setRequestHeader("Connection", "close");
+        return request.send(this._data);
+
+        this._data = JSON.stringify(this._data);
+        console.log(this);
+        //console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
+        var keys = Object.keys(this._param);
+        var param = (!keys.length) ? "" : "?" + $.param(this._param);
         return $.ajax({
-            url: this.baseurl + this.url+ param,
+            url: this.baseurl + this.url + param,
             data: this._data,
             cache: false,
-            contentType: false,
-            processData: false,
+            // contentType: false,
+            // processData: false,
             method: "POST",
             "headers": {
                 "Content-Type": "application/json",
-                // "Cookie": "PHPSESSID=6e3493f4e1e185cd94f35ef9488ef63e"
+                //"Cookie": "PHPSESSID=6e3493f4e1e185cd94f35ef9488ef63e"
             },
             dataType: "json",
             success: callback,

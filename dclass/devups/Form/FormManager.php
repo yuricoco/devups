@@ -82,7 +82,8 @@ abstract class FormManager {
     }
 
     public function addJs($jsfile){
-        $this->js[] = $this->dventity->dvups_module->route($jsfile);
+        $this->js[] = $jsfile;
+        //$this->js[] = $this->dventity->hydrate()->dvups_module->route($jsfile);
         return $this;
     }
 

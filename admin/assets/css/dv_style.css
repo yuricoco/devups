@@ -35,7 +35,7 @@
 }
 
 .dv_modal{
-    width: 500px; background: transparent; display: block; min-height: 50px; padding-top: 80px;
+    min-width: 600px; background: transparent; display: block; min-height: 50px; padding-top: 80px;
     transition: .5s;
 }
 
@@ -72,4 +72,10 @@
     height: calc(2.25rem + 2px);
     padding: .375rem .75rem;
     font-size: .88rem;
+}
+.table th, .table td {
+    line-height: initial;
+     white-space: initial;
+    padding: 0.525rem 0.575rem
+;
 }

@@ -24,6 +24,7 @@ class StatusTable extends Datatable
     public function buildindextable()
     {
 
+        // $this->qbcustom = Status::select()->leftjoin("entity");
         $this->topactions[] = '<button type="button" class="btn btn-info" onclick="model.status.sortlist(this)"><i class="fa fa-exchange"></i> Ordonner </button>';;
         $this->datatablemodel = [
             ['header' => t('status.id', '#'), 'value' => 'id'],

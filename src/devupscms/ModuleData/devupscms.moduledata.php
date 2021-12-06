@@ -3,5 +3,4 @@
     require 'Form/StatusForm.php';
     require 'Datatable/StatusTable.php';
     require 'Controller/StatusController.php';
-    require 'Controller/StatusFrontController.php';
 

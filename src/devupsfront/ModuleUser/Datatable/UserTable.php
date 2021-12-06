@@ -30,7 +30,6 @@ class UserTable extends Datatable
             ['header' => t('user.username', 'Username'), 'value' => 'username'],
             //['header' => t('user.lastname', 'Lastname'), 'value' => 'lastname'],
             ['header' => t('Spacekola Ref.'), 'value' => 'spacekolaRef'],
-            ['header' => t('Country'), 'value' => 'country.name'],
             ['header' => t('user.email', 'Email'), 'value' => 'email'],
             ['header' => t('user.phonenumber', 'Phonenumber'), 'value' => 'phonenumber'],
             //['header' => t('user.resettingpassword', 'Resettingpassword'), 'value' => 'resettingpassword'],

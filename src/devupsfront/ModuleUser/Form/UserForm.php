@@ -52,27 +52,11 @@ class UserForm extends FormManager
             "type" => FORMTYPE_TEXT,
             "value" => $user->getPhonenumber(),
         ];
-
-        $entitycore->field['professional'] = [
-            "label" => 'Is professional',
-            FH_REQUIRE => false,
-            "type" => FORMTYPE_RADIO,
-            "options" => ["No", 'Yes'],
-            "value" => $user->getProfessional(),
-        ];
-
         $entitycore->field['updatePassword'] = [
             "label" => 'Password',
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
             "value" => "",
-        ];
-        $entitycore->field['country'] = [
-            "label" => 'Country',
-            FH_REQUIRE => false,
-            "type" => FORMTYPE_SELECT,
-            "value" => $user->country->getId(),
-            "options" => FormManager::Options_Helper("name", Country::allrows()),
         ];
 
         $entitycore->field['is_activated'] = [
@@ -83,14 +67,6 @@ class UserForm extends FormManager
             "value" => $user->getIs_activated(),
         ];
 
-
-        $entitycore->field['lang'] = [
-            "label" => 'Lang',
-            FH_REQUIRE => false,
-            "type" => FORMTYPE_TEXT,
-            "value" => $user->getLang(),
-        ];
-
         $entitycore->field['username'] = [
             "label" => 'Username',
             "type" => FORMTYPE_TEXT,
@@ -98,7 +74,7 @@ class UserForm extends FormManager
         ];
 
         $entitycore->addDformjs($button);
-        $entitycore->addjs(User::classpath('Ressource/js/userForm'));
+        $entitycore->addjs(User::classpath('Resource/js/userForm'));
 
         return $entitycore;
     }

@@ -133,6 +133,7 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
     public function jsonSerialize()
     {
         return [
+            'id' => $this->id,
             'name' => $this->name,
             'label' => $this->label,
             'dvups_module' => $this->dvups_module,

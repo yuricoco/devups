@@ -184,7 +184,7 @@ class Core extends stdClass {
                     $dvmodule->setProject($project->name);
                     $dvmodule->dvups_component = $dvcomponent;
                     if(!$dvmodule->getId()){
-
+                        //var_dump("component_id name", $dvcomponent->id);
                         $dvmodule->setName($modulename);
                         $dvmodule->__insert();
 

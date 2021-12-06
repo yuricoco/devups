@@ -1,0 +1,54 @@
+{
+  "id": 192,
+  "name": "comment",
+  "attribut": {
+    "3": {
+      "name": "pseudo",
+      "nullable": "not",
+      "size": "255",
+      "formtype": "text",
+      "datatype": "string"
+    },
+    "4": {
+      "name": "email",
+      "nullable": "default",
+      "size": "255",
+      "formtype": "text",
+      "datatype": "string"
+    },
+    "5": {
+      "name": "comment",
+      "nullable": "not",
+      "size": "",
+      "formtype": "textarea",
+      "datatype": "text"
+    },
+    "7": {
+      "name": "seen",
+      "nullable": "not",
+      "size": "",
+      "formtype": "radio",
+      "datatype": "boolean"
+    }
+  },
+  "relation": [
+    {
+      "entity": "chapter",
+      "cardinality": "manyToOne",
+      "nullable": "default",
+      "ondelete": "cascade",
+      "onupdate": "cascade"
+    },
+    {
+      "entity": "user",
+      "cardinality": "manyToOne",
+      "nullable": "default",
+      "ondelete": "cascade",
+      "onupdate": "cascade"
+    }
+  ],
+  "module": {
+    "id": 5,
+    "name": "ModuleComment"
+  }
+}

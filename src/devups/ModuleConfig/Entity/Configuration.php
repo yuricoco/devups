@@ -58,8 +58,8 @@ class Configuration extends Model implements JsonSerializable
 
         $this->_key = $_key;
 
-        $entity = self::where("_key", $_key)->__getOne();
-        if ($entity->getId() && $entity->getId() != $this->id) {
+        $entity = self::where("_key", $_key)->first();
+        if ($entity && $entity->getId() != $this->id) {
             return t("A constante with same key already exist");
         }
 

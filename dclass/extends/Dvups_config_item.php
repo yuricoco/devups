@@ -60,17 +60,7 @@ class Dvups_config_item extends Model implements JsonSerializable, DvupsTranslat
         if (!$this->label)
             return $this->name;
 
-        $ref =  "dvups_entitt_" . $this->id . "_label";
-
-//        $dvcontentlang = Dvups_contentlang::select()
-//            ->where("dvups_lang.ref", $ref)
-//            ->andwhere("lang", "en")->__getOne();
-//
-//        if ($dvcontentlang->getId())
-//            return $dvcontentlang->getContent();
-
-        //return $this->label;
-        return self::gettranslate($this, "label", $this->label);
+        return $this->label;
 
     }
 

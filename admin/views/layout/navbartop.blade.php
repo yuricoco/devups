@@ -1,100 +1,85 @@
-<div class="app-header header-shadow">
-    <div class="app-header__logo">
-        <div class="card-title"><a href="{{__env}}admin"> Dv Admin v3</a></div>
-        {{--<div class="logo-src"></div>--}}
-        <div class="header__pane ml-auto">
-            <div>
-                <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
-                        data-class="closed-sidebar">
-                            <span class="hamburger-box">
-                                <span class="hamburger-inner"></span>
-                            </span>
-                </button>
-            </div>
-        </div>
-    </div>
-    <div class="app-header__mobile-menu">
-        <div>
-            <button type="button" class="hamburger hamburger--elastic mobile-toggle-nav">
-                        <span class="hamburger-box">
-                            <span class="hamburger-inner"></span>
-                        </span>
+<nav class="navbar default-layout col-lg-12 col-12 p-0 fixed-top d-flex align-items-top flex-row">
+    <div class="text-center navbar-brand-wrapper d-flex align-items-center justify-content-start">
+        <div class="me-3">
+            <button class="navbar-toggler navbar-toggler align-self-center" type="button" data-bs-toggle="minimize">
+                <span class="icon-menu"></span>
             </button>
         </div>
+        <div>
+            <a class="navbar-brand brand-logo" href="{{ __env }}admin">
+                <img height="50" src="{{ __env }}logo.png" alt="logo" />
+            </a>
+            <a class="navbar-brand brand-logo-mini" href="{{ __env }}admin">
+                <img height="50"  src="{{ __env }}logo.png" alt="logo" />
+            </a>
+        </div>
     </div>
-    <div class="app-header__menu">
-                <span>
-                    <button type="button"
-                            class="btn-icon btn-icon-only btn btn-primary btn-sm mobile-toggle-header-nav">
-                        <span class="btn-icon-wrapper">
-                            <i class="fa fa-ellipsis-v fa-w-6"></i>
-                        </span>
-                    </button>
-                </span>
-    </div>
-    <div class="app-header__content">
-        <div class="app-header-left">
-            <div class="search-wrapper">
-                <div class="input-holder">
-                    <input type="text" class="search-input" placeholder="Type to search">
-                    <button class="search-icon"><span></span></button>
+    <div class="navbar-menu-wrapper d-flex align-items-top">
+        <ul class="navbar-nav">
+            <li class="nav-item font-weight-semibold d-none d-lg-block ms-0">
+                <h1 class="welcome-text">Bonjour, <span class="text-black fw-bold">{{ getadmin()->getName() }}</span></h1>
+                <h3 class="welcome-sub-text">Système d'administration de contenu </h3>
+            </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
 
-                </div>
-                <button class="close"></button>
-            </div>
-            <ul class="header-menu nav">
-                <li>
-                    <a href="{{__env}}" target="_blank">
-                        <i class="fa fa-share"></i>
-                        aller sur le site
+            <li class=" nav-item dropdown">
+                <a class="nav-link count-indicator" id="countDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="icon-bell"></i>
+                    <span class="count"></span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0" aria-labelledby="countDropdown">
+                    <a class="dropdown-item py-3">
+                        <p class="mb-0 font-weight-medium float-left">You have 7 unread mails </p>
+                        <span class="badge badge-pill badge-primary float-right">View all</span>
                     </a>
-                </li>
-            </ul>
-        </div>
-        <div class="app-header-right">
-            <div class="header-btn-lg pr-0">
-                <div class="widget-content p-0">
-                    <div class="widget-content-wrapper">
-                        <div class="widget-content-left">
-                            <div class="btn-group">
-                                <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
-                                   class="p-0 btn">
-{{--                                    {{assets}}images/avatars/1.jpg--}}
-                                    <img width="42" class="rounded-circle" src="{{p("defaultadmin")}}" alt="">
-                                    <i class="fa fa-angle-down ml-2 opacity-8"></i>
-                                </a>
-                                <div tabindex="-1" role="menu" aria-hidden="true"
-                                     class="dropdown-menu dropdown-menu-right">
-                                    <button type="button" tabindex="0" class="dropdown-item">User Account</button>
-                                    <a href="<?= Dvups_admin::classpath() . 'dvups-admin/editpassword' ?>"
-                                       class="dropdown-item">
-                                        <i class="mdi mdi-settings text-primary"></i>
-                                        Settings
-                                    </a>
-                                    <a class="dropdown-item"
-                                       href="<?= __env . 'admin/index.php?path=deconnexion' ?>">
-                                        <i class="mdi mdi-logout text-primary"></i>
-                                        Logout
-                                    </a>
-                                </div>
-                            </div>
+                    <div class="dropdown-divider"></div>
+                    <a class="dropdown-item preview-item">
+                        <div class="preview-thumbnail">
+                            <img src="{{ __admin }}images/faces/face10.jpg" alt="image" class="img-sm profile-pic">
                         </div>
-                        <div class="widget-content-left  ml-3 header-user-info">
-                            <div class="widget-heading">
-                                {{ getadmin()->getName() }}
-                            </div>
-                            <div class="widget-subheading">
-                                {{ getadmin()->dvups_role->getName() }}
-                            </div>
+                        <div class="preview-item-content flex-grow py-2">
+                            <p class="preview-subject ellipsis font-weight-medium text-dark">Marian Garner </p>
+                            <p class="fw-light small-text mb-0"> The meeting is cancelled </p>
                         </div>
-                        <div class="widget-content-right header-user-info ml-3">
-                            <button type="button" class="btn-shadow p-1 btn btn-primary btn-sm show-toastr-example">
-                                <i class="fa text-white fa-calendar pr-1 pl-1"></i>
-                            </button>
+                    </a>
+                    <a class="dropdown-item preview-item">
+                        <div class="preview-thumbnail">
+                            <img src="{{ __admin }}images/faces/face12.jpg" alt="image" class="img-sm profile-pic">
                         </div>
-                    </div>
+                        <div class="preview-item-content flex-grow py-2">
+                            <p class="preview-subject ellipsis font-weight-medium text-dark">David Grey </p>
+                            <p class="fw-light small-text mb-0"> The meeting is cancelled </p>
+                        </div>
+                    </a>
+                    <a class="dropdown-item preview-item">
+                        <div class="preview-thumbnail">
+                            <img src="{{ __admin }}images/faces/face1.jpg" alt="image" class="img-sm profile-pic">
+                        </div>
+                        <div class="preview-item-content flex-grow py-2">
+                            <p class="preview-subject ellipsis font-weight-medium text-dark">Travis Jenkins </p>
+                            <p class="fw-light small-text mb-0"> The meeting is cancelled </p>
+                        </div>
+                    </a>
                 </div>
-            </div>
-        </div>
+            </li>
+            <li class="nav-item dropdown d-none d-lg-block user-dropdown">
+                <a class="nav-link" id="UserDropdown" href="#" data-bs-toggle="dropdown" aria-expanded="false">
+                    {{ getadmin()->dvups_role->name }} <i class="mdi mdi-account-circle mdi-36px"></i> </a>
+                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+                    <div class="dropdown-header text-center">
+                        <img class="img-md rounded-circle" src="{{ __admin }}images/faces/face8.jpg" alt="Profile image">
+                        <p class="mb-1 mt-3 font-weight-semibold">{{ getadmin()->getName() }}</p>
+                        <p class="fw-light text-muted mb-0">{{ getadmin()->dvups_role->getName() }}</p>
+                    </div>
+                    <a href="<?= Dvups_admin::classpath() . 'dvups-admin/editpassword' ?>" class="dropdown-item"><i class="dropdown-item-icon mdi mdi-account-outline text-primary me-2"></i> My Profile <span class="badge badge-pill badge-danger">1</span></a>
+
+                    <a href="<?= __env . 'admin/index.php?path=deconnexion' ?>" class="dropdown-item"><i class="dropdown-item-icon mdi mdi-power text-primary me-2"></i>Sign Out</a>
+                </div>
+            </li>
+        </ul>
+        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button" data-bs-toggle="offcanvas">
+            <span class="mdi mdi-menu"></span>
+        </button>
     </div>
-</div>
+</nav>

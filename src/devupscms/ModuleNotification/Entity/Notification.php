@@ -119,7 +119,7 @@ class Notification extends Model implements JsonSerializable
         $classname = strtolower(get_class($entity));
         $type = Notificationtype::where(["dvups_entity.name" => $classname, "_key" => $event])
             //->getSqlQuery();
-            ->__firstOrNull();
+            ->firstOrNull();
         //die(var_dump($sql));
         if (is_null($type)) {
             $id = Notificationtype::create([
