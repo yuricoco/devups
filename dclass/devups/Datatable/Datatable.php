@@ -217,16 +217,23 @@ class Datatable extends Lazyloading
     {
         if (isset($this->defaultaction[$actionkey]) && in_array($method, $entityrigths)) {
             if (in_array($method, $_SESSION[dv_role_permission])) {
-                if (is_callable($this->defaultaction[$actionkey])) {
+                $method = $actionkey.'Action';
+                if (method_exists($entity, $method)) {
+                    $result = call_user_func(array($entity, $method), $this->defaultaction[$actionkey]);
+                    if (!is_null($result))
+                        $this->defaultaction[$actionkey] = $result;
+                    else
+                        $this->defaultaction[$actionkey]['action'] = 'onclick="model._' . $actionkey . '(' . $entity->getId() . ', \'' . $this->classname . '\', this)"';
+                }
+                else if (is_callable($this->defaultaction[$actionkey])) {
                     $this->defaultaction[$actionkey] = $this->defaultaction[$actionkey]($entity);
                 } else
-                    $this->defaultaction[$actionkey]['action'] = 'onclick="model._' . $actionkey . '(' . $entity->getId() . ', \'' . $this->classname . '\')"';
+                    $this->defaultaction[$actionkey]['action'] = 'onclick="model._' . $actionkey . '(' . $entity->getId() . ', \'' . $this->classname . '\', this)"';
 
                 return $this->defaultaction[$actionkey];
 
             }
         }
-        return null;
     }
 
     public function actionListView($entity)

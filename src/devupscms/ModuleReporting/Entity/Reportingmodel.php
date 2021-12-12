@@ -39,23 +39,19 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      **/
     protected $title;
     /**
-     * @Column(name="object", type="string" , length=255, nullable=true )
+     * @Column(name="description", type="text" ,  nullable=true )
      * @var string
      **/
-    protected $object;
+    protected $description;
+
     /**
-     * @Column(name="subject", type="string" , length=255, nullable=true )
+     * @Column(name="contenttext", type="text" ,  nullable=true )
      * @var string
-     **/
-    protected $subject;
-    /**
-     * @Column(name="contenttext", type="text"  , nullable=true)
-     * @var text
      **/
     protected $contenttext;
     /**
-     * @Column(name="content", type="text"  , nullable=true)
-     * @var text
+     * @Column(name="content", type="text" ,  nullable=true )
+     * @var string
      **/
     protected $content;
 
@@ -72,6 +68,22 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 
     /**
@@ -100,16 +112,66 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     {
         self::$log_info = " mode - " . $model;
         $reportingmodel = Reportingmodel::getbyattribut("name", $model);
-        if ($reportingmodel->getId())
+
+        if ($reportingmodel->getId()) {
+            /*if ($reportingmodel->dvid_lang) {
+                $iso_code = Dvups_lang::find($reportingmodel->dvid_lang)->iso_code;
+                $data = json_decode(file_get_contents(ROOT . "mails/{$iso_code}/" . $model . ".json"));
+                $reportingmodel->content = file_get_contents(ROOT . "mails/{$iso_code}/" . $model . ".html");
+                $reportingmodel->title = $data->title;
+
+                return $reportingmodel;
+            }
+
+            $iso_code = local();
+            $data = json_decode(file_get_contents(ROOT . "mails/{$iso_code}/" . $model . ".json"),
+                false, 512, JSON_UNESCAPED_UNICODE);
+            $reportingmodel->content = file_get_contents(ROOT . "mails/{$iso_code}/" . $model . ".html");
+            $reportingmodel->title = $data->title;*/
+
             return $reportingmodel;
+        }
 
         $id = Reportingmodel::create([
             "name" => $model,
-            "title" => 'email - '.$model,
+            "title" => 'email - ' . $model,
             "type" => 'email',
         ]);
 
         return new Reportingmodel($id);
+    }
+
+    /**
+     * @param $model
+     * @return Reportingmodel
+     */
+    public static function edit($id)
+    {
+        return Reportingmodel::find($id);
+
+        if ($reportingmodel->getId()) {
+            if ($reportingmodel->dvtranslate) {
+                $langs = Dvups_lang::all();
+                foreach ($langs as $lang) {
+                    $iso_code = $lang->iso_code;
+                    $data = json_decode(file_get_contents(ROOT . "mails/{$iso_code}/" . $reportingmodel->name . ".json"));
+                    $reportingmodel->content[$iso_code] = file_get_contents(ROOT . "mails/{$iso_code}/" . $reportingmodel->name . ".html");
+                    $reportingmodel->title[$iso_code] = $data->title;
+                }
+            } else {
+                $iso_code = local();
+                if (!file_exists(ROOT . "mails/{$iso_code}/" . $reportingmodel->name . ".json"))
+                    return $reportingmodel;
+
+                $data = json_decode(file_get_contents(ROOT . "mails/{$iso_code}/" . $reportingmodel->name . ".json"),
+                    false, 512, JSON_UNESCAPED_UNICODE);
+                $reportingmodel->content = file_get_contents(ROOT . "mails/{$iso_code}/" . $reportingmodel->name . ".html");
+                $reportingmodel->title = $data->title;
+                $reportingmodel->contenttext = $data->contenttext;
+            }
+            return $reportingmodel;
+        }
+
     }
 
     public static $view;
@@ -278,7 +340,7 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     {
         return [
             'id' => $this->id,
-            'object' => $this->object,
+            'title' => $this->title,
             'contenttext' => $this->contenttext,
             'content' => $this->content,
         ];
@@ -298,20 +360,26 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
         // TODO: Implement deleteAction() method.
     }
 
+    public static function extract_content_between_string($begin, $end, $string)
+    {
+        $matches = array();
+        $t = preg_match('/@' . $begin . '(.*?)\@' . $end . '/s', $string, $matches);
+        return $matches[1];
+    }
+
     private function sanitizeContent($content, $datareplace)
     {
-
         foreach ($datareplace as $key => $value) {
             if (is_array($value)) {
-                $looptemplate = \DClass\lib\Util::extract_content_between_string($key, $key, $content);
+                $looptemplate = self::extract_content_between_string($key, $key, $content);
                 if (!$looptemplate)
                     continue;
 
-                $iterationtemplate = '';
+                $iterationtemplate = $looptemplate;
                 foreach ($value as $entity) {
                     foreach ($entity as $k => $item) {
                         //die(var_dump($looptemplate, $k, $item));
-                        $iterationtemplate .= str_replace("{{" . $k . '}}', $item, $looptemplate);
+                        $iterationtemplate = str_replace("{{" . $k . '}}', $item, $iterationtemplate);
                     }
                 }
 
@@ -321,6 +389,7 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
             $content = str_replace("{{" . $key . '}}', $value, $content);
         }
 
+        $content = str_replace("{__css}", "<style>{$this->getCss()}</style>", $content);
         $content = str_replace("{__env}", __env, $content);
 
         return $content;
@@ -367,10 +436,13 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      * @param $name
      * @return $this
      */
-    public function addReceiver($email, $name)
+    public function addReceiver($email, $name = null)
     {
-        self::$emailreceiver[] = $email;
-        self::$namereceiver[] = $name;
+        if (is_array($email)) {
+            self::$emailreceiver = $email;
+        } else {
+            self::$emailreceiver[$email] = $name;
+        }
         return $this;
     }
 
@@ -390,8 +462,22 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     public function sendMail($datacustom)
     {
 
-//        if (!__prod || !$this->id)
-//            return 0;
+        if (!$this->content) {
+
+            Emaillog::create([
+                "object" => self::$log_info . " - object : " . $this->title . ' to ' . json_encode(self::$emailreceiver),
+                "log" => "Message could not be sent. Error detail: Empty body",
+            ]);
+
+            return [
+                "success" => false,
+                "result" => "Message could not be sent. Error detail:  Empty body"
+            ];
+
+        }
+
+        if (!__prod || !$this->id)
+            return 0;
 
         $data = [
                 "style" => $this->getCss(),
@@ -404,7 +490,9 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
         try {
             //Server settings
-            //$mail->SMTPDebug = false;                                       // Enable verbose debug output ->SMTPDebug = false;
+            //$mail->SMTPDebug = false;
+            $mail->CharSet = 'UTF-8';
+            $mail->Encoding = 'base64';
             $mail->isSMTP();                                            // Set mailer to use SMTP
             $mail->Host = Configuration::get("sm_smtp");  // Specify main and backup SMTP servers
             $mail->SMTPAuth = true;                                   // Enable SMTP authentication
@@ -415,7 +503,8 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
             //Recipients
             $mail->setFrom(Configuration::get("sm_from"), $this->title);
-            $mail->addAddress(self::$emailreceiver[0], self::$namereceiver[0]);     // Add a recipient
+            foreach (self::$emailreceiver as $email => $name)
+                $mail->addAddress($email, $name);     // Add a recipient
             //$mail->addAddress('ellen@example.com');               // Name is optional
             $mail->addReplyTo(Configuration::get("sm_from"), $this->title);
 //            $mail->addCC('cc@example.com');
@@ -436,18 +525,18 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
             //echo 'Message has been sent';
             $result = $mail->send();
             Emaillog::create([
-                "object" => self::$log_info . " - object : " . $this->object . ' to ' . self::$emailreceiver[0],
+                "object" => self::$log_info . " - object : " . $this->title . ' to ' . json_encode(self::$emailreceiver),
                 "log" => json_encode($result),
             ]);
             return [
                 "success" => true,
-                "result" => $mail->send(),
+                "result" => $result,
                 "user" => 'Message has been sent'
             ];
         } catch (Exception $e) {
             //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
             Emaillog::create([
-                "object" => self::$log_info . " - object : " . $this->object . ' to ' . self::$emailreceiver[0],
+                "object" => self::$log_info . " - object : " . $this->title . ' to ' . json_encode(self::$emailreceiver),
                 "log" => "Message could not be sent. Error detail: {$mail->ErrorInfo}",
             ]);
 
@@ -458,4 +547,40 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
         }
     }
 
+    public function __insert()
+    {
+        $id = parent::__insert(); // TODO: Change the autogenerated stub
+        //$this->updateData();
+        return $id;
+    }
+
+    public function __update($arrayvalues = null, $seton = null, $case = null, $defauljoin = true)
+    {
+        $result = parent::__update($arrayvalues, $seton, $case, $defauljoin);
+        //$this->updateData();
+        return $result; // TODO: Change the autogenerated stub
+    }
+
+    private function updateData()
+    {
+
+        if ($this->dvtranslate) {
+            $langs = Dvups_lang::all();
+            foreach ($langs as $lang) {
+                \DClass\lib\Util::log($this->content, "mails/" . $lang->iso_code . "/" . $this->name . ".html", ROOT, "w");
+                \DClass\lib\Util::log(json_encode([
+                    "title" => $this->title,
+                    "contenttext" => $this->contenttext
+                ]), "mails/" . $lang->iso_code . "/" . $this->name . ".json", ROOT, "w");
+            }
+        } else {
+            \DClass\lib\Util::log($this->content, "mails/" . __lang . "/" . $this->name . ".html", ROOT, "w");
+            \DClass\lib\Util::log(json_encode([
+                "title" => $this->title,
+                "contenttext" => $this->contenttext
+            ], JSON_UNESCAPED_UNICODE), "mails/" . __lang . "/" . $this->name . ".json", ROOT, "w");
+        }
+    }
+
 }
+

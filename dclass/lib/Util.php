@@ -88,12 +88,12 @@ class Util
         fclose($moddepend);
     }
 
-    public static function log($content, $file = "log", $root = ROOT) {
+    public static function log($content, $file = "log", $root = ROOT, $mode = "a+") {
 
         if (!$content)
             return;
 
-        $moddepend = fopen($root.'/'.$file, "a+");
+        $moddepend = fopen($root.'/'.$file, $mode);
         fputs($moddepend, "  ". $content."\n");
         fclose($moddepend);
     }

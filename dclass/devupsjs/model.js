@@ -137,11 +137,11 @@ var model = {
     callbackdelete(id, response) {
 
     },
-    _delete: function ($this, id, entity, callback) {
+    _delete: function (id, entity, el, callback) {
         model.init(entity)
-        this.addLoader($($this))
-        var $tr = $($this).parents("tr");
-        var $td = $($this).parents("td");
+        this.addLoader($(el))
+        var $tr = $(el).parents("tr");
+        var $td = $(el).parents("td");
 
         if (!confirm('Voulez-vous Supprimer?')) return false;
 

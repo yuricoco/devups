@@ -42,7 +42,7 @@
                             "action" => "$action", "method" => "post"], true) ?>
 
                     <div class="row" id="container">
-                        <div class="col-lg-6   stretch-card" id="textareacontainer">
+                        <div class="col-lg-6 " id="textareacontainer">
 
                             <div class='form-group'>
                                 <label >
@@ -59,7 +59,7 @@
                                     ['id' => 'code', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
                             </div>
                         </div>
-                        <div class="col-lg-6  stretch-card" id="iframecontainer">
+                        <div class="col-lg-6 " id="iframecontainer">
                             <div class="text-right" >
                                 <a target="_blank" href="{{Reportingmodel::classpath(" reportingmodel/preview?id=".$reportingmodel->getId())}}" class="btn btn-info float-lg-right btn-block"> Preview </a>
                             </div>
@@ -84,8 +84,8 @@
                             <?= Form::input('title', $reportingmodel->getTitle(), ['class' => 'form-control']); ?>
                         </div>
                         <div class='form-group'>
-                            <label for='object'>{{t('reportingmodel.object')}}</label>
-                            <?= Form::input('object', $reportingmodel->getObject(), ['class' => 'form-control']); ?>
+                            <label for='object'>{{t('Description')}}</label>
+                            <?= Form::textarea('description', $reportingmodel->description, ['class' => 'form-control']); ?>
                         </div>
                     </div>
 
