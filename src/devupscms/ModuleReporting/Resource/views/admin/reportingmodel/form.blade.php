@@ -42,7 +42,7 @@
                             "action" => "$action", "method" => "post"], true) ?>
 
                     <div class="row" id="container">
-                        <div class="col-lg-6 " id="textareacontainer">
+                        <div class="col-lg-6   stretch-card" id="textareacontainer">
 
                             <div class='form-group'>
                                 <label >
@@ -55,16 +55,57 @@
                                 <div class='alert alert-info'>
                                     use @{{variable}} to add dynamic text in the content.
                                 </div>
-                                <?= Form::textarea('content', $reportingmodel->getContent(),
-                                    ['id' => 'code', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
+                                <ul class="nav nav-tabs nav-justified " id="myTab" role="tablist">
+                                    <li class="nav-item text-center">
+                                        <a class="nav-link text-center" id="mail-body-tab"
+                                           data-toggle="tab" href="#mail-body"
+                                           role="tab" aria-controls="mail-body" aria-selected="true"> Body
+                                        </a>
+                                    </li>
+                                    <li class="nav-item text-center">
+                                        <a class="nav-link text-center" id="mail-header-tab"
+                                           data-toggle="tab" href="#mail-header"
+                                           role="tab" aria-controls="mail-header" aria-selected="false"> Header
+                                        </a>
+                                    </li>
+                                    <li class="nav-item text-center">
+                                        <a class="nav-link text-center" id="mail-footer-tab"
+                                           data-toggle="tab" href="#mail-footer"
+                                           role="tab" aria-controls="mail-footer" aria-selected="false"> Footer
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="myTabContent">
+                                    <div class="tab-pane show " id="mail-body" role="tabpanel"
+                                         aria-labelledby="mail-body-tab">
+                                        <?= Form::textarea('content', $reportingmodel->getContent(),
+                                            ['id' => 'code', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
+
+                                    </div>
+                                    <div class="tab-pane " id="mail-header" role="tabpanel"
+                                         aria-labelledby="mail-header-tab">
+                                        <?= Form::textarea('contentheader', $reportingmodel->getContentheader(),
+                                            ['id' => 'codeheader', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
+
+                                    </div>
+                                    <div class="tab-pane " id="mail-footer" role="tabpanel"
+                                         aria-labelledby="mail-footer-tab">
+                                        <?= Form::textarea('contentfooter', $reportingmodel->getContentfooter(),
+                                            ['id' => 'codefooter', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
+
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 " id="iframecontainer">
+                        <div class="col-lg-6  stretch-card" id="iframecontainer">
                             <div class="text-right" >
                                 <a target="_blank" href="{{Reportingmodel::classpath(" reportingmodel/preview?id=".$reportingmodel->getId())}}" class="btn btn-info float-lg-right btn-block"> Preview </a>
                             </div>
                             <div class='form-group'>
                                 <iframe id=preview></iframe>
+                            </div>
+                            <div class='form-group'>
+                                <button type="button" onclick="updateEditor()" class="btn btn-block btn-info">update Editor</button>
                             </div>
                             <div class='form-group'>
                                 <label for='contenttext'>{{t('Content version text (use the \n to go to line) ')}}</label>
@@ -84,14 +125,14 @@
                             <?= Form::input('title', $reportingmodel->getTitle(), ['class' => 'form-control']); ?>
                         </div>
                         <div class='form-group'>
-                            <label for='object'>{{t('Description')}}</label>
-                            <?= Form::textarea('description', $reportingmodel->description, ['class' => 'form-control']); ?>
+                            <label for='object'>{{t('reportingmodel.object')}}</label>
+                            <?= Form::input('object', $reportingmodel->getObject(), ['class' => 'form-control']); ?>
                         </div>
                     </div>
 
-                        <?= Form::submitbtn("Save and continue update", ['onclick' => 'reportingmodel.submit(this)', 'type' => 'button', 'class' => 'btn btn-info btn-block']) ?>
+                    <?= Form::submitbtn("Save and continue update", ['onclick' => 'reportingmodel.submit(this)', 'type' => 'button', 'class' => 'btn btn-info btn-block']) ?>
 
-                        <?= Form::submitbtn("save and back to list", ['class' => 'btn btn-success ']) ?>
+                    <?= Form::submitbtn("save and back to list", ['class' => 'btn btn-success ']) ?>
 
                     <?= Form::close() ?>
                     <hr>
@@ -120,10 +161,16 @@
         var delay;
         // Initialize CodeMirror editor with a nice html5 canvas demo.
         var editor = CodeMirror.fromTextArea(document.getElementById('code'), {
-            mode: 'text/css'
+            mode: 'text/html'
+        });
+        var editorheader = CodeMirror.fromTextArea(document.getElementById('codeheader'), {
+            mode: 'text/html'
+        });
+        var editorfooter = CodeMirror.fromTextArea(document.getElementById('codefooter'), {
+            mode: 'text/html'
         });
         var editorCss = CodeMirror.fromTextArea(document.getElementById('code_css'), {
-            mode: 'text/html'
+            mode: 'text/css'
         });
         editor.on("change", function () {
             clearTimeout(delay);
@@ -139,10 +186,25 @@
             var previewFrame = document.getElementById('preview');
             var preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
             preview.open();
-            preview.write(editor.getValue().replace(/{__env}/g, __env));
+            preview.write(
+                editorheader.getValue().replace(/{__env}/g, __env)+
+                editor.getValue().replace(/{__env}/g, __env)+
+                editorfooter.getValue().replace(/{__env}/g, __env)
+            );
             preview.close();
+            $(preview.getElementsByTagName("body")).attr("contenteditable", true)
             // added this line
             loadCSS();
+        }
+
+        function updateEditor() {
+            var previewFrame = document.getElementById('preview');
+            var preview = previewFrame.contentDocument || previewFrame.contentWindow.document;
+            //preview.open();
+            //console.log($(preview.getElementsByTagName("html")).html())
+            // added this line
+            editor.setValue("<body>"+$(preview.getElementsByTagName("body")).html()+"</body>")
+            // document.getElementById('code').value = $(preview.getElementsByTagName("html")).html()
         }
 
 

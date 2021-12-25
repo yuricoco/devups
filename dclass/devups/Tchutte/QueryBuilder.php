@@ -984,9 +984,35 @@ class QueryBuilder extends \DBAL
 
         $ll = new \dclass\devups\Datatable\Lazyloading($this->object);
         $ll->debug = $debug;
-        $ll->start($this->object);
+        //$ll->start($this->object);
 
         return $ll->lazyloading($this->object, $this, $order);
+
+    }
+    /**
+     *
+     * @param string $order
+     * @return \dclass\devups\Datatable\Lazyloading
+     */
+    public function perPage($perpage = 10)
+    {
+
+        $ll = new \dclass\devups\Datatable\Lazyloading($this->object, $this);
+
+        return $ll->setPerPage($perpage);
+
+    }
+    /**
+     *
+     * @param string $order
+     * @return \dclass\devups\Datatable\Lazyloading
+     */
+    public function nextPage($page = 1)
+    {
+
+        $ll = new \dclass\devups\Datatable\Lazyloading($this->object, $this);
+
+        return $ll->setNext($page);
 
     }
 

@@ -181,12 +181,6 @@ class User extends UserCore implements JsonSerializable
     {
         return $this->password;
     }
-
-    public function setPassword($password)
-    {
-        $this->password = $password;
-    }
-
    /* public function getResettingpassword()
     {
         return $this->resettingpassword;
@@ -262,25 +256,6 @@ class User extends UserCore implements JsonSerializable
         $this->country = $country;
     }
 
-    public static function sanitizePhonenumber($phonenumber, $phone_code){
-        $telephone = str_replace("+".$phone_code,"", "+".$phonenumber);
-        return str_replace("+","", $telephone);
-    }
-
-    public function setTelephone($telephone)
-    {
-        if (!$telephone)
-            return null;
-
-        $telephone = self::sanitizePhonenumber($telephone, $this->country->getPhonecode());
-
-        $nb = User::where("phonenumber", $telephone);
-        if ($nb->__countEl()) {
-            if ($nb->__getOne()->getId() != $this->id)
-                return t("a user with this :attribute already exist", ["attribute" => "telephone"]);
-        }
-        $this->phonenumber = $telephone;
-    }
 
     /**
      *  manyToOne

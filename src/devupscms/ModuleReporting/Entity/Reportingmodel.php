@@ -55,6 +55,16 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      **/
     protected $content;
 
+    /**
+     * @Column(name="contentheader", type="text"  , nullable=true)
+     * @var text
+     **/
+    protected $contentheader;
+    /**
+     * @Column(name="contentfooter", type="text"  , nullable=true)
+     * @var text
+     **/
+    protected $contentfooter;
 
     public function __construct($id = null)
     {
@@ -68,6 +78,38 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return text
+     */
+    public function getContentheader()
+    {
+        return $this->contentheader;
+    }
+
+    /**
+     * @param text $contentheader
+     */
+    public function setContentheader( $contentheader)
+    {
+        $this->contentheader = $contentheader;
+    }
+
+    /**
+     * @return text
+     */
+    public function getContentfooter()
+    {
+        return $this->contentfooter;
+    }
+
+    /**
+     * @param text $contentfooter
+     */
+    public function setContentfooter($contentfooter)
+    {
+        $this->contentfooter = $contentfooter;
     }
 
     /**
@@ -462,7 +504,7 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     public function sendMail($datacustom)
     {
 
-        if (!$this->content) {
+        if(!$this->content){
 
             Emaillog::create([
                 "object" => self::$log_info . " - object : " . $this->title . ' to ' . json_encode(self::$emailreceiver),
@@ -483,17 +525,17 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
                 "style" => $this->getCss(),
             ] + $datacustom;
 
-        $message_html = $this->sanitizeContent($this->content, $data);
+        $message_html = $this->sanitizeContent($this->contentheader.$this->content.$this->contentfooter, $data);
         $message_text = $this->sanitizeContent($this->contenttext, $data);
 // Instantiation and passing `true` enables exceptions
         $mail = new PHPMailer(true);
 
         try {
             //Server settings
-            //$mail->SMTPDebug = false;
+            //$mail->SMTPDebug = false;                                       // Enable verbose debug output ->SMTPDebug = false;
+            $mail->isSMTP();
             $mail->CharSet = 'UTF-8';
-            $mail->Encoding = 'base64';
-            $mail->isSMTP();                                            // Set mailer to use SMTP
+            $mail->Encoding = 'base64';                                         // Set mailer to use SMTP
             $mail->Host = Configuration::get("sm_smtp");  // Specify main and backup SMTP servers
             $mail->SMTPAuth = true;                                   // Enable SMTP authentication
             $mail->Username = Configuration::get("sm_username");                     // SMTP username

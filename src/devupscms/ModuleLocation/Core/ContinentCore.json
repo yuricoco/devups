@@ -1,0 +1,1 @@
+{"name":"continent","attribut":{"1":{"name":"name","visibility":"name","datatype":"string","size":255,"nullable":"not","formtype":"name"},"2":{"name":"status","visibility":"status","datatype":"integer","size":"","nullable":"not","formtype":"status"}}}

@@ -126,7 +126,15 @@ var ddatatable = {
         //     removeloader();
         // }, 'json');//
     },
-    setperpage: function () {
+    setperpage: function (page) {
+
+        model.baseurl = $("#dv_pagination").data('route') + "services.php";
+        model.entity = $("#dv_pagination").data('entity');
+
+        ddatatable.init(model.entity);
+
+        this.per_page = page
+
         this.page(1);
     },
     callback: function (response) {

@@ -76,7 +76,8 @@ class App extends \dclass\devups\Controller\FrontController
     }
 
     public function tableView(){
-        $datatable = ProductTable::init(new Product())->buildindextable();
+        $datatable = Dvups_entityTable::init(new Dvups_entity())->buildfronttable()
+            ->setModel('front');
         Genesis::render("table", compact("datatable"));
     }
 
