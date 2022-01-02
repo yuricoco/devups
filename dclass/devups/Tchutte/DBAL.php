@@ -872,8 +872,9 @@ class DBAL extends Database
                 if (is_object($value)) {
                     $cn = get_class($value);
                     $classname = strtolower($cn);
-                    $cnk = $this->entity_link_map_list[$classname];
-                    if ($cnk . '_id' == $key2) {
+                    //$cnk = $this->entity_link_map_list[$classname];
+                    //if ($cnk . '_id' == $key2) {
+                    if ($key . '_id' == $key2) {
 
                         if (is_array($flowBD[$key2])) {
                             $object_array[$key] = null;//$classname;

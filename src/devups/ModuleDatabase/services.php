@@ -24,7 +24,7 @@
         case 'request_history.create':
                 g::json_encode($request_historyCtrl->createAction());
                 break;
-        case 'request_history._edit':
+        case 'request_history.form':
                 g::json_encode($request_historyCtrl->formView(R::get("id")));
                 break;
         case 'request_history.update':

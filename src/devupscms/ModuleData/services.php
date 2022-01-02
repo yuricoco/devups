@@ -25,7 +25,7 @@ switch (R::get('path')) {
     case 'status.create':
         g::json_encode($statusCtrl->createAction());
         break;
-    case 'status._edit':
+    case 'status.form':
         StatusForm::render(R::get("id"));
         //g::json_encode($statusCtrl->formView(R::get("id")));
         break;
@@ -51,7 +51,7 @@ switch (R::get('path')) {
     case 'status_entity.create':
         g::json_encode($status_entityCtrl->createAction());
         break;
-    case 'status_entity._edit':
+    case 'status_entity.form':
         g::json_encode($status_entityCtrl->formView(R::get("id")));
         break;
     case 'status_entity.update':

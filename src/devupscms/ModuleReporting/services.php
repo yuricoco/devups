@@ -25,7 +25,7 @@
         case 'emaillog.create':
                 g::json_encode($emaillogCtrl->createAction());
                 break;
-        case 'emaillog._edit':
+        case 'emaillog.form':
                 g::json_encode($emaillogCtrl->formView(R::get("id")));
                 break;
         case 'emaillog.update':
@@ -50,7 +50,7 @@
         case 'reportingmodel.create':
                 g::json_encode($reportingmodelCtrl->createAction());
                 break;
-        case 'reportingmodel._edit':
+        case 'reportingmodel.form':
                 g::json_encode($reportingmodelCtrl->formView(R::get("id")));
                 break;
         case 'reportingmodel.update':

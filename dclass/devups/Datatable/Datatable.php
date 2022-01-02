@@ -646,14 +646,15 @@ EOF;
         $html = '                    
             <div data-notice="'.$this->pagination.'" class="col-lg-3 col-md-12 ">
 
-        <label class=" " >Line to show </label>';
+        <label class=" " >'.t("Line to show").'</label>';
 
         $html .= '<select id="dt_nbrow" class="form-control" style="width:100px; display: inline-block" onchange="ddatatable.setperpage(this.options[this.selectedIndex].value)" >';
         //$html .= '<option value="&next=' . $current_page . '&per_page=10" >10</option>';
 
         for ($i = 1; $i <= 10; $i++) {
-            $html .= '<option value="' . $i * $this->per_page . '" >' . $i * 10 . '</option>';
+            $html .= '<option value="' . $i * 10 . '" >' . $i * 10 . '</option>';
         }
+        $html .= '<option selected value="' . $this->per_page . '" >' . $this->per_page . '</option>';
         $html .= '<option value="all" >All</option>';
         $html .= " </select>
     </div>";

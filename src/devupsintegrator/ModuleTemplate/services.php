@@ -27,7 +27,7 @@
         case 'template.create':
                 g::json_encode($templateCtrl->createAction());
                 break;
-        case 'template._edit':
+        case 'template.form':
                 TemplateForm::render(R::get("id"));
                 break;
         case 'template.update':
@@ -52,7 +52,7 @@
         case 'page.create':
                 g::json_encode($pageCtrl->createAction());
                 break;
-        case 'page._edit':
+        case 'page.form':
                 PageForm::render(R::get("id"));
                 break;
         case 'page.update':
@@ -77,7 +77,7 @@
         case 'hooks.create':
                 g::json_encode($hooksCtrl->createAction());
                 break;
-        case 'hooks._edit':
+        case 'hooks.form':
                 HooksForm::render(R::get("id"));
                 break;
         case 'hooks.update':
@@ -102,7 +102,7 @@
         case 'block.create':
                 g::json_encode($blockCtrl->createAction());
                 break;
-        case 'block._edit':
+        case 'block.form':
                 BlockForm::render(R::get("id"));
                 break;
         case 'block.update':

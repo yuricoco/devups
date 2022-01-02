@@ -24,7 +24,7 @@ switch (R::get('path')) {
     case 'user.create':
         g::json_encode($userCtrl->createAction());
         break;
-    case 'user._edit':
+    case 'user.form':
         UserForm::render(R::get("id"));
         break;
     case 'user.update':

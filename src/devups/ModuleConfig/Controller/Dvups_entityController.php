@@ -44,6 +44,13 @@ class Dvups_entityController extends Controller
         ];
     }
 
+    public function formView($id = null)
+    {
+        return ['success' => true,
+            'form' => Dvups_entityForm::renderExportWidget(),
+        ];
+    }
+
     public function datatable($next, $per_page)
     {
         return ['success' => true,

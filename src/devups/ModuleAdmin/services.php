@@ -33,7 +33,7 @@ switch (Request::get('path')) {
     case 'dvups_admin.create':
         g::json_encode($dvups_adminCtrl->createAction());
         break;
-    case 'dvups_admin._edit':
+    case 'dvups_admin.form':
         g::json_encode(Dvups_adminController::renderForm(R::get("id")));
         break;
     case 'dvups_admin.update':
@@ -55,7 +55,7 @@ switch (Request::get('path')) {
     case 'dvups_right._new':
         g::json_encode(Dvups_rightController::renderForm());
         break;
-    case 'dvups_right._edit':
+    case 'dvups_right.form':
         g::json_encode(Dvups_rightController::renderForm(R::get("id")));
         break;
     case 'dvups_right._show':
@@ -80,7 +80,7 @@ switch (Request::get('path')) {
     case 'dvups_role.update':
         g::json_encode($dvups_roleCtrl->updateAction(R::get("id")));
         break;
-    case 'dvups_role._edit':
+    case 'dvups_role.form':
         g::json_encode(Dvups_roleForm::renderWidget(R::get("id")));
         break;
     case 'dvups_role._show':

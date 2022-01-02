@@ -25,7 +25,7 @@
         case 'message.create':
                 g::json_encode($messageCtrl->createAction());
                 break;
-        case 'message._edit':
+        case 'message.form':
                 g::json_encode($messageCtrl->formView(R::get("id")));
                 break;
         case 'message.update':
@@ -50,7 +50,7 @@
         case 'newsletter.create':
                 g::json_encode($newsletterCtrl->createAction());
                 break;
-        case 'newsletter._edit':
+        case 'newsletter.form':
                 g::json_encode($newsletterCtrl->formView(R::get("id")));
                 break;
         case 'newsletter.update':

@@ -348,8 +348,11 @@ var ddatatable = {
         this.dtinstance = $("#dv_" + entity + "_table");
         this.entity = entity;
 
+        if (this.dtinstance.find("#dt_nbrow").length)
+            ddatatable.per_page = this.dtinstance.find("#dt_nbrow").val();
+        else
+            ddatatable.per_page = this.dtinstance.find("#dv_table").data('perpage');
 
-        ddatatable.per_page = this.dtinstance.find("#dv_table").data('perpage');
 
         ddatatable.baseurl = this.dtinstance.find("#dv_table").data('route') + "services.php";
         console.log(ddatatable.baseurl);

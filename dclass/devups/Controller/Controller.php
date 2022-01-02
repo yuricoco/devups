@@ -29,6 +29,39 @@ class Controller
     protected $entity = null;
     public $indexView = "default.index";
 
+    /**
+     * this method is used by devups from the admin/services.php file to manage router as we use to do at the front App.php
+     * @return false|int|mixed
+     */
+    public static function serve(\Dvups_entity $entity){
+
+        global $viewdir;
+
+        $viewdir[] = $entity->dvups_module->hydrate()->moduleRoot() . 'Resource/views';
+
+        //dv_dump($viewdir);
+        $ctrl = $entity->name."Controller";
+        return Request::Controller(new $ctrl(), Request::get('path'));
+    }
+    /**
+     * this method is used by devups from the admin/services.php file to manage router as we use to do at the front App.php
+     * @return false|int|mixed
+     */
+    public static function views(\Dvups_entity $entity){
+
+        global $viewdir, $moduledata;
+
+        $viewdir[] = $entity->dvups_module->hydrate()->moduleRoot() . 'Resource/views';
+        $moduledata = $entity->dvups_module;
+        $admin = getadmin();
+        $moduledata->dvups_entity = $admin->dvups_role->collectDvups_entityOfModule($moduledata);
+
+        //dv_dump($viewdir);
+        $ctrl = $entity->name."Controller";
+        return Request::Controller(new $ctrl(), Request::get('path'));
+
+    }
+
     public function __construct()
     {
 

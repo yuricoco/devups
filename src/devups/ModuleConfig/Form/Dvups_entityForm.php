@@ -100,6 +100,10 @@ class Dvups_entityForm extends FormManager
     {
         Genesis::renderView("dvups_entity.formWidget", self::getFormData($id, $action));
     }
+    public static function renderExportWidget($id = null, $action = "create")
+    {
+        return Genesis::getView("admin.dvups_entity.formExportWidget", Request::$uri_get_param);
+    }
 
 }
     

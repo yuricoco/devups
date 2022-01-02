@@ -28,7 +28,7 @@ switch (R::get('path')) {
     case 'country.create':
         g::json_encode($countryCtrl->createAction());
         break;
-    case 'country._edit':
+    case 'country.form':
         g::json_encode($countryCtrl->formView(R::get("id")));
         break;
     case 'country.update':
@@ -53,7 +53,7 @@ switch (R::get('path')) {
     case 'department.create':
         g::json_encode($departmentCtrl->createAction());
         break;
-    case 'department._edit':
+    case 'department.form':
         g::json_encode($departmentCtrl->formView(R::get("id")));
         break;
     case 'department.update':
@@ -78,7 +78,7 @@ switch (R::get('path')) {
     case 'district.create':
         g::json_encode($districtCtrl->createAction());
         break;
-    case 'district._edit':
+    case 'district.form':
         g::json_encode($districtCtrl->formView(R::get("id")));
         break;
     case 'district.update':
@@ -103,7 +103,7 @@ switch (R::get('path')) {
     case 'region.create':
         g::json_encode($regionCtrl->createAction());
         break;
-    case 'region._edit':
+    case 'region.form':
         g::json_encode($regionCtrl->formView(R::get("id")));
         break;
     case 'region.update':
@@ -128,7 +128,7 @@ switch (R::get('path')) {
     case 'town.create':
         g::json_encode($townCtrl->createAction());
         break;
-    case 'town._edit':
+    case 'town.form':
         g::json_encode($townCtrl->formView(R::get("id")));
         break;
     case 'town.update':
@@ -153,7 +153,7 @@ switch (R::get('path')) {
     case 'continent.create':
         g::json_encode((new ContinentController())->createAction());
         break;
-    case 'continent._edit':
+    case 'continent.form':
         g::json_encode((new ContinentController())->formView(R::get("id")));
         break;
     case 'continent.update':

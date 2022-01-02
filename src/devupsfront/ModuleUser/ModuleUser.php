@@ -71,7 +71,7 @@ class ModuleUser
             case 'address.create':
                 g::json_encode($addressCtrl->createAction());
                 break;
-            case 'address._edit':
+            case 'address.form':
                 \AddressForm::renderaccount(Request::get("id"));
                 break;
             case 'address.update':

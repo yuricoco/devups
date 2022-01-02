@@ -466,7 +466,7 @@ class " . ucfirst($name) . "_lang extends Dv_langCore {\n");
         $onoinsert = "\n" . implode("", $onoinsert);
         $otherattrib = false;
 
-        $contenu = "public function listView($" . "next = 1, $" . "per_page = 10){
+        $contenu = "public function listView(){
 
         \$this->datatable = " . ucfirst($name) . "Table::init(new " . ucfirst($name) . "())->buildindextable();
 
@@ -479,7 +479,7 @@ class " . ucfirst($name) . "_lang extends Dv_langCore {\n");
 
     }
 
-    public function datatable($" . "next, $" . "per_page) {
+    public function datatable() {
     
         return ['success' => true,
             'datatable' => " . ucfirst($name) . "Table::init(new " . ucfirst($name) . "())->router()->getTableRest(),
@@ -791,6 +791,7 @@ class " . ucfirst($name) . "Table extends Datatable{
 
     public function buildindextable(){
 
+        \$this->base_url = __env.\"admin/\";
         $" . "this->datatablemodel = $datatablemodel;
 
         return $" . "this;

@@ -192,4 +192,11 @@ class Dvups_module extends Dvups_config_item implements JsonSerializable, DvupsT
         return route('src/' . strtolower($this->project) . '/' . $this->name . '/'.$path);
     }
 
+    public function moduleRoot(){
+
+            return ROOT . "src/" . $this->project."/".$this->name."/";
+            //return ROOT . "src" . $this->dvups_component->name."/".$this->name."/";
+
+    }
+
 }

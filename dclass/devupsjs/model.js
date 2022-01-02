@@ -101,7 +101,7 @@ var model = {
         }*/
 
         this._showmodal();
-        model.request(this.entity + "._new"+ddatatable.urlparam)
+        model.request(this.entity + ".form"+ddatatable.urlparam)
             //.param({path: this.entity + "._new"})
             .get(function (response) {
                 console.log(response)
@@ -120,7 +120,8 @@ var model = {
 
         this._showmodal();
 
-        model.request(this.entity + "._edit")
+        //model.request(this.entity + "._edit")
+        model.request(this.entity + ".form"+ddatatable.urlparam)
             .param({
                 id: id
             })

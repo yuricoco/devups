@@ -28,7 +28,7 @@ switch (R::get('path')) {
     case 'cmstext.create':
         g::json_encode($cmstextCtrl->createAction());
         break;
-    case 'cmstext._edit':
+    case 'cmstext.form':
         CmstextForm::render(R::get("id"));
         break;
     case 'cmstext/update':
@@ -65,7 +65,7 @@ switch (R::get('path')) {
     case 'imagecms.create':
         g::json_encode($imagecmsCtrl->createAction());
         break;
-    case 'imagecms._edit':
+    case 'imagecms.form':
         ImagecmsForm::renderWidget(R::get("id"));
         break;
     case 'imagecms.update':

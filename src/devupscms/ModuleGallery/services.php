@@ -27,7 +27,7 @@ switch (R::get('path')) {
     case 'dv_image.store':
         g::json_encode($dv_imageCtrl->storeImage());
         break;
-    case 'dv_image._edit':
+    case 'dv_image.form':
         Dv_imageForm::render(R::get("id"));
         break;
     case 'dv_image.update':

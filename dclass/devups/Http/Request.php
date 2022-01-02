@@ -183,10 +183,35 @@ class Request
         }
         $paramvalues = self::getMethodParamValues("App", $function);
         if ($paramvalues)
-            //$app->{$function}($paramvalues);
-            Genesis::json_encode(call_user_func_array(array($app, $function), $paramvalues));
+            //$app->{$function}(...$paramvalues);
+            call_user_func_array(array($app, $function), $paramvalues);
+            //Genesis::json_encode(call_user_func_array(array($app, $function), $paramvalues));
         else
             $app->{$function}();
+        //call_user_func(array($app, $function));
+    }
+
+    public static function Controller($app, $path)
+    {
+
+        //$array = explode("-", $path);
+        $function = self::niceFunction($path, '-');
+        if (in_array($function, ["create","update","delete","_delete","deleteGroup", ]))
+            $function .= "Action";
+        else if (in_array($function, ["form","detail","list", ]))
+            $function .= "View";
+
+        if (!method_exists($app, $function)) {
+            var_dump(" You may create method " . " " . $function . " in entity. ");
+            die;
+        }
+        $paramvalues = self::getMethodParamValues(get_class($app), $function);
+        if ($paramvalues)
+            //$app->{$function}(...$paramvalues);
+            return call_user_func_array(array($app, $function), $paramvalues);
+            //Genesis::json_encode(call_user_func_array(array($app, $function), $paramvalues));
+        else
+            return $app->{$function}();
         //call_user_func(array($app, $function));
     }
 

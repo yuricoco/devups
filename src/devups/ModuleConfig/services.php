@@ -27,7 +27,7 @@
         case 'dvups_component.create':
                 g::json_encode($dvups_componentCtrl->createAction());
                 break;
-        case 'dvups_component._edit':
+        case 'dvups_component.form':
                 Dvups_componentForm::render(R::get("id"));
                 break;
         case 'dvups_component.update':
@@ -52,7 +52,7 @@
         case 'dvups_entity.create':
                 g::json_encode($dvups_entityCtrl->createAction());
                 break;
-        case 'dvups_entity._edit':
+        case 'dvups_entity.form':
                 Dvups_entityForm::render(R::get("id"));
                 break;
         case 'dvups_entity.update':
@@ -80,7 +80,7 @@
         case 'dvups_module.create':
                 g::json_encode($dvups_moduleCtrl->createAction());
                 break;
-        case 'dvups_module._edit':
+        case 'dvups_module.form':
                 Dvups_moduleForm::render(R::get("id"));
                 break;
         case 'dvups_module.update':
@@ -105,7 +105,7 @@
         case 'configuration.create':
                 g::json_encode($configurationCtrl->createAction());
                 break;
-        case 'configuration._edit':
+        case 'configuration.form':
                 ConfigurationForm::render(R::get("id"));
                 break;
         case 'configuration.update':

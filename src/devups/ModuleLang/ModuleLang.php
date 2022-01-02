@@ -80,7 +80,7 @@ class ModuleLang
             case 'local_content_key.create':
                 g::json_encode($local_content_keyCtrl->createAction());
                 break;
-            case 'local_content_key._edit':
+            case 'local_content_key.form':
                 Local_content_keyForm::render(R::get("id"));
                 break;
             case 'local_content_key.update':
@@ -105,7 +105,7 @@ class ModuleLang
             case 'local_content.create':
                 g::json_encode($local_contentCtrl->createAction());
                 break;
-            case 'local_content._edit':
+            case 'local_content.form':
                 Local_contentForm::render(R::get("id"));
                 break;
             case 'local_content.update':
@@ -133,7 +133,7 @@ class ModuleLang
             case 'page_mapped.create':
                 g::json_encode($page_mappedCtrl->createAction());
                 break;
-            case 'page_mapped._edit':
+            case 'page_mapped.form':
                 Page_mappedForm::render(R::get("id"));
                 break;
             case 'page_mapped.update':
@@ -158,7 +158,7 @@ class ModuleLang
             case 'page_local_content.create':
                 g::json_encode($page_local_contentCtrl->createAction());
                 break;
-            case 'page_local_content._edit':
+            case 'page_local_content.form':
                 Page_local_contentForm::render(R::get("id"));
                 break;
             case 'page_local_content.update':
@@ -211,7 +211,7 @@ class ModuleLang
             case 'local_content.create':
                 g::json_encode($local_contentCtrl->createAction());
                 break;
-            case 'local_content._edit':
+            case 'local_content.form':
                 Local_contentForm::render(Request::get("id"));
                 break;
             case 'local_content.update':

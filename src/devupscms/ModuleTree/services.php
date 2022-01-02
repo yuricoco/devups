@@ -27,7 +27,7 @@
         case 'tree.create':
                 g::json_encode($treeCtrl->createAction());
                 break;
-        case 'tree._edit':
+        case 'tree.form':
                 g::json_encode($treeCtrl->formView(R::get("id")));
                 break;
         case 'tree.update':
@@ -52,7 +52,7 @@
         case 'tree_item.create':
                 g::json_encode($tree_itemCtrl->createAction());
                 break;
-        case 'tree_item._edit':
+        case 'tree_item.form':
                 g::json_encode($tree_itemCtrl->formView(R::get("id")));
                 break;
         case 'tree_item.update':
@@ -77,7 +77,7 @@
         case 'tree_item_lang.create':
                 g::json_encode($tree_item_langCtrl->createAction());
                 break;
-        case 'tree_item_lang._edit':
+        case 'tree_item_lang.form':
                 g::json_encode($tree_item_langCtrl->formView(R::get("id")));
                 break;
         case 'tree_item_lang.update':
@@ -102,7 +102,7 @@
         case 'tree_item_image.create':
                 g::json_encode($tree_item_imageCtrl->createAction());
                 break;
-        case 'tree_item_image._edit':
+        case 'tree_item_image.form':
                 g::json_encode($tree_item_imageCtrl->formView(R::get("id")));
                 break;
         case 'tree_item_image.update':

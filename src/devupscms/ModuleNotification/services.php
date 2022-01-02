@@ -25,7 +25,7 @@ switch (R::get('path')) {
     case 'notification.create':
         g::json_encode($notificationCtrl->createAction());
         break;
-    case 'notification._edit':
+    case 'notification.form':
         g::json_encode($notificationCtrl->formView(R::get("id")));
         break;
     case 'notification.update':
@@ -50,7 +50,7 @@ switch (R::get('path')) {
     case 'notificationbroadcasted.create':
         g::json_encode($notificationbroadcastedCtrl->createAction());
         break;
-    case 'notificationbroadcasted._edit':
+    case 'notificationbroadcasted.form':
         g::json_encode($notificationbroadcastedCtrl->formView(R::get("id")));
         break;
     case 'notificationbroadcasted.update':
@@ -75,7 +75,7 @@ switch (R::get('path')) {
     case 'notificationtype.create':
         g::json_encode($notificationtypeCtrl->createAction());
         break;
-    case 'notificationtype._edit':
+    case 'notificationtype.form':
         g::json_encode($notificationtypeCtrl->formView(R::get("id")));
         break;
     case 'notificationtype.update':

@@ -27,52 +27,6 @@ define('__jsversion', '1');
 
 Dvups_adminController::restartsessionAction();
 
-(new Request('dashboard'));
-if ($path = Request::get("dvpath")) {
-
-// move comment scope to enable authentication
-    if (!isset($_SESSION[ADMIN])) {
-
-        Genesis::json_encode(["success" => false, "message" => "admin session expired!!"]);
-
-    }
-
-    switch ($path) {
-
-        case 'dvexport':
-            $classname = ucfirst(Request::get("classname"));
-            $entity = new $classname;
-            $entity->exportCsv($classname); //,
-            $message = $classname . ": CSV generated with success";
-//            Genesis::json_encode([
-//                "message"=>$message
-//            ]);
-            Genesis::json_encode(compact("message", "entity"));
-            break;
-        case 'dvimport':
-            $classname = ucfirst(Request::get("classname"));
-            $entity = new $classname;
-            $response = $entity->importCsv($classname); //,
-            $message = $classname . ": Core generated with success";
-            Genesis::json_encode(compact("response", "message"));
-            break;
-
-        default:
-            Genesis::json_encode(['success' => false, 'error' => ['message' => "404 : action note found", 'route' => $path]]);
-            break;
-
-    }
-    die;
-}
-
-
-// move comment scope to enable authentication
-if (!isset($_SESSION[ADMIN]) and Request::get('path') != 'connexion') {
-    //$token = sha1(\DClass\lib\Util::randomcode());
-    header("location: " . __env . 'admin/login.php');
-
-}
-
 global $global_navigation, $viewdir;
 
 $viewdir = [admin_dir . "views"];
