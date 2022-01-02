@@ -184,7 +184,6 @@ class BackendGenerator
          *	@return " . $antislash . $entitytype . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            $" . "this->" . $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -210,7 +209,6 @@ class BackendGenerator
          *	@return " . $antislash . $entitytype . "
          */
         function get" . ucfirst($relation->entity) . "() {
-            $" . "this->" . $relation->entity . " = $" . "this->" . $relation->entity . "->__show();
             return $" . "this->" . $relation->entity . ";
         }";
                     $method .= "
@@ -275,23 +273,6 @@ class BackendGenerator
             $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
         }
         ";
-                }
-                elseif (false && in_array($attribut->formtype, ['date', 'datepicker'])) {
-                    $construt .= "
-
-        public function get" . ucfirst($attribut->name) . "() {
-            if(is_object($" . "this->" . $attribut->name . "))
-                return $" . "this->" . $attribut->name . ";
-            else
-                return new DateTime($" . "this->" . $attribut->name . ");
-        }
-
-        public function set" . ucfirst($attribut->name) . "($" . $attribut->name . ") {
-                    if(is_object($" . $attribut->name . "))
-                            $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
-                    else
-                            $" . "this->" . $attribut->name . " = new DateTime($" . $attribut->name . ");
-        }";
                 }
                 elseif ($attribut->formtype == 'liste') {
                     $construt .= "

@@ -3,6 +3,7 @@
 /build/
 /admin/cache/
 /cache/
+/database/
 /node_modules/
 /src/devupstuto/
 /src/devupstest/

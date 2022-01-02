@@ -9,7 +9,7 @@ use Request as R;
 header("Access-Control-Allow-Origin: *");
 
 global $viewdir;
-$viewdir[] = __DIR__ . '/Ressource/views';
+$viewdir[] = __DIR__ . '/Resource/views';
 
 $dvups_adminCtrl = new Dvups_adminController();
 $dvups_rightCtrl = new Dvups_rightController();

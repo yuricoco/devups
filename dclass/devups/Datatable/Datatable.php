@@ -116,7 +116,10 @@ class Datatable extends Lazyloading
             $dentity = \Dvups_entity::getbyattribut("this.name", $this->class);
             $this->base_url = $dentity->dvups_module->hydrate()->route();
 
-            $this->defaultgroupaction = '<button id="deletegroup" onclick="ddatatable.groupdelete(this, \'' . $this->class . '\')" class="btn btn-danger btn-block">delete</button>';
+            $this->defaultgroupaction = '<button id="deletegroup" onclick="ddatatable.groupdelete(this, \'' . $this->class . '\')" class="btn btn-danger btn-block">delete</button>'
+            .'<button data-entity="' . $this->class . '"  onclick="ddatatable._export(this, \'' . $this->class . '\')" type="button" class="btn btn-default btn-block" >
+            <i class="fa fa-arrow-down"></i> Export csv
+        </button>';
         }
         $this->id_lang = \Dvups_lang::defaultLang()->id;
         $this->createaction = [
@@ -185,16 +188,14 @@ class Datatable extends Lazyloading
 /*
  *
  */
-        if (getadmin()->getId() && false) {
+        if (getadmin()->getId() ) {
             $top_action .= '<div class="btn-group" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle"  data-bs-toggle="dropdown" aria-expanded="false" >
       <i class="fa fa-angle-down"></i> options
     </button>
     <div class="dropdown-menu text-left" aria-labelledby="btnGroupDrop1">
-        <button data-entity="' . $this->class . '" type="button" class="dv_export_csv btn btn-default btn-block" >
-            <i class="fa fa-arrow-down"></i> Export csv
-        </button>
-        <button data-entity="' . $this->class . '" type="button" class="dv_import_csv btn btn-default btn-block" >
+    
+        <button data-entity="' . $this->class . '" type="button" onclick="ddatatable._import(this, \'' . $this->class . '\')" class="  btn btn-default btn-block" >
             <i class="fa fa-arrow-up"></i> Import csv
         </button>
     </div>
@@ -272,42 +273,7 @@ class Datatable extends Lazyloading
             $this->rowaction[] = $this->getaction($entity, "edit", 'update', $entityrigths);
             $this->rowaction[] = $this->getaction($entity, "show", 'read', $entityrigths);
             $this->rowaction[] = $this->getaction($entity, "delete", 'delete', $entityrigths);
-            /*if (isset($this->defaultaction["edit"]) && in_array('update', $entityrigths)) {
-                if (in_array('update', $_SESSION[dv_role_permission])) {
-                    if (is_callable($this->defaultaction["edit"])) {
-                        $this->defaultaction["edit"] = $this->defaultaction["edit"]($entity);
-                    } else
-                        $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \'' . $this->classname . '\')"';
 
-                    $this->rowaction[] = $this->defaultaction["edit"];
-
-                }
-            }*/
-
-            /*if (isset($this->defaultaction["show"]) && in_array('read', $entityrigths)) {
-                if (in_array('read', $_SESSION[dv_role_permission])) {
-
-                    if (is_callable($this->defaultaction["show"]))
-                        $this->defaultaction["show"] = $this->defaultaction["show"]($entity);
-                    else
-                        $this->defaultaction["show"]['action'] = 'onclick="model._show(' . $entity->getId() . ', \'' . $this->classname . '\')"';
-
-                    $this->rowaction[] = $this->defaultaction["show"];
-                }
-            }
-
-            if (isset($this->defaultaction["delete"]) && in_array('delete', $entityrigths)) {
-                if (in_array('delete', $_SESSION[dv_role_permission])) {
-
-                    if (is_callable($this->defaultaction["delete"]))
-                        $this->defaultaction["delete"] = $this->defaultaction["delete"]($entity);
-                    else
-                        $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ', \'' . $this->classname . '\')"';
-
-                    $this->rowaction[] = $this->defaultaction["delete"];
-                }
-
-            }*/
 
             if (isset($this->defaultaction[$this->mainrowaction]))
                 $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
@@ -318,51 +284,10 @@ class Datatable extends Lazyloading
 
         } elseif (isset($_SESSION[dv_role_permission])) {
             $entityrigths = $_SESSION[dv_role_permission];
-//            if (in_array('update', $_SESSION[dv_role_permission]) or
-//                in_array('read', $_SESSION[dv_role_permission]) or
-//                in_array('delete', $_SESSION[dv_role_permission])) {
 
             $this->rowaction[] = $this->getaction($entity, "edit", 'update', $entityrigths);
             $this->rowaction[] = $this->getaction($entity, "show", 'read', $entityrigths);
             $this->rowaction[] = $this->getaction($entity, "delete", 'delete', $entityrigths);
-
-            /*if (in_array('update', $_SESSION[dv_role_permission])) {
-                $method = 'editAction';
-                if (method_exists($entity, $method)) {
-                    $result = call_user_func(array($entity, $method), $this->defaultaction["edit"]);
-                    if (!is_null($result))
-                        $this->defaultaction["edit"] = $result;
-                    else
-                        $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \'' . $this->classname . '\')"';
-                } else
-                    $this->defaultaction["edit"]['action'] = 'onclick="model._edit(' . $entity->getId() . ', \'' . $this->classname . '\')"';
-
-                $this->rowaction[] = $this->defaultaction["edit"];
-            }
-
-            if (in_array('read', $_SESSION[dv_role_permission])) {
-                $method = 'showAction';
-                if (method_exists($entity, $method) && $result = call_user_func(array($entity, $method), $this->defaultaction["show"]))
-                    $this->defaultaction["show"] = $result;
-                else
-                    $this->defaultaction["show"]['action'] = 'onclick="model._show(' . $entity->getId() . ', \'' . $this->classname . '\')"';
-
-                $this->rowaction[] = $this->defaultaction["show"];
-            }
-
-            if (in_array('delete', $_SESSION[dv_role_permission])) {
-                $method = 'deleteAction';
-                if (method_exists($entity, $method)) {
-                    $result = call_user_func(array($entity, $method), $this->defaultaction["delete"]);
-                    if (!is_null($result))
-                        $this->defaultaction["delete"] = $result;
-                    else
-                        $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ', \'' . $this->classname . '\')"';
-                } else
-                    $this->defaultaction["delete"]['action'] = 'onclick="model._delete(this, ' . $entity->getId() . ', \'' . $this->classname . '\')"';
-
-                $this->rowaction[] = $this->defaultaction["delete"];
-            }*/
 
             if (isset($this->defaultaction[$this->mainrowaction]))
                 $this->mainrowactionbtn = $this->defaultaction[$this->mainrowaction];
@@ -431,6 +356,7 @@ EOF;
     public function render()
     {
 
+        //Lazyloading::$colunms = array_keys($this->datatablemodel);
         $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
 
         $this->rowaction = [];
@@ -911,20 +837,10 @@ EOF;
     private function tablebodybuilder()
     {
 
-        //if($this->entity->dvtranslate) {
-        /*if(!$this->id_lang) {
-            $trace = debug_backtrace();
-            trigger_error(
-                "the entity {$this->classname} is set as multilang you must specify the default id_lang in
-                the {$this->classname}Table instance."
-//                    . ' dans ' . $trace[0]['file'] .
-//                    ' à la ligne ' . $trace[0]['line']
-                ,
-                E_USER_NOTICE);
-        }*/
         \DBAL::$id_lang_static = $this->id_lang;
         $iso_code = \Dvups_lang::getattribut("iso_code", $this->id_lang);
         //}
+
         foreach ($this->listentity as $entity) {
             $tr = [];
             $entityarray = (array) $entity;
@@ -957,9 +873,13 @@ EOF;
                      */
                     if(isset($entity->{$attrib})){
                         $tr[] = "<td>" . $entity->{$attrib} . "</td>";
-                    }else
-                        $tr[] = "<td>".$entity->{$attrib}."</td>"; // maybe we can activate debug mode so that when we are on this we show a notice!
-
+                    }else {
+                        $attrs = explode(".", $attrib);
+                        if (count($attrs)>1)
+                            $tr[] = "<td>" . $entity->{$attrs[0]}->{$attrs[1]} . "</td>"; // maybe we can activate debug mode so that when we are on this we show a notice!
+                        else
+                            $tr[] = "<td>" . $entity->{$attrib} . "</td>"; // maybe we can activate debug mode so that when we are on this we show a notice!
+                    }
                     continue;
                 }
 

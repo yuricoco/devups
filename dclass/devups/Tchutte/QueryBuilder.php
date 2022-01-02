@@ -977,16 +977,16 @@ class QueryBuilder extends \DBAL
     /**
      *
      * @param string $order
-     * @return \dclass\devups\Datatable\Lazyloading
+     * @return \dclass\devups\Datatable\Lazyloading | $this
      */
-    public function lazyloading($order = "", $debug = false)
+    public function lazyloading($order = "", $debug = false, $qbinstance = false)
     {
 
         $ll = new \dclass\devups\Datatable\Lazyloading($this->object);
         $ll->debug = $debug;
         //$ll->start($this->object);
 
-        return $ll->lazyloading($this->object, $this, $order);
+        return $ll->lazyloading($this->object, $this, $order, null, $qbinstance);
 
     }
     /**
@@ -1054,7 +1054,7 @@ class QueryBuilder extends \DBAL
         return $this->__findOneRow($this->query, $this->parameters);
     }
 
-    public function get($column = "*", $recursif = true, $collect = [])
+    public function get($column = "*", $callback = null, $collect = [])
     {
         $this->select($column);
         $this->initSelect($column);
@@ -1063,7 +1063,7 @@ class QueryBuilder extends \DBAL
         if (self::$debug)
             return $this->getSqlQuery();
 
-        return $this->__findAllRow($this->query, $this->parameters);
+        return $this->__findAllRow($this->query, $this->parameters, $callback);
 
     }
 

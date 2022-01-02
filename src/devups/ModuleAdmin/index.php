@@ -3,7 +3,7 @@
 
 require '../../../admin/header.php';
 global $viewdir, $moduledata;
-$viewdir[] = __DIR__ . '/Ressource/views';
+$viewdir[] = __DIR__ . '/Resource/views';
 $moduledata = Dvups_module::init("ModuleAdmin");
 //require 'header.php';
 //require 'App.php';

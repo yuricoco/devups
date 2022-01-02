@@ -49,6 +49,63 @@ var ddatatable = {
             this.allchecked = false;
         }
     },
+    _export: function (el, classname) {
+        model.init(classname)
+
+        model._showmodal();
+        Drequest.init( __env+"admin/services.php?path=dvups_entity.form-export-view&entity="+classname)
+            //.param({path: this.entity + "._new"})
+            .toFormdata({filters :  "dfilters=on&next="+this.currentpage + "&per_page=" +
+                    this.per_page + this.searchparam +
+                    this.order + this.urlparam })
+            .post(function (response) {
+                console.log(response)
+                databinding.checkrenderform(response);
+            })
+            .fail(function (resultat, statut, erreur) {
+                console.log(statut, erreur);
+                databinding.bindmodal(resultat.responseText);
+            });
+
+    },
+    _import: function (el, classname) {
+        model.init(classname)
+
+        model._showmodal();
+        Drequest.init( __env+"admin/services.php?path=dvups_entity.form-import-view&entity="+classname)
+            .get(function (response) {
+                console.log(response)
+                databinding.checkrenderform(response);
+            })
+            .fail(function (resultat, statut, erreur) {
+                console.log(statut, erreur);
+                databinding.bindmodal(resultat.responseText);
+            });
+
+    },
+    exportrows: function (el, entity) {
+        ddatatable.init(entity);
+        var thisclass = this;
+        this.groupaction(function (ids, $trs) {
+
+            if (ids === '') {
+                alert("Aucun element selectionné!")
+                return false;
+            }
+
+            // if (!confirm('Voulez-vous Supprimer les éléments selectionnés?')) return false;
+            model.addLoader($(el))
+            $.get(ddatatable.baseurl + "?path=export&classname=" + entity + "&ids=" + ids.join(),
+                (response) => {
+                    console.log(response)
+                }, 'json')
+                .fail(function (resultat, statut, erreur) {
+                console.log(statut, erreur);
+                //$("#" + model.entity + "modal").modal("show");
+                databinding.bindmodal(resultat.responseText);
+            });//, 'json'
+        });
+    },
     groupdelete: function (el, entity) {
         ddatatable.init(entity);
         var thisclass = this;
@@ -286,7 +343,7 @@ var ddatatable = {
             });
         }
         dialog.footercontent = `
-            <button onclick="self.export()" type="button" class="btn btn-default">Exporter les données!</button>
+            <button onclick="ddatatable.exportrows(this, '${model.entity}')" type="button" class="btn btn-default">Exporter les données!</button>
         `;
         dialog.init()
         dialog.show()

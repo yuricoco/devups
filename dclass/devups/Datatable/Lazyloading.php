@@ -9,6 +9,7 @@
 namespace dclass\devups\Datatable;
 
 use Dvups_lang;
+use phpDocumentor\Reflection\Types\Self_;
 use QueryBuilder;
 use Request;
 
@@ -211,6 +212,8 @@ class Lazyloading implements \JsonSerializable
         return $this;
     }
 
+    public static $colunms = "*";
+
     /***
      * @param \stdClass $entity the instance of the entity
      * @param int $this ->next the page to print within the datatable by default it's 0
@@ -219,7 +222,7 @@ class Lazyloading implements \JsonSerializable
      * @param string $order
      * @return int | $this
      */
-    public function lazyloading(\stdClass $entity = null, \QueryBuilder $qbcustom = null, $order = "", $id_lang = null)
+    public function lazyloading(\stdClass $entity = null, \QueryBuilder $qbcustom = null, $order = "", $id_lang = null, $qbinstance = false)
     {//
         if($entity){
             $this->entity = $entity;
@@ -314,7 +317,8 @@ class Lazyloading implements \JsonSerializable
             } else {
                 $this->next = $page;
             }
-        } else {
+        }
+        else {
             $pagination = 0;
             $page = 1;
             $remain = 0;
@@ -349,10 +353,17 @@ class Lazyloading implements \JsonSerializable
         if($this->debug)
             return $qbcustom ? $qbcustom->getSqlQuery() : $qb->getSqlQuery();
 
+        if ($qbinstance){
+            if ($qbcustom != null)
+                return $qbcustom;
+            else
+                return $qb;
+        }
+
         if ($qbcustom != null)
-            $listEntity = $qbcustom->get();
+            $listEntity = $qbcustom->get(self::$colunms);
         else
-            $listEntity = $qb->get();
+            $listEntity = $qb->get(self::$colunms);
 
 
         $paginationcustom = [];

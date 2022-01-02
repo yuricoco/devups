@@ -43,74 +43,79 @@
 
                     <div class="row" id="container">
                         <div class="col-lg-6   stretch-card" id="textareacontainer">
+                            <div class="row">
 
-                            <div class='form-group'>
-                                <label >
-                                    style of the mail
-                                </label>
-                                <?= Form::textarea('style', $reportingmodel->getStyle(),
-                                    ['id' => 'code_css', 'class' => 'form-control', 'placeholder' => 'Your css code here ...']); ?>
-                            </div>
-                            <div class='form-group'>
-                                <div class='alert alert-info'>
-                                    use @{{variable}} to add dynamic text in the content.
+                                <div class='col-lg-12 form-group'>
+                                    <label >
+                                        style of the mail
+                                    </label>
+                                    <?= Form::textarea('style', $reportingmodel->getStyle(),
+                                        ['id' => 'code_css', 'class' => 'form-control', 'placeholder' => 'Your css code here ...']); ?>
                                 </div>
-                                <ul class="nav nav-tabs nav-justified " id="myTab" role="tablist">
-                                    <li class="nav-item text-center">
-                                        <a class="nav-link text-center" id="mail-body-tab"
-                                           data-toggle="tab" href="#mail-body"
-                                           role="tab" aria-controls="mail-body" aria-selected="true"> Body
-                                        </a>
-                                    </li>
-                                    <li class="nav-item text-center">
-                                        <a class="nav-link text-center" id="mail-header-tab"
-                                           data-toggle="tab" href="#mail-header"
-                                           role="tab" aria-controls="mail-header" aria-selected="false"> Header
-                                        </a>
-                                    </li>
-                                    <li class="nav-item text-center">
-                                        <a class="nav-link text-center" id="mail-footer-tab"
-                                           data-toggle="tab" href="#mail-footer"
-                                           role="tab" aria-controls="mail-footer" aria-selected="false"> Footer
-                                        </a>
-                                    </li>
-                                </ul>
-                                <div class="tab-content" id="myTabContent">
-                                    <div class="tab-pane show " id="mail-body" role="tabpanel"
-                                         aria-labelledby="mail-body-tab">
-                                        <?= Form::textarea('content', $reportingmodel->getContent(),
-                                            ['id' => 'code', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
-
+                                <div class='col-lg-12 form-group'>
+                                    <div class='alert alert-info'>
+                                        use @{{variable}} to add dynamic text in the content.
                                     </div>
-                                    <div class="tab-pane " id="mail-header" role="tabpanel"
-                                         aria-labelledby="mail-header-tab">
-                                        <?= Form::textarea('contentheader', $reportingmodel->getContentheader(),
-                                            ['id' => 'codeheader', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
+                                    <ul class="nav nav-tabs nav-justified " id="myTab" role="tablist">
+                                        <li class="nav-item text-center">
+                                            <a class="nav-link text-center" id="mail-body-tab"
+                                               data-toggle="tab" href="#mail-body"
+                                               role="tab" aria-controls="mail-body" aria-selected="true"> Body
+                                            </a>
+                                        </li>
+                                        <li class="nav-item text-center">
+                                            <a class="nav-link text-center" id="mail-header-tab"
+                                               data-toggle="tab" href="#mail-header"
+                                               role="tab" aria-controls="mail-header" aria-selected="false"> Header
+                                            </a>
+                                        </li>
+                                        <li class="nav-item text-center">
+                                            <a class="nav-link text-center" id="mail-footer-tab"
+                                               data-toggle="tab" href="#mail-footer"
+                                               role="tab" aria-controls="mail-footer" aria-selected="false"> Footer
+                                            </a>
+                                        </li>
+                                    </ul>
+                                    <div class="tab-content" id="myTabContent">
+                                        <div class="tab-pane show " id="mail-body" role="tabpanel"
+                                             aria-labelledby="mail-body-tab">
+                                            <?= Form::textarea('content', $reportingmodel->getContent(),
+                                                ['id' => 'code', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
 
-                                    </div>
-                                    <div class="tab-pane " id="mail-footer" role="tabpanel"
-                                         aria-labelledby="mail-footer-tab">
-                                        <?= Form::textarea('contentfooter', $reportingmodel->getContentfooter(),
-                                            ['id' => 'codefooter', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
+                                        </div>
+                                        <div class="tab-pane " id="mail-header" role="tabpanel"
+                                             aria-labelledby="mail-header-tab">
+                                            <?= Form::textarea('contentheader', $reportingmodel->getContentheader(),
+                                                ['id' => 'codeheader', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
 
+                                        </div>
+                                        <div class="tab-pane " id="mail-footer" role="tabpanel"
+                                             aria-labelledby="mail-footer-tab">
+                                            <?= Form::textarea('contentfooter', $reportingmodel->getContentfooter(),
+                                                ['id' => 'codefooter', 'class' => 'form-control', 'placeholder' => 'Your html code here ...']); ?>
+
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-6  stretch-card" id="iframecontainer">
-                            <div class="text-right" >
+                            <div class="row">
+
+                            <div class="col-lg-12 text-right" >
                                 <a target="_blank" href="{{Reportingmodel::classpath(" reportingmodel/preview?id=".$reportingmodel->getId())}}" class="btn btn-info float-lg-right btn-block"> Preview </a>
                             </div>
-                            <div class='form-group'>
+                            <div class='col-lg-12 form-group'>
                                 <iframe id=preview></iframe>
                             </div>
-                            <div class='form-group'>
+                            <div class='col-lg-12 form-group'>
                                 <button type="button" onclick="updateEditor()" class="btn btn-block btn-info">update Editor</button>
                             </div>
-                            <div class='form-group'>
+                            <div class='col-lg-12 form-group'>
                                 <label for='contenttext'>{{t('Content version text (use the \n to go to line) ')}}</label>
                                 <?= Form::textarea('contenttext', $reportingmodel->getContenttext(), ['class' => 'form-control']); ?>
                             </div>
+                        </div>
                         </div>
                     </div>
                     <hr>
@@ -123,10 +128,6 @@
                         <div class='form-group'>
                             <label for='object'>{{t('reportingmodel.title')}}</label>
                             <?= Form::input('title', $reportingmodel->getTitle(), ['class' => 'form-control']); ?>
-                        </div>
-                        <div class='form-group'>
-                            <label for='object'>{{t('reportingmodel.object')}}</label>
-                            <?= Form::input('object', $reportingmodel->getObject(), ['class' => 'form-control']); ?>
                         </div>
                     </div>
 

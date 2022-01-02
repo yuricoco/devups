@@ -35,17 +35,17 @@ switch (Request::get('path')) {
         g::json_encode(["success" => true, "message" => "hello devups you made your first apicall"]);
         break;
 
-    case 'dvexport':
+    case 'export':
         $classname = ucfirst(Request::get("classname"));
         $entity = new $classname;
-        $entity->exportCsv($classname); //,
+        $result = $entity->exportCsv($classname); //,
         $message = $classname . ": CSV generated with success";
 //            Genesis::json_encode([
 //                "message"=>$message
 //            ]);
-        Genesis::json_encode(compact("message", "entity"));
+        Genesis::json_encode(compact("message", "entity", "result"));
         break;
-    case 'dvimport':
+    case 'import':
         $classname = ucfirst(Request::get("classname"));
         $entity = new $classname;
         $response = $entity->importCsv($classname); //,

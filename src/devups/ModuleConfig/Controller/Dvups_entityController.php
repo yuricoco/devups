@@ -44,10 +44,16 @@ class Dvups_entityController extends Controller
         ];
     }
 
-    public function formView($id = null)
+    public function formExportView()
     {
         return ['success' => true,
             'form' => Dvups_entityForm::renderExportWidget(),
+        ];
+    }
+    public function formImportView()
+    {
+        return ['success' => true,
+            'form' => Genesis::getView("admin.dvups_entity.formImportWidget", Request::$uri_get_param),
         ];
     }
 

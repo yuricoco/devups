@@ -90,7 +90,7 @@ class DvAdmin
                 if(is_null($entitylink))
                     continue;
 
-                $entrel = ucfirst(strtolower($relation->entity));
+                $entrel = (strtolower($relation->entity));
                 $key = 0;
                 $entitylinkattrname = "id";
                 $entitylink->attribut = (array)$entitylink->attribut;
@@ -99,7 +99,7 @@ class DvAdmin
                     $entitylinkattrname = $entitylink->attribut[$key]->name;
                 }
 
-                $listview[] = "\n'{$entrel}_id' => ['header' => t('" . $entrel . "') , 'value' => '" . $entrel . "." . $entitylinkattrname . "']";
+                $listview[] = "\n'{$entrel}.{$entitylinkattrname}' => ['header' => t('" . ucfirst($entrel) . "') , ]";
             }
         }
 
