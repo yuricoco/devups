@@ -14,6 +14,7 @@ class DBAL extends Database
 {
 
     protected $defaultjoin = "";
+    public $custom_columns = "";
     protected $collect = [];
     /**
      *
@@ -900,6 +901,11 @@ class DBAL extends Database
                             $object_array[$key] = $flowBD[$key2];
                         }
                         break;
+
+                    } else if (!isset($object_array[$key2]) && $this->custom_columns != "") { // for custom
+                        //var_dump( $k2);
+                        $object_array[$key2] = $flowBD[$key2];
+
                     }
                 }
             }

@@ -120,6 +120,8 @@ class Datatable extends Lazyloading
             .'<button data-entity="' . $this->class . '"  onclick="ddatatable._export(this, \'' . $this->class . '\')" type="button" class="btn btn-default btn-block" >
             <i class="fa fa-arrow-down"></i> Export csv
         </button>';
+
+            $this->qbcustom = new \QueryBuilder($entity);
         }
         $this->id_lang = \Dvups_lang::defaultLang()->id;
         $this->createaction = [
@@ -357,6 +359,7 @@ EOF;
     {
 
         //Lazyloading::$colunms = array_keys($this->datatablemodel);
+
         $this->lazyloading($this->entity, $this->qbcustom, $this->order_by);
 
         $this->rowaction = [];
@@ -517,6 +520,8 @@ EOF;
             //$customaction[] = "<span id='".$action["id"]."' class=\"btn btn-info\" >".$action["label"]."</span>";
             if (is_callable($action))
                 $customaction[] = $action(); //, $param)
+            else if (is_string($action))
+                $customaction[] = $action; //, $param)
             else
                 $customaction[] = call_user_func(array($this->class, $action . "Groupaction")); //, $param)
         }
@@ -841,6 +846,7 @@ EOF;
         $iso_code = \Dvups_lang::getattribut("iso_code", $this->id_lang);
         //}
 
+        //dv_dump($this->listentity);
         foreach ($this->listentity as $entity) {
             $tr = [];
             $entityarray = (array) $entity;

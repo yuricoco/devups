@@ -149,7 +149,7 @@ class QueryBuilder extends \DBAL
 
     public function addColumns(...$columns)
     {
-        $this->columns .= implode(", ", $columns);
+        $this->custom_columns .= implode(", ", $columns);
         return $this;
     }
 
@@ -849,8 +849,10 @@ class QueryBuilder extends \DBAL
 
     private function initSelect($columns = "*")
     {
-        $this->query = " SELECT {$this->_select_option} FROM ";
-        $this->query .= $this->_from;
+        $this->query = " SELECT {$this->_select_option} ";
+        if ($this->custom_columns != "")
+            $this->query .= ", {$this->custom_columns}";
+        $this->query .= " FROM ".$this->_from;
 
         if ($this->_join)
             $this->query .= " {$this->_join} ";
