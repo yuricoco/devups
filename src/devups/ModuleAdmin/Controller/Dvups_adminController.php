@@ -315,7 +315,7 @@ class Dvups_adminController extends Controller
                 ]);
 
                 unset($_SESSION[ADMIN]);
-                redirect("admin/");
+                redirect(__env."admin/");
 
             } else {
                 $error = 'Incorrect Current password!';
