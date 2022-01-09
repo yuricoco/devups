@@ -9,7 +9,7 @@ if (!isset($_SESSION[ADMIN]) and $_GET['path'] != 'connexion') {
 }
 
 global $viewdir, $moduledata;
-$viewdir[] = __DIR__ . '/Ressource/views';
+$viewdir[] = __DIR__ . '/Resource/views';
 
 $moduledata = Dvups_module::init('ModuleTree');
 

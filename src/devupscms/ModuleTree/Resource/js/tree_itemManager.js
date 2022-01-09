@@ -199,7 +199,7 @@ Vue.component("addchild", {
                 this.tree_item.main = 0;
                 this.tree_item.parent_id = this.parent.id;
             }
-
+            this.tree_item.name["fr"] = this.tree_item.name["en"]
             Drequest.api("tree-item.create")
                 .data({
                     tree_item: this.tree_item
@@ -208,7 +208,7 @@ Vue.component("addchild", {
 
                     console.log(response);
                     // todo: add to the parent
-                    this.tree_item.name = "";
+                    this.tree_item.name = {};
                     if (this.tree_items)
                         this.tree_items.push(response.tree_item)
                     else if (this.$parent.children)
@@ -655,7 +655,7 @@ var tree_itemview = new Vue({
         attributes: [],
         tree: {},
         langs: langs,
-        treeedit: {name:{}},
+        treeedit: {name: ''},
     },
     mounted() {
         Drequest.api("tree.lazyloading").get((response) => {

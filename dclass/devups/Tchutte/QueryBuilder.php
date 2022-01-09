@@ -355,20 +355,29 @@ class QueryBuilder extends \DBAL
     /**
      * init innerjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current
      * class
-     * @param type $classname
-     * @param type $classnameon
+     * @param string $classname
+     * @param string $classnameon
+     * @param string $constraint
      * @return $this
      */
-    public function innerjoin($classname, $classnameon = "")
+    public function innerjoin($classname, $classnameon = "", $constraint = "")
     {
-        $this->join = strtolower(get_class($classname));
+
+        $join = strtolower($classname);
 
         if (!$classnameon)
-            $classnameon = $this->objectName;
+            $classnameon = $this->table;
 
-        $this->_join = " INNER JOIN `" . $this->join . "` ON `" . $this->join . "`.id = `" . strtolower($classnameon) . "`." . $this->join . "_id";
+        $this->_join .= " INNER JOIN `" . $join . "` ON ( `" . $join . "`.id = `" . strtolower($classnameon) . "`." . $join . "_id $constraint ) ";
 
-        $this->query .= $this->_join;
+        return $this;
+    }
+
+    public function join_str($classname, $on)
+    {
+        $join = strtolower($classname);
+
+        $this->_join .= " INNER JOIN `" . $join . "` ON ( $on ) ";
 
         return $this;
     }
@@ -376,18 +385,19 @@ class QueryBuilder extends \DBAL
     /**
      * init leftjoin of the $classname, base on the $classnameon. if the $classnameon is not specified, it will be set as the current
      * class
-     * @param type $classname
-     * @param type $classnameon
+     * @param string $classname
+     * @param string $classnameon
+     * @param string $constraint
      * @return $this
      */
-    public function leftjoin($classname, $classnameon = "")
+    public function leftjoin($classname, $classnameon = "", $constraint = "")
     {
         $join = strtolower($classname);
 
         if (!$classnameon)
             $classnameon = $this->table;
 
-        $this->_join .= " LEFT JOIN `" . $join . "` ON `" . $join . "`.id = `" . strtolower($classnameon) . "`." . $join . "_id";
+        $this->_join .= " LEFT JOIN `" . $join . "` ON ( `" . $join . "`.id = `" . strtolower($classnameon) . "`." . $join . "_id $constraint )";
 
         return $this;
     }
@@ -1032,7 +1042,7 @@ class QueryBuilder extends \DBAL
 
     }
 
-    public function getRows($callbackexport = null)
+    /*public function getRows($callbackexport = null)
     {
         $this->initSelect();
         $this->query .= $this->_join;
@@ -1042,7 +1052,7 @@ class QueryBuilder extends \DBAL
             return $this->getSqlQuery();
 
         return $this->__findAllRow($this->query, $this->parameters, $callbackexport);
-    }
+    }*/
 
     public function getInstance($column = "*", $collect = [])
     {
@@ -1056,7 +1066,19 @@ class QueryBuilder extends \DBAL
         return $this->__findOneRow($this->query, $this->parameters);
     }
 
-    public function get($column = "*", $callback = null, $collect = [])
+    public function get($column = "*", $recursif = true, $collect = [])
+    {
+        $this->select($column);
+        $this->initSelect();
+        $this->sequensization();
+
+        if (self::$debug)
+            return $this->getSqlQuery();
+
+        return $this->__findAll($this->query, $this->parameters);
+
+    }
+    public function getRows($column = "*", $recursif = true, $collect = [])
     {
         $this->select($column);
         $this->initSelect($column);
@@ -1065,10 +1087,9 @@ class QueryBuilder extends \DBAL
         if (self::$debug)
             return $this->getSqlQuery();
 
-        return $this->__findAllRow($this->query, $this->parameters, $callback);
+        return $this->__findAllRow($this->query, $this->parameters);
 
     }
-
     public function getValue()
     {
         // todo: put select() here

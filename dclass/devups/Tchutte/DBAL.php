@@ -969,7 +969,10 @@ class DBAL extends Database
             WHERE {$this->table }_id = {$flowBD->id} ";
 
         $values = (new DBAL())->executeDbal($sql, [], DBAL::$FETCHALL);
-        $langs = Dvups_lang::all();
+
+        $sql = " SELECT * FROM dvups_lang  ";
+        $langs = (new DBAL())->executeDbal($sql, [], DBAL::$FETCHALL);
+
         foreach ($columns as $item) {
             $flowBD->{$item} = [];
 
@@ -979,7 +982,7 @@ class DBAL extends Database
                 }
             else
                 foreach ($langs as $value) {
-                    $flowBD->{$item}[$value->iso_code] = "";
+                    $flowBD->{$item}[$value['iso_code']] = "";
                 }
         }
     }
@@ -1030,7 +1033,6 @@ class DBAL extends Database
         $query = $this->link->prepare($sql);
         $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
 
-//        $flowBD = $query->fetchAll(PDO::FETCH_CLASS);
         if (is_callable($callbackexport)) {
 
             $rows = $query->fetchAll(PDO::FETCH_NAMED);
@@ -1045,12 +1047,45 @@ class DBAL extends Database
 
         $rows = $query->fetchAll(PDO::FETCH_NAMED);
 
+        return $rows;
+
+    }
+
+    /**
+     * Return array of base entity
+     *
+     * @param type $sql
+     * @param type $values
+     * @return type
+     */
+    protected function __findAll($sql, $values = [], $callbackexport = null)
+    {
+        $result = [];
+        $query = $this->link->prepare($sql);
+        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+
+//        $flowBD = $query->fetchAll(PDO::FETCH_CLASS);
+        if (is_callable($callbackexport)) {
+
+            $rows = $query->fetchAll(PDO::FETCH_NAMED);
+            foreach ($rows as $row) {
+                $callbackexport($row, $this->objectName);
+            }
+            return true;
+        }
+
+        if (empty($this->entity_link_list) and empty($this->objectCollection) && !$this->object->dvtranslate)
+            return $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
+
+        $rows = $query->fetchAll(PDO::FETCH_NAMED);
+
         foreach ($rows as $row) {
             $result[] = $this->dbrow($row);
         }
 
         return $result;
     }
+
 
     /**
      * Return array of entire entity
@@ -1061,7 +1096,7 @@ class DBAL extends Database
      * @param type $recursif
      * @return array
      */
-    protected function __findAll($sql, $values = [], $collection = false, $recursif = false)
+    /*protected function __findAll($sql, $values = [], $collection = false, $recursif = false)
     {
 
 
@@ -1079,7 +1114,7 @@ class DBAL extends Database
 
 //            $this->ResetObject();
         return $retour;
-    }
+    }*/
 
     protected function __cursor($sql, $values, $callback = null)
     {

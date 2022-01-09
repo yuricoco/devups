@@ -266,16 +266,6 @@ class FormFactory
         if(!$lang)
             return "<input " . $directive . " type='" . $field['type'] . "' name='" . FormFactory::$fieldname . "' value='" . $field['value'] . "'  />";
         else{
-            //$value = $entitycore->entity->__gettranslate( FormFactory::$entityattrib, $lang, $field['value']);
-            /*if($entitycore->entity->getId()) {
-                $sql = " SELECT {$entitycore->name }_lang." . FormFactory::$entityattrib . " FROM {$entitycore->name }_lang 
-            LEFT JOIN  dvups_lang ON dvups_lang.id = {$entitycore->name }_lang.lang_id
-            WHERE {$entitycore->name }_id = {$entitycore->entity->getId()} AND dvups_lang.iso_code = '$lang'  ";
-
-                $value = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH)[0];
-            }else{
-                $value = $field['value'];
-            }*/
             $inp = [];
             if(is_array($field['value'])){
                 foreach ($field['value'] as $iso => $val){
@@ -288,7 +278,7 @@ class FormFactory
                 }
                 $input = $inp;
             }
-            //$input = "<input " . $directive . " type='" . $field['type'] . "' name='" . FormFactory::$fieldname . "' value='" . $value . "'  />";
+
             return $input;
         }
 

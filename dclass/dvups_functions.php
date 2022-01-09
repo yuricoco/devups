@@ -127,6 +127,7 @@ function route($path, $id = "", $title = "") {
 
 function dv_dump(... $args){
     //echo json_encode($args);
+    echo "<pre>";
     var_dump($args);
     die(1);
 }

@@ -591,9 +591,6 @@ class Model extends \stdClass
 
         $qb = new QueryBuilder($entity);
         if ($entity->dvtranslate) {
-//            if (!$id_lang)
-//                $id_lang = Dvups_lang::defaultLang()->getId();
-
             $qb->setLang($id_lang);
         }
         if ($sort == 'id')
@@ -609,19 +606,28 @@ class Model extends \stdClass
      * @return \QueryBuilder
      * @example name, description, category if none has been set, all will be take.
      */
-    public static function select($columns = '*', $id_lang = null)
+    public static function select($columns = '*', $id_lang = null, $defaultjoin = true)
     {
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
-        $qb = new QueryBuilder($entity);
+        $qb = new QueryBuilder($entity, $defaultjoin);
         if ($entity->dvtranslate) {
-//            if (!$id_lang)
-//                $id_lang = Dvups_lang::defaultLang()->getId();
 
             $qb->setLang($id_lang);
         }
         return $qb->select($columns);
+    }
+
+    /**
+     * return instance of \QueryBuilder with the select request sequence without the default join.
+     * @param string $columns
+     * @return \QueryBuilder
+     * @example name, description, category if none has been set, all will be take.
+     */
+    public static function initQb($columns = '*', $id_lang = null)
+    {
+        return self::select($columns, $id_lang, false);
     }
 
     /**

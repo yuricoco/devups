@@ -23,9 +23,9 @@ class TreeController extends Controller{
 
         self::$jsfiles[] = __admin.'plugins/vue.min.js';
         self::$cssfiles[] = Dv_image::classpath('Resource/css/image.css');
-        self::$jsfiles[] = Tree::classpath('Ressource/js/treeForm.js');
+        self::$jsfiles[] = Tree::classpath('Resource/js/treeForm.js');
         self::$jsfiles[] = Tree::classpath('Resource/js/tree_item_imageForm.js');
-        self::$jsfiles[] = Tree::classpath('Ressource/js/tree_itemManager.js');
+        self::$jsfiles[] = Tree::classpath('Resource/js/tree_itemManager.js');
 
 
         Genesis::renderView("overview", [

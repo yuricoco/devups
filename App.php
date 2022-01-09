@@ -58,12 +58,12 @@ class App extends \dclass\devups\Controller\FrontController
 
     public function helloView(){
 
-        $product = new Product();
-        $product->description = "La 4eme sortie bd de 3ag pour l'année  2021";
-        $product->name = ["en"=>'Mysterious eyes VE', 'fr'=>'Mysterious eyes VF'];
-        $product->__insert();
+        $product = Category::find(1);
+//        $product->description = "La 4eme sortie bd de 3ag pour l'année  2021";
+//        $product->name = ["en"=>'Mysterious eyes VE', 'fr'=>'Mysterious eyes VF'];
+//        $product->__insert();
 
-        var_dump($product);
+        dv_dump($product);
         //$product = Product::find(2, 1);
         //var_dump($product);
 
