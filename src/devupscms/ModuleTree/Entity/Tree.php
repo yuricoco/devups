@@ -13,6 +13,11 @@ class Tree extends Model implements JsonSerializable
      * */
     protected $id;
     /**
+     * @Column(name="name", type="string" , length=255 )
+     * @var string
+     **/
+    protected $name;
+    /**
      * @Column(name="description", type="text"  , nullable=true)
      * @var text
      **/
@@ -22,7 +27,7 @@ class Tree extends Model implements JsonSerializable
     public function __construct($id = null)
     {
         $this->dvtranslate = true;
-        $this->dvtranslated_columns = ["name"];
+        $this->dvtranslated_columns = ["label"];
         if ($id) {
             $this->id = $id;
         }

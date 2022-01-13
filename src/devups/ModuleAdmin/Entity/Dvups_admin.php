@@ -26,6 +26,11 @@ class Dvups_admin extends Model implements JsonSerializable
      * @var string
      * */
     protected $name;
+    /**
+     * @Column(name="email", type="string" , length=255, nullable=true )
+     * @var string
+     * */
+    protected $email;
 
     /**
      * @Column(name="login", type="string" , length=255 )
@@ -65,6 +70,22 @@ class Dvups_admin extends Model implements JsonSerializable
     public function setId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @param string $email
+     */
+    public function setEmail($email)
+    {
+        $this->email = $email;
     }
 
     /**

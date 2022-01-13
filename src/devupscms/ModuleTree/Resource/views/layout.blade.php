@@ -10,15 +10,15 @@
 <?php } ?>
 
 @section('content')
- 
+
     @include("default.moduleheaderwidget")
     <hr>
 
     @yield('layout_content')
 
 
-        @endsection
-        
+@endsection
+
 <?php function script(){ ?>
 
 <script src="<?= CLASSJS ?>devups.js"></script>

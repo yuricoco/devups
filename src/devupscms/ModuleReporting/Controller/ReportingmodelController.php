@@ -42,7 +42,7 @@ class ReportingmodelController extends Controller
             self::$jsfiles[] = Reportingmodel::classpath('Resource/js/reportingmodelCtrl.js');
 
             $action = Reportingmodel::classpath("services.php?path=reportingmodel.update&id=" . $id);
-            $reportingmodel = Reportingmodel::edit($id);
+            $reportingmodel = Reportingmodel::find($id);
 
             return [
                 "success" => true,
@@ -143,10 +143,12 @@ class ReportingmodelController extends Controller
 
     public function testmailAction($id, $email)
     {
-        $rep = Reportingmodel::find($id);
-        return Reportingmodel::init($rep->name)
+        return Reportingmodel::find($id)
             ->addReceiver($email, "devups developer")
-            ->sendMail([]);
+            ->sendMail([
+                "activationcode" => "ddddd",
+                "username" => "devups developer",
+            ]);
 
     }
 

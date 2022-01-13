@@ -87,20 +87,41 @@ EOF;
 //                if (isset($actionclass[$mainaction["class"]]))
 //                    $mainaction["ctlass"] = $actionclass[$mainaction["class"]];
 
-            $mainaction = '<button type="button" class="btn btn-outline-warning btn-sm" ' . $mainaction["action"] . ' >' . $mainaction["content"] . '</button>';
+            $mainaction = '<button type="button" class="btn btn-warning" ' . $mainaction["action"] . ' >' . $mainaction["content"] . '</button>';
 
             }
         return <<<EOF
-<div class="btn-group">
+<div class="btn-group d-inline-block dropdown">
     $mainaction
-    <button type="button" class="btn btn-outline-primary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"></button>
-    <div class="dropdown-menu" style="">
-    $act 
-    </div>                          
-  </div>
-  
+    <div class="btn-group" role="group">
+    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" class="btn-shadow dropdown-toggle btn btn-light">
+        <i class="fa fa-angle-down"></i>
+    </button>
+    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-131px, 33px, 0px);">
+        <ul class="nav flex-column"> $act </ul>
+    </div>
+    </div>
+</div>
 EOF;
 
+    }
+
+    static function optionImport($entityname)
+    {
+        return '
+
+<div class="btn-group d-inline-block dropdown" role="group">
+    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" class="btn-shadow dropdown-toggle btn btn-light">
+        options 
+    </button>
+    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-131px, 33px, 0px);">
+      
+        <button data-entity="' . $entityname . '" type="button" onclick="ddatatable._import(this, \'' . $entityname . '\')" class="  btn btn-default btn-block" >
+            <i class="fa fa-arrow-up"></i> Import csv
+        </button>
+    </div>
+  </div>
+           ';
     }
 
     static function modulelinkGenerator($projet)

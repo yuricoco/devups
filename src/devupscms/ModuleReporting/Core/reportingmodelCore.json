@@ -1,1 +1,85 @@
-{"id":9,"name":"reportingmodel","module":{"id":4},"attribut":{"1":{"name":"object","visibility":"","datatype":"string","size":"255","nullable":"not","formtype":"text","$$hashKey":"object:3521"},"3":{"name":"contenttext","visibility":"","datatype":"text","size":"","nullable":"default","formtype":"text","$$hashKey":"object:3577"},"4":{"name":"content","visibility":"","datatype":"text","size":"","nullable":"default","formtype":"textarea","$$hashKey":"object:3606"}},"relation":[],"$$hashKey":"object:1362"}
+{
+  "name": "reportingmodel",
+  "attribut": [
+    {
+      "name": "id",
+      "visibility": "id",
+      "datatype": "integer",
+      "size": "",
+      "nullable": "not",
+      "formtype": "id"
+    },
+    {
+      "name": "name",
+      "visibility": "name",
+      "datatype": "string",
+      "size": 255,
+      "nullable": "not",
+      "formtype": "name"
+    },
+    {
+      "name": "type",
+      "visibility": "type",
+      "datatype": "string",
+      "size": 55,
+      "nullable": "not",
+      "formtype": "type"
+    },
+    {
+      "name": "styleressource",
+      "visibility": "styleressource",
+      "datatype": "string",
+      "size": 255,
+      "nullable": "default",
+      "formtype": "styleressource"
+    },
+    {
+      "name": "style",
+      "visibility": "style",
+      "datatype": "text",
+      "size": "",
+      "nullable": "default",
+      "formtype": "style"
+    },
+    {
+      "name": "title",
+      "visibility": "title",
+      "datatype": "string",
+      "size": 255,
+      "nullable": "default",
+      "formtype": "title"
+    },
+    {
+      "name": "object",
+      "visibility": "object",
+      "datatype": "string",
+      "size": 255,
+      "nullable": "default",
+      "formtype": "object"
+    },
+    {
+      "name": "subject",
+      "visibility": "subject",
+      "datatype": "string",
+      "size": 255,
+      "nullable": "default",
+      "formtype": "subject"
+    },
+    {
+      "name": "contenttext",
+      "visibility": "contenttext",
+      "datatype": "text",
+      "size": "",
+      "nullable": "default",
+      "formtype": "contenttext"
+    },
+    {
+      "name": "content",
+      "visibility": "content",
+      "datatype": "text",
+      "size": "",
+      "nullable": "default",
+      "formtype": "content"
+    }
+  ]
+}

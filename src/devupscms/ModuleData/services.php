@@ -29,6 +29,9 @@ switch (R::get('path')) {
         StatusForm::render(R::get("id"));
         //g::json_encode($statusCtrl->formView(R::get("id")));
         break;
+    case 'status._clonerow':
+        g::json_encode($statusCtrl->cloneAction(R::get("id")));
+        break;
     case 'status.update':
         g::json_encode($statusCtrl->updateAction(R::get("id")));
         break;
@@ -43,31 +46,6 @@ switch (R::get('path')) {
         break;
     case 'status.datatable':
         g::json_encode($statusCtrl->datatable(R::get('next'), R::get('per_page')));
-        break;
-
-    case 'status_entity._new':
-        g::json_encode($status_entityCtrl->formView());
-        break;
-    case 'status_entity.create':
-        g::json_encode($status_entityCtrl->createAction());
-        break;
-    case 'status_entity.form':
-        g::json_encode($status_entityCtrl->formView(R::get("id")));
-        break;
-    case 'status_entity.update':
-        g::json_encode($status_entityCtrl->updateAction(R::get("id")));
-        break;
-    case 'status_entity._show':
-        $status_entityCtrl->detailView(R::get("id"));
-        break;
-    case 'status_entity._delete':
-        g::json_encode($status_entityCtrl->deleteAction(R::get("id")));
-        break;
-    case 'status_entity._deletegroup':
-        g::json_encode($status_entityCtrl->deletegroupAction(R::get("ids")));
-        break;
-    case 'status_entity.datatable':
-        g::json_encode($status_entityCtrl->datatable(R::get('next'), R::get('per_page')));
         break;
 
 

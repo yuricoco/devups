@@ -35,8 +35,11 @@
 }
 
 .dv_modal{
-    min-width: 600px; background: transparent; display: block; min-height: 50px; padding-top: 80px;
+    width: 800px; background: transparent; display: block; min-height: 50px; padding-top: 80px;
     transition: .5s;
+}
+.dv_modal .box-container{
+    width: 800px;
 }
 
 .app-main__inner {
@@ -73,9 +76,6 @@
     padding: .375rem .75rem;
     font-size: .88rem;
 }
-.table th, .table td {
-    line-height: initial;
-     white-space: initial;
-    padding: 0.525rem 0.575rem
-;
+.dropdown-item {
+    white-space: inherit;
 }

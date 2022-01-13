@@ -15,17 +15,17 @@
             <div class="btn-group-sm" role="group" aria-label="Basic example">
                     @if ($ll->previous > 0)
                         <button onclick="ddatatable.firstpage(this)" type="button" class="btn btn-outline-secondary">
-                            <i class="mdi mdi-page-first"></i>
+                            <i class="fa fa-angle-double-left"></i>
                         </button>
                         <button onclick="ddatatable.previous(this)" type="button" class="btn btn-outline-secondary">
-                            <i class="mdi mdi-chevron-double-left"></i>
+                            <i class="fa fa-angle-left"></i>
                         </button>
                     @else
                         <button disabled type="button" class="btn ">
-                            <i class="mdi mdi-page-first"></i>
+                            <i class="fa fa-angle-double-left"></i>
                         </button>
                         <button disabled type="button" class="btn ">
-                            <i class="mdi mdi-chevron-double-left"></i>
+                            <i class="fa fa-angle-left"></i>
                         </button>
                     @endif
 
@@ -122,18 +122,18 @@
 
                     @if ($ll->remain)
                         <button onclick="ddatatable.next();" type="button" class="btn btn-outline-secondary">
-                            <i class="mdi mdi-page-last"></i>
+                            <i class="fa fa-angle-right"></i>
                         </button>
                         <button onclick="ddatatable.lastpage(this,  {{$ll->pagination}} )" type="button"
                                 class="btn btn-outline-secondary">
-                            <i class="mdi mdi-chevron-double-right"></i>
+                            <i class="fa fa-angle-double-right"></i>
                         </button>
                     @else
                         <button disabled type="button" class="btn">
-                            <i class="mdi mdi-page-last"></i>
+                            <i class="fa fa-angle-right"></i>
                         </button>
                         <button disabled type="button" class="btn ">
-                            <i class="mdi mdi-chevron-double-right"></i>
+                            <i class="fa fa-angle-double-right"></i>
                         </button>
                     @endif
             </div>

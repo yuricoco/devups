@@ -11,6 +11,11 @@ class Tree_item_lang extends \Dv_langCore
      * @var string
      **/
     protected $name;
+    /**
+     * @Column(name="content", type="text"  , nullable=true)
+     * @var text
+     **/
+    protected $content;
 
     /**
      * @Id @ManyToOne(targetEntity="\Tree_item")

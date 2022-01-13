@@ -351,11 +351,12 @@ class DBAL extends Database
         return $qb->select()->where("id", "=", $id)->__getOneRow();
     }
 
-    public function hasmany($entity, $collection, $exec = true, $incollectionof = null, $recursif = false)
+    public function hasmany($entity, $collection, $exec = true, $incollectionof = null, $id_lang = null)
     {
 
         $collectionName = strtolower(get_class($collection));
 
+        $this->id_lang = $id_lang;
         if ($incollectionof != null) {
 
             $qb = new QueryBuilder($collection);
@@ -622,15 +623,56 @@ class DBAL extends Database
     public static function _createDbal($object, $keyvalue)
     {
 
-        $values = [];
+        $table = strtolower($object);
+        $objectinst = new $object;
+
+        if ($objectinst->dvtranslate) {
+            $objarray = $keyvalue;
+            $values = [];
+
+            foreach ($objectinst->dvtranslated_columns as $key) {
+                unset($objarray[$key]);
+            }
+
+            $id = self::_createAction($table, $objarray);
+            $objarray = $keyvalue;
+            $langs = Dvups_lang::allrows();
+            foreach ($langs as $lang) {
+                $keyvalue = [];
+                foreach ($objectinst->dvtranslated_columns as $key) {
+                    if (!isset($objarray[$key]))
+                        continue;
+
+                    if (isset($objarray[$key][$lang->getIso_code()]))
+                        $keyvalue[$key] = $objarray[$key][$lang->getIso_code()];
+                    else
+                        $keyvalue[$key] = $id . "_" . $lang->getIso_code();
+                    // $this->object->{$key} = $objarray[$key][$lang->getIso_code()];
+                }
+                $keyvalue["lang_id"] = $lang->getId();
+                $keyvalue[$table . "_id"] = $id;
+                self::_createAction($table . "_lang", $keyvalue);
+            }
+
+        }else{
+            /*$objectvar = array_keys($keyvalue);
+            $parameterQuery = ':' . implode(", :", $objectvar);
+            $sql = "INSERT INTO `" . $table . "` (`" . strtolower(implode('` ,`', $objectvar)) . "`) VALUES (" . strtolower($parameterQuery) . ")";
+
+            $db = new DBAL();
+            $id = $db->executeDbal($sql, $keyvalue, 1);*/
+            $id = self::_createAction($table, $keyvalue);
+        }
+        return  $id;
+    }
+
+    private static function _createAction($table, $keyvalue){
         $objectvar = array_keys($keyvalue);
         $parameterQuery = ':' . implode(", :", $objectvar);
-
-        $sql = "INSERT INTO `" . strtolower($object) . "` (`" . strtolower(implode('` ,`', $objectvar)) . "`) VALUES (" . strtolower($parameterQuery) . ")";
+        $sql = "INSERT INTO `" . $table . "` (`" . strtolower(implode('` ,`', $objectvar)) . "`) VALUES (" . strtolower($parameterQuery) . ")";
 
         $db = new DBAL();
         return $db->executeDbal($sql, $keyvalue, 1);
-
     }
 
     /**
@@ -714,7 +756,7 @@ class DBAL extends Database
         return $result;
     }
 
-    private function updateLangValue($keyvalue, $parameterQuery, $id_lang)
+    protected function updateLangValue($keyvalue, $parameterQuery, $id_lang)
     {
         //
 
@@ -939,6 +981,9 @@ class DBAL extends Database
 
         if (empty($this->entity_link_list) and empty($this->objectCollection)) {
             $flowBD = $req->fetchObject($this->objectName);
+
+            if (!$flowBD)
+                return new $this->objectName;
 
             if ($this->object->dvtranslate)
                 $this->getLangValues($flowBD, $this->object->dvtranslated_columns);
@@ -1258,7 +1303,8 @@ class DBAL extends Database
                 } else {
                     if ($k2 == $key2 || $key == $key2) {
                         if (is_array($flowBD[$key2])) {
-                            $object_array[$key] = $flowBD[$key2][0];
+                            //dv_dump($flowBD[$key2]);
+                            $object_array[$key] = $flowBD[$key2];
                         } else {
                             $object_array[$key] = $flowBD[$key2];
                         }

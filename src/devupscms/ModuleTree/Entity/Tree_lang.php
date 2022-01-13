@@ -7,10 +7,10 @@ class Tree_lang extends \Dv_langCore
 {
 
     /**
-     * @Column(name="name", type="string" , length=255 )
+     * @Column(name="label", type="string" , length=255 )
      * @var string
      **/
-    protected $name;
+    protected $label;
 
     /**
      * @Id @ManyToOne(targetEntity="\Tree")

@@ -63,6 +63,7 @@ class Drequest {
 
     post(callback) {
         console.log(this);
+        //this._param.lang = __lang;
         //console.log(this.baseurl + this.url+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param));
         var keys = Object.keys(this._param);
         var param = (!keys.length) ? "" : "?" + $.param(this._param);
@@ -95,7 +96,7 @@ class Drequest {
 // var params = "action=something";
         request.open('POST', this.baseurl + this.url + params, true);
         request.onreadystatechange = function () {
-            console.log(request.response);
+            //console.log(request.response);
             if (request.readyState == 4) {
                 //alert("It worked!")
                 callback(JSON.parse(request.response))
@@ -132,6 +133,7 @@ class Drequest {
 
     get(callback) {
         console.log(this._param)
+        // this._param.lang = __lang;
         return $.ajax({
             url: this.baseurl + this.url, //+ $.isEmptyObject(this._param)? "": "?"+ $.param(this._param),
             data: this._param,

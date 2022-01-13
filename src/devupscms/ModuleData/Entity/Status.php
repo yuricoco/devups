@@ -193,7 +193,7 @@ class Status extends Model implements JsonSerializable
                 $qb->where("order.id", $id);
             if ($id = Request::get("user_id"))
                 $qb->where("user.id", $id);
-            $nb_element = $qb->__countEl();
+            $nb_element = $qb->count();
 
             $return["stat"] = $nb_element;
         }
@@ -214,7 +214,8 @@ class Status extends Model implements JsonSerializable
     public static function getStatus($key, $entityname = null)
     {
         if ($entityname)
-            return self::where("this._key", $key)->where("entity.name", $entityname)->first();
+            return self::where("this._key", "=", $key)->where("entity.name", $entityname)->first();
+
         return self::getbyattribut("this._key", $key);
     }
 

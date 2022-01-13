@@ -653,6 +653,7 @@ var tree_itemview = new Vue({
     data: {
         trees: [],
         attributes: [],
+        role: _role,
         tree: {},
         langs: langs,
         treeedit: {name: ''},

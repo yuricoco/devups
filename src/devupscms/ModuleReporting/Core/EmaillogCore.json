@@ -1,1 +1,29 @@
-{"id":9,"name":"emaillog","module":{"id":4},"attribut":{"1":{"name":"object","visibility":"","datatype":"string","size":"255","nullable":"not","formtype":"text","$$hashKey":"object:3521"},"3":{"name":"log","visibility":"","datatype":"text","size":"","nullable":"default","formtype":"text","$$hashKey":"object:3577"}},"relation":[],"$$hashKey":"object:1362"}
+{
+  "name": "emaillog",
+  "attribut": [
+    {
+      "name": "id",
+      "visibility": "id",
+      "datatype": "integer",
+      "size": "",
+      "nullable": "not",
+      "formtype": "id"
+    },
+    {
+      "name": "object",
+      "visibility": "object",
+      "datatype": "string",
+      "size": 255,
+      "nullable": "not",
+      "formtype": "object"
+    },
+    {
+      "name": "log",
+      "visibility": "log",
+      "datatype": "text",
+      "size": "",
+      "nullable": "default",
+      "formtype": "log"
+    }
+  ]
+}

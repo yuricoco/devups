@@ -449,13 +449,14 @@ class Model extends \stdClass
      * @param string $value
      * @return $this
      */
-    public static function getbyattribut($attribut, $value, $recusif = true)
+    public static function getbyattribut($attribut, $value, $id_lang = false)
     {
 
         $reflection = new ReflectionClass(get_called_class());
         $entity = $reflection->newInstance();
 
         $qb = new QueryBuilder($entity);
+        $qb->setLang($id_lang);
         return $qb->select()->where($attribut, $value)->getInstance();
     }
 
@@ -511,17 +512,17 @@ class Model extends \stdClass
             return $qb->where("this.id")->in($id)->get();
         }
 
-        if ($entity->dvtranslate) {
+        //if ($entity->dvtranslate) {
 //            if (!$id_lang)
 //                $id_lang = Dvups_lang::defaultLang()->getId();
-            $qb->setLang($id_lang);
+         //   $qb->setLang($id_lang);
             return $qb->select()->where("this.id", "=", $id)
                 ->getInstance();
 
-        } else {
-            $dbal = new DBAL();
-            return $dbal->findByIdDbal($entity);
-        }
+//        } else {
+//            $dbal = new DBAL();
+//            return $dbal->findByIdDbal($entity);
+//        }
     }
 
     /**
@@ -840,7 +841,7 @@ class Model extends \stdClass
         return $qb->select()->orderby($att . " " . $order)->__getAll();
     }*/
 
-    public function __hasmany($collection, $exec = true, $incollectionof = null, $recursif = false)
+    public function __hasmany($collection, $exec = true, $incollectionof = null, $id_lang = null)
     {
         if (!is_object($collection)) {
             $reflection = new ReflectionClass($collection);
@@ -848,7 +849,7 @@ class Model extends \stdClass
         }
         if ($this->getId()) {
             $dbal = new DBAL();
-            return $dbal->hasmany($this, $collection, $exec, $incollectionof, $recursif);
+            return $dbal->hasmany($this, $collection, $exec, $incollectionof, $id_lang);
         } elseif (!$exec)
             return new QueryBuilder($this);
         else {
@@ -890,7 +891,7 @@ class Model extends \stdClass
      * @return $this | QueryBuilder
      * @throws ReflectionException
      */
-    public function __hasone($relation, $recursif = false, $get = true)
+    public function __hasone($relation, $id_lang = null, $get = true)
     {
         if (!is_object($relation)) :
             $reflection = new ReflectionClass($relation);
@@ -898,8 +899,9 @@ class Model extends \stdClass
         endif;
 
         $qb = new QueryBuilder($relation);
+        $qb->setLang($id_lang);
         if ($get)
-            return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId())->getInstance($recursif);
+            return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId())->getInstance();
 
         return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId());
     }
@@ -926,6 +928,9 @@ class Model extends \stdClass
             $this->{$k."_id"} = $data[$k."_id"];
         }
 
+        if ($this->dvtranslate)
+            (new DBAL($this))->getLangValues($this, $this->dvtranslated_columns);
+
         $this->dvfetched = true;
 
         return $this;
@@ -941,13 +946,15 @@ class Model extends \stdClass
             $cnl = strtolower($classlang);
             if (property_exists($classlang, $attribut)) {
                 $idlang = DBAL::$id_lang_static;
+
                 if(!$idlang) {
-                    //$idlang = Dvups_lang::defaultLang()->getId();
+
                     (new DBAL())->setClassname(get_class($this))->getLangValues($this, [$attribut]);
                     return $this->{$attribut};
                 }
                 $sql = " SELECT $attribut FROM $cnl WHERE lang_id = $idlang AND ".strtolower(get_class($this))."_id = ".$this->id;
                 $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
+
                 $this->{$attribut} = $data[0];
                 return $data[0];
             }

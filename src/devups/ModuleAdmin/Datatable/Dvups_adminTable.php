@@ -23,6 +23,7 @@ class Dvups_adminTable extends Datatable
     {
         $this->datatablemodel = [
             ['header' => 'nom', 'value' => 'name', 'search' => true],
+            ['header' => 'Email', 'value' => 'email', 'search' => true],
             ['header' => 'login', 'value' => 'login', 'search' => true],
             ['header' => 'Role', 'value' => 'dvups_role.name'],
         ];

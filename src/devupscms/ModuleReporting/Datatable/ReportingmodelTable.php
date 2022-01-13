@@ -29,12 +29,14 @@ class ReportingmodelTable extends Datatable
         $this->datatablemodel = [
             ['header' => t('emailmodel.id', '#'), 'value' => 'id'],
             ['header' => t('Name'), 'value' => 'name'],
-            ['header' => t('Type'), 'value' => 'type'],
-            ['header' => t('Titre'), 'value' => 'title'],
-            ['header' => t('Description'), 'value' => 'description'],
+            // ['header' => t('Type'), 'value' => 'type'],
+            ['header' => t('emailmodel.object', 'Object'), 'value' => 'object'],
             ['header' => t('emailmodel.content', 'Content'), 'value' => 'test']
         ];
 
+        $this->addcustomaction(function ($item){
+            return "<button class='btn btn-default btn-block' onclick='model.clonerow(".$item->getId().", \"reportingmodel\")'>duplicate</button>";
+        });
         return $this;
     }
 

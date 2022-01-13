@@ -17,6 +17,7 @@ class Tree_item extends Model implements JsonSerializable
      * @var string
      **/
     protected $position;
+
     /**
      * @Column(name="content", type="text"  , nullable=true)
      * @var text
@@ -260,7 +261,7 @@ class Tree_item extends Model implements JsonSerializable
 
     public function collectChildren($limit = 10)
     {
-        $count = self::select()->where("parent_id", $this->id)->__countEl();
+        $count = self::select()->where("parent_id", $this->id)->count();
         if ($count)
             return self::select()->where("parent_id", $this->id)
                 ->limit($limit)
@@ -332,29 +333,33 @@ class Tree_item extends Model implements JsonSerializable
      * @param string $tree
      * @return QueryBuilder
      */
-    public static function mainmenus($trees = ["menu"])
+    public static function mainmenus($trees = ["menu"], $id_lang = null)
     {
-        return self::join(Tree::class)->where("tree.name")->in($trees)
-            ->andwhere("main", 1);
+        //join(Tree::class)->
+        return self::where("tree.name")->in($trees)
+            ->andwhere("main", 1)
+            ->setLang($id_lang);
     }
 
     /**
      * @param string $tree
      * @return array
      */
-    public static function getmainmenu($tree = "menu")
+    public static function getmainmenu($tree = "menu", $id_lang = null)
     {
-        return self::join(Tree::class)->where("tree.name", $tree)
+        //join(Tree::class, null, $id_lang)->
+        return self::where("tree.name", $tree)
             ->andwhere("main", 1)
             ->orderby("position")
+            ->setLang($id_lang)
             //->limit(5)
-            ->__getAll();
+            ->get();
     }
 
     public function getCmstext()
     {
         return Cmstext::where($this)
-            ->__getOne();
+            ->first();
     }
 
     public static function children($id)

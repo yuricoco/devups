@@ -107,6 +107,17 @@ class Genesis
         die;
     }
 
+    public static function json_encode2($value, $options = 0, $depth = 512)
+    {
+        /*global $_start;
+        if (is_array($value)) {
+            $_end = microtime(true);
+            $value["exectime"] = $_end - $_start;
+        }*/
+
+        echo json_encode($value, JSON_INVALID_UTF8_IGNORE , $depth);
+    }
+
     public static function renderBladeView($view, $data = [], $action = "list", $redirect = false)
     {
 

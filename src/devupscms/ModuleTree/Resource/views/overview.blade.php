@@ -2,7 +2,7 @@
 @section('title', 'List')
 
 @section('layout_content')
-    <div class="row">
+    <div hidden class="row">
         @foreach($moduledata->dvups_entity as $entity)
             @ include("default.entitywidget")
         @endforeach
@@ -28,21 +28,27 @@
 
                                     <ul class="nav n">
                                         <li class="nav-item">
-                                            <a class="nav-link active" href="#">Available tree: (0) | </a>
+                                            <a class="nav-link active" href="#">Available tree: (0) | @{{role}} </a>
                                         </li>
                                         <li v-for="(cat, $index) in trees" class="nav-item">
                                             <div class="input-group mb-3">
-                                                <input v-model="cat.name['en']" type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                <input v-model="cat.name" type="text" class="form-control" placeholder="Recipient's username" aria-label="Recipient's username" aria-describedby="basic-addon2">
                                                 <div class="input-group-append">
-                                                    <span @click="_delete(cat.id, $index)" class="input-group-text" >supp.</span>
-                                                    <span @click="update(cat)" class="input-group-text" >editer</span>
-                                                    <span @click="init(cat, $index)" class="input-group-text" >detail</span>
+                                                    <span v-if="role =='admin'" @click="_delete(cat.id, $index)" class="input-group-text btn-danger" >
+                                                        <i class="fa fa-times"></i>
+                                                    </span>
+                                                    <span v-if="role =='admin'" @click="update(cat)" class="input-group-text" >
+                                                        <i class="fa fa-edit"></i></span>
+                                                    <span @click="init(cat, $index)" class="input-group-text" >
+                                                        <i class="fa fa-eye"></i></span>
+                                                    <a :href="'{{Tree_item::classpath('tree-item/index?dfilters=on&tree.name:eq=')}}'+cat.name" class="input-group-text" >
+                                                        <i class="fa fa-list-alt"></i></a>
                                                 </div>
                                             </div>
                                         </li>
-                                        <li  class="nav-item">
+                                        <li v-if="role =='admin'" class="nav-item">
                                             <div class="input-group mb-3">
-                                                <input v-model="treeedit.name['en']" type="text" class="form-control" placeholder="Nouvelle racine" aria-label="Recipient's username" aria-describedby="basic-addon2">
+                                                <input v-model="treeedit.name" type="text" class="form-control" placeholder="Nouvelle racine" aria-label="Recipient's username" aria-describedby="basic-addon2">
                                                 <div class="input-group-append">
                                                     <span @click="update(treeedit)" class="btn btn-primary input-group-text" >cree</span>
                                                 </div>
@@ -99,6 +105,6 @@
 
 @section("jsimport")
     <script>
-        var createcontenturl = '{!! $addcontenturl !!}';
+        var createcontenturl = ' $addcontenturl !!}';
     </script>
 @endsection

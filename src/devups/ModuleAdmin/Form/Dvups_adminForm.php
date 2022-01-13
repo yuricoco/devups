@@ -18,6 +18,11 @@ class Dvups_adminForm extends FormManager
             "directive" => ["require"=>true],
             "value" => $dvups_admin->getName(),
         ];
+        $entitycore->field['email'] = [
+            "label" => 'Email',
+            "type" => FORMTYPE_TEXT,
+            "value" => $dvups_admin->getEmail(),
+        ];
 
         // administrator, admin_central, agent_central, admin_center,  agent_center
 

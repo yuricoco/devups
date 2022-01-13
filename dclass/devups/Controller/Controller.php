@@ -797,6 +797,21 @@ class Controller
         echo $blade->view()->make($view, $data)->render();
     }
 
+    public function cloneAction($id){
+
+        $classname = self::getclassname();
+        $newclass = ucfirst($classname);
+        $newclasstable = $newclass.'Table';
+        $entity = $newclass::find($id);
+        $entity->setId(null);
+        $entity->__insert();
+        return 	array(	'success' => true,
+            $classname => $entity,
+            'tablerow' => $newclasstable::init()->buildindextable()->getSingleRowRest($entity),
+            'detail' => '');
+
+    }
+
 
     public static $classname;
 

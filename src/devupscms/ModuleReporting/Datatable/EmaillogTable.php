@@ -24,14 +24,14 @@ class EmaillogTable extends Datatable
     public function buildindextable()
     {
 
+        $this->order_by =" this.id desc ";
         $this->datatablemodel = [
             ['header' => t('emaillog.id', '#'), 'value' => 'id'],
             ['header' => t('Date'), 'value' => 'createdAt'],
             ['header' => t('emaillog.object', 'Object'), 'value' => 'object'],
             ['header' => t('emaillog.log', 'Log'), 'value' => 'logmessage']
         ];
-        $this->order_by = "this.id desc";
-        $this->per_page = 30;
+
         return $this;
     }
 

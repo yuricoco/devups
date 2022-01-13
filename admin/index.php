@@ -29,21 +29,48 @@ switch (Request::get("path")) {
     case 'dashboard':
         Genesis::render("dashboard", AdminTemplateGenerator::dashboardView());
         break;
-
     case 'initlang':
+        echo "<pre>";
         $dlangs = Dvups_lang::all();
         foreach ($dlangs as $dlang) {
-            $countries = Country::all();
-            foreach ($countries as $country) {
-                DBAL::_createDbal("country_lang", [
-                    "nicename" => $country->name,
-                    "lang_id" => $dlang->id,
-                    "country_id" => $country->id,
+            $items = Tree_item::all();
+            foreach ($items as $item) {
+                DBAL::_createDbal("tree_item_lang", [
+                    "name" => $item->getName(),
+                    "lang_id" => $dlang->getId(),
+                    "tree_item_id" => $item->getId(),
                 ]);
 
             }
+            $items = Product::all();
+            foreach ($items as $item) {
+                DBAL::_createDbal("product_lang", [
+                    "name" => $item->getName(),
+                    "description" => $item->getDescription(),
+                    "lang_id" => $dlang->getId(),
+                    "product_id" => $item->getId(),
+                ]);
+            }
+            $items = Category::all();
+            foreach ($items as $item) {
+                DBAL::_createDbal("category_lang", [
+                    "name" => $item->getName(),
+                    "description" => $item->getDescription(),
+                    "lang_id" => $dlang->getId(),
+                    "category_id" => $item->getId(),
+                ]);
+            }
+            $items = Rate::all();
+            foreach ($items as $item) {
+                DBAL::_createDbal("rate_lang", [
+                    "description" => $item->getDescription(),
+                    "lang_id" => $dlang->getId(),
+                    "rate_id" => $item->getId(),
+                ]);
+            }
         }
         break;
+
     case 'connexion':
         $adminCtrl->connexionAction();
         break;

@@ -117,7 +117,7 @@ class Datatable extends Lazyloading
             $this->base_url = $dentity->dvups_module->hydrate()->route();
 
             $this->defaultgroupaction = '<button id="deletegroup" onclick="ddatatable.groupdelete(this, \'' . $this->class . '\')" class="btn btn-danger btn-block">delete</button>'
-            .'<button data-entity="' . $this->class . '"  onclick="ddatatable._export(this, \'' . $this->class . '\')" type="button" class="btn btn-default btn-block" >
+                . '<button data-entity="' . $this->class . '"  onclick="ddatatable._export(this, \'' . $this->class . '\')" type="button" class="btn btn-default btn-block" >
             <i class="fa fa-arrow-down"></i> Export csv
         </button>';
 
@@ -126,7 +126,7 @@ class Datatable extends Lazyloading
         $this->id_lang = \Dvups_lang::defaultLang()->id;
         $this->createaction = [
             //'type' => 'btn',
-            'content' => '<i class="fa fa-plus" ></i> '.t('create'),
+            'content' => '<i class="fa fa-plus" ></i> ' . t('create'),
             'class' => 'btn btn-success',
             'action' => 'onclick="model._new(this, \'' . $this->class . '\')"',
             'habit' => 'stateless',
@@ -187,11 +187,12 @@ class Datatable extends Lazyloading
 //        $top_action .= ' <button type="button" onclick="ddatatable._reload()"  class="btn btn-primary" >
 // <i class="fa fa-retweet"></i> Reload</button>
 // ';
-/*
- *
- */
-        if (getadmin()->getId() ) {
-            $top_action .= '<div class="btn-group" role="group">
+        /*
+         *
+         */
+        if (getadmin()->getId()) {
+            $top_action .= \AdminTemplateGenerator::optionImport($this->class);
+            /*$top_action .= '<div class="btn-group" role="group">
     <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle"  data-bs-toggle="dropdown" aria-expanded="false" >
       <i class="fa fa-angle-down"></i> options
     </button>
@@ -201,7 +202,7 @@ class Datatable extends Lazyloading
             <i class="fa fa-arrow-up"></i> Import csv
         </button>
     </div>
-  </div>';
+  </div>';*/
         }
 
         return $top_action;
@@ -220,15 +221,14 @@ class Datatable extends Lazyloading
     {
         if (isset($this->defaultaction[$actionkey]) && in_array($method, $entityrigths)) {
             if (in_array($method, $_SESSION[dv_role_permission])) {
-                $method = $actionkey.'Action';
+                $method = $actionkey . 'Action';
                 if (method_exists($entity, $method)) {
                     $result = call_user_func(array($entity, $method), $this->defaultaction[$actionkey]);
                     if (!is_null($result))
                         $this->defaultaction[$actionkey] = $result;
                     else
                         $this->defaultaction[$actionkey]['action'] = 'onclick="model._' . $actionkey . '(' . $entity->getId() . ', \'' . $this->classname . '\', this)"';
-                }
-                else if (is_callable($this->defaultaction[$actionkey])) {
+                } else if (is_callable($this->defaultaction[$actionkey])) {
                     $this->defaultaction[$actionkey] = $this->defaultaction[$actionkey]($entity);
                 } else
                     $this->defaultaction[$actionkey]['action'] = 'onclick="model._' . $actionkey . '(' . $entity->getId() . ', \'' . $this->classname . '\', this)"';
@@ -340,13 +340,16 @@ class Datatable extends Lazyloading
 
         $html = <<<EOF
 <div class="d-sm-flex justify-content-between align-items-start">
-                                <div>
+                                
+                                
+<div class="col-lg-8 col-md-12">
                                     $groupaction
-                                </div>
-                                <div>
+                                 </div>
+<div class="col-lg-4 col-md-12 text-right">
                                     $headaction
-                                </div>
-                            </div> 
+                               </div>
+                             
+                        </div> 
 EOF;
 
         $html .= ' ';//.$this->openform;
@@ -528,17 +531,16 @@ EOF;
 
         return '
 
-<div class="col-lg-8 col-md-12">
-<div class="btn-group" role="group">
-    <button id="btnGroupDrop1" type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-      Action groupe
+<div class="btn-group d-inline-block dropdown" role="group">
+    <button type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" class="btn-shadow dropdown-toggle btn btn-light">
+        Action group  
     </button>
-    <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
+    <div tabindex="-1" role="menu" aria-hidden="true" class="dropdown-menu dropdown-menu-right" x-placement="bottom-end" style="position: absolute; will-change: transform; top: 0px; left: 0px; transform: translate3d(-131px, 33px, 0px);">
       ' . implode("", $customaction) . '
       ' . $this->defaultgroupaction . '
     </div>
   </div>
-                    </div>';
+           ';
 
     }
 
@@ -575,9 +577,9 @@ EOF;
             return "";
 
         $html = '                    
-            <div data-notice="'.$this->pagination.'" class="col-lg-3 col-md-12 ">
+            <div data-notice="' . $this->pagination . '" class="col-lg-3 col-md-12 ">
 
-        <label class=" " >'.t("Line to show").'</label>';
+        <label class=" " >' . t("Line to show") . '</label>';
 
         $html .= '<select id="dt_nbrow" class="form-control" style="width:100px; display: inline-block" onchange="ddatatable.setperpage(this.options[this.selectedIndex].value)" >';
         //$html .= '<option value="&next=' . $current_page . '&per_page=10" >10</option>';
@@ -682,7 +684,7 @@ EOF;
         foreach ($this->datatablemodel as $key => $valuetd) {
             $thforder = "";
 
-            if(!isset($valuetd["value"]))
+            if (!isset($valuetd["value"]))
                 $valuetd["value"] = $key;
 
             $value = $valuetd["value"];
@@ -750,7 +752,7 @@ EOF;
             if ($this->enablecolumnaction)
                 $thf[] = '<th>'
                     . '<input name="dfilters" value="on" hidden >'
-                    . '<button onclick="ddatatable.search(\'' . $this->classname . '\', this)" class="' . $this->btnsearch_class . '" >'.t("search").'</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
+                    . '<button onclick="ddatatable.search(\'' . $this->classname . '\', this)" class="' . $this->btnsearch_class . '" >' . t("search") . '</button> <button id="dcancel-search" onclick="ddatatable.cancelsearch()" type="reset" class="btn btn-light hidden" hidden >cancel</button></th>';
 
             return ["th" => '<tr>' . implode(" ", $th) . '</tr>',
                 "thf" => '<tr class="th-filter">' . implode(" ", $thf) . '</tr>'];
@@ -846,10 +848,14 @@ EOF;
         $iso_code = \Dvups_lang::getattribut("iso_code", $this->id_lang);
         //}
 
-        //dv_dump($this->listentity);
         foreach ($this->listentity as $entity) {
+            /**
+             * it seems at each loop something happen and the \DBAL::$id_lang_static is reseted to null/false value
+             * therefore reset it with the instance of id_land
+             */
+            \DBAL::$id_lang_static = $this->id_lang;
             $tr = [];
-            $entityarray = (array) $entity;
+            $entityarray = (array)$entity;
 
             if ($this->groupaction) {
                 $checkmethod = 'isSelectable'; // must return a boolean
@@ -867,7 +873,8 @@ EOF;
 
             foreach ($this->datatablemodel as $attrib => $valuetd) {
 
-                if(!isset($valuetd["value"])){
+
+                if (!isset($valuetd["value"])) {
                     /**
                      * issue: here I tried to test a value set as null and the isset consider those king of $variable
                      * unset . the  goal is to find how to handle that constraint.
@@ -877,13 +884,13 @@ EOF;
                      * Nb: at the moment I wrote the comment I defined a getter for the null attribute to avoid notice
                      * while datatable is rendering
                      */
-                    if(isset($entity->{$attrib})){
+                    if (isset($entity->{$attrib})) {
                         $tr[] = "<td>" . $entity->{$attrib} . "</td>";
-                    }else {
+                    } else {
                         $attrs = explode(".", $attrib);
-                        if (count($attrs)>1)
+                        if (count($attrs) > 1) {
                             $tr[] = "<td>" . $entity->{$attrs[0]}->{$attrs[1]} . "</td>"; // maybe we can activate debug mode so that when we are on this we show a notice!
-                        else
+                        } else
                             $tr[] = "<td>" . $entity->{$attrib} . "</td>"; // maybe we can activate debug mode so that when we are on this we show a notice!
                     }
                     continue;
@@ -1034,14 +1041,14 @@ EOF;
                 $tr[] = '<td style="padding: .3rem;" >' . $actionbutton . '</td>';
 
             }
-            if(is_callable($this->trattribut_callback)){
+            if (is_callable($this->trattribut_callback)) {
                 $callable = $this->trattribut_callback;
                 $trattr = $callable($entity);
-            }else
+            } else
                 $trattr = "";
 
             // onclick="ddatatable.rowselect(this, ' . $entity->getId() . ')"
-            $tb[] = '<tr id="' . $entity->getId() . '" '.$trattr.' >' . implode(" ", $tr) . '</tr>';
+            $tb[] = '<tr id="' . $entity->getId() . '" ' . $trattr . ' >' . implode(" ", $tr) . '</tr>';
 
         }
 

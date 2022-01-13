@@ -69,6 +69,24 @@ var model = {
         return route + getAttr;
 
     },
+    clonerow: function (id, entity) {
+        model.init(entity)
+        var regex = /_/gi;
+        model.request(this.entity + "._clonerow&dclass="+entity)
+            .param({
+                id: id
+            })
+            .get(function (response) {
+                console.log(response)
+                $.notify("Nouvelle ligne ajoutée avec succès!", "success");
+                ddatatable.addrow(response.tablerow.row);
+            })
+            .fail(function (resultat, statut, erreur) {
+                console.log(statut, erreur);
+                databinding.bindmodal(resultat.responseText);
+            });
+
+    },
     routing: function (route, parameter) {
         return this.baseurl + "?path=" + this.url(route, parameter);
     },

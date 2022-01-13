@@ -19,11 +19,11 @@ if (!isset($_SESSION[ADMIN])) {
 
 (new Request('hello'));
 
-$path = explode(".", Request::get("path"));
-if (count($path) > 1) {
-    Request::$uri_get_param["path"] = $path[1];
-    Request::$uri_get_param["dclass"] = $path[0];
-    $entity = Dvups_entity::where("this.name", Request::get("dclass"))->firstOrNull();
+$path = Request::get("path");
+if ($dclass = Request::get("dclass")) {
+    //Request::$uri_get_param["path"] = $path[1];
+    //Request::$uri_get_param["dclass"] = $path[0];
+    $entity = Dvups_entity::where("this.url", $dclass)->firstOrNull();
 
     if ($entity)
         g::json_encode(\dclass\devups\Controller\Controller::serve($entity));

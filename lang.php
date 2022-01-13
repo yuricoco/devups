@@ -55,7 +55,7 @@ function t($ref, $default = "", $local = null ){
 }
 
 function p($ref, $default = "no_image"){
-
+    return "";
     return Dv_image::templatePosition($ref);
 
 }

@@ -222,7 +222,10 @@ abstract class FormManager {
 //                    }
                 }
                 else {
-                    $key_value[call_user_func(array( $entity, 'get' . ucfirst($key)))] = call_user_func(array($entity, 'get' . ucfirst($value)));
+                    if (method_exists($entity, $value))
+                        $key_value[call_user_func(array( $entity, 'get' . ucfirst($key)))] = call_user_func(array($entity, 'get' . ucfirst($value)));
+                    else
+                        $key_value[$entity->{$key}] = $entity->{$value};
                 }
                 $entitylist2[call_user_func(array($entity, 'getId' ) )] = $entity; 
         }

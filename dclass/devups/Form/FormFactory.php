@@ -162,9 +162,24 @@ class FormFactory
         return $checkbox;
     }
 
-    public static function __textarea($entitycore, $field, $directive = "")
+    public static function __textarea($entitycore, $field, $directive = "", $lang = false)
     {
+        if ($lang) {
+            $inp = [];
+            if (is_array($field['value'])) {
+                foreach ($field['value'] as $iso => $val) {
+                    $inp[$iso] = "<textarea " . $directive . " name='" . FormFactory::$fieldname . "[$iso]' >" . $val . "</textarea>";
+                }
+                $input = $inp;
+            } else {
+                foreach (self::$langs as $lang) {
+                    $inp[$lang->iso_code] = "<textarea " . $directive . " name='" . FormFactory::$fieldname . "[{$lang->iso_code}]' ></textarea>";
+                }
+                $input = $inp;
+            }
 
+            return $input;
+        }
         $textarea = "<textarea " . $directive . " name='" . FormFactory::$fieldname . "' ";
 
         return $textarea . '>' . $field['value'] . '</textarea>';
@@ -180,7 +195,7 @@ class FormFactory
         }
 
         foreach ($field['options'] as $key => $value) {
-            if(is_callable($callback)) {
+            if (is_callable($callback)) {
                 $select .= $callback($value, $field['value']);
                 continue;
             }
@@ -196,6 +211,7 @@ class FormFactory
     public static function __selectGroup($entitycore, $field, $callback, $directive = "")
     {
 
+        //dv_dump($field);
         $select = '<select ' . $directive . ' name="' . FormFactory::$fieldname . '" >';
 
         if (isset($field['placeholder'])) {
@@ -205,7 +221,7 @@ class FormFactory
         foreach ($field['options'] as $keygroup => $value) {
             $selectchild = '';
             $children = $callback($keygroup);
-            if($children) {
+            if ($children) {
                 foreach ($children as $key => $child) {
                     if ('' . $field['value'] == '' . $key)
                         $selectchild .= '<option value="' . $key . '" selected >' . $child . '</option>';
@@ -213,7 +229,7 @@ class FormFactory
                         $selectchild .= '<option value="' . $key . '" >' . $child . '</option>';
                 }
                 $select .= '<optgroup label="' . $value . '" >' . $selectchild . '</optgroup>';
-            }else{
+            } else {
                 if ('' . $field['value'] == '' . $keygroup)
                     $select .= '<option value="' . $keygroup . '" selected >' . $value . '</option>';
                 else
@@ -263,17 +279,17 @@ class FormFactory
 
     public static function __input($entitycore, $field, $directive = null, $lang = null)
     {
-        if(!$lang)
+        if (!$lang)
             return "<input " . $directive . " type='" . $field['type'] . "' name='" . FormFactory::$fieldname . "' value='" . $field['value'] . "'  />";
-        else{
+        else {
             $inp = [];
-            if(is_array($field['value'])){
-                foreach ($field['value'] as $iso => $val){
+            if (is_array($field['value'])) {
+                foreach ($field['value'] as $iso => $val) {
                     $inp[$iso] = "<input " . $directive . " type='" . $field['type'] . "' name='" . FormFactory::$fieldname . "[$iso]' value='" . $val . "'  />";
                 }
                 $input = $inp;
-            }else{
-                foreach (self::$langs as $lang){
+            } else {
+                foreach (self::$langs as $lang) {
                     $inp[$lang->iso_code] = "<input " . $directive . " type='" . $field['type'] . "' name='" . FormFactory::$fieldname . "[{$lang->iso_code}]' value=''  />";
                 }
                 $input = $inp;
@@ -293,7 +309,8 @@ class FormFactory
         return implode(" ", $formdirective);
     }
 
-    public static function getLabel($field, $etoil, $lang = ""){
+    public static function getLabel($field, $etoil, $lang = "")
+    {
 
         $label = "";
         if (isset($field['label'])) {
@@ -303,6 +320,7 @@ class FormFactory
     }
 
     private static $entityattrib = "";
+
     public static function __renderForm($entitycore)
     {
 
@@ -342,24 +360,16 @@ class FormFactory
             FormFactory::$fieldid = $entitycore->name . "-" . $key . '';
             FormFactory::$entityattrib = $key;
 
-            if (in_array($field['type'], [FORMTYPE_DATE,FORMTYPE_TEXT, FORMTYPE_EMAIL, FORMTYPE_NUMBER, FORMTYPE_PASSWORD])) {
+            if (in_array($field['type'], [FORMTYPE_DATE, FORMTYPE_TEXT, FORMTYPE_EMAIL, FORMTYPE_NUMBER, FORMTYPE_PASSWORD])) {
 
                 if (isset($field["lang"]) && $field["lang"]) {
                     $formfield = FormFactory::__input($entitycore, $field, $field['directive'], true);
-                    // $formfield = [" "=>FormFactory::__input($entitycore, $field, $field['directive'])];
-                    /*
 
-                    foreach ($langs as $lang) {
-                        FormFactory::$fieldname = $entitycore->name . "_form[" . $key . ']['.$lang->getIso_code().']';
-                        //FormFactory::$fieldname = $fieldname.'_'.$lang->getIso_code();
-                        $formfield[$lang->getIso_code()] = FormFactory::__input($entitycore, $field, $field['directive'], $lang->getIso_code());
-                    }*/
-
-                }else {
+                } else {
                     $formfield = FormFactory::__input($entitycore, $field, $field['directive']);
                 }
             } elseif ($field['type'] == FORMTYPE_TEXTAREA) {
-                $formfield = FormFactory::__textarea($entitycore, $field, $field['directive']);
+                $formfield = FormFactory::__textarea($entitycore, $field, $field['directive'], true);
             } elseif ($field['type'] == FORMTYPE_CHECKBOX) {
                 $formfield = FormFactory::__checkbox($entitycore, $field, $field['directive']);
             } elseif ($field['type'] == FORMTYPE_RADIO) {
@@ -389,7 +399,7 @@ class FormFactory
             }
 
             $hidden = '';
-            if(isset($field["hidden"]))
+            if (isset($field["hidden"]))
                 $hidden = 'hidden';
 
             if (isset($field["lang"]) && $field["lang"] && is_array($formfield)) {
@@ -404,7 +414,7 @@ class FormFactory
                     $td .= "<div $hidden id='" . FormFactory::$fieldname . "_$iso_code' class='" . $class . " form-group $hidden' >" . $iso_code . $fieldlang . "</div>";
                 }
                 $formrow .= "<tr $hidden id='" . FormFactory::$fieldname . "' class='" . $class . " form-group $hidden' >
-<td>" . $label ."</td><td >". $td . "</td></tr>";
+<td>" . $label . "</td><td >" . $td . "</td></tr>";
             } else {
 
                 $label = "";
@@ -412,7 +422,7 @@ class FormFactory
                     $label = "<label class='dv_label ' >" . $field['label'] . " " . $etoil . "</label>";
                 }
 
-                $formrow .= "<tr $hidden id='" . FormFactory::$fieldname . "' class='" . $class . " form-group $hidden' ><td>" . $label ."</td><td >". $formfield . "</td></tr>";
+                $formrow .= "<tr $hidden id='" . FormFactory::$fieldname . "' class='" . $class . " form-group $hidden' ><td>" . $label . "</td><td >" . $formfield . "</td></tr>";
 
             }
         }
@@ -444,7 +454,7 @@ class FormFactory
         }
 
         $form = $formcss . $formaction .
-            "<table class='table'>".$formrow."</table>"
+            "<table class='table'>" . $formrow . "</table>"
             //"<table class='table'>".$form."</table>"
             //. $dvups_form
             . $formbutton . $formjs;

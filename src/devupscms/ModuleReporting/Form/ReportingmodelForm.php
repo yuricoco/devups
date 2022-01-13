@@ -36,10 +36,10 @@ class ReportingmodelForm extends FormManager
             "value" => $this->emailmodel->getTitle(),
         ];
 
-        $this->fields['description'] = [
-            "label" => t('Description of the mail'),
-            "type" => FORMTYPE_TEXTAREA,
-            "value" => $this->emailmodel->getDescription(),
+        $this->fields['object'] = [
+            "label" => t('Object of the mail'),
+            "type" => FORMTYPE_TEXT,
+            "value" => $this->emailmodel->getObject(),
         ];
 
 
