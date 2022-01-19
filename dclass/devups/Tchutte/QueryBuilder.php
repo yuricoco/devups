@@ -299,35 +299,45 @@ class QueryBuilder extends \DBAL
         else {
             $arrayset = [];
 
-            if ($this->object->dvtranslate) {
-                $objarray = $arrayvalues;
-                if ($this->object->dvid_lang) {
-                    $parameterQuery = [];
-                    $keyvalue = [];
-                    foreach ($this->object->dvtranslated_columns as $key) {
-                        if (!isset($objarray[$key]))
-                            continue;
+            if ($this->object->dvtranslate ) {
 
-                        $parameterQuery[] = ' `' . $key . '`= :' . $key;
-                        $keyvalue[$key] = $objarray[$key];
-                        unset($arrayvalues[$key]);
-                    }
-                    $this->updateLangValue($keyvalue, $parameterQuery, $this->object->dvid_lang);
-                } else {
-                    //dv_dump($objarray);
-                    $langs = Dvups_lang::allrows();
-                    foreach ($langs as $lang) {
+                // we check of attribut translable is present in the arrayvalue to update for an entity dvtranslated
+                // then if $attribnotexist comes with the same value of dvtranslated_columns that mean non translable attribute
+                // has been setted for update
+                $attribnotexist = array_diff($this->object->dvtranslated_columns, array_keys($arrayvalues));
+
+                if ($attribnotexist != $this->object->dvtranslated_columns) {
+
+                    $objarray = $arrayvalues;
+                    if ($this->object->dvid_lang) {
                         $parameterQuery = [];
                         $keyvalue = [];
                         foreach ($this->object->dvtranslated_columns as $key) {
                             if (!isset($objarray[$key]))
                                 continue;
-                            $parameterQuery[] = ' `' . $key . '`= :' . $key;
-                            $keyvalue[$key] = $objarray[$key][$lang->getIso_code()];
 
+                            $parameterQuery[] = ' `' . $key . '`= :' . $key;
+                            $keyvalue[$key] = $objarray[$key];
                             unset($arrayvalues[$key]);
                         }
-                        $this->updateLangValue($keyvalue, $parameterQuery, $lang->getId());
+                        $this->updateLangValue($keyvalue, $parameterQuery, $this->object->dvid_lang);
+                    } else {
+                        // dv_dump($this->object->dvtranslated_columns, $arrayvalues);
+                        $langs = Dvups_lang::allrows();
+                        foreach ($langs as $lang) {
+                            $parameterQuery = [];
+                            $keyvalue = [];
+                            foreach ($this->object->dvtranslated_columns as $key) {
+                                if (!isset($objarray[$key]))
+                                    continue;
+                                $parameterQuery[] = ' `' . $key . '`= :' . $key;
+                                $keyvalue[$key] = $objarray[$key][$lang->getIso_code()];
+
+                                unset($arrayvalues[$key]);
+                            }
+
+                            $this->updateLangValue($keyvalue, $parameterQuery, $lang->getId());
+                        }
                     }
                 }
             }

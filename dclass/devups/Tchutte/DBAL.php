@@ -626,7 +626,7 @@ class DBAL extends Database
         $table = strtolower($object);
         $objectinst = new $object;
 
-        if ($objectinst->dvtranslate) {
+        if (isset($objectinst->dvtranslate) && $objectinst->dvtranslate) {
             $objarray = $keyvalue;
             $values = [];
 
@@ -1377,7 +1377,7 @@ class DBAL extends Database
         $this->select = false;
 
         if (is_object($object)) {
-
+            $objectarray = (array) $object;
             $this->object = $object;
             $this->objectName = get_class($object);
             $this->table = strtolower($this->objectName);
@@ -1385,7 +1385,6 @@ class DBAL extends Database
             $metadata = $em->getClassMetadata("\\" . $this->objectName);
             $fieldNames = $metadata->fieldNames;
             $assiactions = array_keys($metadata->associationMappings);
-            $fieldNames += array_combine($assiactions, $assiactions);
 
             if (!$this->tableExists($this->table)) {
                 echo $this->table . " table not exist";
@@ -1395,6 +1394,8 @@ class DBAL extends Database
 //                }
             }
             $keys = [];
+            $keys = $object->entityKey($fieldNames);
+            // dv_dump($keys, array_keys($fieldNames));
             $this->instanceid = $object->getId();
 
             foreach ($object->dv_collection as $key) {
@@ -1403,8 +1404,21 @@ class DBAL extends Database
                 if (is_array($val))
                     $this->objectCollection[] = $val;
             }
-            foreach ($fieldNames as $key => $val) {
-                $val = $object->{$key};
+            // var_dump($objectarray);
+            foreach ($assiactions as $key) {
+                if (!isset($objectarray[$key]))
+                    die(var_dump($key." must be set as public in class ".$this->objectName." "));
+
+                $val = $objectarray[$key];
+                //if (is_object($val)) {
+                //var_dump(get_class($val));
+                $this->entity_link_list[strtolower(get_class($val) . ":" . $key)] = $val;
+                $this->entity_link_map_list[strtolower(get_class($val))] = $key;
+                $keys[$key . '_id'] = $val->getId();
+                //}
+            }
+            /*foreach ($fieldNames as $key => $val) {
+                /*$val = $objectarray[$key];
                 if (is_object($val)) {
                     //var_dump(get_class($val));
                     $this->entity_link_list[strtolower(get_class($val) . ":" . $key)] = $val;
@@ -1415,7 +1429,9 @@ class DBAL extends Database
 //                    $this->objectCollection[] = $val;
                 else
                     $keys[$key] = $val;
-            }
+            }*/
+            //$fieldNames += array_combine($assiactions, $assiactions);
+
             // $object->entityKey($this->objectCollection, $this->softdelete);
             $this->objectVar = array_keys($keys);
             $this->objectValue = array_values($keys);

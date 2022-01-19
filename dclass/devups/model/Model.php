@@ -23,7 +23,7 @@ class Model extends \stdClass
     public $dvid_lang = false; // this attribute has an issue I've forgot the one but this note is just to remind me of that
     // in fact if the attribute is not setted the __get() method will throw a error: attribute not found! why Have i commented it?
     public $dvtranslated_columns = [];
-    private static $dvkeys = ["dvid_lang","dvfetched", "dvinrelation", "dvsoftdelete", "dvtranslate", "dvtranslated_columns",];
+    private static $dvkeys = ["dvid_lang", "dvfetched", "dvinrelation", "dvsoftdelete", "dvtranslate", "dvtranslated_columns",];
 
     public $dv_collection = [];
 
@@ -81,6 +81,7 @@ class Model extends \stdClass
         $dirname = str_replace("Entity", "", $dirname[1]);
         return str_replace("\\", "/", $route . "src" . $dirname . $src);
     }
+
     /**
      * static method gives the path of the module where the entity is/
      * @return string the path of the module where the class is.
@@ -92,7 +93,7 @@ class Model extends \stdClass
         $fn = $reflector->getFileName();
         $dirname = explode("src", dirname($fn));
         $dirname = str_replace("Entity", "", $dirname[1]);
-        return str_replace("\\", "/", $route . "src" . $dirname ."services.php?path=". $src);
+        return str_replace("\\", "/", $route . "src" . $dirname . "services.php?path=" . $src);
     }
 
     public static function classroot($src)
@@ -121,145 +122,6 @@ class Model extends \stdClass
             return $_POST[$class . "_form"][$attribute];
         else
             return $default;
-
-    }
-
-    /**
-     *
-     * @param type $lable
-     * @param type $content
-     * @param type $lang
-     * @return \Dvups_lang
-     */
-    public static function inittranslate($entity, $column, $content, $lang = __lang)
-    {
-        $id = $entity->getId();
-        if (!$id || !$content)
-            return;
-
-        $table = strtolower(get_class($entity));
-        $ref = $table . "_" . $id . "_" . $column;
-
-        $dvlang = Dvups_lang::select()->where("ref", $ref)->getInstance();
-        $dvcontentlang = new Dvups_contentlang();
-
-        if ($dvlang->getId()) {
-            $dvcontentlang = Dvups_contentlang::select()
-                ->where("dvups_lang.ref", $dvlang->getRef())
-                ->andwhere("lang", $lang)
-                ->getInstance();
-            if (!$dvcontentlang->getId()) {
-                $dvcontentlang = new Dvups_contentlang();
-
-                $dvcontentlang->setDvups_lang($dvlang);
-                $dvcontentlang->setLang($lang);
-            }
-        } else {
-            $dvlang = new Dvups_lang();
-            $dvlang->setRef($ref);
-            $dvlang->set_table($table);
-            $dvlang->set_row($id);
-            $dvlang->set_column($column);
-            $dvlang->__save();
-
-            $dvcontentlang->setDvups_lang($dvlang);
-            $dvcontentlang->setLang($lang);
-        }
-        $dvcontentlang->setContent($content);
-        $dvcontentlang->__save();
-
-    }
-
-    public function __persistlang($fields)
-    {
-        $data = [];
-        $lang = \Dvups_lang::defaultLang();
-        foreach ($fields as $key => $field) {
-            if (is_string($key))
-                $data[$key] = $field;
-            else
-                $data[$field] = (get_class($this))::post($field, $this->{$field});
-        }
-        $this->__inittranslate($data, $lang);
-
-        $langs = \Dvups_lang::otherLangs();
-        foreach ($langs as $lang) {
-            $data = [];
-            foreach ($fields as $key => $field) {
-                if (is_string($key))
-                    $data[$key] = $field;
-                else
-                    $data[$field] = (get_class($this))::post($field . "_" . $lang->getIso_code(), $this->{$field});
-            }
-            $this->__inittranslate($data, $lang);
-        }
-    }
-
-    /**
-     *
-     * @param type $lable
-     * @param type $content
-     * @param type $lang
-     * @return \Dvups_lang
-     */
-    public function __inittranslate($data, $lang)
-    {
-        if (!$this->id || !$data)
-            return null;
-
-        $table = get_class($this);
-        $ltable = strtolower($table);
-
-        $data["lang_id"] = $lang->getId();
-        $data[$ltable . "_id"] = $this->getId();
-
-        $translation = (get_class($this) . "_lang")::where([$ltable . "_id" => $this->id, "lang_id" => $lang->getId()])->getInstance();
-        if ($translation->getId()) {
-            (get_class($this) . "_lang")::where("id", $translation->getId())->update($data);
-        } else {
-            (get_class($this) . "_lang")::create($data);
-        }
-
-    }
-
-    public static function gettranslate($entity, $column, $default = null)
-    {
-        $id = $entity->getId();
-
-        if (!$id)
-            return "";
-
-        $lang = Dvups_lang::getbyattribut("iso_code", local());
-        $table = get_class($entity);
-        $ltable = strtolower($table);
-        $translation = ($table . "_lang")::where([$ltable . "_id" => $id, "lang_id" => $lang->getId()])->__firstOrNull();
-        if (!$translation)
-            return $default;
-
-        // dynamic call of method in entity lang
-        return $translation->{"get" . ucfirst($column)}();
-
-    }
-
-    public function __gettranslate($column, $lang = null, $default = null)
-    {
-        $id = $this->id;
-
-        if (!$id)
-            return "";
-
-        if (!$lang)
-            $lang = local();
-
-        $lang = Dvups_lang::getbyattribut("iso_code", $lang);
-        $table = get_class($this);
-        $ltable = strtolower($table);
-        $translation = (get_class($this) . "_lang")::where([$ltable . "_id" => $this->id, "lang_id" => $lang->getId()])->__firstOrNull();
-        if (!$translation)
-            return $default;
-
-        // dynamic call of method in entity lang
-        return $translation->{"get" . ucfirst($column)}();
 
     }
 
@@ -515,9 +377,9 @@ class Model extends \stdClass
         //if ($entity->dvtranslate) {
 //            if (!$id_lang)
 //                $id_lang = Dvups_lang::defaultLang()->getId();
-         //   $qb->setLang($id_lang);
-            return $qb->select()->where("this.id", "=", $id)
-                ->getInstance();
+        //   $qb->setLang($id_lang);
+        return $qb->select()->where("this.id", "=", $id)
+            ->getInstance();
 
 //        } else {
 //            $dbal = new DBAL();
@@ -823,24 +685,6 @@ class Model extends \stdClass
         }
     }
 
-    /*public function __getall($att = 'id', $order = "asc")
-    {
-        $qb = new QueryBuilder($this);
-        if ($att == 'id')
-            $att = $qb->getTable() . "." . $att;
-
-        return $qb->select()->orderby($att . " " . $order)->__getAll();
-    }
-
-    public function __all($att = 'id', $order = "")
-    {
-        $qb = new QueryBuilder($this);
-        if ($att == 'id')
-            $att = $qb->getTable() . "." . $att;
-
-        return $qb->select()->orderby($att . " " . $order)->__getAll();
-    }*/
-
     public function __hasmany($collection, $exec = true, $incollectionof = null, $id_lang = null)
     {
         if (!is_object($collection)) {
@@ -906,8 +750,9 @@ class Model extends \stdClass
         return $qb->select()->where("this." . strtolower(get_class($this)) . "_id", $this->getId());
     }
 
-    public function hydrate(){
-        if(!$this->id || $this->dvfetched)
+    public function hydrate()
+    {
+        if (!$this->id || $this->dvfetched)
             return $this;
 
         global $em;
@@ -916,7 +761,7 @@ class Model extends \stdClass
         $fieldNames = $metadata->fieldNames;
         $assiactions = array_keys($metadata->associationMappings);
 
-        $sql = " SELECT * FROM `$classlang` WHERE id = ".$this->id;
+        $sql = " SELECT * FROM `$classlang` WHERE id = " . $this->id;
         $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
         //var_dump($classlang." - ".$attribut, $data, $fieldNames);
         foreach ($fieldNames as $k => $val) {
@@ -924,8 +769,8 @@ class Model extends \stdClass
         }
         foreach ($assiactions as $k) {
             //if(isset($data[$k]))
-            $this->{$k}->id = $data[$k."_id"];
-            $this->{$k."_id"} = $data[$k."_id"];
+            $this->{$k}->id = $data[$k . "_id"];
+            $this->{$k . "_id"} = $data[$k . "_id"];
         }
 
         if ($this->dvtranslate)
@@ -938,8 +783,10 @@ class Model extends \stdClass
 
     public function __get($attribut)
     {
+//        $calledfrom = debug_backtrace();
+//        dv_dump($calledfrom);
         if (!property_exists($this, $attribut) && $this->dvtranslate && in_array($attribut, $this->dvtranslated_columns)) {
-            if(!$this->id)
+            if (!$this->id)
                 return null;
 
             $classlang = get_class($this) . "_lang";
@@ -947,12 +794,12 @@ class Model extends \stdClass
             if (property_exists($classlang, $attribut)) {
                 $idlang = DBAL::$id_lang_static;
 
-                if(!$idlang) {
+                if (!$idlang) {
 
                     (new DBAL())->setClassname(get_class($this))->getLangValues($this, [$attribut]);
                     return $this->{$attribut};
                 }
-                $sql = " SELECT $attribut FROM $cnl WHERE lang_id = $idlang AND ".strtolower(get_class($this))."_id = ".$this->id;
+                $sql = " SELECT $attribut FROM $cnl WHERE lang_id = $idlang AND " . strtolower(get_class($this)) . "_id = " . $this->id;
                 $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
 
                 $this->{$attribut} = $data[0];
@@ -966,11 +813,11 @@ class Model extends \stdClass
              * if devups has never fetch it before then we hydrate the hole instance with it row in database
              */
 
-            if($this->id && !$this->dvfetched && $attribut != "id") { //  && !$this->{$attribut}
+            if ($this->id && !$this->dvfetched && $attribut != "id") { //  && !$this->{$attribut}
 
                 /*
                  * the fact is that by a mechanism I don't understand by now once the method detect an association
-                 * it automatically make request to the db what I don't want.
+                 * it automatically makes request to the db what I don't want.
                  * by the way even if we do $entity = $object->imbricate; when the dev will do $entity->attrib it will
                  * automatically hydrate the entity what solve the problem (at least for the current use case)
                  */
@@ -987,16 +834,16 @@ class Model extends \stdClass
                 $fieldNames = $metadata->fieldNames;
                 $assiactions = array_keys($metadata->associationMappings);
                 $cn = strtolower($classlang);
-                $sql = " SELECT * FROM $cn WHERE id = ".$this->id;
+                $sql = " SELECT * FROM $cn WHERE id = " . $this->id;
                 $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
                 //var_dump($classlang." - ".$attribut, $data, $fieldNames);
                 foreach ($fieldNames as $k => $val) {
-                        $this->{$k} = $data[$k];
+                    $this->{$k} = $data[$k];
                 }
                 foreach ($assiactions as $k) {
                     //if(isset($data[$k]))
-                    $this->{$k}->id = $data[$k."_id"];
-                    $this->{$k."_id"} = $data[$k."_id"];
+                    $this->{$k}->id = $data[$k . "_id"];
+                    $this->{$k . "_id"} = $data[$k . "_id"];
                 }
 
                 $this->dvfetched = true;
@@ -1166,10 +1013,15 @@ class Model extends \stdClass
         //return implode(",", $collection_ids);
     }
 
-    public function entityKey(&$entity_link_list, &$collection, &$softdelete)
+    public function entityKey($fieldNames, &$entity_link_list = null, &$collection = null, &$softdelete = null)
     {
         $keys = [];
-        $softdelete = $this->dvsoftdelete;
+        foreach ($this as $key => $val) {
+            if (isset($fieldNames[$key]))
+                $keys[$key] = $val;
+        }
+        return  $keys;
+        // $softdelete = $this->dvsoftdelete;
 
         /*if(get_class($this) == "User") {
             var_dump($this);
@@ -1180,12 +1032,11 @@ class Model extends \stdClass
                 continue;
             if (is_object($val)) {
                 //var_dump(get_class($val));
-                $entity_link_list[strtolower(get_class($val) . ":" . $key)] = $val;
+                // $entity_link_list[strtolower(get_class($val) . ":" . $key)] = $val;
                 $keys[$key . '_id'] = $val->getId();
+//            } else if (is_array($val))
+//                // $collection[] = $val;
             } else
-                if (is_array($val))
-                $collection[] = $val;
-            else
                 $keys[$key] = $val;
         }
         //var_dump($this->dvtranslated_columns);
@@ -1259,7 +1110,7 @@ class Model extends \stdClass
                                 continue;
                             if (is_object($val)) {
                                 if (isset($keyvalue[$key . '_id']) && in_array(strtolower($keyvalue[$key . '_id']), ['', 'null']))
-                                    $keyvalue[$key. '_id' ] = null;
+                                    $keyvalue[$key . '_id'] = null;
                             }
                         }
                         // dv_dump($keyvalue);
@@ -1303,7 +1154,7 @@ class Model extends \stdClass
         $qb = new QueryBuilder($this);
 
         return $qb->select($column)
-            ->lazyloading("this.".$sort . " " . $order, false, true)
+            ->lazyloading("this." . $sort . " " . $order, false, true)
             ->get($column, $callable);
 
     }
@@ -1313,7 +1164,7 @@ class Model extends \stdClass
         $keys = [];
         foreach ($this as $key => $val) {
             self::$dvkeys[] = 'id';
-            if (in_array($key,  self::$dvkeys) || is_array($val))
+            if (in_array($key, self::$dvkeys) || is_array($val))
                 continue;
             if (is_object($val)) {
                 $keys[] = $key . '_id';
@@ -1324,15 +1175,19 @@ class Model extends \stdClass
         $exportat = date("YmdHis");
         //$classname = get_class($this);
         $filename = $classname . "-" . $exportat . ".csv";
-        $root = ROOT. "database/fixtures/".$classname;
+        $root = ROOT . "database/fixtures/" . $classname;
+
+        if (!file_exists($root)) {
+            mkdir($root, 0777, true);
+        }
 
         // todo; optimization open the file once and write once
-        \DClass\lib\Util::writein(implode(";", $keys), $filename, $root);
+        \DClass\lib\Util::log(implode(";", $keys), $filename, $root);
         $this->exportrows(function ($row, $classname) use ($filename, $exportat, $root) {
-            \DClass\lib\Util::writein(implode(";", $row), $filename,  $root);
-        }, "this.".implode(", this.", $keys));
+            \DClass\lib\Util::log(implode(";", $row), $filename, $root);
+        }, "this." . implode(", this.", $keys));
 
-        $download = __env.$root."/".$filename;
+        $download = __env . "database/fixtures/" . $classname . "/" . $filename;
         return compact('keys', "download");
     }
 

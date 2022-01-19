@@ -100,42 +100,11 @@ class UserFrontController extends UserController
 
         $userhydrate = $this->hydrateWithJson(new User(), $rawdata["user"]);
 
-        $qb = new QueryBuilder(new User());
-        $qb->select();
-
-        $qb->where('phonenumber', "=", $userhydrate->getPhonenumber());
-
-        $nbuser = $qb
-            //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
-            ->__countEl();
-
-        if ($nbuser) {
-            $nbuser = User::select()
-                ->where('phonenumber', "=", $userhydrate->getPhonenumber())
-                //->andwhere('country.phonecode', "=", $userhydrate->country->__get("phonecode"))
-                ->__countEl();
-
-            if ($nbuser)
-                return ["success" => false, "detail" => "phonenumber already use"];
-        }
-
-        if ($userhydrate->getEmail()) {
-
-            $qb = User::where('this.email', "=", $userhydrate->getEmail());
-
-            $nbuser = $qb
-                //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
-                ->__countEl();
-
-            if ($nbuser) {
-                $nbuser = User::select()
-                    ->where('user.email', "=", $userhydrate->getEmail())
-                    ->__countEl();
-
-                if ($nbuser)
-                    return ["success" => false, "detail" => "email address already use"];
-
-            }
+        if ( $this->error ) {
+            return 	array(	'success' => false,
+                'user' => $userhydrate,
+                'action' => 'create',
+                'error' => $this->error);
         }
 
         $userhydrate->setPassword(md5($userhydrate->getPassword()));
@@ -168,7 +137,8 @@ class UserFrontController extends UserController
             ["username" => $userhydrate->getFirstname(),
                 "code" => $activationcode])
             ->send([$userhydrate])
-            ->sendSMS([$userhydrate->getTelephone()]);
+            //->sendSMS([$userhydrate->getTelephone()])
+        ;
 
         return array('success' => true,
             'user' => $userhydrate,

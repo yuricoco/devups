@@ -132,6 +132,10 @@ class Status extends Model implements JsonSerializable
     {
         return "<span class='dv-color' style='background: " . $this->color . "; color: #333333 '>" . $this->label . "</span>";
     }
+    public function __toString()
+    {
+        return "<span class='dv-color' style='background: " . $this->color . "; color: #333333 '>" . $this->label . "</span>";
+    }
 
     public function setColor($color)
     {
@@ -219,16 +223,17 @@ class Status extends Model implements JsonSerializable
         return self::getbyattribut("this._key", $key);
     }
 
-    /**
-     * @param $entityname
-     * @param null $_key
-     * @return QueryBuilder
-     */
-    public static function getStatusOf($entityname, $_key = null)
+    public static function getStatusPosition($position, $entity = null)
     {
-        if($_key)
-            return Status_entity::where("entity.name", $entityname)->where("_key", $_key);
-        return Status_entity::where("entity.name", $entityname);
+        if ($entity)
+            return self::where("this.position", "=", $position)->where("entity.name", $entity)->__first();
+        return self::getbyattribut("this.position", $position);
+    }
+
+
+    public static function getStatusOf($entity)
+    {
+        return Status::where("entity.name", $entity);
     }
 
 }

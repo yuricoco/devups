@@ -121,8 +121,8 @@ class UserCore extends \Model implements JsonSerializable
         }
 
         $nb = User::where("email", $email);
-        if ($nb->__countEl()) {
-            if ($nb->__getOne()->getId() != $this->id)
+        if ($nb->count()) {
+            if ($nb->first()->getId() != $this->id)
                 return t("a user with this :attribute already exist", ["attribute" => "email"]);
         }
         $this->email = $email;

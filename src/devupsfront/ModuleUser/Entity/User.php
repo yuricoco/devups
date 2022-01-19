@@ -322,21 +322,6 @@ class User extends UserCore implements JsonSerializable
         return new \User();
     }
 
-    /**
-     * @return \Transporter
-     */
-    public function transporter()
-    {
-        return $this->__hasone(Transporter::class);
-    }
-    /**
-     * @return \Transporter
-     */
-    public function affiliate()
-    {
-        return $this->__hasone(Affiliate::class);
-    }
-
     public function updateSession()
     {
         $_SESSION[USER] = serialize(User::find($this->id));

@@ -849,11 +849,6 @@ EOF;
         //}
 
         foreach ($this->listentity as $entity) {
-            /**
-             * it seems at each loop something happen and the \DBAL::$id_lang_static is reseted to null/false value
-             * therefore reset it with the instance of id_land
-             */
-            \DBAL::$id_lang_static = $this->id_lang;
             $tr = [];
             $entityarray = (array)$entity;
 
@@ -873,6 +868,11 @@ EOF;
 
             foreach ($this->datatablemodel as $attrib => $valuetd) {
 
+                /**
+                 * it seems at each loop something happen and the \DBAL::$id_lang_static is reseted to null/false value
+                 * therefore reset it with the instance of id_land
+                 */
+                \DBAL::$id_lang_static = $this->id_lang;
 
                 if (!isset($valuetd["value"])) {
                     /**

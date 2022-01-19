@@ -88,7 +88,7 @@ class Dvups_roleController extends Controller
     public function listView($next = 1, $per_page = 10)
     {
 
-        self::$jsfiles[] = Dvups_role::classpath('Ressource/js/dvups_roleCtrl.js');
+        self::$jsfiles[] = Dvups_role::classpath('Resource/js/dvups_roleCtrl.js');
 
         $this->entitytarget = 'dvups_role';
         $this->title = "Manage Role";

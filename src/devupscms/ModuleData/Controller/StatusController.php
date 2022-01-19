@@ -112,4 +112,16 @@ class StatusController extends Controller{
         return Response::$data;
     }
 
+    public function cloneAction($id){
+
+        $status = Status::find($id);
+        $status->setId(null);
+        $status->__insert();
+        return 	array(	'success' => true,
+            'status' => $status,
+            'tablerow' => StatusTable::init()->buildindextable()->getSingleRowRest($status),
+            'detail' => '');
+
+    }
+
 }

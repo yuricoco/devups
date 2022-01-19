@@ -35,6 +35,10 @@ class StatusTable extends Datatable
             ['header' => t('status.label', 'Label'), 'value' => 'label']
         ];
 
+        $this->addcustomaction(function ($item){
+            return "<button class='btn btn-default' onclick='model.clonerow(".$item->getId().", \"status\")'>duplicate</button>";
+        });
+
         return $this;
     }
 
