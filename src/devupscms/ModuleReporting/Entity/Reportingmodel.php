@@ -44,10 +44,19 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      **/
     protected $object;
     /**
-     * @Column(name="subject", type="string" , length=255, nullable=true )
+     * @Column(name="description", type="text" , nullable=true )
      * @var string
      **/
-    protected $subject;
+    protected $description;
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
     /**
      * @Column(name="contenttext", type="text"  , nullable=true)
      * @var text
@@ -431,6 +440,22 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
         }
         return $this;
     }
+    static $namecc = [];
+
+    /**
+     * @param $email
+     * @param $name
+     * @return $this
+     */
+    public function addCC($email, $name = null)
+    {
+        if (is_array($email)){
+            self::$namecc = $email;
+        }else {
+            self::$namecc[$email] = $name;
+        }
+        return $this;
+    }
 
     public static $attachments = [];
 
@@ -462,15 +487,18 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
         }
 
-        if (!__prod || !$this->id)
-            return 0;
-
         $data = [
                 "style" => $this->getCss(),
             ] + $datacustom;
 
         $message_html = $this->sanitizeContent($this->contentheader.$this->content.$this->contentfooter, $data);
         $message_text = $this->sanitizeContent($this->contenttext, $data);
+
+        if (!__prod || !$this->id) {
+            \DClass\lib\Util::log($message_html, $this->name.".html", ROOT."cache/", "w");
+            return 0;
+        }
+
 // Instantiation and passing `true` enables exceptions
         $mail = new PHPMailer(true);
 
@@ -493,6 +521,9 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
                 $mail->addAddress($email, $name);     // Add a recipient
             //$mail->addAddress('ellen@example.com');               // Name is optional
             $mail->addReplyTo(Configuration::get("sm_from"), $this->title);
+
+            foreach (self::$namecc as $email => $name)
+                $mail->addCC($email, $name);
 //            $mail->addCC('cc@example.com');
 //            $mail->addBCC('bcc@example.com');
 

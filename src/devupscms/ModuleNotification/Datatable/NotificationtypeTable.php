@@ -28,8 +28,12 @@ class NotificationtypeTable extends Datatable
             ['header' => t('notificationtype.id', '#'), 'value' => 'id'],
             ['header' => t('Entity'), 'value' => 'dvups_entity.name'],
             ['header' => t('notificationtype._key', '_key'), 'value' => '_key'],
-            ['header' => t('notificationtype.content', 'Content'), 'value' => 'content']
+            ['header' => t('notificationtype.content', 'Content'), 'value' => 'content'],
+            ['header' => 'Test', 'value' => 'test']
         ];
+        $this->addcustomaction(function ($item){
+            return "<button class='btn btn-default btn-block' onclick='model.clonerow(".$item->getId().", \"notificationtype\")'>duplicate</button>";
+        });
 
         return $this;
     }
@@ -43,7 +47,9 @@ class NotificationtypeTable extends Datatable
             ['header' => t('Entity'), 'value' => 'dvups_entity.name'],
             ['header' => t('notificationtype._key', '_key'), 'value' => '_key'],
             ['header' => t('notificationtype.content', 'Content'), 'value' => 'content'],
-            ['header' => t('Redirect'), 'value' => 'redirection'],
+            //['header' => t('Redirect'), 'value' => 'redirection'],
+            ['header' => 'Test', 'value' => 'test']
+
         ];
 
         /*$this->addcustomaction(function ($item){

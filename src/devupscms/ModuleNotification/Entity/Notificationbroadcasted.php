@@ -18,28 +18,32 @@ class Notificationbroadcasted extends Model implements JsonSerializable
      * @var datetime
      **/
     protected $viewedat;
+
     /**
-     **/
-    public static $STATUSS = ['un' => 'unviewed', 'vi' => 'viewed'];
-    /**
-     * @Column(name="status", type="string" , length=2 )
+     * @Column(name="status", type="integer" , length=1 )
      * @var string
      **/
-    protected $status = 'un';
+    protected $status = 0;
 
     /**
      * @ManyToOne(targetEntity="\Notification")
-     * , inversedBy="reporter"
+     * @JoinColumn(onDelete="cascade")
      * @var \Notification
      */
     public $notification;
 
     /**
      * @ManyToOne(targetEntity="\User")
-     * , inversedBy="reporter"
+     * @JoinColumn(onDelete="cascade")
      * @var \User
      */
     public $user;
+    /**
+     * @ManyToOne(targetEntity="\Dvups_admin")
+     * @JoinColumn(onDelete="cascade")
+     * @var \Dvups_admin
+     */
+    public $admin;
 
 
     public function __construct($id = null)
@@ -51,12 +55,39 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
         $this->notification = new Notification();
         $this->user = new User();
+        $this->admin = new Dvups_admin();
 
+    }
+
+    /**
+     * @return Dvups_admin
+     */
+    public function getAdmin()
+    {
+        return $this->admin;
+    }
+
+    /**
+     * @param Dvups_admin $admin
+     */
+    public function setAdmin(Dvups_admin $admin)
+    {
+        $this->admin = $admin;
     }
 
     public static function unreaded($user)
     {
-        return self::where($user)->andwhere("this.status", "=", 0)->__countEl();
+        return self::where($user)->orderby("this.id desc")->limit(20)->get();
+    }
+
+    public static function unreadedcount($user)
+    {
+        return self::where($user)->andwhere("this.status", "=", 0)->count();
+    }
+
+    public static function unreadedadmin($user)
+    {
+        return self::where("admin.id", $user->getId())->andwhere("this.status", "=", 0)->count();
     }
 
 
@@ -174,15 +205,19 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
     public function widgetModel()
     {
-        if ($this->status == 0)
-            $route = route("notification?read=" . $this->id . "&redirect=" . $this->notification->notificationtype->getRedirect() . "?id=" . $this->notification->getEntityid());
-        elseif($redirect = $this->notification->notificationtype->getRedirect())
-            $route = route($redirect . "?id=" . $this->notification->getEntityid());
-        else
-            $route = route("notifications");
+//        if ($this->status == 0) {
+//
+//            if($redirect = $this->notification->notificationtype->getRedirect())
+//                $route = route("notification?read=" . $this->id . "&redirect=" . $redirect . "?id=" . $this->notification->getEntityid());
+//            else
+//                $route = route("notification?read=" . $this->id . "&redirect=notifications");
+//
+//        }elseif($redirect = $this->notification->notificationtype->getRedirect())
+//            $route = route($redirect . "?id=" . $this->notification->getEntityid());
+//        else
+//            $route = route("notifications");
 
-
-        return '<a href="' . $route . '"><span class="pull-right">'
+        return '<a href="' . $this->getRedirect() . '"><span class="pull-right">'
             . $this->created_at . '</span><br>'
             . $this->notification->getContent() . '</a>';
 
@@ -203,6 +238,20 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
     }
 
+    public static function sendAdmin($notification, $receivers = null)
+    {
+        foreach ($receivers as $receiver) {
+
+            $nb = new Notificationbroadcasted();
+            $nb->notification = $notification;
+            $nb->setStatus(0);
+            $nb->setAdmin($receiver);
+            $nb->__insert();
+
+        }
+
+    }
+
     public static function of($entity)
     {
         return Notificationbroadcasted::where("notification.entity", $entity)
@@ -210,21 +259,36 @@ class Notificationbroadcasted extends Model implements JsonSerializable
             ->count();
     }
 
-    public static function onPackageDelivered(Package $package)
+    public function getRedirect()
     {
+        if ($this->status == 0) {
+            if ($this->notification->notificationtype->getSession() == "admin")
+                return __env . ('admin/index.php?path=notified&read=' . $this->getId());
 
-        $notif = new Notification();
-        $notif->setEntity(Package::class);
-        $notif->setEntityid($package->getId());
-        $notif->setContent(t("event.packagedelivered", "Le paquet n° " . $package->getId() . " a bien été Receptionné. Votre le colis est cloture et les fond sont desormais disponible."));
-        $notif->__insert();
-
-        $nb = new Notificationbroadcasted();
-        $nb->notification = $notif;
-        $nb->shop = $package->shop;
-        $nb->user = $package->shop->user->__show();
-        return $nb;
-
+            return route('notification?read=' . $this->getId());
+        }
+        return $this->notification->getRedirect();
     }
+
+    public static function readed($id)
+    {
+        (new Notificationbroadcasted($id))->__update([
+            "viewedat" => date('Y-m-d'),
+            "status" => 1,
+        ]);
+    }
+
+    public function route()
+    {
+        $note = "";
+        if (!$this->viewedat)
+            $note = "?read=" . $this->id;
+        switch ($this->notification->entity) {
+            case "schedule":
+                return route("rdv") . $note;
+
+        }
+    }
+
 
 }

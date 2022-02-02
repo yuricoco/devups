@@ -34,6 +34,20 @@
     width: calc(100% - 280px)!important;
 }
 
+.dv_datatable_container .align-items-start{
+    position: sticky;
+    padding: 5px;
+    top: 60px;
+    background: whitesmoke;
+    z-index: 1000;
+}
+.dv_datatable thead{
+    position: sticky;
+    top: 98px;
+    background: whitesmoke;
+    z-index: 1000;
+}
+
 .dv_modal{
     width: 800px; background: transparent; display: block; min-height: 50px; padding-top: 80px;
     transition: .5s;

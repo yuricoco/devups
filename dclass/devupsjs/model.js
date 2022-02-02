@@ -164,7 +164,7 @@ var model = {
 
         if (!confirm('Voulez-vous Supprimer?')) return false;
 
-        model.request(this.entity + "._delete")
+        model.request(this.entity + ".delete")
             .param({
                 id: id
             })

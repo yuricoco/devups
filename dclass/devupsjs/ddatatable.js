@@ -143,7 +143,7 @@ var ddatatable = {
         callback(ids, $trs);
     },
     search: function (entity, el) {
-        ddatatable.init(entity);
+        ddatatable.init(entity, el);
         var form = $(el).parents("tr.th-filter");
         var $input = form.find('input');
         var $selects = form.find('select');
@@ -395,14 +395,17 @@ var ddatatable = {
         //dialog.setcontent()
 
     },
-    init: function (entity) {
+    init: function (entity, el) {
 
         // if (typeof $ === 'undefined') {
         //     return;
         // }
 
         console.log("#dv_" + entity + "_table");
-        this.dtinstance = $("#dv_" + entity + "_table");
+        if (el)
+            this.dtinstance = $(el).parents("#dv_" + entity + "_table");
+        else
+            this.dtinstance = $("#dv_" + entity + "_table");
         this.entity = entity;
 
         if (this.dtinstance.find("#dt_nbrow").length)

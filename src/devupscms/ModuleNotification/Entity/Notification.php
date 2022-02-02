@@ -28,6 +28,11 @@ class Notification extends Model implements JsonSerializable
      * @var string
      **/
     protected $content;
+    /**
+     * @Column(name="redirect", type="string" , length=255, nullable=true )
+     * @var string
+     **/
+    protected $redirect;
 
     /**
      * @ManyToOne(targetEntity="\Notificationtype")
@@ -56,6 +61,23 @@ class Notification extends Model implements JsonSerializable
     public function getNotificationtype(): Notificationtype
     {
         return $this->notificationtype;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRedirect()
+    {
+        return $this->redirect;
+    }
+
+    /**
+     * @param string $redirect
+     */
+    public function setRedirect(  $redirect)
+    {
+        $this->redirect = $redirect;
+        return $this;
     }
 
     /**
@@ -104,7 +126,13 @@ class Notification extends Model implements JsonSerializable
             'entity' => $this->entity,
             'entityid' => $this->entityid,
             'content' => $this->content,
+            'redirect' => $this->redirect,
         ];
+    }
+
+    public static function onadmin($entity, $event, $params = [], $session = "admin")
+    {
+        return self::on($entity, $event, $params, $session);
     }
 
     /**
@@ -113,21 +141,23 @@ class Notification extends Model implements JsonSerializable
      * @param array $params
      * @return int|Notification
      */
-    public static function on($entity, $event, $params = [])
+    public static function on($entity, $event, $params = [], $session = "user")
     {
 
         $classname = strtolower(get_class($entity));
         $type = Notificationtype::where(["dvups_entity.name" => $classname, "_key" => $event])
+            ->where("this.session", $session)
             //->getSqlQuery();
-            ->firstOrNull();
-        //die(var_dump($sql));
+            ->__firstOrNull();
+        //die(var_dump($type));
         if (is_null($type)) {
             $id = Notificationtype::create([
                 "dvups_entity_id" => Dvups_entity::getbyattribut("this.name", $classname)->getId(),
                 "_key" => $event,
+                "session" => $session,
                 "content" => 'no content',
             ]);
-            $type = Notification::find($id);
+            $type = Notificationtype::find($id);
         }
         $msg = $type->getContent();
         foreach ($params as $search => $value) {
@@ -143,13 +173,21 @@ class Notification extends Model implements JsonSerializable
         return $notification;
     }
 
-    public function send($mb = [])
+    public function sendadmin($mb = [])
+    {
+        return $this->send($mb, true);
+    }
+
+    public function send($mb = [], $admin = false)
     {
         if (!$this->entityid)
             return $this;
 
         $this->__insert();
-        Notificationbroadcasted::send($this, $mb);
+        if($admin)
+            Notificationbroadcasted::sendAdmin($this, $mb);
+        else
+            Notificationbroadcasted::send($this, $mb);
         return $this;
     }
 
@@ -158,16 +196,20 @@ class Notification extends Model implements JsonSerializable
         if (!$this->entityid)
             return $this;
 
-        self::execSMS($destination, $this->getContent());
-    }
-
-    public static function execSMS($destination, $sms)
-    {
-
         if (!__prod)
             return 0;
 
-        $from = Configuration::get("sms_sender_id");
+//        global $user;
+//        $smsrestriction = explode(";", Configuration::get("smsrestriction"));
+//
+//        $continent = Continent::find($user->country->continent->getId());
+//        if (in_array($continent->getCode(), $smsrestriction))
+            self::execSMS($destination, $this->getContent(), $this->notificationtype->get_key());
+
+    }
+
+    public static function execSMS($destination, $sms, $event = "")
+    {
 
 //Etape 4: precisez le numéro de téléphone (Format international)
         if (is_array($destination))
@@ -183,44 +225,74 @@ class Notification extends Model implements JsonSerializable
                 'detail' => t("you most specify destination (s)"),
             ];
 
+        $from = Configuration::get("sms_sender_id");
+        $gateway_url = Configuration::get("sms_api");
+
+        $access = Request::initCurl($gateway_url."auth?type=".Configuration::get("sms_refresh_token"))
+            ->raw_data(
+                [
+                    "type"=> Configuration::get("sms_type"),
+                    "username"=> Configuration::get("sms_username"),
+                    "password"=> Configuration::get("sms_password"),
+                    ]
+            )
+            ->send()
+            ->json();
+
+        if($access->status_code != 200) {
+            Emaillog::create([
+                "object" => "sms exception"." dest: ".$destination,
+                "log" => $access->errors[0]->message,
+            ]);
+            return [
+                "success"=>false,
+                "detail" => $access->errors[0]->message,
+            ];
+        }
+
 // Construire le corps de la requête
         $sms_body = array(
-            'action' => 'send-sms',
-            'api_key' => Configuration::get("sms_api_key"),
-            'to' => $destination,
-            'from' => $from,
-            'sms' => $sms
+//            'action' => 'send-sms',
+//            'api_key' => Configuration::get("sms_api_key"),
+            "to" => ["$destination"],
+            "from" => $from,
+            "message" => $sms
         );
 
-        $send_data = http_build_query($sms_body);
-        $gateway_url = Configuration::get("sms_api") . "?" . $send_data;
+//        $send_data = http_build_query($sms_body);
+//        $gateway_url = Configuration::get("sms_api") . "?" . $send_data;
 
         try {
-            $ch = curl_init();
-            curl_setopt($ch, CURLOPT_URL, $gateway_url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($ch, CURLOPT_HTTPGET, 1);
-            $output = curl_exec($ch);
 
-            if (curl_errno($ch)) {
-                $output = curl_error($ch);
-            }
-            curl_close($ch);
+            $output = Request::initCurl($gateway_url."sms/mt/v2/send")
+                ->raw_data([$sms_body])
+                ->addHeader('Authorization', "Bearer ".$access->payload->access_token)
+                ->send();
 
             Emaillog::create([
-                "object" => "sms sent",
-                "log" => " tel: ".$destination." detail ".$output,
+                "object" => "sms sent".$event." dest: ".$destination,
+                "log" => $output->_response,
             ]);
             //var_dump($output);
 
         } catch (Exception $exception) {
 
             Emaillog::create([
-                "object" => "sms exception",
-                "log" => " tel: ".$destination." detail ".$exception->getMessage(),
+                "object" => "sms exception"." dest: ".$destination,
+                "log" => $exception->getMessage(),
             ]);
             //echo $exception->getMessage();
         }
+    }
+
+    public function sendMail($mb = ["editorial.3ag@gmail.com" => "3agedition"])
+    {
+        if ($this->id){
+            Reportingmodel::init($this->notificationtype->getEmailmodel())
+                ->addReceiver($mb)
+                ->sendMail(["notification"=>$this->content]);
+        }
+        return $this;
     }
 
 }

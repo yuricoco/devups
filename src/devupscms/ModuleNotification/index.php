@@ -25,6 +25,7 @@ $notificationtypeCtrl = new NotificationtypeController();
 switch (Request::get('path')) {
 
     case 'layout':
+        \dclass\devups\Controller\Controller::$jsfiles[] = Notification::classpath("Resource/js/notificationCtrl.js");
         $notificationtable = NotificationTable::init(new Notification());
         $notificationttypeable = NotificationtypeTable::init(new Notificationtype());
         Genesis::renderView("admin.overview",

@@ -18,11 +18,16 @@ class NotificationtypeForm extends FormManager
     public function buildForm()
     {
 
-        $this->fields['dvups_entity'] = [
+        $this->fields['dvups_entity.id'] = [
             "label" => t('Entity'),
             "type" => FORMTYPE_SELECT,
             "options" => FormManager::Options_Helper("name", Dvups_entity::allrows(" name ")),
             "value" => $this->notificationtype->dvups_entity->getId(),
+        ];
+        $this->fields['emailmodel'] = [
+            "label" => t('Email model key / reference'),
+            "type" => FORMTYPE_TEXT,
+            "value" => $this->notificationtype->getEmailmodel(),
         ];
 
         $this->fields['_key'] = [
@@ -31,6 +36,12 @@ class NotificationtypeForm extends FormManager
             "value" => $this->notificationtype->get_key(),
         ];
 
+        $this->fields['session'] = [
+            "label" => t('Session'),
+            "type" => FORMTYPE_RADIO,
+            "value" => $this->notificationtype->getSession(),
+            "options" => FormManager::key_as_value(["user", "admin"]),
+        ];
         $this->fields['redirect'] = [
             "label" => t('Redirect route'),
             "type" => FORMTYPE_TEXT,

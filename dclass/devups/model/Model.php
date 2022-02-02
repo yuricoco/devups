@@ -799,7 +799,7 @@ class Model extends \stdClass
                     (new DBAL())->setClassname(get_class($this))->getLangValues($this, [$attribut]);
                     return $this->{$attribut};
                 }
-                $sql = " SELECT $attribut FROM $cnl WHERE lang_id = $idlang AND " . strtolower(get_class($this)) . "_id = " . $this->id;
+                $sql = " SELECT $attribut FROM `$cnl` WHERE lang_id = $idlang AND " . strtolower(get_class($this)) . "_id = " . $this->id;
                 $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
 
                 $this->{$attribut} = $data[0];
@@ -834,7 +834,7 @@ class Model extends \stdClass
                 $fieldNames = $metadata->fieldNames;
                 $assiactions = array_keys($metadata->associationMappings);
                 $cn = strtolower($classlang);
-                $sql = " SELECT * FROM $cn WHERE id = " . $this->id;
+                $sql = " SELECT * FROM `$cn` WHERE id = " . $this->id;
                 $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
                 //var_dump($classlang." - ".$attribut, $data, $fieldNames);
                 foreach ($fieldNames as $k => $val) {

@@ -35,7 +35,7 @@ class Datatable extends Lazyloading
     protected $lazyloading = "";
     protected $tablefilter = "";
     public $pagination = 0;
-    protected $paginationcustom = [];
+    public $paginationcustom = [];
     protected $editAction = null;
     protected $datatablemodel = []; // describe the model of the table (available column and metadata of row)
     protected $header = []; // describe the model of the table (available column and metadata of row)
@@ -841,6 +841,13 @@ EOF;
 
     }
 
+    public $group_field_name = "id";
+    public function setGroupFieldName($name){
+        $this->group_field_name = $name;
+        $this->addFilterParam("group_field_name", $name);
+        return $this;
+    }
+
     private function tablebodybuilder()
     {
 
@@ -856,13 +863,13 @@ EOF;
                 $checkmethod = 'isSelectable'; // must return a boolean
                 if (method_exists($entity, $checkmethod)) {
                     if (call_user_func(array($entity, $checkmethod)))
-                        $tr[] = '<td><input name="id[]" value="' . $entity->getId() . '" type="checkbox" class="dcheckbox" ></td>';
+                        $tr[] = '<td><input name="' . $this->group_field_name . '[]" value="' . $entity->getId() . '" type="checkbox" class="dcheckbox" ></td>';
                     else
                         $tr[] = '<td></td>';
                 } elseif ($this->isRadio)
-                    $tr[] = '<td><input name="id" value="' . $entity->getId() . '" type="radio" class="dcheckbox" ></td>';
+                    $tr[] = '<td><input name="' . $this->group_field_name . '" value="' . $entity->getId() . '" type="radio" class="dcheckbox" ></td>';
                 else
-                    $tr[] = '<td><input name="id[]" value="' . $entity->getId() . '" type="checkbox" class="dcheckbox" ></td>';
+                    $tr[] = '<td><input name="' . $this->group_field_name . '[]" value="' . $entity->getId() . '" type="checkbox" class="dcheckbox" ></td>';
 
             }
 

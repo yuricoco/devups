@@ -36,9 +36,9 @@ INSERT INTO `dvups_module` (`id`, `name`, `project`, `dvups_component_id`) VALUE
 -- Déchargement des données de la table `dvups_entity`
 --
 
-INSERT INTO `dvups_entity` (`id`, `name`,`url`, `dvups_module_id`) VALUES
-(1, 'dvups_admin','dvups-admin', 1),
-(2, 'dvups_role', 'dvups-role', 1);
+INSERT INTO `dvups_entity` (`id`, `name`,`label`,`url`, `dvups_module_id`) VALUES
+(1, 'dvups_admin','dvups_admin','dvups-admin', 1),
+(2, 'dvups_role','dvups_role', 'dvups-role', 1);
 
 
 --

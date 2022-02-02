@@ -113,9 +113,19 @@ class NotificationtypeController extends Controller{
     {
 
         Notificationtype::where("id")->in($ids)->delete();
-
         return array('success' => true,
                 'detail' => ''); 
+
+    }
+
+    public function testnotificationAction($id, $number)
+    {
+        $nt = Notificationtype::find($id);
+        $notification = Notification::on(new Package(), $nt->get_key(), []);
+            //->send([$customer])
+            //->sendSMS([$number]);
+        Notification::execSMS([$number], $nt->getContent(), $nt->get_key());
+        return $notification;
 
     }
 

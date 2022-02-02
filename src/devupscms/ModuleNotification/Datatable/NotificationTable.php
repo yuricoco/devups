@@ -24,6 +24,7 @@ class NotificationTable extends Datatable
     public function buildindextable()
     {
 
+        $this->order_by = "this.id desc";
         $this->datatablemodel = [
             ['header' => t('notification.id', '#'), 'value' => 'id'],
             ['header' => t('notification.entity', 'Entity'), 'value' => 'entity'],
@@ -36,6 +37,7 @@ class NotificationTable extends Datatable
 
     public function buildconfigtable()
     {
+        $this->order_by = "this.id desc";
         $this->enabletopaction = false;
         $this->datatablemodel = [
             ['header' => t('notification.id', '#'), 'value' => 'id'],

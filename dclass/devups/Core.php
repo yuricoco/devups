@@ -186,6 +186,7 @@ class Core extends stdClass {
                     if(!$dvmodule->getId()){
                         //var_dump("component_id name", $dvcomponent->id);
                         $dvmodule->setName($modulename);
+                        $dvmodule->setLabel($modulename);
                         $dvmodule->__insert();
 
                         $rolemodule = new Dvups_role_dvups_module();
@@ -209,6 +210,7 @@ class Core extends stdClass {
                         if(!$dventity->getId()){
                             $dventity = new Dvups_entity();
                             $dventity->setName($entityname);
+                            $dventity->setLabel($entityname);
                             $dventity->setUrl($entityname);
                             $dventity->dvups_module = $dvmodule;
                             $dventity->__insert();

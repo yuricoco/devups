@@ -22,6 +22,7 @@ class Lazyloading implements \JsonSerializable
     public $nb_element = 0;
     public $per_page = 30;
     public $pagination = 1;
+    public $paginationcustom = [];
     public $current_page = 1;
     public $next = 1;
     public $previous = 0;
@@ -365,42 +366,30 @@ class Lazyloading implements \JsonSerializable
         else
             $listEntity = $qb->get(self::$colunms);
 
-
         $paginationcustom = [];
         if ($pagination >= self::maxpagination) {
-            $middle = intval($pagination / 2);
-            $paginationcustom['firsts'] = [1, 2, 3];
-            $paginationcustom['lasts'] = [$pagination - 2, $pagination - 1, $pagination];
 
-            if ($page > self::maxpagination / 2) {
-
-                $paginationcustom['middleleft'] = intval($pagination / 4);
-                //$paginationcustom['firsts'] = [$page, 1 + $page + 1, 2 + $page + 2];
-
-                if ($page + 3 >= $pagination) {
-                    $paginationcustom['middleleft'] = intval($pagination / 4);
-                    $paginationcustom['lasts'] = [];
-                    $paginationcustom['middles'] = [$pagination - 5, $pagination - 4, $pagination - 3, $pagination - 2, $pagination - 1, $pagination];
-//                else{
-//                    $paginationcustom['middles'][] = $middle + $page + 2;
-//                    $paginationcustom['middles'][] = $middle + $page + 3;
-//                    $paginationcustom['middles'][] = $middle + $page + 4;
-                } else {
-                    $paginationcustom['middleright'] = intval($pagination * 3 / 4);
-                    $paginationcustom['middles'] = [$page - 1, $page, $page + 1];
+            if ($page <= 8 / 2){
+                for ($i = 1; $i <= 8; $i++){
+                    $paginationcustom['left'][] = $i;
                 }
-                //= [$page, $page + 1, $page + 2];
-            } else {
-
-                $paginationcustom['middles'] = [$middle - 1, $middle, $middle + 1];
-                $paginationcustom['middleright'] = intval($pagination * 3 / 4);
-                $paginationcustom['middleleft'] = intval($pagination / 4);
-
-                if ($page > 3 && $page < 8) {
-                    $paginationcustom['firsts'] = [1, 2, 3, 4, 5, 6, 7];
-                }
-
+                $paginationcustom['middle'] = [];
+                $paginationcustom['right'] = ["...", $pagination];
             }
+            elseif ($pagination - $page <= 8 / 2){
+                $paginationcustom['left'] = [1, "..."];
+                $paginationcustom['middle'] = [];
+                for ($i = $pagination - 8; $i <= $pagination; $i++){
+                    $paginationcustom['right'][] = $i;
+                }
+            }else{
+                $paginationcustom['left'] = [1, "..."];
+                for ($i = $page - 2; $i <= $page + 3; $i++){
+                    $paginationcustom['middle'][] = $i;
+                }
+                $paginationcustom['right'] = ["...", $pagination];
+            }
+
         }
 
         $this->listentity = $listEntity;
@@ -421,6 +410,7 @@ class Lazyloading implements \JsonSerializable
         return array('success' => true, // pour le restservice
             'classname' => $this->classname,
             'dynamicpagination' => $this->dynamicpagination,
+            'paginationcustom' => $this->paginationcustom,
             'nb_element' => (int)$this->nb_element,
             'per_page' => (int)$this->per_page,
             'pagination' => (int)$this->pagination,
@@ -443,6 +433,7 @@ class Lazyloading implements \JsonSerializable
     {
         return array('success' => true, // pour le restservice
             'classname' => $this->classname,
+            'paginationcustom' => $this->paginationcustom,
             'listEntity' => $this->listentity,
             'nb_element' => (int)$this->nb_element,
             'per_page' => (int)$this->per_page,

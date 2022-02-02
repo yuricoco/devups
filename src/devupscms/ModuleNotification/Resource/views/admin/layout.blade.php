@@ -30,7 +30,7 @@
                             ->buildconfigtable()
                             ->setModel("config")
                             ->Qb(Configuration::where("_key")
-                            ->in(["sms_api","sms_sender_id","sms_api_key" ]))
+                            ->in(["sms_api","sms_sender_id","sms_type","sms_username","sms_password","sms_refresh_token","sms_api_key" ]))
                             ->render()
                     !!}
                 </div>

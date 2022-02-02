@@ -723,7 +723,7 @@ switch (Request::get('path')) {
         foreach ($modulelistentity as $entity) {
             $name = strtolower($entity->name);
             $contenu .= "
-    case '" . str_replace("_", "-", $name) . "/index':
+    case '" . str_replace("_", "-", $name) . "/list':
         $".$name."Ctrl->listView();
         break;\n";
         }
@@ -820,14 +820,11 @@ switch (Request::get('path')) {
 
         foreach ($modulelistentity as $entity) {
             $name = strtolower($entity->name);
-            $contenu .= "
-        case '" . $name . "._new':
-                g::json_encode($" . $name . "Ctrl->formView());
-                break;
+            $contenu .= " 
         case '" . $name . ".create':
                 g::json_encode($" . $name . "Ctrl->createAction());
                 break;
-        case '" . $name . "._edit':
+        case '" . $name . ".form':
                 g::json_encode($" . $name . "Ctrl->formView(R::get(\"id\")));
                 break;
         case '" . $name . ".update':
@@ -836,10 +833,10 @@ switch (Request::get('path')) {
         case '" . $name . "._show':
                 $" . $name . "Ctrl->detailView(R::get(\"id\"));
                 break;
-        case '" . $name . "._delete':
+        case '" . $name . ".delete':
                 g::json_encode($" . $name . "Ctrl->deleteAction(R::get(\"id\")));
                 break;
-        case '" . $name . "._deletegroup':
+        case '" . $name . ".deletegroup':
                 g::json_encode($" . $name . "Ctrl->deletegroupAction(R::get(\"ids\")));
                 break;
         case '" . $name . ".datatable':

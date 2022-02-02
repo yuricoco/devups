@@ -60,8 +60,6 @@ class ModuleLang
         $page_mappedCtrl = new Page_mappedController();
         $page_local_contentCtrl = new Page_local_contentController();
 
-        (new Request('hello'));
-
         switch ($path) {
 
             case 'local-content.get':
@@ -114,10 +112,10 @@ class ModuleLang
             case 'local_content._show':
                 $local_contentCtrl->detailView(R::get("id"));
                 break;
-            case 'local_content._delete':
+            case 'local_content.delete':
                 g::json_encode($local_contentCtrl->deleteAction(R::get("id")));
                 break;
-            case 'local_content._deletegroup':
+            case 'local_content.deletegroup':
                 g::json_encode($local_contentCtrl->deletegroupAction(R::get("ids")));
                 break;
             case 'local_content.datatable':

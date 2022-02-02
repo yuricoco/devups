@@ -69,6 +69,9 @@ switch (R::get('path')) {
         g::json_encode($notificationbroadcastedCtrl->datatable(R::get('next'), R::get('per_page')));
         break;
 
+    case 'notificationtype._clonerow':
+        g::json_encode($notificationtypeCtrl->cloneAction(Request::get("id")));
+        break;
     case 'notificationtype._new':
         g::json_encode($notificationtypeCtrl->formView());
         break;
@@ -92,6 +95,9 @@ switch (R::get('path')) {
         break;
     case 'notificationtype.datatable':
         g::json_encode($notificationtypeCtrl->datatable(R::get('next'), R::get('per_page')));
+        break;
+    case 'notificationtype.test':
+        g::json_encode($notificationtypeCtrl->testnotificationAction(R::get('id'), R::get('number')));
         break;
 
 

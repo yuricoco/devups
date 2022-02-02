@@ -18,6 +18,11 @@ class Notificationtype extends Model implements JsonSerializable
      **/
     protected $_key;
     /**
+     * @Column(name="session", type="string" , length=55 )
+     * @var string
+     **/
+    protected $session = 'user';
+    /**
      * @Column(name="content", type="string" , length=255 )
      * @var integer
      **/
@@ -27,6 +32,11 @@ class Notificationtype extends Model implements JsonSerializable
      * @var string
      **/
     protected $redirect;
+    /**
+     * @Column(name="emailmodel", type="string" , length=255, nullable=true )
+     * @var integer
+     **/
+    protected $emailmodel;
 
     /**
      * @ManyToOne(targetEntity="\Dvups_entity")
@@ -48,6 +58,38 @@ class Notificationtype extends Model implements JsonSerializable
     public function getId()
     {
         return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    /**
+     * @param string $session
+     */
+    public function setSession(  $session)
+    {
+        $this->session = $session;
+    }
+
+    /**
+     * @return int
+     */
+    public function getEmailmodel()
+    {
+        return $this->emailmodel;
+    }
+
+    /**
+     * @param int $emailmodel
+     */
+    public function setEmailmodel($emailmodel)
+    {
+        $this->emailmodel = $emailmodel;
     }
 
     /**
@@ -118,6 +160,14 @@ class Notificationtype extends Model implements JsonSerializable
             'redirect' => $this->redirect,
             'dvups_entity' => $this->dvups_entity,
         ];
+    }
+
+    public function getTest()
+    {
+        return '
+        <input id="notification-' . $this->id . '" class="form-control" name="phonenumber" />
+        <button type="button" onclick="model.sendsms(this, ' . $this->id . ')" class="btn btn-info"> Test sms </button>';
+
     }
 
 }

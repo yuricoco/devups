@@ -24,8 +24,11 @@ class NotificationbroadcastedTable extends Datatable
     public function buildindextable()
     {
 
+        $this->order_by = " this.id desc";
         $this->datatablemodel = [
             ['header' => t('#'), 'value' => 'id'],
+            ['header' => t('User'), 'value' => 'user.email'],
+            ['header' => t('Admin'), 'value' => 'admin.name'],
             ['header' => t('Viewedat'), 'value' => 'viewedat'],
             ['header' => t('Status'), 'value' => 'status'],
             ['header' => t('Notification'), 'value' => 'Notification.entity']
@@ -50,6 +53,27 @@ class NotificationbroadcastedTable extends Datatable
             }]
         ];
         $this->setModel("customer");
+        return $this;
+    }
+    public function builddashboardtable()
+    {
+
+        $this->order_by = "this.id desc";
+        $this->groupaction = false;
+        $this->disablepagination();
+        $this->enabletopaction = false;
+        $this->searchaction = false;
+        $this->enablecolumnaction = false;
+        $this->base_url = Notification::classpath("services.php?path=");
+        $this->datatablemodel = [
+            //['header' => t('#'), 'value' => 'id'],
+            // ['header' => t('Status'), 'value' => 'status'],
+            ['header' => t('Viewedat'), 'value' => 'viewedat'],
+            ['header' => t('Notification'), 'value' => function(\Notificationbroadcasted $item){
+                return $item->notification->getContent();
+            }]
+        ];
+        $this->setModel("dashboard");
         return $this;
     }
 

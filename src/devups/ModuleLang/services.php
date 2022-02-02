@@ -3,7 +3,8 @@
 
 require '../../../admin/header.php';
 
-// verification token
-//
+
+(new Request('hello'));
+
 \devups\ModuleLang\ModuleLang::services(Request::get('path'));
 
