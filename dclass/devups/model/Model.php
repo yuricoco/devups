@@ -785,27 +785,53 @@ class Model extends \stdClass
     {
 //        $calledfrom = debug_backtrace();
 //        dv_dump($calledfrom);
-        if (!property_exists($this, $attribut) && $this->dvtranslate && in_array($attribut, $this->dvtranslated_columns)) {
-            if (!$this->id)
-                return null;
+        if (!property_exists($this, $attribut)) {
 
-            $classlang = get_class($this) . "_lang";
-            $cnl = strtolower($classlang);
-            if (property_exists($classlang, $attribut)) {
-                $idlang = DBAL::$id_lang_static;
+            if ($this->dvtranslate && in_array($attribut, $this->dvtranslated_columns)) {
+                if (!$this->id)
+                    return null;
+                $classlang = get_class($this) . "_lang";
+                $cnl = strtolower($classlang);
+                if (property_exists($classlang, $attribut)) {
+                    $idlang = DBAL::$id_lang_static;
 
-                if (!$idlang) {
+                    if (!$idlang) {
 
-                    (new DBAL())->setClassname(get_class($this))->getLangValues($this, [$attribut]);
+                        (new DBAL())->setClassname(get_class($this))->getLangValues($this, [$attribut]);
+                        return $this->{$attribut};
+                    }
+                    $sql = " SELECT $attribut FROM `$cnl` WHERE lang_id = $idlang AND " . strtolower(get_class($this)) . "_id = " . $this->id;
+                    $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
+
+                    $this->{$attribut} = $data[0];
+                    return $data[0];
+                }
+            }
+            else {
+                $entityattribut = substr($attribut, 1, strlen($attribut)-1);
+                //var_dump($attribut);
+                if ($attribut != "_".$entityattribut){
+                    $trace = debug_backtrace();
+                    trigger_error(
+                        'Propriété non-définie via __get() : ' . $attribut .
+                        ' dans ' . $trace[0]['file'] .
+                        ' à la ligne ' . $trace[0]['line'],
+                        E_USER_NOTICE);
+                    die;
+                }
+                if (is_object($this->{$entityattribut})) { //  && isset($this->{$entityattribut . "_id"})
+
+                    if ($this->{$entityattribut}->dvfetched)
+                        return $this->{$entityattribut};
+
+                    $this->{$attribut} = $this->{$entityattribut}->hydrate();
+//                    $classname = get_class($this->{$attribut});
+//                    $this->{"_".$attribut} = $classname::findrow($this->{$attribut . "_id"});
+
                     return $this->{$attribut};
                 }
-                $sql = " SELECT $attribut FROM `$cnl` WHERE lang_id = $idlang AND " . strtolower(get_class($this)) . "_id = " . $this->id;
-                $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
 
-                $this->{$attribut} = $data[0];
-                return $data[0];
             }
-
         } elseif (property_exists($this, $attribut)) {//$this->id &&
 
             /*

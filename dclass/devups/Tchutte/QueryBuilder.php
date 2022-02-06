@@ -395,9 +395,9 @@ class QueryBuilder extends \DBAL
             foreach ($entity_links as $entity_link) {
                 $class_attrib = explode(":", $entity_link);
                 if ($class_attrib[0] != $class_attrib[1])
-                    $this->defaultjoin .= " LEFT JOIN `" . $class_attrib[0] . "` " . $class_attrib[1] . " ON `" . $class_attrib[1] . "`.id = " . $this->table . "." . $class_attrib[1] . "_id";
+                    $this->defaultjoin .= " LEFT JOIN `" . $class_attrib[0] . "` `" . $class_attrib[1] . "` ON `" . $class_attrib[1] . "`.id = " . $this->table . "." . $class_attrib[1] . "_id";
                 else
-                    $this->defaultjoin .= " LEFT JOIN `" . $class_attrib[0] . "` ON `" . $class_attrib[0] . "`.id = {$this->_from}." . $class_attrib[0] . "_id";
+                    $this->defaultjoin .= " LEFT JOIN `" . $class_attrib[0] . "` ON `" . $class_attrib[0] . "`.id = {$this->table}." . $class_attrib[0] . "_id";
             }
         }
         $this->_join .= $this->defaultjoin;

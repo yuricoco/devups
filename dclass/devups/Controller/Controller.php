@@ -130,7 +130,7 @@ class Controller
         $classname = self::getclassname();
         $newclass = ucfirst($classname);
         $entity = new $newclass;
-
+        $entities = [];
         $rawdata = \Request::raw();
         if (is_null($rawdata)) {
             if (!isset($_POST[$classname . "_form"]))
@@ -138,9 +138,30 @@ class Controller
                     $classname => $entity,
                     'detail' => $classname . "_form is missing in your form_data. ex: entity_form[attribute] ");
             $entity = $this->form_fillingentity($entity, $_POST[$classname . "_form"]);
-        } else
-            $entity = $this->hydrateWithJson($entity, $rawdata[$classname]);
+        } else {
+            if (isset($rawdata[$classname."_bulk"])) {
+                $datacollection = [];
+                foreach ($rawdata[$classname."_bulk"] as $rawentity) {
+                    $this->error = [];
+                    $entity_item = $this->hydrateWithJson($entity, $rawentity);
+                    $entity_item->id = null;
+                    if ($this->error) {
+                        $datacollection[] = array('success' => false,
+                            $classname => $entity_item,
+                            'error' => $this->error);
+                        continue;
+                    }
 
+                    $id = $entity_item->__insert();
+
+                    $datacollection[] = array('success' => true,
+                        $classname => $entity_item,
+                        'detail' => '');
+                }
+                return compact("datacollection");
+            }else
+                $entity = $this->hydrateWithJson($entity, $rawdata[$classname]);
+        }
         if (!$persist)
             return $entity;
 

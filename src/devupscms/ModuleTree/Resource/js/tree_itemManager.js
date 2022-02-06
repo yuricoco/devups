@@ -279,7 +279,7 @@ Vue.component("childrenTree", {
         changestatus(el, status) {
             el.status = status;
             console.log(el);
-            Drequest.api("tree-item.changestatus&id=" + el.id + "&status=" + status)
+            Drequest.api("tree-item.changestatus?id=" + el.id + "&status=" + status)
                 .get(function (response) {
                     console.log(response);
                 })

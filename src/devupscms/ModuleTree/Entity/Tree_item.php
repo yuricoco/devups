@@ -362,13 +362,14 @@ class Tree_item extends Model implements JsonSerializable
             ->first();
     }
 
-    public static function children($id)
+    public static function children($id, $id_lang = null)
     {
 
         return self::select()
             ->where("this.parent_id", $id)
             ->orderby("this.position")
-            ->__getAll();
+            ->setLang($id_lang)
+            ->get();
     }
 
     public function images()

@@ -49,13 +49,14 @@ class Form extends FormFactory{
         //$_SESSION["dvups_form"][Form::$name] = Form::$fields;
 //        $dvups_form = "<textarea style='display:none;' name='dvups_form[".Form::$name."]' >".json_encode(Form::$fields)."</textarea>";
 //        return $dvups_form."</form>";
-        return "</form>";
+        return "<div id='dv-form-".Form::$name."-error}'></div></form>";
     }
 
     public static function imbricate($enitty) {
         Form::$savestate = [Form::$name, Form::$fields];
         //Form::$fields = [];
         Form::$name = strtolower(get_class($enitty));
+        return "";
     }
 
     public static function closeimbricate() {
@@ -143,6 +144,32 @@ class Form extends FormFactory{
 
     }
 
+    /**
+     * @param $name
+     * @param $options
+     * @param $value
+     * @param $callback
+     * @param array $directive
+     * @param array $setter
+     * @return string
+     */
+    public static function selectGroup($name, $options, $value, $callback, $directive = [], $setter = []) {
+
+        FormFactory::$fieldname = Form::$name."_form[".$name.']';
+        FormFactory::$fieldid = Form::$name."-".$name.'';
+        $field["options"] = $options;
+        $field["value"] = $value;
+
+        if(isset($directive['placeholder'])){
+            $field["placeholder"] = $directive['placeholder'];
+        }
+
+        Form::optionsfield($name, $value, $options, $setter);
+
+        return Form::__selectGroup("", $field, $callback, Form::serialysedirective($directive));
+
+    }
+
     public static function select($name, $options, $value, $directive = [], $setter = [], $callback = null) {
 
         FormFactory::$fieldname = Form::$name."_form[".$name.']';
@@ -157,6 +184,22 @@ class Form extends FormFactory{
         Form::optionsfield($name, $value, $options, $setter);
 
         return Form::__select("", $field, Form::serialysedirective($directive), $callback);
+
+    }
+
+    public static function autocomplete($name, $options, $value, $directive = [], $setter = [], $callback = null) {
+
+        FormFactory::$fieldname = Form::$name."_form[".$name.']';
+        FormFactory::$fieldid = Form::$name."-".$name.'';
+        $field["options"] = $options;
+        $field["value"] = $value;
+        if(isset($directive['placeholder'])){
+            $field["placeholder"] = $directive['placeholder'];
+        }
+
+        Form::optionsfield($name, $value, $options, $setter);
+
+        return Form::__autocomplete("", $field, Form::serialysedirective($directive), $callback);
 
     }
 

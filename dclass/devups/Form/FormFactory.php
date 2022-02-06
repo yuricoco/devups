@@ -208,6 +208,37 @@ class FormFactory
         return $select . '</select>';
     }
 
+    public static function __autocomplete($entitycore, $field, $directive = "", $callback = null)
+    {
+
+        $text = "";
+        $value = "";
+        $option = "";
+        if (is_object($field['value'])) {
+            $entity = $field['value'];
+            $text = $entity->{$field['options']["text"]};
+            $value = $entity->{$field['options']["value"]};
+            $option = '<option value="' . $value . '" >' . $text . '</option>';
+        }
+
+        $select = '
+        <div class="input-group">
+            <input onblur="model.autocompletehide(this)" onfocus="model.autocompleteshow(this)" onkeyup="model.autocomplete(this)" autocomplete="off" ' . $directive . ' >
+            <div class="input-group-append">
+                <button onclick="model.autocompletereset(this, \'' . $value . '\', \'' . $text . '\')"
+                        class="reset btn btn-outline-primary" type="button"><i class="fa fa-reply"></i>
+                </button>
+            </div>
+        </div>
+        ';
+
+        $select .= '<div class="search-results"><ul class="list-group"></ul></div>
+<select style="display: none" ' . $directive . ' name="' . FormFactory::$fieldname . '" >';
+
+        $options = json_encode($field['options']);
+        return "<div data-options='$options' class='dv-autocomplete'>" . $select . $option . '</select></div>';
+    }
+
     public static function __selectGroup($entitycore, $field, $callback, $directive = "")
     {
 
@@ -303,6 +334,9 @@ class FormFactory
     public static function serialysedirective($directives)
     {
         $formdirective = [];
+        if (!isset($directives["id"]))
+            $directives["id"] = FormFactory::$fieldid;
+
         foreach ($directives as $key => $value) {
             $formdirective[] = $key . "='" . $value . "'";
         }
@@ -369,7 +403,7 @@ class FormFactory
                     $formfield = FormFactory::__input($entitycore, $field, $field['directive']);
                 }
             } elseif ($field['type'] == FORMTYPE_TEXTAREA) {
-                $formfield = FormFactory::__textarea($entitycore, $field, $field['directive'], true);
+                $formfield = FormFactory::__textarea($entitycore, $field, $field['directive'], isset($field["lang"]));
             } elseif ($field['type'] == FORMTYPE_CHECKBOX) {
                 $formfield = FormFactory::__checkbox($entitycore, $field, $field['directive']);
             } elseif ($field['type'] == FORMTYPE_RADIO) {
@@ -436,7 +470,7 @@ class FormFactory
 
         $formbutton = "";
         if ($entitycore->formbutton) {
-            $formbutton = "<button class='btn btn-success btn-block' type='submit' >Save</button></form>";//<input class='btn btn-light' type='reset' value='reset' >
+            $formbutton = "<button class='btn btn-success btn-block' type='submit' >" . t("Save") . "</button></form>";//<input class='btn btn-light' type='reset' value='reset' >
         }
 
         $formjs = "";

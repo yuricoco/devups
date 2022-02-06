@@ -72,7 +72,7 @@ var model = {
     clonerow: function (id, entity) {
         model.init(entity)
         var regex = /_/gi;
-        model.request(this.entity + "._clonerow&dclass="+entity)
+        model.request(this.entity + "._clonerow&dclass=" + entity)
             .param({
                 id: id
             })
@@ -119,7 +119,7 @@ var model = {
         }*/
 
         this._showmodal();
-        model.request(this.entity + ".form"+ddatatable.urlparam)
+        model.request(this.entity + ".form" + ddatatable.urlparam)
             //.param({path: this.entity + "._new"})
             .get(function (response) {
                 console.log(response)
@@ -139,7 +139,7 @@ var model = {
         this._showmodal();
 
         //model.request(this.entity + "._edit")
-        model.request(this.entity + ".form"+ddatatable.urlparam)
+        model.request(this.entity + ".form" + ddatatable.urlparam)
             .param({
                 id: id
             })
@@ -168,10 +168,10 @@ var model = {
             .param({
                 id: id
             })
-            .get( (response) => {
+            .get((response) => {
                 this.removeLoader();
                 console.log(response)
-                if($tr.length)
+                if ($tr.length)
                     $tr.remove();
                 if (callback)
                     callback(response);
@@ -192,7 +192,7 @@ var model = {
                 path: this.entity + "._show",
                 id: id
             })
-            .get( (response) => {
+            .get((response) => {
                 console.log(response);
                 databinding.bindmodal(response);
             })
@@ -273,11 +273,137 @@ var model = {
         return formdata;
     },
 
-    request : function (action) {
+    loading: false,
+    dataset: [],
+    autocompleteshow(el) {
+        var component = $(el).parents(".dv-autocomplete");
+        component.find("ul").show();
+    },
+    autocompletehide(el) {
+        var component = $(el).parents(".dv-autocomplete");
+        setTimeout(() => {
+            component.find("ul").hide();
+        }, 300)
+    },
+    bindresult(options, component, listEntity) {
+        $.each(listEntity, function (i, item) {
+            if (options.lang) {
+                /*component.find("select").append($('<option>', {
+                    value: item[options.value],
+                    text: item[options.text][options.lang]
+                }));*/
+                component.find("ul").append(`<li onclick="model.selectvalue(this, '${item[options.value]}', '${item[options.text][options.lang]}')" class="list-group-item" >${item[options.text][options.lang]}</li>`);
+            } else {
+                /*component.find("select").append($('<option>', {
+                    value: item[options.value],
+                    text: item[options.text]
+                }));*/
+                component.find("ul").append(`<li onclick="model.selectvalue(this, '${item[options.value]}', '${item[options.text]}')" class="list-group-item" >${item[options.text]}</li>`);
+            }
+        });
+    },
+    autocompletereset(el, value, text) {
+        this.selectvalue(el, value, text)
+    },
+    selectvalue(el, value, text) {
+        var component = $(el).parents(".dv-autocomplete");
+        component.find("input").val(text);
+        component.find("select").html($('<option>', {
+            value: value,
+            text: text
+        }));
+
+        if (options.userselected) {
+            model[options.userselected](value, text);
+        }
+
+    },
+    autocomplete: function (el) {
+        var component = $(el).parents(".dv-autocomplete"),
+            options = component.data("options"),
+            value = el.value,
+            _param = {"dfilters": "on"};
+
+        if (value.length < 3) {
+            model.dataset = [];
+            this.loading = false;
+            this.loaddata = false;
+            return;
+        }
+        var data = [];
+        if (this.loading) {
+            if (model.dataset.length) {
+                /*component.find("select").html($('<option>', {
+                    value: "",
+                    text: "... loading"
+                }));*/
+                component.find("ul").html(`<li class="list-group-item">... loading</li>`);
+                data = model.filterrow(value, model.dataset, options.searchkey);
+                model.bindresult(options, component, data)
+            }
+            if (data.length === 0) {
+                this.loading = false;
+            } else
+                return;
+        }
+
+        /*component.find("select").html($('<option>', {
+            value: "",
+            text: "... loading"
+        }));*/
+        component.find("ul").show();
+        component.find("ul").html(`<li class="list-group-item">... loading</li>`);
+        this.loading = true;
+
+        for (let v of options.search) {
+            _param[v] = value
+        }
+        console.log(options, value);
+        Drequest.api("lazyloading." + options.entity)
+            .param(_param)
+            .get((response) => {
+                console.log(response)
+
+                // component.find("select").html("");
+                component.find("ul").html(``);
+                model.dataset = response.listEntity
+
+                if (options.callback) {
+                    model[options.callback](response);
+                }
+
+                if (response.nb_element)
+                    model.bindresult(options, component, response.listEntity)
+                else {
+                    component.find("select").html($('<option>', {
+                        value: "",
+                        text: "--- Aucun element trouve ---"
+                    }));
+                    component.find("ul").html(`<li class="list-group-item">--- Aucun element trouve ---</li>`);
+                }
+            })
+    },
+
+    filterrow(value, dataarray, key) {
+        var filter, filtered = [], i, data;
+
+        console.log(dataarray);
+        filter = value.toUpperCase();
+
+        for (i = 0; i < dataarray.length; i++) {
+            data = dataarray[i];
+            if (data[key].toUpperCase().indexOf(filter) > -1) {
+                filtered.push(data);
+            }
+        }
+        return filtered;
+    },
+
+    request: function (action) {
         // var formdata = this._formdata(form);
         // model.modalbody.append('<div id="loader" style="position: absolute;bottom:0; z-index: 3; height: 60px; text-align: center; padding: 5%">Loading ...</div>');
         console.log(this.baseurl)
-        return Drequest.init(this.baseurl+"?path="+action)
+        return Drequest.init(this.baseurl + "?path=" + action)
     },
 
     getformvalue: function (field) {
@@ -362,8 +488,8 @@ var model = {
     },
     init: function (entity) {
 
-        if(!entity)
-            return ;
+        if (!entity)
+            return;
         model.entity = entity;
         ddatatable.init(entity);
         model.baseurl = ddatatable.baseurl;
@@ -378,6 +504,6 @@ var model = {
 };
 
 //setTimeout(function () {
-    // model.init();
+// model.init();
 //}, 800)
 
