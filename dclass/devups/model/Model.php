@@ -1349,4 +1349,9 @@ class Model extends \stdClass
 
     }
 
+    public static function getStatusWhereKey($key){
+        $classname = get_called_class();
+        return Status::getStatus($key, strtolower($classname));
+    }
+
 }

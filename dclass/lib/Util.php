@@ -162,4 +162,12 @@ class Util
         return date("Y-m-d H:i:s", strtotime($duration . " $period", strtotime($from)));
     }
 
+    public static function sanitizePhonenumber($phonenumber, $phone_code){
+        $telephone = str_replace(" ","", $phonenumber);
+        $telephone = str_replace("(","", $telephone);
+        $telephone = str_replace(")","", $telephone);
+        $telephone = str_replace("+".$phone_code,"", "+".$telephone);
+        return str_replace("+","", $telephone);
+    }
+
 }

@@ -14,12 +14,14 @@ class Dvups_role_dvups_component extends Model implements JsonSerializable
 
     /**
      * @ManyToOne(targetEntity="\Dvups_component")
+     * @JoinColumn(onDelete="cascade")
      * @var \Dvups_component
      */
     public $dvups_component;
 
     /**
      * @ManyToOne(targetEntity="\Dvups_role")
+     * @JoinColumn(onDelete="cascade")
      * @var \Dvups_role
      */
     public $dvups_role;

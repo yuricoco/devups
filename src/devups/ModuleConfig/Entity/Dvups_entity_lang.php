@@ -18,7 +18,7 @@ class Dvups_entity_lang extends Dv_langCore
      * @JoinColumn(onDelete="cascade")
      * @var \Dvups_entity
      */
-    public $dvups_entity_id;
+    public $dvups_entity;
 
 
 

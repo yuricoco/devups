@@ -105,7 +105,7 @@ class UserCore extends \Model implements JsonSerializable
         //return $this->setEmail($value);
         // code de validation
         if (is_numeric($value)) {
-            return $this->setTelephone($value);
+            return $this->setPhonenumber($value);
         }
         return $this->setEmail($value);
 
@@ -133,6 +133,8 @@ class UserCore extends \Model implements JsonSerializable
         if (!$phonenumber)
             return null;
 
+        $phonenumber = \DClass\lib\Util::sanitizePhonenumber($phonenumber, $this->country->getPhonecode());
+
         $nb = User::where("phonenumber", $phonenumber);
         if ($nb->count()) {
             if ($nb->first()->getId() != $this->id)
@@ -148,15 +150,18 @@ class UserCore extends \Model implements JsonSerializable
 
         $this->password = $password;
     }
+    public function setResetpassword ($password)
+    {
+        if(!$password)
+            return null;
 
-    public static function sanitizePhonenumber($phonenumber, $phone_code){
-        $telephone = str_replace("+".$phone_code,"", "+".$phonenumber);
-        return str_replace("+","", $telephone);
+        $this->password = sha1($password);
     }
 
     public function setTelephone($telephone)
     {
-        if (!$telephone)
+        $this->setPhonenumber($telephone);
+        /*if (!$telephone)
             return null;
 
         $telephone = self::sanitizePhonenumber($telephone, $this->country->getPhonecode());
@@ -166,7 +171,7 @@ class UserCore extends \Model implements JsonSerializable
             if ($nb->first()->getId() != $this->id)
                 return t("a user with this :attribute already exist", ["attribute" => "telephone"]);
         }
-        $this->telephone = $telephone;
+        $this->telephone = $telephone;*/
     }
 
     /**
@@ -386,9 +391,8 @@ class UserCore extends \Model implements JsonSerializable
     /**
      * @return string
      */
-    public function getTelephone()
-    {
-        return $this->phonenumber;
+    public function getTelephone(){
+        return $this->country->phonecode.$this->phonenumber;
     }
 
     public function mapAvailableData($userbaseinfo)

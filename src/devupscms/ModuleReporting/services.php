@@ -11,6 +11,9 @@ use Request as R;
 
 header("Access-Control-Allow-Origin: *");
 
+global $viewdir, $moduledata;
+$viewdir[] = __DIR__ . '/Resource/views';
+
 
 $emaillogCtrl = new EmaillogController();
 $reportingmodelCtrl = new ReportingmodelController();

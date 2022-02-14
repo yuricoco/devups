@@ -18,14 +18,15 @@ $separator = '/';
 
 //If the first three characters PHP_OS are equal to "WIN",
 //then PHP is running on a Windows operating system.
-if(strcasecmp(substr(PHP_OS, 0, 3), 'WIN') == 0){
+if (strcasecmp(substr(PHP_OS, 0, 3), 'WIN') == 0) {
     $isWindows = true;
     $separator = '\\';
 }
 
 $module_entities = [];
 
-function getproject($namespace) {
+function getproject($namespace)
+{
     global $separator;
     // get all components building the global project
     $components = Core::buildOriginCore();
@@ -34,7 +35,8 @@ function getproject($namespace) {
     return __Generator::findproject($components, $ns[0]);
 }
 
-function getcomponent($namespace) {
+function getcomponent($namespace)
+{
     global $separator;
     // get all components building the global project
     $components = Core::getComponentCore();
@@ -43,7 +45,9 @@ function getcomponent($namespace) {
     return __Generator::findproject($components, $ns[0]);
 
 }
-function recurse_copy_dir(string $src, string $dest) : int {
+
+function recurse_copy_dir(string $src, string $dest): int
+{
     $count = 0;
 
     // ensure that $src and $dest end with a slash so that we can concatenate it with the filenames directly
@@ -57,12 +61,12 @@ function recurse_copy_dir(string $src, string $dest) : int {
     @mkdir($dest);
 
     // store the next file name to $file. if $file is false, that's all -- end the loop.
-    while(($file = $list->read()) !== false) {
-        if($file === "." || $file === "..") continue;
-        if(is_file($src . $file)) {
+    while (($file = $list->read()) !== false) {
+        if ($file === "." || $file === "..") continue;
+        if (is_file($src . $file)) {
             copy($src . $file, $dest . $file);
             $count++;
-        } elseif(is_dir($src . $file)) {
+        } elseif (is_dir($src . $file)) {
             $count += recurse_copy_dir($src . $file, $dest . $file);
         }
     }
@@ -122,7 +126,7 @@ CREATE TABLE `$lc_entity\_lang` (
     }*/
 
     $action = "--dump-sql";
-    if(isset($argv[2]))
+    if (isset($argv[2]))
         $action = $argv[2];
 
     switch ($action) {
@@ -133,21 +137,54 @@ CREATE TABLE `$lc_entity\_lang` (
 
         case '--force':
 
+            require ROOT . 'src/requires.php';
+
+            $entitiestoupdate = [];
+//            foreach ($result as $row) {
+//
+//            }
+
             echo " Updating database schema...\n ";
+
+            // todo: connect to toolrad and update the schema of the entity
 
             $dbal = new DBAL();
             for ($i = 3; $i < count($result); $i++) {
-                if(!isset($result[$i]))
+                if (!isset($result[$i]))
                     break;
 
                 $query = $result[$i];
-                if ($query){
+                if ($query) {
+
+                    $pos = strpos($query, "ALTER TABLE");
+                    if (!$pos)
+                        $pos = strpos($query, "CREATE TABLE");
+
+                    if (!$pos)
+                        continue;
+
+                    $ent = explode(" ", trim($query))[2];
+                    if (!in_array($ent, $entitiestoupdate))
+                        $entitiestoupdate[] = $ent;
+
                     $dbal->executeDbal($query);
                     \dclass\devups\Tchutte\DB_dumper::migration($query);
                 }
             }
+            //if (count($entitiestoupdate) )
             echo "\n \e[42m \e[1m\e[30m \n[OK] Database schema updated successfully!\n ";
-            echo  "\e[0m";
+            echo "\e[0m";
+
+
+            foreach ($entitiestoupdate as $entity) {
+                //__Generator::core($entity);
+                $backend = new BackendGenerator();
+                $backend->coreGenerator($entity, true);
+            }
+
+            echo "\n \e[42m \e[1m\e[30m \n All entity has well been synchronized";
+            echo "\e[0m";
+
             break;
         default:
             echo " \n Enter the option --force to persist the query ";
@@ -157,7 +194,7 @@ CREATE TABLE `$lc_entity\_lang` (
 
             break;
     }
-    echo  "\n";
+    echo "\n";
     die;
 
 }
@@ -207,8 +244,18 @@ if (isset($argv[2])) {
             break;
 
         case 'entity:g:core':
-            __Generator::core($argv[2], $project); //,
+            require ROOT . 'src/requires.php';
+            if (isset($argv[3]) && $argv[3] == "--sync")
+                __Generator::core($argv[2], true); //,
+            else
+                __Generator::core($argv[2]); //,
+
             echo $argv[2] . ": Core generated with success";
+            break;
+
+        case 'entity:g:postmandoc':
+            __Generator::postmandoc($argv[2], $project); //,
+            echo $argv[2] . ": Postmandoc generated with success";
             break;
 
         case 'core:g:views':
@@ -253,30 +300,30 @@ if (isset($argv[2])) {
 
         case 'core:g:entity':
 
-            if(isset($argv[3])){
-                if($argv[3] == "--lang"){
+            if (isset($argv[3])) {
+                if ($argv[3] == "--lang") {
                     __Generator::entityLang($argv[2], $project); //,
                     echo $argv[2] . ": Entity lang generated with success";
 //                }
 //                elseif(isset($argv[4])){
 //                    __Generatorjava::entity($argv[2], $project, $argv[4]); //,$argv[4] for package
 //                    echo $argv[2] . ": Entity java generated with success";
-                }else
+                } else
                     echo "warning: did you mean --lang?";
-            }else{
+            } else {
                 __Generator::entity($argv[2], $project); //,
                 echo $argv[2] . ": Entity generated with success";
             }
             break;
 
         case 'core:g:crud':
-            if(isset($argv[3])){
-                if(isset($argv[4])){
+            if (isset($argv[3])) {
+                if (isset($argv[4])) {
                     __Generatorjava::crud($argv[2], $project, $argv[4]); //,$argv[4] for package
                     echo $argv[2] . ": Entity java generated with success";
-                }else
+                } else
                     echo "warning: package missing!";
-            }else {
+            } else {
                 __Generator::crud($argv[2], $project); //,
                 echo $argv[2] . ": CRUD generated with success";
             }
@@ -328,8 +375,7 @@ if (isset($argv[2])) {
     }
 
     chdir('../../');
-}
-else {
+} else {
 
     require __DIR__ . '/../../src/devups/ModuleLang/Entity/Dvups_lang.php';
     require __DIR__ . '/../../src/devups/ModuleConfig/Entity/Dvups_component.php';
@@ -349,24 +395,24 @@ else {
             $dir = __DIR__ . '/../../build';
 
 // we delete the previews version
-            if(!file_exists($dir. ''))
-                mkdir ($dir. '', 777, true);
+            if (!file_exists($dir . ''))
+                mkdir($dir . '', 777, true);
 
-            if(file_exists($dir. '/'.__project_id.'.zip'))
-                unlink ($dir. '/'.__project_id.'.zip');
+            if (file_exists($dir . '/' . __project_id . '.zip'))
+                unlink($dir . '/' . __project_id . '.zip');
 
-            recurse_copy_dir(ROOT."src", ROOT."build/src");
-            recurse_copy_dir(ROOT."dclass", ROOT."build/dclass");
+            recurse_copy_dir(ROOT . "src", ROOT . "build/src");
+            recurse_copy_dir(ROOT . "dclass", ROOT . "build/dclass");
             //$files = scanDir::scan(ROOT, [], true);
 
-            HZip::zipDir($dir, $dir . '/'.__project_id.'.zip');
+            HZip::zipDir($dir, $dir . '/' . __project_id . '.zip');
 
             echo 'succes de la compression';
             break;
         case 'deploy':
 
             $dir = __DIR__ . '/../../build';
-            $file = $dir . '/'.__project_id.'.zip';
+            $file = $dir . '/' . __project_id . '.zip';
 
             $zip = new ZipArchive;
             if ($zip->open($file) === TRUE) {
@@ -399,7 +445,7 @@ else {
             }
 
             RequestGenerator::databasecreate(dbname); //, 
-            echo " > Creating Database.\n\n". dbname . ": created with success ...\n";
+            echo " > Creating Database.\n\n" . dbname . ": created with success ...\n";
             $result = [];
             exec("bin\doctrine orm:schema:create", $result);
 
@@ -411,8 +457,8 @@ else {
             $dvupsadminsql .= "
             TRUNCATE `configuration`;
             INSERT INTO `configuration` ( `_key`, `_value`, `_type`) VALUES
-                    (\"PROJECT_NAME\", \"".PROJECT_NAME."\", 'string'),
-                    (\"dbname\", \"".dbname."\", 'string'),
+                    (\"PROJECT_NAME\", \"" . PROJECT_NAME . "\", 'string'),
+                    (\"dbname\", \"" . dbname . "\", 'string'),
                     (\"dbuser\", \"root\", 'string'),
                     (\"dbpassword\", \"\", 'string'),
                     (\"dbhost\", \"localhost\", 'string'),
@@ -420,9 +466,9 @@ else {
                     (\"dbtransaction\", \"false\", 'bool'),
                     (\"__v\", 1, 'integer'),
                     (\"__server\", \"http://127.0.0.1\", 'string'),
-                    (\"__env\", \"{__server}/".PROJECT_NAME."/\", 'string'),
+                    (\"__env\", \"{__server}/" . PROJECT_NAME . "/\", 'string'),
                     (\"__prod\", 0, 'integer'),
-                    (\"__project_id\", \"".PROJECT_NAME."\", 'string'),
+                    (\"__project_id\", \"" . PROJECT_NAME . "\", 'string'),
                     (\"UPLOAD_DIR\", \"{ROOT}uploads/\", 'string'),
                     (\"RESSOURCE\", \"{ROOT}admin/Resource/\", 'string'),
                     (\"admin_dir\", \"{ROOT}admin/\", 'string'),

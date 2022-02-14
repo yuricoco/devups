@@ -20,6 +20,7 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
 
     /**
      * @ManyToOne(targetEntity="\Dvups_module")
+     * @JoinColumn(onDelete="cascade")
      * @var \Dvups_module
      */
     public $dvups_module;

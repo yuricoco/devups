@@ -283,11 +283,22 @@ Usage:
      * 
      * @param type $namespace
      */
-    public static function core($namespace, $project) {
+    public static function core($namespace, $sync = false) {
 
         $ns = explode("\\", $namespace);
         //__Generator::findentity($project, $ns[1], $ns[2]);
-        __Generator::__core($ns[2], $ns[1]);
+        __Generator::__core($ns[2], $ns[1], $sync);
+
+    }
+    /**
+     *
+     * @param type $namespace
+     */
+    public static function postmandoc($namespace, $project) {
+
+        $ns = explode("\\", $namespace);
+        //__Generator::findentity($project, $ns[1], $ns[2]);
+        __Generator::__postmandoc($ns[2], $ns[1]);
 
     }
     /**
@@ -415,14 +426,26 @@ Usage:
         __Generator::dependencies($project, __Generator::$modulecore, $entity);
     }
 
-    private static function __core($entity, $module){
+    private static function __core($entity, $module, $sync = false){
 
         $backend = new BackendGenerator();
         $repertoire = ucfirst($module);
         //$repertoire = ucfirst(__Generator::$modulecore->name);
         chdir($repertoire);
 
-        $backend->coreGenerator($entity);
+        $backend->coreGenerator($entity, $sync);
+
+        chdir('../');
+    }
+
+    private static function __postmandoc($entity, $module){
+
+        $backend = new BackendGenerator();
+        $repertoire = ucfirst($module);
+        //$repertoire = ucfirst(__Generator::$modulecore->name);
+        chdir($repertoire);
+
+        $backend->postmandocGenerator($entity);
 
         chdir('../');
     }
@@ -723,7 +746,7 @@ switch (Request::get('path')) {
         foreach ($modulelistentity as $entity) {
             $name = strtolower($entity->name);
             $contenu .= "
-    case '" . str_replace("_", "-", $name) . "/list':
+    case '" . str_replace("_", "-", $name) . "/index':
         $".$name."Ctrl->listView();
         break;\n";
         }
@@ -820,11 +843,14 @@ switch (Request::get('path')) {
 
         foreach ($modulelistentity as $entity) {
             $name = strtolower($entity->name);
-            $contenu .= " 
+            $contenu .= "
+        case '" . $name . "._new':
+                g::json_encode($" . $name . "Ctrl->formView());
+                break;
         case '" . $name . ".create':
                 g::json_encode($" . $name . "Ctrl->createAction());
                 break;
-        case '" . $name . ".form':
+        case '" . $name . "._edit':
                 g::json_encode($" . $name . "Ctrl->formView(R::get(\"id\")));
                 break;
         case '" . $name . ".update':
@@ -833,10 +859,10 @@ switch (Request::get('path')) {
         case '" . $name . "._show':
                 $" . $name . "Ctrl->detailView(R::get(\"id\"));
                 break;
-        case '" . $name . ".delete':
+        case '" . $name . "._delete':
                 g::json_encode($" . $name . "Ctrl->deleteAction(R::get(\"id\")));
                 break;
-        case '" . $name . ".deletegroup':
+        case '" . $name . "._deletegroup':
                 g::json_encode($" . $name . "Ctrl->deletegroupAction(R::get(\"ids\")));
                 break;
         case '" . $name . ".datatable':

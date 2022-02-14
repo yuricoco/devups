@@ -13,12 +13,14 @@
         
         /**
          * @ManyToOne(targetEntity="\Dvups_admin")
+         * @JoinColumn(onDelete="cascade")
          * @var \Dvups_admin
          */
         public $dvups_admin;
 
         /**
          * @ManyToOne(targetEntity="\Dvups_role")
+         * @JoinColumn(onDelete="cascade")
          * @var \Dvups_role
          */
         public $dvups_role;

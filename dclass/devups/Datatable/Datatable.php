@@ -518,6 +518,9 @@ EOF;
     private function groupactionbuilder()
     {
 
+        if ($this->isRadio)
+            return "";
+
         $customaction = [];
         foreach ($this->groupactions as $action) {
             //$customaction[] = "<span id='".$action["id"]."' class=\"btn btn-info\" >".$action["label"]."</span>";

@@ -236,7 +236,7 @@ class DBAL extends Database
                     $sql = "update `" . $entityTable . "` set " . $this->table . "_id = $id where id = " . $entity->getId();
 
                     $query = $this->link->prepare($sql);
-                    $success = $query->execute() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $entityTable, $values));
+                    $success = $query->execute() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values, $entityTable));
 
                 } else {
 
@@ -529,7 +529,7 @@ class DBAL extends Database
                 $bd_dump->transaction($this->table, $sql, $values);
             }
         } elseif ($action == self::$FETCH) {
-            $return = $query->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+            $return = $query->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
             //$return = 33;
         } elseif ($action == self::$INSERT) {
             if (dbtransaction) {
@@ -538,12 +538,12 @@ class DBAL extends Database
             }
             $req = $this->link->prepare("select @@IDENTITY as id");
             $req->execute();
-            $id = $req->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+            $id = $req->fetch() or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
             $return = $id['id'];
         } elseif ($action == self::$FETCHALL) {
             $return = $query->fetchAll();// or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
         } elseif ($action == self::$FETCHOBJECT) {
-            $return = $query->fetchObject($this->objectName) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+            $return = $query->fetchObject($this->objectName) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
         }
 
         return $return;
@@ -977,7 +977,7 @@ class DBAL extends Database
     {
 
         $req = $this->link->prepare($sql);
-        $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $req->errorInfo()));
+        $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $req->errorInfo(), $sql, $values));
 
         if (empty($this->entity_link_list) and empty($this->objectCollection)) {
             $flowBD = $req->fetchObject($this->objectName);
@@ -1045,7 +1045,7 @@ class DBAL extends Database
     {
 
         $req = $this->link->prepare($sql);
-        $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $sql, $req->errorInfo()));
+        $req->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__,$req->errorInfo(), $sql, $values));
 
         $arrayReturn = $this->listeEntity;
 
@@ -1076,7 +1076,7 @@ class DBAL extends Database
     {
         $result = [];
         $query = $this->link->prepare($sql);
-        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
         if (is_callable($callbackexport)) {
 
@@ -1107,7 +1107,7 @@ class DBAL extends Database
     {
         $result = [];
         $query = $this->link->prepare($sql);
-        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
 //        $flowBD = $query->fetchAll(PDO::FETCH_CLASS);
         if (is_callable($callbackexport)) {
@@ -1131,41 +1131,11 @@ class DBAL extends Database
         return $result;
     }
 
-
-    /**
-     * Return array of entire entity
-     *
-     * @param type $sql
-     * @param type $values
-     * @param type $collection
-     * @param type $recursif
-     * @return array
-     */
-    /*protected function __findAll($sql, $values = [], $collection = false, $recursif = false)
-    {
-
-
-        $query = $this->link->prepare($sql);
-        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
-
-        if (empty($this->entity_link_list))
-            $retour = $query->fetchAll(PDO::FETCH_CLASS, $this->objectName);
-        elseif ($arraybd = $query->fetchAll(PDO::FETCH_NAMED)) {
-            foreach ($arraybd as $row)
-                $liste[] = $this->djoin($row, $this->object, $collection, $recursif);
-            $retour = $liste;
-        } else
-            $retour = array();
-
-//            $this->ResetObject();
-        return $retour;
-    }*/
-
     protected function __cursor($sql, $values, $callback = null)
     {
 
         $query = $this->link->prepare($sql);
-        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql));
+        $query->execute($values) or die(Bugmanager::getError(__CLASS__, __METHOD__, __LINE__, $query->errorInfo(), $sql, $values));
 
         if (is_callable($callback)) {
             while ($row = $query->fetch(PDO::FETCH_NAMED)) {
@@ -1417,22 +1387,7 @@ class DBAL extends Database
                 $keys[$key . '_id'] = $val->getId();
                 //}
             }
-            /*foreach ($fieldNames as $key => $val) {
-                /*$val = $objectarray[$key];
-                if (is_object($val)) {
-                    //var_dump(get_class($val));
-                    $this->entity_link_list[strtolower(get_class($val) . ":" . $key)] = $val;
-                    $this->entity_link_map_list[strtolower(get_class($val))] = $key;
-                    $keys[$key . '_id'] = $val->getId();
-                }
-//                elseif (is_array($val))
-//                    $this->objectCollection[] = $val;
-                else
-                    $keys[$key] = $val;
-            }*/
-            //$fieldNames += array_combine($assiactions, $assiactions);
 
-            // $object->entityKey($this->objectCollection, $this->softdelete);
             $this->objectVar = array_keys($keys);
             $this->objectValue = array_values($keys);
             $this->objectKeyValue = $keys;

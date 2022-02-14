@@ -252,10 +252,17 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
     }
 
-    public static function of($entity)
+    public static function of($entity, $userid = null)
     {
+        if ($userid)
+            return Notificationbroadcasted::where("notification.entity", $entity)
+                ->where("this.user_id", $userid)
+                ->whereNull("viewedat")
+                ->count();
+
         return Notificationbroadcasted::where("notification.entity", $entity)
-            ->andwhere("viewedat")->isNull()
+            ->where("viewedat")
+            ->whereNull("viewedat")
             ->count();
     }
 
@@ -276,6 +283,7 @@ class Notificationbroadcasted extends Model implements JsonSerializable
             "viewedat" => date('Y-m-d'),
             "status" => 1,
         ]);
+        return Notificationbroadcasted::find($id);
     }
 
     public function route()

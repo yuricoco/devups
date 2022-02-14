@@ -149,6 +149,10 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      */
     public static function init($model)
     {
+        global $viewdir;
+        $viewdir[] = __DIR__ . '/../Resource/views';
+        //Reportingmodel::classroot("Resource/views");
+
         self::$log_info = " mode - " . $model;
         $reportingmodel = Reportingmodel::getbyattribut("name", $model);
         if ($reportingmodel->getId())
@@ -178,6 +182,18 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     }
 
     /**
+     * Values:
+    \Mpdf\Output\Destination::INLINE, or "I"
+    send the file inline to the browser. The plug-in is used if available. The name given by $filename is used when one selects the “Save as” option on the link generating the PDF.
+    \Mpdf\Output\Destination::DOWNLOAD, or "D"
+    send to the browser and force a file download with the name given by $filename.
+    \Mpdf\Output\Destination::FILE, or "F"
+    save to a local file with the name given by $filename (may include a path).
+    \Mpdf\Output\Destination::STRING_RETURN, or "S"
+    return the document as a string. $filename is ignored.
+     *
+     * https://mpdf.github.io/reference/mpdf-functions/output.html
+     *
      * @param string $name
      * @param string $dest
      * @return string
@@ -195,9 +211,13 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
 // Write some HTML code:
         $mpdf->WriteHTML(self::$view);
-        $name = UPLOAD_DIR . "invoice$name.pdf";
+        if ($name && $dest != 'S') {
+            $name = UPLOAD_DIR . "invoice$name.pdf";
 // Output a PDF file directly to the browser
-        $mpdf->Output($name, $dest);
+            $mpdf->Output($name, $dest);
+        }else
+            return $mpdf->Output($name, $dest);
+
         return $name;
 
     }
@@ -313,6 +333,14 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     }
 
     /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * @param $model
      * @return Reportingmodel
      */
@@ -323,11 +351,12 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
     public function getTest()
     {
-        return '
-        <input id="email-' . $this->id . '" class="form-control" name="emailtest" />
-        <button type="button" onclick="model.sendmail(this, ' . $this->id . ')" class="btn btn-info"> Test mail </button>
-        <a target="_blank" href="' . Reportingmodel::classpath("reportingmodel/preview?id=" . $this->id) . '" class="btn btn-info"> Preview </a>
-        <a target="_blank" href="' . Reportingmodel::classpath("reportingmodel/pdf?id=" . $this->id) . '" class="btn btn-info"> PDF </a>';
+        return '<div class="input-group">
+  <input id="email-' . $this->id . '" type="email"  name="emailtest" placeholder="Enter a valide email address" class="form-control" >
+  <button type="button" onclick="model.sendmail(this, ' . $this->id . ')" class="input-group-text btn btn-info"> Test mail </button>
+  <a target="_blank" href="' . Reportingmodel::classpath("reportingmodel/preview?id=" . $this->id) . '" class="input-group-text"> Preview </a>
+       
+</div>';
 
     }
 
@@ -482,7 +511,7 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
             return [
                 "success" => false,
-                "result" => "Message could not be sent. Error detail:  Empty body"
+                "detail" => "Message could not be sent. Error detail:  Empty body"
             ];
 
         }
@@ -491,8 +520,10 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
                 "style" => $this->getCss(),
             ] + $datacustom;
 
-        $message_html = $this->sanitizeContent($this->contentheader.$this->content.$this->contentfooter, $data);
+        $message_html = $this->sanitizeContent($this->content, $data);
         $message_text = $this->sanitizeContent($this->contenttext, $data);
+
+        $message_html = str_replace("{yield}", $message_html, Genesis::getView("email"));
 
         if (!__prod || !$this->id) {
             \DClass\lib\Util::log($message_html, $this->name.".html", ROOT."cache/", "w");
@@ -545,10 +576,13 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
                 "object" => self::$log_info . " - object : " . $this->object . ' to ' . json_encode(self::$emailreceiver),
                 "log" => json_encode($result),
             ]);
+//            foreach (self::$attachments as $attachment) {
+//                unlink($attachment) ;        // Add attachments
+//            }
             return [
                 "success" => true,
                 "result" => $result,
-                "user" => 'Message has been sent'
+                "detail" => 'Message has been sent'
             ];
         } catch (Exception $e) {
             //echo "Message could not be sent. Mailer Error: {$mail->ErrorInfo}";
@@ -557,9 +591,12 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
                 "log" => "Message could not be sent. Error detail: {$mail->ErrorInfo}",
             ]);
 
+//            foreach (self::$attachments as $attachment) {
+//                unlink($attachment) ;        // Add attachments
+//            }
             return [
                 "success" => false,
-                "result" => "Message could not be sent. Error detail: {$mail->ErrorInfo}"
+                "detail" => "Message could not be sent. Error detail: {$mail->ErrorInfo}"
             ];
         }
     }

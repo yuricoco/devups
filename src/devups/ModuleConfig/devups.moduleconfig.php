@@ -6,11 +6,13 @@
     require 'Controller/Dvups_componentFrontController.php';
 
     require 'Entity/Dvups_entity.php';
+    require 'Entity/Dvups_entity_lang.php';
     require 'Form/Dvups_entityForm.php';
     require 'Datatable/Dvups_entityTable.php';
     require 'Controller/Dvups_entityController.php';
 
     require 'Entity/Dvups_module.php';
+    require 'Entity/Dvups_module_lang.php';
     require 'Form/Dvups_moduleForm.php';
     require 'Datatable/Dvups_moduleTable.php';
     require 'Controller/Dvups_moduleController.php';

@@ -44,7 +44,7 @@ class BackendGenerator
             if (isset($attribut->lang) && $attribut->lang) {
                 $attributlang[] = $attribut->name;
                 $construt .= "
-                // $" . $attribut->name." available in {$name}_lang class \n";
+                // $" . $attribut->name . " available in {$name}_lang class \n";
                 continue;
             }
 
@@ -90,9 +90,9 @@ class BackendGenerator
         $otherattrib = true;
         $langconfig = "";
 //        }
-        if($attributlang){
+        if ($attributlang) {
             $langconfig = "\$this->dvtranslate = true;
-            \$this->dvtranslated_columns = [\"".implode(',', $attributlang)."\"];";
+            \$this->dvtranslated_columns = [\"" . implode(',', $attributlang) . "\"];";
         }
         $construteur = "
         public function __construct($" . "id = null){
@@ -105,7 +105,7 @@ class BackendGenerator
             $construteur .= "";
             foreach ($entity->relation as $relation) {
                 $entitytype = ucfirst($relation->entity);
-                if(isset($relation->entitytype))
+                if (isset($relation->entitytype))
                     $entitytype = ucfirst($relation->entitytype);
 
                 if ($relation->cardinality == 'manyToMany') {
@@ -164,8 +164,7 @@ class BackendGenerator
         }
         
                         ";
-                }
-                elseif ($relation->cardinality == 'oneToOne') { // or $relation->nullable == 'DEFAULT'
+                } elseif ($relation->cardinality == 'oneToOne') { // or $relation->nullable == 'DEFAULT'
 
                     $construteur .= "\n\t$" . "this->" . $relation->entity . " = new $entitytype();";
 
@@ -273,8 +272,7 @@ class BackendGenerator
             $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
         }
         ";
-                }
-                elseif ($attribut->formtype == 'liste') {
+                } elseif ($attribut->formtype == 'liste') {
                     $construt .= "
         public function get" . ucfirst($attribut->name) . "List() {
             return $" . "this->" . $attribut->name . ";
@@ -288,8 +286,7 @@ class BackendGenerator
             $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
         }
         ";
-                }
-                else {
+                } else {
                     $construt .= "
         public function get" . ucfirst($attribut->name) . "() {
             return $" . "this->" . $attribut->name . ";
@@ -692,7 +689,7 @@ class " . ucfirst($name) . "_lang extends Dv_langCore {\n");
         $name = strtolower($entity->name);
 
         //if(__Generator::$ctrltype == 'front' || __Generator::$ctrltype == 'both'){
-        if($front) {
+        if ($front) {
 
             $ctrlname = '' . ucfirst($name) . 'FrontController';
             $classController = fopen('Controller/' . $ctrlname . '.php', 'w');
@@ -810,9 +807,8 @@ class " . ucfirst($name) . "Table extends Datatable{
 
     /* CREATION OF CORE */
 
-    public function coreGenerator($entityname)
+    public function coreGenerator($entityname, $sync = false)
     {
-        require ROOT . 'src/requires.php';
         global $em;
 
         $classmetadata = (array)$em->getClassMetadata("\\" . $entityname);
@@ -822,6 +818,9 @@ class " . ucfirst($name) . "Table extends Datatable{
 
         $classdevupsmetadata["name"] = $name;
         foreach ($classmetadata["fieldMappings"] as $field) {
+            if (in_array($field["fieldName"], ["created_at", "updated_at", "deleted_at",]))
+                continue;
+
             $length = "";
             if ($field["length"])
                 $length = $field["length"];
@@ -852,12 +851,89 @@ class " . ucfirst($name) . "Table extends Datatable{
             $classdevupsmetadata["relation"][] = $dvfield;
         }
 
-        if (!file_exists('Core')) {
-            mkdir('Core', 0777);
+        $contenu = json_encode($classdevupsmetadata);
+        if (!$sync) {
+            if (!file_exists('Core')) {
+                mkdir('Core', 0777);
+            }
+
+            $entitycore = fopen('Core/' . $name . 'Core.json', 'w+');
+            fputs($entitycore, $contenu);
+
+            fclose($entitycore);
+        }
+        if ($sync) {
+            $curl = curl_init();
+
+            $data = array(
+                CURLOPT_URL => __toolrad_server . "entity.sync?project=" . __project_id . "&entity=$name&api_key=" . __toolrad_api_key,
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                //CURLOPT_FAILONERROR => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST'
+            );
+
+            $data[CURLOPT_POSTFIELDS] = json_encode(["entity" => [
+                "name" => $name,
+                "jsondata" => $contenu,
+            ]]);
+
+            curl_setopt_array($curl, $data);
+            $response = curl_exec($curl);
+            curl_close($curl);
+
+            echo " $name > entity well synchronized\n ";
+            //if($this->_log)
+            \DClass\lib\Util::log(date("Y-m-d H:i:s") . __LINE__ . $response, "log_sync_toolrad");
+
         }
 
-        $entitycore = fopen('Core/' . $name . 'Core.json', 'w+');
-        $contenu = json_encode($classdevupsmetadata);
+    }
+
+
+    /* CREATION OF POSTMANDOC */
+
+    public function postmandocGenerator($entityname)
+    {
+        require ROOT . 'src/requires.php';
+        global $em;
+
+        $classmetadata = (array)$em->getClassMetadata("\\" . $entityname);
+
+        $name = strtolower($entityname);
+
+        $postmandoc = [
+            "url" => "{{base_url}}create.$name",
+            "lazyloading" => "{{base_url}}lazyloading.$name?dfilters=on&per_page=10&next=1",
+            "raw" => [$name => []],
+            "formdata" => [],
+        ];
+        $classdevupsmetadata["name"] = $name;
+
+        foreach ($classmetadata["fieldMappings"] as $field) {
+            if (in_array($field["fieldName"], ["created_at", "updated_at", "deleted_at",]))
+                continue;
+
+            $postmandoc["raw"][$name][$field["fieldName"]] = "";
+            $postmandoc["formdata"][$name . "_form[{$field["fieldName"]}]"] = "";
+        }
+
+        foreach ($classmetadata["associationMappings"] as $field) {
+
+            $postmandoc["raw"][$name][$field["fieldName"] . ".id"] = 1;
+            $postmandoc["formdata"][$name . "_form[{$field["fieldName"]}.id]"] = 1;
+
+        }
+        if (!file_exists('PostmanDoc')) {
+            mkdir('PostmanDoc', 0777);
+        }
+
+        $entitycore = fopen('PostmanDoc/' . $name . '_pmd.json', 'w+');
+        $contenu = json_encode($postmandoc);
         fputs($entitycore, $contenu);
 
         fclose($entitycore);

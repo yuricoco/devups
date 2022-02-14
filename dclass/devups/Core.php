@@ -37,7 +37,7 @@ class Core extends stdClass {
     public static function __extract($entity, $asarray = false) {
 
         global $enittycollection;
-                
+
         $entityname = strtolower(get_class($entity));
         $path = $enittycollection[$entityname] . '/Core/' . $entityname . 'Core.json';
 //        $path = $__DIR__ . '/../Core/' . ucfirst(get_class($entity)) . 'Core.json';
@@ -62,7 +62,7 @@ class Core extends stdClass {
 
         $files = array_diff(scandir($dir), array('.', '..'));
         $modulecores = [];
-        
+
         $projectcore = json_decode(file_get_contents($dir . "/" . strtolower($file) . "Core.json"));
 
         foreach ($files as $file) {
@@ -70,9 +70,9 @@ class Core extends stdClass {
             if (is_dir($dir . "/" . $file)) {
 
 //                if (!file_exists($dir . "/" . strtolower($file) . "Core.json")){
-                    $modulecores[] = Core::findmodulecore($dir . "/" . $file, $file);
+                $modulecores[] = Core::findmodulecore($dir . "/" . $file, $file);
 //                }
-                
+
             }
         }
         $projectcore->listmodule = $modulecores;
@@ -83,7 +83,7 @@ class Core extends stdClass {
     public static function findmodulecore($dir, $file) {
         if (!file_exists($dir . "/" . strtolower($file) . "Core.json"))
             return [];
-        
+
         $modulecore = json_decode(file_get_contents($dir . "/" . strtolower($file) . "Core.json"));
 
         $entitycores = Core::findentitycore($dir . "/Core");
@@ -96,7 +96,7 @@ class Core extends stdClass {
     public static function findentitycore($dir) {
         if(!file_exists($dir))
             return [];
-        
+
         $entitycores = [];
         $files = array_diff(scandir($dir), array('.', '..'));
         foreach ($files as $file) {
@@ -107,7 +107,7 @@ class Core extends stdClass {
             }
         }
         return $entitycores;
-        
+
     }
 
     public static function buildOriginCore() {
@@ -131,7 +131,7 @@ class Core extends stdClass {
     public static function getComponentCore($component) {
 
         $dir = __DIR__ . '/../../src';
-        
+
         if (file_exists($dir. "/".$component)) {
             if(file_exists($dir))
                 return json_decode(file_get_contents($dir . "/".$component ."/" . $component . "Core.json"));

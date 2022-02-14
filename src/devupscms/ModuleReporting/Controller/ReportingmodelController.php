@@ -152,4 +152,31 @@ class ReportingmodelController extends Controller
 
     }
 
+    public function loadContent($name)
+    {
+        $filename = Reportingmodel::classroot("Resource/partial/$name.html");
+        if (!file_exists($filename))
+            return [
+                "success"=> false,
+                "detail"=> t("Le fichier :file n existe pas!", ["file"=>$filename]),
+            ];
+        $content = file_get_contents($filename);
+        return [
+            "success"=> true,
+            "content"=> $content,
+        ];
+    }
+
+    public function saveContent($id)
+    {
+        $rm = Reportingmodel::find($id);
+
+        $filename = Reportingmodel::classroot("Resource/partial");
+        \DClass\lib\Util::log($rm->content, "{$rm->name}.html", $filename);
+
+        return [
+            "success"=> true,
+        ];
+    }
+
 }

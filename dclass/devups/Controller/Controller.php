@@ -159,7 +159,8 @@ class Controller
                         'detail' => '');
                 }
                 return compact("datacollection");
-            }else
+            }
+            else
                 $entity = $this->hydrateWithJson($entity, $rawdata[$classname]);
         }
         if (!$persist)

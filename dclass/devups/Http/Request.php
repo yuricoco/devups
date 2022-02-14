@@ -276,6 +276,7 @@ class Request
     public function data($post){
         $this->_data = $post;
         $this->_method = "POST";
+        return $this;
     }
     public function addHeader($key, $value){
         $this->_header[] = "$key: $value";

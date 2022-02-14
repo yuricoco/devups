@@ -434,8 +434,8 @@ setTimeout(function () {
 
     ddatatable.pagination = function (el, page) {
 
-        model.baseurl = $("#dv_pagination").data('route') + "services.php";
-        model.entity = $("#dv_pagination").data('entity');
+        model.baseurl = $(el).parents("#dv_pagination").data('route') + "services.php";
+        model.entity = $(el).parents("#dv_pagination").data('entity');
 
         ddatatable.init(model.entity);
 
