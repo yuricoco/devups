@@ -68,7 +68,7 @@ class FormFactory
             //foreach ($field['options'] as $key => $value) {
 
             $ckecked = (in_array($field['option'], $field['values'])) ? "checked" : "";
-            return '<input class="" name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $field['option'] . '"  ' . $ckecked . ' />';
+            return '<input name="' . FormFactory::$fieldname . '[]" type="checkbox" value="' . $field['option'] . '"  ' . $ckecked . ' ' . $directive . ' />';
 
 //                $checkbox['uncheckecd'][] = ["checkbox" => $input, "entity" => $value];
             //}

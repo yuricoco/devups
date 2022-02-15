@@ -11,7 +11,8 @@
  *
  * @author azankang
  */
-class Core extends stdClass {
+class Core extends stdClass
+{
 
     public function __construct($entity)
     {
@@ -22,19 +23,23 @@ class Core extends stdClass {
         return $this;
     }
 
-    public function addDformjs($action = true){
-        if($action)  $this->addjs[] = CLASSJS."dform";
+    public function addDformjs($action = true)
+    {
+        if ($action) $this->addjs[] = CLASSJS . "dform";
     }
 
-    public function addjs($js, $path = ""){
-        $this->addjs[] = $path.$js;//.".js";
+    public function addjs($js, $path = "")
+    {
+        $this->addjs[] = $path . $js;//.".js";
     }
 
-    public function addcss($css, $path = ""){
-        $this->addcss[] = $path.$css;//.".css";
+    public function addcss($css, $path = "")
+    {
+        $this->addcss[] = $path . $css;//.".css";
     }
 
-    public static function __extract($entity, $asarray = false) {
+    public static function __extract($entity, $asarray = false)
+    {
 
         global $enittycollection;
 
@@ -50,12 +55,13 @@ class Core extends stdClass {
             $entitycore = json_decode($json_file_content);
 
         $entitycore->instance = $entity;
-        $entitycore->name = strtolower($entitycore->name) ;
+        $entitycore->name = strtolower($entitycore->name);
 
         return $entitycore;
     }
 
-    public static function findprojectcore($dir, $file) {
+    public static function findprojectcore($dir, $file)
+    {
 //            var_dump($dir."/".strtolower($file) . ".json");
         if (!file_exists($dir . "/" . strtolower($file) . "Core.json"))
             return [];
@@ -80,7 +86,8 @@ class Core extends stdClass {
         return $projectcore;
     }
 
-    public static function findmodulecore($dir, $file) {
+    public static function findmodulecore($dir, $file)
+    {
         if (!file_exists($dir . "/" . strtolower($file) . "Core.json"))
             return [];
 
@@ -93,8 +100,9 @@ class Core extends stdClass {
         return $modulecore;
     }
 
-    public static function findentitycore($dir) {
-        if(!file_exists($dir))
+    public static function findentitycore($dir)
+    {
+        if (!file_exists($dir))
             return [];
 
         $entitycores = [];
@@ -110,7 +118,8 @@ class Core extends stdClass {
 
     }
 
-    public static function buildOriginCore() {
+    public static function buildOriginCore()
+    {
 
         $dir = __DIR__ . '/../../src';
         $navigation = [];
@@ -118,7 +127,7 @@ class Core extends stdClass {
             $files = array_diff(scandir($dir), array('.', '..'));
 
             foreach ($files as $file) {
-                if($file != "requires.php")
+                if ($file != "requires.php")
                     $navigation[] = Core::findprojectcore($dir . "/" . $file, $file);
             }
 
@@ -128,13 +137,14 @@ class Core extends stdClass {
         }
     }
 
-    public static function getComponentCore($component) {
+    public static function getComponentCore($component)
+    {
 
         $dir = __DIR__ . '/../../src';
 
-        if (file_exists($dir. "/".$component)) {
-            if(file_exists($dir))
-                return json_decode(file_get_contents($dir . "/".$component ."/" . $component . "Core.json"));
+        if (file_exists($dir . "/" . $component)) {
+            if (file_exists($dir))
+                return json_decode(file_get_contents($dir . "/" . $component . "/" . $component . "Core.json"));
             else
                 return null;
 
@@ -143,7 +153,8 @@ class Core extends stdClass {
         }
     }
 
-    public static function updateDvupsTable() {
+    public static function updateDvupsTable()
+    {
         $updated = false;
         $global_navigation = Core::buildOriginCore();
 
@@ -151,39 +162,45 @@ class Core extends stdClass {
             if (is_object($project)) {
 
                 $projectname = ($project->name);
+
                 $qb = new QueryBuilder(new Dvups_component());
-                $dvcomponent = $qb->select()->where("name", '=', $projectname )
-                    ->firstOr(function () use ($projectname, &$updated){
+                $dvcomponent = $qb->select()->where("name", '=', $projectname)
+                    ->firstOrNull();
+                /*(function () use ($projectname, &$updated){
 
-                        $dvcomponent = new Dvups_component();
-                        $dvcomponent->setName($projectname);
-                        $dvcomponent->setLabel($projectname);
-                        $dvcomponent->__insert();
 
-                        $rolecomponent = new Dvups_role_dvups_component();
-                        $rolecomponent->setDvups_component($dvcomponent);
-                        $rolecomponent->setDvups_role(new Dvups_role(1));
-                        $rolecomponent->__insert();
+                    var_dump($projectname);
+                    $updated = true;
 
-                        $updated = true;
+                    return $rolecomponent;
 
-                        return $rolecomponent;
+                });*/
 
-                    });
+                if (is_null($dvcomponent)) {
+                    $dvcomponent = new Dvups_component();
+                    $dvcomponent->setName($projectname);
+                    $dvcomponent->setLabel($projectname);
+                    $dvcomponent->__insert();
+
+                    $rolecomponent = new Dvups_role_dvups_component();
+                    $rolecomponent->setDvups_component($dvcomponent);
+                    $rolecomponent->setDvups_role(new Dvups_role(1));
+                    $rolecomponent->__insert();
+                }
 
 
                 foreach ($project->listmodule as $key => $module) {
 
-                    if(!is_object($module)){
+                    if (!is_object($module)) {
                         continue;
                     }
                     $modulename = ucfirst($module->name);
                     $qb = new QueryBuilder(new Dvups_module());
-                    $dvmodule = $qb->select()->where("this.name", '=', $modulename )->first();
+                    $dvmodule = $qb->select()->where("this.name", '=', $modulename)->first();
 
                     $dvmodule->setProject($project->name);
                     $dvmodule->dvups_component = $dvcomponent;
-                    if(!$dvmodule->getId()){
+                    if (!$dvmodule->getId()) {
                         //var_dump("component_id name", $dvcomponent->id);
                         $dvmodule->setName($modulename);
                         $dvmodule->setLabel($modulename);
@@ -196,7 +213,7 @@ class Core extends stdClass {
 
                         $updated = true;
 
-                    }else{
+                    } else {
                         $dvmodule->__update();
                     }
 
@@ -204,10 +221,10 @@ class Core extends stdClass {
 
                         $entityname = strtolower($entity->name);
                         $qb = new QueryBuilder(new Dvups_entity());
-                        $dventity = $qb->select()->where("dvups_entity.name", '=', $entityname )->first();
+                        $dventity = $qb->select()->where("dvups_entity.name", '=', $entityname)->first();
 
                         $dventity->setDvups_module($dvmodule);
-                        if(!$dventity->getId()){
+                        if (!$dventity->getId()) {
                             $dventity = new Dvups_entity();
                             $dventity->setName($entityname);
                             $dventity->setLabel($entityname);
@@ -222,7 +239,7 @@ class Core extends stdClass {
 
                             $updated = true;
 
-                        }else{
+                        } else {
                             $dventity->dvups_module = $dvmodule;
                             $dventity->__update();
                         }

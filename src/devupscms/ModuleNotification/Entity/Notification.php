@@ -7,6 +7,8 @@
 class Notification extends Model implements JsonSerializable
 {
 
+    public static $send_sms = false;
+
     /**
      * @Id @GeneratedValue @Column(type="integer")
      * @var int

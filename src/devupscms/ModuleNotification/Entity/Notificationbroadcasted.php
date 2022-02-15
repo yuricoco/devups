@@ -87,6 +87,11 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
     public static function unreadedadmin($user)
     {
+        return self::where("admin.id", $user->getId())->orderby("this.id desc")->limit(20)->get();
+    }
+
+    public static function unreadedadmincount($user)
+    {
         return self::where("admin.id", $user->getId())->andwhere("this.status", "=", 0)->count();
     }
 
@@ -224,8 +229,9 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
     }
 
-    public static function send($notification, $receivers = null)
+    public static function send($notification, $receivers)
     {
+        $bulk = [];
         foreach ($receivers as $receiver) {
 
             $nb = new Notificationbroadcasted();
@@ -233,7 +239,25 @@ class Notificationbroadcasted extends Model implements JsonSerializable
             $nb->setStatus(0);
             $nb->setUser($receiver);
             $nb->__insert();
+            $bulk[$receiver->getTelephone()] = $notification->content;
+        }
 
+        if (Notification::$send_sms && __prod) {
+            foreach ($bulk as $telephone => $content) {
+                $response = Request::initCurl("https://spacekolasms.com/api/sendsms?api_key=" . Configuration::get("sms_api_key"))
+//            $response = Request::initCurl("https://spacekolasms.com/api/sendsms_bulk?api_key=" . Configuration::get("sms_api_key"))
+                    ->data([
+                        "phonenumber" => $telephone,
+                        "message" => $content,
+                    ])
+                    ->send()
+                    ->json();
+
+                Emaillog::create([
+                    "object" => " - object : " . $notification->notificationtype->_key . ' to ' . $receiver->getTelephone(),
+                    "log" => json_encode($response),
+                ]);
+            }
         }
 
     }
@@ -290,10 +314,14 @@ class Notificationbroadcasted extends Model implements JsonSerializable
     {
         $note = "";
         if (!$this->viewedat)
-            $note = "?read=" . $this->id;
+            $note = "&read=" . $this->id;
         switch ($this->notification->entity) {
-            case "schedule":
-                return route("rdv") . $note;
+            case "order":
+                return route("order-detail?id=".$this->notification->entityid) . $note;
+            case "sponsoring":
+                return route("investor-detail?id=".$this->notification->entityid) . $note;
+            case "cycle":
+                return route("cycle?id=".$this->notification->entityid) . $note;
 
         }
     }

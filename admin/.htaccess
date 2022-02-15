@@ -12,7 +12,7 @@ RewriteRule    ^api/delete.([A-Za-z0-9-]+)?$    services.php?path=delete&dclass=
 RewriteRule    ^api/detail.([A-Za-z0-9-]+)?$    services.php?path=detail&dclass=$1    [NC,L]
 RewriteRule    ^api/lazyloading.([A-Za-z0-9-]+)?$    services.php?path=lazyloading&dclass=$1    [NC,L]
 
-RewriteRule    ^api/([A-Za-z0-9-]+).([A-Za-z0-9-]+)?$    services.php?path=$2&dclass=$1    [NC,L]
+RewriteRule    ^api/([A-Za-z0-9-]+).([A-Za-z0-9-]+)?$    services.php?path=$1.$2&dclass=$1    [NC,L]
 
 RewriteRule    ^([A-Za-z0-9-]+)?$    index.php?path=$1    [NC,L]
 RewriteRule    ^([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)/([A-Za-z0-9-]+)?$    index.php?path=$4&dclass=$3&dcmod=$2&dcomp=$1    [NC,L]

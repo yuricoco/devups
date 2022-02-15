@@ -62,6 +62,9 @@ switch (R::get('path')) {
     case 'reportingmodel.update':
         g::json_encode($reportingmodelCtrl->updateAction(R::get("id")));
         break;
+    case 'reportingmodel.update-email':
+        $reportingmodelCtrl->updateMailAction(R::get("id"));
+        break;
     case 'reportingmodel._show':
         $reportingmodelCtrl->detailView(R::get("id"));
         break;

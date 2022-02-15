@@ -33,7 +33,7 @@ define('__lang', 'fr');
  */
 define('__project_id', 'devupstuto');
 define('__toolrad_server', 'http://127.0.0.1/toolrad2/api/');
-define('__toolrad_api_key', '123456789');
+define('__toolrad_api_key', 'ynwE33SgT');
 
 
 define('ROOT', __DIR__  . '/../');

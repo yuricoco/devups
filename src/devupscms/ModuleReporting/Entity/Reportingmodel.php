@@ -372,11 +372,11 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
     public function editAction($btarray)
     {
-        return '<a class="btn btn-warning"  href="' . self::classpath("reportingmodel/edit?id=") . $this->id . '"> edit</a>';
     }
 
     public function showAction($btarray)
     {
+        return " ";
     }
 
     public function deleteAction($btarray)
@@ -522,6 +522,9 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
         $message_html = $this->sanitizeContent($this->content, $data);
         $message_text = $this->sanitizeContent($this->contenttext, $data);
+
+        global $viewdir;
+        $viewdir[] = Reportingmodel::classroot("Resource/views");
 
         $message_html = str_replace("{yield}", $message_html, Genesis::getView("email"));
 

@@ -39,13 +39,13 @@
     padding: 5px;
     top: 60px;
     background: whitesmoke;
-    z-index: 1000;
+    z-index: 100;
 }
 .dv_datatable thead{
     position: sticky;
     top: 98px;
     background: whitesmoke;
-    z-index: 1000;
+    z-index: 100;
 }
 
 .dv_modal{

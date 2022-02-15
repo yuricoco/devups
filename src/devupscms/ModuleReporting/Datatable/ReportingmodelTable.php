@@ -24,6 +24,7 @@ class ReportingmodelTable extends Datatable
     public function buildindextable()
     {
 
+        $this->base_url = __env."admin/";
         // $this->topactions[] = "<a href='" . Reportingmodel::classpath("emailmodel/new") . "' class='btn btn-primary'>Create new content</a>";
 
         $this->datatablemodel = [
@@ -35,6 +36,11 @@ class ReportingmodelTable extends Datatable
             ['header' => t('emailmodel.content', 'Content'), 'value' => 'test']
         ];
 
+        $this->addcustomaction(function ($item){
+
+            return '<a class="btn btn-warning btn-block"  href="' . Reportingmodel::classpath("reportingmodel/edit-email?id=") . $item->id . '">Edit email</a>';
+
+        });
         $this->addcustomaction(function ($item){
             return "<button class='btn btn-default btn-block' onclick='model.clonerow(".$item->getId().", \"reportingmodel\")'>duplicate</button>";
         });

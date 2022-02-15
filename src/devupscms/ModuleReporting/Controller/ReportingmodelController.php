@@ -34,6 +34,20 @@ class ReportingmodelController extends Controller
 
     }
 
+    public function editmailView($id = null)
+    {
+
+        self::$jsfiles[] = Reportingmodel::classpath('Resource/js/reportingmodelCtrl.js');
+
+        $action = Reportingmodel::classpath("services.php?path=reportingmodel.update-email&id=" . $id);
+        $reportingmodel = Reportingmodel::find($id);
+        Genesis::renderView("admin.reportingmodel.form", [
+            "success" => true,
+            "reportingmodel" => $reportingmodel,
+            "action" => $action,
+        ]);
+    }
+
     public function formView($id = null)
     {
         $reportingmodel = new Reportingmodel();
@@ -44,10 +58,11 @@ class ReportingmodelController extends Controller
             $action = Reportingmodel::classpath("services.php?path=reportingmodel.update&id=" . $id);
             $reportingmodel = Reportingmodel::find($id);
 
-            return [
-                "success" => true,
-                "reportingmodel" => $reportingmodel,
-                "action" => $action,
+            return ['success' => true,
+                'form' => ReportingmodelForm::init($reportingmodel, $action)
+                    ->buildForm()
+                    ->addDformjs()
+                    ->renderForm(),
             ];
         }
 
@@ -67,8 +82,6 @@ class ReportingmodelController extends Controller
         if ($this->error) {
             return //Genesis::renderView("reportingmodel.form",
                 array('success' => false,
-                    'reportingmodel' => $reportingmodel,
-                    'action' => 'create',
                     'error' => $this->error);//);
         }
 
@@ -90,6 +103,26 @@ class ReportingmodelController extends Controller
         $reportingmodel = $this->form_fillingentity(new Reportingmodel($id), $reportingmodel_form);
 
         if ($this->error) {
+            return //Genesis::renderView("reportingmodel.form",
+                array('success' => false,
+                    'error' => $this->error);//);
+        }
+
+        $reportingmodel->__update();
+        return array('success' => true,
+            'reportingmodel' => $reportingmodel,
+            'tablerow' => ReportingmodelTable::init()->buildindextable()->getSingleRowRest($reportingmodel),
+            'detail' => '');
+
+    }
+
+    public function updateMailAction($id, $reportingmodel_form = null)
+    {
+        extract($_POST);
+
+        $reportingmodel = $this->form_fillingentity(new Reportingmodel($id), $reportingmodel_form);
+
+        if ($this->error) {
             return Genesis::renderView("reportingmodel.form", array('success' => false,
                 'reportingmodel' => $reportingmodel,
                 'action_form' => 'update&id=' . $id,
@@ -97,11 +130,7 @@ class ReportingmodelController extends Controller
         }
 
         $reportingmodel->__update();
-        return redirect(Reportingmodel::classpath("reportingmodel/index"));
-        return array('success' => true,
-            'reportingmodel' => $reportingmodel,
-            'tablerow' => ReportingmodelTable::init()->buildindextable()->getSingleRowRest($reportingmodel),
-            'detail' => '');
+        redirect(Reportingmodel::classpath("reportingmodel/index"));
 
     }
 
@@ -157,13 +186,13 @@ class ReportingmodelController extends Controller
         $filename = Reportingmodel::classroot("Resource/partial/$name.html");
         if (!file_exists($filename))
             return [
-                "success"=> false,
-                "detail"=> t("Le fichier :file n existe pas!", ["file"=>$filename]),
+                "success" => false,
+                "detail" => t("Le fichier :file n existe pas!", ["file" => $filename]),
             ];
         $content = file_get_contents($filename);
         return [
-            "success"=> true,
-            "content"=> $content,
+            "success" => true,
+            "content" => $content,
         ];
     }
 
@@ -175,7 +204,7 @@ class ReportingmodelController extends Controller
         \DClass\lib\Util::log($rm->content, "{$rm->name}.html", $filename);
 
         return [
-            "success"=> true,
+            "success" => true,
         ];
     }
 

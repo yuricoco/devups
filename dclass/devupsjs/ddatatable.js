@@ -118,7 +118,7 @@ var ddatatable = {
 
             if (!confirm('Voulez-vous Supprimer les éléments selectionnés?')) return false;
             model.addLoader($(el))
-            $.get(ddatatable.baseurl + "?path=" + entity + "._deletegroup&ids=" + ids.join(),
+            $.get(ddatatable.baseurl + "?path=" + entity + ".deletegroup&ids=" + ids.join(),
                 (response) => {
                     model.removeLoader();
                     console.log(response);
@@ -250,19 +250,32 @@ var ddatatable = {
             databinding.bindmodal(resultat.responseText);
         });//, 'json'
     },
-    previous: function () {
+    previous: function (el) {
+        model.baseurl = $(el).parents("#dv_pagination").data('route') + "services.php";
+        model.entity = $(el).parents("#dv_pagination").data('entity');
+
         this.currentpage -= 1;
         this.page(this.currentpage);
     },
-    firstpage: function () {
+    firstpage: function (el) {
+        model.baseurl = $(el).parents("#dv_pagination").data('route') + "services.php";
+        model.entity = $(el).parents("#dv_pagination").data('entity');
+
         this.currentpage = 1;
         this.page(1);
     },
-    next: function () {
+    next: function (el) {
+        model.baseurl = $(el).parents("#dv_pagination").data('route') + "services.php";
+        model.entity = $(el).parents("#dv_pagination").data('entity');
+
         this.currentpage = parseInt(this.currentpage) + 1;
-        this.page(this.currentpage);
+        this.page(this.currentpage, el);
     },
-    lastpage: function (last) {
+    lastpage: function (last, el) {
+
+        model.baseurl = $(el).parents("#dv_pagination").data('route') + "services.php";
+        model.entity = $(el).parents("#dv_pagination").data('entity');
+
         this.currentpage = last;
         this.page(last);
     },
@@ -322,79 +335,6 @@ var ddatatable = {
     getinstanceof(entity) {
         return $("#dv_" + entity + "_table");
     },
-    exportcsv(entity) {
-        model.init(entity)
-        var dialog = new dialogbox();
-        dialog.title = model.entity;
-        dialog.export = function () {
-
-            dialog.addLoader()
-
-            $.get(__env + "admin/header.php?dvpath=dvexport&classname=" + model.entity + "",
-                (response) => {
-                    console.log(response);
-                    dialog.removeLoader();
-                    dialog.setcontent(`
-                        <div class="alert alert-success">${response.message}</div>
-                    `)
-                }, 'json').fail(function (resultat, statut, erreur) {
-                console.log(resultat, statut, erreur);
-
-            });
-        }
-        dialog.footercontent = `
-            <button onclick="ddatatable.exportrows(this, '${model.entity}')" type="button" class="btn btn-default">Exporter les données!</button>
-        `;
-        dialog.init()
-        dialog.show()
-
-    },
-    importcsv(entity) {
-        model.init(entity)
-        var dialog = new dialogbox();
-        dialog.title = model.entity;
-        dialog.import = function () {
-
-            dialog.addLoader()
-
-            var formdata = new FormData();
-            formdata.append("fixture", $("input.dv_import_form")[0].files[0])
-            $.ajax({
-                url: __env + "admin/header.php?dvpath=dvimport&classname=" + model.entity,
-                data: formdata,
-                cache: false,
-                contentType: false,
-                processData: false,
-                method: "POST",
-                dataType: "json",
-                success: function (response) {
-                    console.log(response);
-                    dialog.removeLoader();
-                    dialog.setcontent(`
-                        <div class="alert alert-success">${response.message}</div>
-                    `)
-                },
-                error: function (e) {
-                    console.log(e);//responseText
-                }
-            });
-
-        }
-        dialog.opendialogmedia = function () {
-            $("input.dv_import_form").trigger("click");
-        }
-        dialog.bodycontent = `
-             <input class="dv_import_form" type="file" style="display: none" />
-    <button onclick="self.opendialogmedia()">Open File Dialog</button>
-        `;
-        dialog.footercontent = `
-            <button onclick="self.import()" type="button" class="btn btn-default">import data!</button>
-        `;
-        dialog.init()
-        dialog.show()
-        //dialog.setcontent()
-
-    },
     init: function (entity, el) {
 
         // if (typeof $ === 'undefined') {
@@ -437,7 +377,7 @@ setTimeout(function () {
         model.baseurl = $(el).parents("#dv_pagination").data('route') + "services.php";
         model.entity = $(el).parents("#dv_pagination").data('entity');
 
-        ddatatable.init(model.entity);
+        ddatatable.init(model.entity, el);
 
         this.currentpage = page;
         this.page(page);

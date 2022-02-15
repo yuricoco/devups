@@ -52,8 +52,8 @@ switch (Request::get('path')) {
     case 'reportingmodel/create':
         $reportingmodelCtrl->createAction();
         break;
-    case 'reportingmodel/edit':
-        Genesis::renderView("admin.reportingmodel.form", $reportingmodelCtrl->formView(Request::get("id")));
+    case 'reportingmodel/edit-email':
+        $reportingmodelCtrl->editmailView(Request::get("id"));
         //ReportingmodelForm::renderWidget(Request::get("id"));
         break;
     case 'reportingmodel/update':
