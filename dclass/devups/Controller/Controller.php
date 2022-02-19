@@ -180,6 +180,16 @@ class Controller
 
         $id = $entity->__insert();
 
+        if (Request::get("tablemodel")){
+            $table = $classname."Table";
+            return [
+                'success' => true,
+                $classname => $entity,
+                'tablerow' => $table::init()->router()->getSingleRowRest($entity),
+                'detail' => ''
+            ];
+        }
+
         return array('success' => true,
             $classname => $entity,
             'detail' => '');
@@ -225,12 +235,6 @@ class Controller
         } else
             $entity = $this->hydrateWithJson($entity, $rawdata[$classname]);
 
-//        if (isset($_FILES[$classname . "_form"])) {
-//            foreach ($_FILES[$classname . "_form"]['name'] as $key_form => $value_form) {
-//                self::addEventListenerAfterCreate(get_class($this->entity), 'upload' . ucfirst($key_form));
-//            }
-//        }
-
         if ($this->error) {
             return array('success' => false,
                 $classname => $entity,
@@ -238,6 +242,17 @@ class Controller
         }
 
         $entity->__update();
+
+        if (Request::get("tablemodel")){
+            $table = $classname."Table";
+            return [
+                'success' => true,
+                $classname => $entity,
+                'tablerow' => $table::init()->router()->getSingleRowRest($entity),
+                'detail' => ''
+            ];
+        }
+
         return array('success' => true,
             $classname => $entity,
             'detail' => '');

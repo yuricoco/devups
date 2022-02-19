@@ -282,9 +282,9 @@ class DBAL extends Database
 
                     foreach ($listentity['todrop'] as $entity) {
                         if ($this->tableExists($entityName . '_' . $this->objectName)) {
-                            $entityTable = $entityName . "_" . $this->objectName;
+                            $entityTable = strtolower($entityName . "_" . $this->objectName);
                         } elseif ($this->tableExists($this->objectName . "_" . $entityName)) {
-                            $entityTable = $this->objectName . "_" . $entityName;
+                            $entityTable = strtolower($this->objectName . "_" . $entityName);
                         } else {
                             $entityTable = $entityName;
                         }

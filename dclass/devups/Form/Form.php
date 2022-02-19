@@ -35,7 +35,11 @@ class Form extends FormFactory{
             $formdirective[] = $key ."='" . $value ."'";
         }
 
-        return "<form action='" . $action . "' id='".Form::$name."-form' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
+        $id = Form::$name.'-form';
+        if (isset($directives["id"]))
+            $id = $directives["id"];
+
+        return "<form action='" . $action . "' id='$id' ". implode(" ", $formdirective) ." data-id=\"".$enitty->getId()."\"  >";
 
     }
 

@@ -467,14 +467,17 @@ class QueryBuilder extends \DBAL
      * @param string $classnameon
      * @return $this
      */
-    public function leftjoinrecto($classname, $classnameon = "")
+    public function leftjoinrecto($classname, $classnameon = "", $alias = "")
     {
         $this->join = strtolower($classname);
 
         if (!$classnameon)
             $classnameon = $this->objectName;
 
-        $this->_join .= " INNER JOIN `" . $this->join . "` ON `" . $this->join . "`." . strtolower($classnameon) . "_id = `" . strtolower($classnameon) . "`.id";
+        if (!$alias)
+            $alias = $this->join;
+
+        $this->_join .= " INNER JOIN `" . $this->join . "` `$alias` ON `" . $alias . "`." . strtolower($classnameon) . "_id = `" . strtolower($classnameon) . "`.id";
 
         return $this;
     }

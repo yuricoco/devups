@@ -2,20 +2,35 @@
 <html lang="en">
 
 <head>
-    <!-- Required meta tags -->
+    <!-- iso-8859-1  -->
+    <meta name="author" content="spacekola">
+    <title class="mdi mdi-sort-variant">Dashboard | Dvups Admin</title>
+    <!-- Favicons -->
+    <link href="<?= __env; ?>favicon.png" rel="icon">
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Star Admin2 </title>
-    <!-- plugins:css -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Language" content="en">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no"/>
+    <meta name="description" content="This is an example dashboard created using build-in elements and components.">
+    <meta name="msapplication-tap-highlight" content="no">
     <link rel="stylesheet" href="<?= __env; ?>admin/main.css">
 </head>
 
 <body>
-<div class="container-scroller">
-    <div class="container-fluid page-body-wrapper full-page-wrapper">
-        <div class="content-wrapper d-flex align-items-center auth px-0">
-            <div class="row w-100 mx-0">
-                <div class="col-lg-4 mx-auto">
+
+<div class="app-container app-theme-white body-tabs-shadow fixed-sidebar fixed-header">
+
+    <div class="app-main">
+        <div class="container">
+            <div style="width: 400px; margin: auto" class="loginbox">
+
+                <div class="login-left">
+                    <img class="img-fluid" src="<?= __env; ?>logo-long.png" alt="Logo">
+                </div><hr >
+                <div class="login-panel panel panel-default">
+
                     <div class="auth-form-light text-left py-5 px-4 px-sm-5">
 
                         <h1>Bonjour, <?= $admin->getName(); ?></h1>
@@ -48,18 +63,17 @@
                         </form>
                     </div>
                 </div>
+
             </div>
         </div>
-        <!-- content-wrapper ends -->
     </div>
-    <!-- page-body-wrapper ends -->
 </div>
-<!-- container-scroller -->
-<!-- plugins:js -->
 
 <script src="<?= assets; ?>scripts/main.js"></script>
+<!-- End custom js for this page-->
 
 <!-- endinject -->
 </body>
 
 </html>
+
