@@ -29,6 +29,14 @@ define('__default_lang', "fr");
 define('__lang', 'fr');
 
 /**
+ * mode debug
+ *
+ * display error
+ */
+define('__debug_front', false);
+define('__debug_admin', false);
+
+/**
  * config toolrad sync
  */
 define('__project_id', 'devupstuto');

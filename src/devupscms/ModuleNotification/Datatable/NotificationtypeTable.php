@@ -24,6 +24,7 @@ class NotificationtypeTable extends Datatable
     public function buildindextable()
     {
 
+        $this->base_url = __env."admin/";
         $this->datatablemodel = [
             ['header' => t('notificationtype.id', '#'), 'value' => 'id'],
             ['header' => t('Entity'), 'value' => 'dvups_entity.name'],

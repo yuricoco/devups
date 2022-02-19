@@ -146,36 +146,6 @@ class Dvups_adminController extends Controller
 //            'detail' => 'detail de l\'action.');
     }
 
-    /**
-     * retourne l'instance de l'entité ou un json pour les requete asynchrone (ajax)
-     *
-     * @param type $id
-     * @return \Array
-     */
-    public function showAction($id)
-    {
-        //$dvups_adminDao = new Dvups_adminDAO();
-        $dvups_admin = Dvups_admin::find($id);
-
-        return array('success' => true,
-            //'url' => 'index.php?path=dvups_admin/show&id='.$id,
-            'dvups_admin' => $dvups_admin,
-            'detail' => 'detail de l\'action.');
-    }
-
-    /**
-     * Data for creation form
-     * @Sequences: controller - genesis - ressource/view/form
-     * @return \Array
-     */
-    public function __newAction()
-    {
-
-        return array('success' => true, // pour le restservice
-            'dvups_admin' => new Dvups_admin(),
-            'action_form' => 'create', // pour le web service
-            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
-    }
 
     public function createAction()
     {
@@ -206,24 +176,6 @@ class Dvups_adminController extends Controller
             'redirect' => Dvups_admin::classpath() . 'dvups-admin/added?login=' . $dvups_admin->getLogin() . "&password=" . $password, // pour le web service
             'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
 
-    }
-
-    /**
-     * Data for edit form
-     * @Sequences: controller - genesis - ressource/view/form
-     * @param type $id
-     * @return \Array
-     */
-    public function __editAction($id)
-    {
-        //$dvups_adminDao = new Dvups_adminDAO();
-        $dvups_admin = (new DBAL())->findByIdDbal(new Dvups_admin($id));
-        //$dvups_admin->collectDvups_role();
-
-        return array('success' => true, // pour le restservice
-            'dvups_admin' => $dvups_admin,
-            'action_form' => 'update&id=' . $id, // pour le web service
-            'detail' => ''); //Detail de l'action ou message d'erreur ou de succes
     }
 
     public function updateAction($id)
@@ -328,4 +280,10 @@ class Dvups_adminController extends Controller
         Genesis::renderView('admin.dvups_admin.complete_registration', compact("admin", "action", "error"));
     }
 
+    public function profile()
+    {
+        $admin = getadmin();
+        Genesis::renderView('admin.dvups_admin.profile', ["admin" => $admin]);
+
+    }
 }

@@ -86,6 +86,20 @@ class Model extends \stdClass
      * static method gives the path of the module where the entity is/
      * @return string the path of the module where the class is.
      */
+    public static function classview($view, $route = __env."admin/")
+    {
+        //return get_called_class();
+        $reflector = new ReflectionClass(get_called_class());
+        $fn = $reflector->getFileName();
+        $dirname = explode("src", dirname($fn));
+        $dirname = str_replace("Entity", "", $dirname[1]);
+        return str_replace("\\", "/", $route . $dirname . $view);
+    }
+
+    /**
+     * static method gives the path of the module where the entity is/
+     * @return string the path of the module where the class is.
+     */
     public static function services($src = "", $route = __env)
     {
         //return get_called_class();

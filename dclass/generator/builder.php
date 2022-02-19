@@ -2,6 +2,8 @@
 
 //require __DIR__ . '/../../config/constante.php';
 
+define('__debug', false);
+
 require __DIR__ . '/../../config/dependanceInjection.php';
 
 require __DIR__ . '/BackendGenerator.php';

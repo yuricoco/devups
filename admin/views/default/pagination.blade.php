@@ -29,9 +29,10 @@
                     </button>
                 @endif
 
-                @if ($ll->pagination > 10 && !$ll->dynamicpagination)
+                @if ($ll->pagination > 10)
+                    @if(!$ll->dynamicpagination)
 
-                    <span class="paginate_button page-item ">
+                        <span class="paginate_button page-item ">
                             <select class=" form-control"
                                     onchange="ddatatable.pagination(this, this.value)">
                                 @for ($page = 1; $page <= $ll->pagination; $page++)
@@ -44,8 +45,7 @@
                                 @endfor
                             </select>
                         </span>
-                @else
-                    @if ($ll->dynamicpagination)
+                    @else
 
                         @foreach ($ll->paginationcustom['firsts'] as $key => $page)
                             @if ($page == $ll->current_page)
@@ -108,17 +108,17 @@
                             @endif
 
                         @endif
-
-                    @else
-                        @for ($page = 1; $page <= $ll->pagination; $page++)
-                            <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
-                                    type="button"
-                                    class="btn @if ($page == $ll->current_page) btn-primary @else  btn-outline-secondary @endif btn-sm">{{$page}}</button>
-
-                        @endfor
                     @endif
+                @else
+                    @for ($page = 1; $page <= $ll->pagination; $page++)
+                        <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                type="button"
+                                class="btn @if ($page == $ll->current_page) btn-primary @else  btn-outline-secondary @endif btn-sm">{{$page}}</button>
+
+                    @endfor
 
                 @endif
+
 
                 @if ($ll->remain)
                     <button onclick="ddatatable.next(this);" type="button" class="btn btn-outline-secondary">

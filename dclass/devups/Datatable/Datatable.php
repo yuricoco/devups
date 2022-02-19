@@ -25,7 +25,6 @@ class Datatable extends Lazyloading
     protected $actionDropdown = true;
     private $filterParam = [];
     protected $base_url = "";
-    protected $dynamicpagination = false;
     protected $isFrontEnd = false;
 
     protected $entity = null;

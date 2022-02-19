@@ -33,7 +33,10 @@ switch (Request::get('path')) {
         $dvups_adminCtrl->completeRegistrationAction(Request::get("id"));
         break;
     case 'dvups-admin/profile':
-        Genesis::renderView('admin.dvups_admin.profile', ["admin" => Dvups_admin::find(getadmin()->getId())], "profile");
+        $dvups_adminCtrl->profile();
+        break;
+    case 'dvups-admin/credential':
+        Genesis::renderView('admin.dvups_admin.credential', ["admin" => Dvups_admin::find(getadmin()->getId())], "profile");
         break;
     case 'dvups-admin/changepassword':
         Genesis::renderView('admin.dvups_admin.changepwd', $dvups_adminCtrl->changepwAction(), true);

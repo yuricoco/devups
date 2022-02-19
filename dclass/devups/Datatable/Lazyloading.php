@@ -22,6 +22,7 @@ class Lazyloading implements \JsonSerializable
     public $nb_element = 0;
     public $per_page = 30;
     public $pagination = 1;
+    protected $dynamicpagination = true;
     public $paginationcustom = [];
     public $current_page = 1;
     public $next = 1;
@@ -85,6 +86,8 @@ class Lazyloading implements \JsonSerializable
             case "let":
                 $this->currentqb->andwhere($attr, "<=", $value);
                 break;
+            case "lk":
+                $this->currentqb->andwhere($attr)->like($value);
             case "lkr":
                 $this->currentqb->andwhere($attr)->like_($value);
                 break;

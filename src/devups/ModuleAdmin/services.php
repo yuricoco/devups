@@ -27,9 +27,6 @@ switch (Request::get('path')) {
         g::json_encode(Dvups_moduleController::updatelabel($_GET['id'], $_GET['label']));
         break;
 
-    case 'dvups_admin._new':
-        g::json_encode(Dvups_adminController::renderForm());
-        break;
     case 'dvups_admin.create':
         g::json_encode($dvups_adminCtrl->createAction());
         break;
@@ -39,13 +36,10 @@ switch (Request::get('path')) {
     case 'dvups_admin.update':
         g::json_encode($dvups_adminCtrl->updateAction(R::get("id")));
         break;
-    case 'dvups_admin._show':
-        g::json_encode(Dvups_adminController::renderDetail(R::get("id")));
-        break;
-    case 'dvups_admin._delete':
+    case 'dvups_admin.delete':
         g::json_encode($dvups_adminCtrl->deleteAction(R::get("id")));
         break;
-    case 'dvups_admin._deletegroup':
+    case 'dvups_admin.deletegroup':
         g::json_encode($dvups_adminCtrl->deletegroupAction(R::get("ids")));
         break;
     case 'dvups_admin.datatable':

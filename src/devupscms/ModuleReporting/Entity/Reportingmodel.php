@@ -153,6 +153,9 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
         $viewdir[] = __DIR__ . '/../Resource/views';
         //Reportingmodel::classroot("Resource/views");
 
+        self::$emailreceiver = [];
+        self::$attachments = [];
+
         self::$log_info = " mode - " . $model;
         $reportingmodel = Reportingmodel::getbyattribut("name", $model);
         if ($reportingmodel->getId())
@@ -528,10 +531,10 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
         $message_html = str_replace("{yield}", $message_html, Genesis::getView("email"));
 
-        if (!__prod || !$this->id) {
-            \DClass\lib\Util::log($message_html, $this->name.".html", ROOT."cache/", "w");
-            return 0;
-        }
+        //if (!__prod || !$this->id) {
+            \DClass\lib\Util::log($message_html, date("Y_m_d-H_i_s")."_".$this->name.".html", ROOT."cache/", "w");
+        //    return 0;
+        //}
 
 // Instantiation and passing `true` enables exceptions
         $mail = new PHPMailer(true);

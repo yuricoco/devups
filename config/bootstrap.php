@@ -1,5 +1,7 @@
 <?php
 
+define('__debug', false);
+
 //require_once "vendor/autoload.php";
 require __DIR__ . '/dependanceInjection.php';
 

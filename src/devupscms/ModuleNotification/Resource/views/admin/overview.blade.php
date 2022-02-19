@@ -17,16 +17,11 @@
                         <div class="nav">{!! $notificationttypeable->renderTopaction() !!}</div>
                     </div>
                 </div>
-                <div class="card-body">
                     {!!
                         $notificationttypeable->buildconfigtable()
                             ->setModel("config")
                             ->render()
                     !!}
-                </div>
-                <div class="card-footer">
-
-                </div>
             </div>
         </div>
         <div class="col-lg-6 col-md-6  stretch-card">
@@ -40,16 +35,13 @@
                         <div class="nav"></div>
                     </div>
                 </div>
-                <div class="card-body">
+
                     {!!
                         $notificationtable->buildconfigtable()
                             ->setModel("config")
                             ->render()
                     !!}
-                </div>
-                <div class="card-footer">
 
-                </div>
             </div>
         </div>
     </div>

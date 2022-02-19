@@ -1,7 +1,6 @@
 <div class="app-header header-shadow">
     <div class="app-header__logo">
-        <div class="card-title"><a href="{{__env}}admin"> Dv Admin v3</a></div>
-        {{--<div class="logo-src"></div>--}}
+        <div class="logo-src"></div>
         <div class="header__pane ml-auto">
             <div>
                 <button type="button" class="hamburger close-sidebar-btn hamburger--elastic"
@@ -49,6 +48,26 @@
                         aller sur le site
                     </a>
                 </li>
+                <li class="ml-3">
+                    <div class="btn-group">
+                        <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
+                           class="p-0 btn ">
+                            | Shortcut
+                            <i class="fa fa-angle-down ml-2 opacity-8"></i>
+                        </a>
+                        <div tabindex="-1" role="menu" aria-hidden="true"
+                             class="dropdown-menu dropdown-menu-right">
+                            <a href="{{__env . 'admin/devupscms/ModuleData/status/list'}}"
+                               class="dropdown-item">{{t("Status")}}</a>
+                            <a href="{{Reportingmodel::classview("reportingmodel/list")}}"
+                               class="dropdown-item">{{t("Email manager")}}</a>
+                            <a href="{{Notification::classpath("index.php")}}"
+                               class="dropdown-item">{{t("Notifications")}}</a>
+                            <a href="{{Reportingmodel::classview("emaillog/list")}}"
+                               class="dropdown-item">{{t("Log")}}</a>
+                        </div>
+                    </div>
+                </li>
             </ul>
         </div>
         <div class="app-header-right">
@@ -62,22 +81,22 @@
                             <div class="btn-group">
                                 <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"
                                    class="p-0 btn">
-                                    {{--                                    {{assets}}images/avatars/1.jpg--}}
-                                    <img width="42" class="rounded-circle" src="{{("defaultadmin")}}" alt="">
+                                    <img width="42" class="rounded-circle" src="{{__admin}}images/avatar.png" alt="">
                                     <i class="fa fa-angle-down ml-2 opacity-8"></i>
                                 </a>
                                 <div tabindex="-1" role="menu" aria-hidden="true"
                                      class="dropdown-menu dropdown-menu-right">
-                                    <button type="button" tabindex="0" class="dropdown-item">User Account</button>
+                                    <a href="{{__env . 'admin/devups/ModuleAdmin/dvups-admin/profile'}}"
+                                       class="dropdown-item">{{t("Admin Account")}}</a>
                                     <a href="<?= Dvups_admin::classpath() . 'dvups-admin/editpassword' ?>"
                                        class="dropdown-item">
                                         <i class="mdi mdi-settings text-primary"></i>
-                                        Settings
+                                        {{t("Settings")}}
                                     </a>
                                     <a class="dropdown-item"
                                        href="<?= __env . 'admin/index.php?path=deconnexion' ?>">
                                         <i class="mdi mdi-logout text-primary"></i>
-                                        Logout
+                                        {{t("Logout")}}
                                     </a>
                                 </div>
                             </div>

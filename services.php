@@ -12,6 +12,7 @@ header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
 
 (new \devupscms\ModuleTree\ModuleTree())->webservices();
+(new \devupscms\ModuleNotification\ModuleNotification())->webservices();
 
 (new Request('hello'));
 

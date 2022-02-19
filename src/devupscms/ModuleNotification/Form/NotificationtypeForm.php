@@ -24,16 +24,17 @@ class NotificationtypeForm extends FormManager
             "options" => FormManager::Options_Helper("name", Dvups_entity::allrows(" name ")),
             "value" => $this->notificationtype->dvups_entity->getId(),
         ];
-        $this->fields['emailmodel'] = [
-            "label" => t('Email model key / reference'),
-            "type" => FORMTYPE_TEXT,
-            "value" => $this->notificationtype->getEmailmodel(),
-        ];
-
         $this->fields['_key'] = [
             "label" => t('Event i.e: new_message '),
             "type" => FORMTYPE_TEXT,
             "value" => $this->notificationtype->get_key(),
+        ];
+
+
+        $this->fields['content'] = [
+            "label" => t('Content <br><i>NB: use : to specify a variable i.e: :username</i>'),
+            "type" => FORMTYPE_TEXTAREA,
+            "value" => $this->notificationtype->getContent(),
         ];
 
         $this->fields['session'] = [
@@ -47,21 +48,16 @@ class NotificationtypeForm extends FormManager
             "type" => FORMTYPE_TEXT,
             "value" => $this->notificationtype->getRedirect(),
         ];
-
-        $this->fields['content'] = [
-            "label" => t('notificationtype.content'),
-            "type" => FORMTYPE_TEXTAREA,
-            "value" => $this->notificationtype->getContent(),
+        $this->fields['emailmodel'] = [
+            "label" => t('Email model key / reference'),
+            "type" => FORMTYPE_TEXT,
+            "value" => $this->notificationtype->getEmailmodel(),
         ];
 
         return $this;
 
     }
 
-    public static function renderWidget($id = null, $action = "create")
-    {
-        Genesis::renderView("notificationtype.formWidget", self::getFormData($id, $action));
-    }
 
 }
     

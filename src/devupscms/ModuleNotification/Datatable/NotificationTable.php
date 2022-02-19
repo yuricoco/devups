@@ -24,6 +24,7 @@ class NotificationTable extends Datatable
     public function buildindextable()
     {
 
+        $this->base_url = __env."admin/";
         $this->order_by = "this.id desc";
         $this->datatablemodel = [
             ['header' => t('notification.id', '#'), 'value' => 'id'],

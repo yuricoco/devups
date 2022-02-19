@@ -6,11 +6,16 @@
  * and open the template in the editor.
  */
 
+
+require __DIR__ . '/constante.php';
+
+if (__debug)
+    require 'php_ini.php';
+
 if (file_exists(__DIR__ . '/../vendor')) {
     require __DIR__ . '/../vendor/autoload.php';
 }
 
-require __DIR__ . '/constante.php';
 require __DIR__ . '/Database.php';
 
 require __DIR__ . '/../dclass/devups/Tchutte/Bugmanager.php';

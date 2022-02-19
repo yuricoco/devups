@@ -1,17 +1,16 @@
-
 function _t(key) {
-    var lang =  _local_content[key];
+    var lang = _local_content[key];
 
-    if(lang)
+    if (lang)
         return lang;
 
-    return  key;
+    return key;
 }
 
 var devups = {
     el: "",
-    togglemore(el){
-        if(el === this.el){
+    togglemore(el) {
+        if (el === this.el) {
             this.el = "";
             $(".more-dropdown").css({
                 visibility: "hidden",
@@ -28,7 +27,7 @@ var devups = {
             transition: "0s",
         });
 
-        if(!$(el).find(".more-dropdown").length)
+        if (!$(el).find(".more-dropdown").length)
             return;
 
         $(el).find(".more-dropdown").css({
@@ -52,7 +51,7 @@ var devups = {
         if (min.length < 2) min = '0' + min;
         if (sec.length < 2) sec = '0' + sec;
 
-        return [year, month, day].join('-')+' '+[hour, min, sec].join(':');
+        return [year, month, day].join('-') + ' ' + [hour, min, sec].join(':');
 
     },
     validateEmail(email) {
@@ -61,7 +60,7 @@ var devups = {
     },
     urlify(text) {
         var urlRegex = /(https?:\/\/[^\s]+)/g;
-        return text.replace(urlRegex, function(url) {
+        return text.replace(urlRegex, function (url) {
             return '<a href="' + url + '" target="_blank" >' + url + '</a>';
         })
         // or alternatively
@@ -79,30 +78,30 @@ var devups = {
 
         return model.baseurl + "services.php?path=" + route + getAttr;
     },
-    upload: function  (file, url, onprogress, onload, oncomplete, _datatype, _postname, form) {
+    upload: function (file, url, onprogress, onload, oncomplete, _datatype, _postname, form) {
 
-        if(!_postname)
+        if (!_postname)
             _postname = "file";
 
         var xhr = new XMLHttpRequest();
         xhr.open('POST', url);
 
-        xhr.upload.onprogress = function(e) {
+        xhr.upload.onprogress = function (e) {
             console.log(e.loaded);
             onprogress(e.loaded, e.total, e);
         };
 
-        xhr.onload = function() {
+        xhr.onload = function () {
             console.log('Upload terminé !');
             onload(xhr.response);
         };
-        xhr.onreadystatechange = function() {
+        xhr.onreadystatechange = function () {
             if (xhr.readyState == 4 && xhr.status == 200) {
                 console.log(xhr.response);
-                if(_datatype == "json")
+                if (_datatype == "json")
                     try {
                         oncomplete(JSON.parse(xhr.response));
-                    } catch(e) {
+                    } catch (e) {
                         console.log(e); // error in the above string (in this case, yes)!
                         oncomplete(e)
                     }
@@ -111,20 +110,20 @@ var devups = {
             }
         };
 
-        if(!form )
+        if (!form)
             form = new FormData();
 
         form.append(_postname, file);
         form.append("user_local_date", devups.formatDate());
         xhr.send(form);
     },
-    sessionoff : function(response, url){
-        if(!response.session)
+    sessionoff: function (response, url) {
+        if (!response.session)
             return;
 
-        if(url){
+        if (url) {
             window.location.href = url;
-        }else{
+        } else {
             window.location.reload();
         }
     },
@@ -154,7 +153,66 @@ var devups = {
                 return map[m];
             });
     },
-    round: function(variable){
-        return Math.round(variable*100)/100;
+    round: function (variable) {
+        return Math.round(variable * 100) / 100;
+    },
+    lastnotification: null,
+    notified(el) {
+        $(el).find(".badge-counter").fadeOut();
+        var $notified = $("#notification-block");
+        var ids = []
+        $notified.find("input").each((i, el) => {
+            console.log(i, el)
+            ids.push(el.value)
+        })
+        console.log(ids)
+        Drequest.api("notified")
+            .toFormdata({ids: ids.join()})
+            .post((response) => {
+                console.log(response)
+                $notified.find("a").removeClass("bg-info", function () {
+
+                })
+            })
+
+    },
+    callbackNotification(response) {
+        var nbnotif = response.notifications.length;
+        if (nbnotif === 0)
+            return;
+
+        this.lastnotification = response.notifications[nbnotif - 1].created_at
+        for (let item of response.notifications)
+            $("#notification-items").prepend(item.html)
+
+        $("#notification-block").find("#notif-ping").show().html(response.unreaded+"")
+        $.notify(`vous avez ${nbnotif} nouvelles notifications`, "info")
+
+    },
+    initNotification(id, date) {
+        Drequest.api(`lazyloading.notificationbroadcasted?dfilters=on&admin.id:eq=${id}&ping:eq=1&created_at:let=` + date)
+            .get((response) => {
+                console.log(response)
+                devups.callbackNotification(response)
+            })
+    },
+    timerNotification(id, date) {
+
+        // else {
+        //     this.initNotification(id, date)
+        //     return 1;
+        // }
+
+        setInterval(() => {
+            if (this.lastnotification) {
+                date = this.lastnotification
+            }
+            Drequest.api(`notificationbroadcasted.alert?jsonmodel=html&adminid=${id}&ping=1&date=` + date)
+                .get((response) => {
+                    console.log(response)
+                    devups.callbackNotification(response)
+                })
+        }, 15000)
+
     }
 };

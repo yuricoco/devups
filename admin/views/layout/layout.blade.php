@@ -5,6 +5,7 @@
     <meta name="author" content="spacekola">
     <title class="mdi mdi-sort-variant">Dashboard | Dvups Admin</title>
     <meta charset="utf-8">
+    <link href="<?= __admin; ?>images/favicon.png" rel="icon">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta http-equiv="Content-Language" content="en">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -30,10 +31,10 @@
         var __lang = '<?= __lang ?>';
         var langs = <?php Genesis::json_encode2(Dvups_lang::all()) ?>;
 
+        var _admin_id = '{{getadmin()->id}}';
         var _role = '{{getadmin()->dvups_role->name}}';
-        console.log(role)
         /*
-        var _local_content = <?= Local_contentController::getdatajs() ?>;
+        var _local_content = = Local_contentController::getdatajs() ?>;
          */
     </script>
 </head>
@@ -90,7 +91,11 @@
 <script src="<?= assets; ?>plugins/jquery/jquery.min.js"></script>
 <script src="<?= assets; ?>plugins/notify.min.js"></script>
 <script src="<?= CLASSJS; ?>Request.js"></script>
+<script src="<?= CLASSJS; ?>devups.js"></script>
 <script src="<?= CLASSJS; ?>dialogbox.js"></script>
+<script >
+    devups.timerNotification(_admin_id, '{{date("Y-m-d H:i:s")}}')
+</script>
 
 <?php
 if (function_exists("script"))
