@@ -197,4 +197,12 @@ class Dvups_lang extends Model implements JsonSerializable
         return self::where("iso_code", local())->first();
     }
 
+    /**
+     * @param $iso_code
+     * @return Dvups_lang
+     */
+    public static function getByIsoCode($iso_code){
+        return Dvups_lang::getbyattribut("iso_code",$iso_code);
+    }
+
 }

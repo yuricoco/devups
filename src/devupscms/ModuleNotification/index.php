@@ -13,10 +13,7 @@ $viewdir[] = __DIR__ . '/Resource/views';
 
 $moduledata = Dvups_module::init('ModuleNotification');
 
-
-$emailmodelCtrl = new ReportingmodelController();
 $notificationCtrl = new NotificationController();
-$notificationbroadcastedCtrl = new NotificationbroadcastedController();
 $notificationtypeCtrl = new NotificationtypeController();
 
 
@@ -52,30 +49,9 @@ switch (Request::get('path')) {
         $mpdf->Output();
         // echo $emailmodel->getPreview();
         break;
-    case 'emailmodel/index':
-        $emailmodelCtrl->listView();
-        break;
-    case 'emailmodel/create':
-        $emailmodelCtrl->createAction();
-        break;
-    case 'emailmodel/edit':
-        Genesis::renderView("admin.emailmodel.form", $emailmodelCtrl->formView(Request::get("id")));
-        //ReportingmodelForm::renderWidget(Request::get("id"));
-        break;
-    case 'emailmodel/update':
-        $emailmodelCtrl->updateAction(Request::get("id"));
-        break;
-
-    case 'emaillog/index':
-        (new EmaillogController())->listView();
-        break;
 
     case 'notification/index':
         $notificationCtrl->listView();
-        break;
-
-    case 'notificationbroadcasted/index':
-        $notificationbroadcastedCtrl->listView();
         break;
 
     case 'notificationtype/index':

@@ -23,11 +23,6 @@ class Status extends Model implements JsonSerializable
      **/
     protected $_key;
     /**
-     * @Column(name="label", type="string" , length=55, nullable=true )
-     * @var string
-     **/
-    protected $label;
-    /**
      * @Column(name="position", type="integer", nullable=true )
      * @var string
      **/
@@ -47,6 +42,8 @@ class Status extends Model implements JsonSerializable
     public function __construct($id = null)
     {
 
+        $this->dvtranslate = true;
+        $this->dvtranslated_columns = ["label"];
         if ($id) {
             $this->id = $id;
         }
@@ -160,11 +157,6 @@ class Status extends Model implements JsonSerializable
     public function set_key($_key)
     {
         $this->_key = $_key;
-    }
-
-    public function getLabel()
-    {
-        return $this->label;
     }
 
     public function setLabel($label)

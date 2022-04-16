@@ -85,10 +85,10 @@ class UserCore extends \Model implements JsonSerializable
      **/
     protected $last_login;
     /**
-     * @Column(name="lang", type="string" , length=15 , nullable=true)
+     * @Column(name="lang", type="string" , length=2 , nullable=true)
      * @var string
      **/
-    protected $lang;
+    protected $lang = "en";
     /**
      * @Column(name="api_key", type="string" , length=255 , nullable=true )
      * @var string
@@ -133,7 +133,7 @@ class UserCore extends \Model implements JsonSerializable
         if (!$phonenumber)
             return null;
 
-        $phonenumber = \DClass\lib\Util::sanitizePhonenumber($phonenumber, $this->country->getPhonecode());
+        $phonenumber = \DClass\lib\Util::sanitizePhonenumber($phonenumber, $this->country->phonecode);
 
         $nb = User::where("phonenumber", $phonenumber);
         if ($nb->count()) {
@@ -148,7 +148,7 @@ class UserCore extends \Model implements JsonSerializable
         if(!$password)
             return null;
 
-        $this->password = $password;
+        $this->password = sha1($password);
     }
     public function setResetpassword ($password)
     {

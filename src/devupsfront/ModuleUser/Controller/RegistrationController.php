@@ -24,7 +24,7 @@ class RegistrationController extends Controller {
 
         $nbuser = User::select()
             ->where('user.email', "=", $email)
-            ->__countEl();
+            ->count();
 
         if($nbuser)
             return ["success" => false, "detail" => t("Cette adresse mail existe déjà!")];
@@ -39,11 +39,11 @@ class RegistrationController extends Controller {
 
         // send mail with activation code $codeactivation
         $data = [
-            "activationcode" => route('login').'?vld='.$activationcode.'&u_id='.$user->getId(),
+            "activation_link" => route('login').'?vld='.$activationcode.'&u_id='.$user->getId(),
             "activation_code" => $activationcode,
             "username" => $user->getFirstname(),
         ];
-        Reportingmodel::init("change_email")
+        Reportingmodel::init("change_email", Dvups_lang::getByIsoCode($user->lang)->id)
             ->addReceiver($email, $user->getUsername())
             ->sendMail($data);
 
@@ -58,7 +58,7 @@ class RegistrationController extends Controller {
         if($user->getActivationcode() !==  $code )
             return ["success" => false, "detail" => t("Activation code incorrect")];
 
-        if($user->getPassword() !== md5(Request::post("password")))
+        if($user->getPassword() !== sha1(Request::post("password")))
             return ["success" => false, "detail" => t("Mot de passe incorrect")];
 
         $user->setEmail(Request::post("email"));
@@ -74,15 +74,22 @@ class RegistrationController extends Controller {
     public static function checktelephoneAction()
     {
         if(isset($_POST['phonecode']))
-            $country = Country::getbyattribut("phonecode", Request::post("phonecode"));
+            $country = Country::where("phonecode", Request::post("phonecode"))->firstOrNull();
         else
-            $country = Country::getbyattribut("iso", Request::post("country_iso"));
+            $country = Country::where("iso", Request::post("country_iso"))->firstOrNull();
+
+        if (is_null($country)){
+            return [
+                'success'=> false,
+                'detail'=> t('country not found'),
+            ];
+        }
 
         $phonenumber = User::sanitizePhonenumber(Request::post("phonenumber"), $country->getPhonecode());
 
         $nbuser = User::select()
             ->where('user.phonenumber', "=", $phonenumber)
-            ->__countEl();
+            ->count();
 
         if($nbuser)
             return ["success" => false, "detail" => t("Ce numéro de téléphone existe déjà")];
@@ -93,9 +100,10 @@ class RegistrationController extends Controller {
         $userhydrate->setActivationcode($activationcode);
         $userhydrate->__update();
 
-        Notification::on($userhydrate, "change_telephone", ["username"=>$userhydrate->getFirstname(), "code"=>$activationcode])
-            //->send([$userhydrate])
-            ->sendSMS([$country->getPhonecode().$phonenumber]);
+        $userhydrate->phonenumber = $phonenumber;
+        Notification::$send_sms = true;
+        Notification::on($userhydrate, "change_telephone")
+            ->send($userhydrate, ["username"=>$userhydrate->username, "code"=>$activationcode]);
 
         return ["success" => true, "detail" => t("code d'activation vous a été envoyé. Utilisez le pour confirmer le changement de votre numéro.")];
 
@@ -109,7 +117,7 @@ class RegistrationController extends Controller {
         if($user->getActivationcode() !==  $code )
             return ["success" => false, "detail" => t("Activation code incorrect")];
 
-        if($user->getPassword() !== md5(Request::post("password")))
+        if($user->getPassword() !== sha1(Request::post("password")))
             return ["success" => false, "detail" => t("Mot de passe incorrect")];
 
         $user->setPhonenumber(Request::post("phonenumber"));
@@ -189,6 +197,99 @@ class RegistrationController extends Controller {
 
     }
 
+    public function register($id = null) {
+        extract($_POST);
+
+        // check if username is free
+        //$userhydrate = Controller::form_generat(new User($id), $user_form, null, true);
+        $userhydrate = new User($id);
+        if ( ! is_null($id)){
+            $userhydrate = $this->form_generat(new User($id), $user_form);
+
+            if($userhydrate->getPassword() != md5($confirm))
+                return ["success" => false, "detail" => "le mot de passe est incorrect"];
+
+            $userhydrate->__update();
+            return ["success" => true, "detail" => "success", "user" => $userhydrate];
+
+        }
+
+        $userhydrate = $this->form_generat(new User(), $user_form);
+
+        $qb = new QueryBuilder(new User());
+        $qb->select();
+
+        $qb->where('this.phonenumber', "=", $userhydrate->getPhonenumber());
+
+            $nbuser = $qb
+                //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
+                ->__countEl();
+
+            if($nbuser) {
+                $nbuser = User::select()
+                    ->where('this.phonenumber', "=", $userhydrate->getPhonenumber())
+                    //->andwhere('country.phonecode', "=", $userhydrate->country->__get("phonecode"))
+                    ->__countEl();
+
+                if ($nbuser)
+                    return ["success" => false, "detail" => "phonenumber already use"];
+            }
+
+        if($userhydrate->getEmail()){
+
+            $qb = User::where('this.email', "=", $userhydrate->getEmail());
+
+            $nbuser = $qb
+                //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
+                ->__countEl();
+
+            if($nbuser) {
+                $nbuser = User::select()
+                    ->where('user.email', "=", $userhydrate->getEmail())
+                    ->__countEl();
+
+                if($nbuser)
+                    return ["success" => false, "detail" => "email address already use"];
+
+            }
+        }
+
+        $userhydrate->setPassword(md5($user_form['password']));
+        //$userhydrate->setUsername($user_form['username']);
+
+        $activationcode = RegistrationController::generatecode();
+        $userhydrate->setActivationcode($activationcode);
+
+        // todo: handle it better
+        $userhydrate->setIs_activated(1);
+        $userhydrate->setApiKey(\DClass\lib\Util::randomcode());
+
+        $userhydrate->__insert();
+
+        $_SESSION[USER] = serialize($userhydrate);
+        $_SESSION[USERID] = $userhydrate->getId();
+
+        if($userhydrate->getEmail()) {
+            $data = [
+                "activationcode" => $activationcode,
+                "username" => $userhydrate->getFirstname(),
+            ];
+            Reportingmodel::init("registered")
+                ->addReceiver($userhydrate->getEmail(), $userhydrate->getUsername())
+                ->sendMail($data);
+        }
+
+        // todo: send notification to seller
+        Notification::on($userhydrate, "registered", ["username"=>$userhydrate->getFirstname(), "code"=>$activationcode])
+            ->send([$userhydrate])
+            ->sendSMS([$userhydrate->getTelephone()]);
+
+        return ["success" => true,
+            //"activationcode" => $activationcode,
+            "detail" => "success", "user" => $userhydrate];
+
+    }
+
     public static function resendactivationcode() {
 
         $user = User::find(Request::get("user_id"));
@@ -200,19 +301,20 @@ class RegistrationController extends Controller {
         $_SESSION[USER] = serialize($user);
 
         // send mail with activation code $codeactivation
-        if($user->getEmail()) {
+        if ($user->getEmail()) {
             $data = [
                 "activation_link" => route('login') . '?vld=' . $activationcode . '&u_id=' . $user->getId(),
+                "activation_code" => $activationcode,
                 "username" => $user->getFirstname(),
             ];
-            Reportingmodel::init("verify_account")
+            Reportingmodel::init("reset-password", Dvups_lang::getByIsoCode($user->lang)->id)
                 ->addReceiver($user->getEmail(), $user->getUsername())
                 ->sendMail($data);
         }
 
-        Notification::on($user, "verify_account", ["username"=>$user->getFirstname(), "code"=>$activationcode])
-            //->send([$userhydrate])
-            ->sendSMS([$user->getTelephone()]);
+        Notification::$send_sms = true;
+        Notification::on($user, "reset-password")
+            ->send($user, ["username"=>$user->getFirstname(), "code"=>$activationcode]);
 
         // send sms with activation code $codeactivation
         //RegistrationController::sendsms($activationcode, null, $user);
@@ -225,15 +327,15 @@ class RegistrationController extends Controller {
 
     }
 
-    public static function activateaccount() {
+    public static function activateaccount() {   
 //        global $appuser;
         $appuser = User::find(Request::get("user_id"));
 
         //return $_POST;
-        if ($appuser->isActivated())
-            return ["success" => true, "url" => route('home')];
-        else {
-            $code = sha1($_POST['user_form']["activationcode"]);
+        if ($appuser->isActivated()) {
+            return ["success" => true, "url" => route("home")];
+        }else {
+            $code = sha1($_POST["activationcode"]);
             if ($code == $appuser->getActivationcode()) {
             //if (substr($code, 0, 5) == $appuser->getActivationcode()) {
 
@@ -243,7 +345,23 @@ class RegistrationController extends Controller {
                 //updatesession($appuser);
                 $_SESSION[USERAPP] = serialize($appuser);
 
-                return ["success" => true, "url" => route("user-profile")];
+                // @rfc
+                // todo: we can create a hook system so that we persist specific action
+                // for this position then the code will be executer from where it has been writen
+
+                // we credit the user wallet with the amount of payment
+                $wt = new Wallettransaction();
+                $wt->wallet = $appuser->wallet;
+                $wt->amount = 900;
+                $wt->type = "credit";
+                $wt->comment = t("credit offer for new account.");
+                $wt->__insert();
+
+                Notification::on($appuser, "account_activated")
+                    ->send($appuser, $appuser->notificationData());
+
+
+                return ["success" => true, "url" => route("home")];
             }
         }
 

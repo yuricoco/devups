@@ -6,7 +6,7 @@
             <div class="widget-content-wrapper">
                 <div class="widget-content-left">
                     <div class="widget-heading">
-                        {{$dv_image->folder->getName()}}/
+                        {$dv_image->folder->name}}/
                         <button onclick="model.dvimage._delete(this, {{$dv_image->getId()}}, this)"
                                 class="btn btn-danger">delete
                         </button>

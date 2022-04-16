@@ -212,7 +212,7 @@ var devups = {
                     console.log(response)
                     devups.callbackNotification(response)
                 })
-        }, 15000)
+        }, 30000)
 
     }
 };

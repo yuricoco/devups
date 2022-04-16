@@ -31,6 +31,11 @@ class Dvups_admin extends Model implements JsonSerializable
      * @var string
      * */
     protected $email;
+    /**
+     * @Column(name="lang", type="string" , length=2 , nullable=true)
+     * @var string
+     **/
+    protected $lang = "en";
 
     /**
      * @Column(name="login", type="string" , length=255 )

@@ -18,37 +18,49 @@
             $dvups_role->inCollectionOf("dvups_right"), ['class' => 'form-control']); ?>
     </div>
     <label for='dvups_module'>Dvups_module</label>
-    <ul class=''>
+    <table class='table'>
+        <tr>
+            <td>Component</td>
+            <td></td>
+        </tr>
         @foreach($components as $component)
-            <li class='form-group'>
-                <label class='form-group '>
-                    <?= Form::input('dvups_component::values', [$component->getId(), $value_components], ['class' => 'form-control'], "checkbox"); ?>
+            <tr class='form-group'>
+                <th class='form-group '>
+                    <?= Form::input('dvups_component::values', [$component->getId(), $value_components], ['class' => ''], "checkbox"); ?>
                     {{$component->getName()}}
-                </label>
-                <ul class=''>
-                    @foreach($component->__hasmany(Dvups_module::class) as $module)
-                        <li class='form-group'>
-                            <label class='form-group '>
-                                <?= Form::input('dvups_module::values', [$module->getId(), $value_modules], ['class' => 'form-control'], "checkbox"); ?>
-                                {{$module->getName()}}
-                            </label>
-                            <ul class=''>
-                                <label for='dvups_module'>Dvups_Entities</label>
-                                @foreach($module->__hasmany(Dvups_entity::class) as $entity)
-                                    <li>
-                                        <label class='form-group '>
-                                            <?= Form::input('dvups_entity::values', [$entity->getId(), $value_entities], ['class' => 'form-control'], "checkbox"); ?>
-                                            {{$entity->getName()}}
-                                        </label>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </li>
-                    @endforeach
-                </ul>
-            </li>
+                </th>
+                <td>
+                    <table class='table'>
+                        @foreach($component->__hasmany(Dvups_module::class) as $module)
+                            <tr class='form-group'>
+                                <th class='form-group '>
+                                    <?= Form::input('dvups_module::values', [$module->getId(), $value_modules], ['class' => ''], "checkbox"); ?>
+                                    {{$module->getName()}}
+                                </th>
+                                <td>
+
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <div class='row pl-6'>
+                                        @foreach($module->__hasmany(Dvups_entity::class) as $entity)
+                                            <div class="col-lg-3">
+                                                <label class='form-group '>
+                                                    <?= Form::input('dvups_entity::values', [$entity->getId(), $value_entities], ['class' => ''], "checkbox"); ?>
+                                                    {{$entity->getName()}}
+                                                </label>
+                                            </div>
+                                        @endforeach
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </table>
+                </td>
+            </tr>
         @endforeach
-    </ul>
+    </table>
 
 </div>
 

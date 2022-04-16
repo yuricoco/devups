@@ -127,8 +127,8 @@ class Dvups_entityController extends Controller
     public function deleteAction($id)
     {
 
-        Dvups_right_dvups_entity::delete()->where("dvups_entity_id", $id)->exec();
-        Dvups_role_dvups_entity::delete()->where("dvups_entity_id", $id)->exec();
+//        Dvups_right_dvups_entity::delete()->where("dvups_entity_id", $id)->exec();
+//        Dvups_role_dvups_entity::delete()->where("dvups_entity_id", $id)->exec();
         Dvups_entity::delete($id);
 
         return array('success' => true, // pour le restservice
@@ -140,8 +140,8 @@ class Dvups_entityController extends Controller
     public function deletegroupAction($ids)
     {
 
-        Dvups_right_dvups_entity::delete()->where("dvups_entity_id")->in($ids)->exec();
-        Dvups_role_dvups_entity::delete()->where("dvups_entity_id")->in($ids)->exec();
+//        Dvups_right_dvups_entity::delete()->where("dvups_entity_id")->in($ids)->exec();
+//        Dvups_role_dvups_entity::delete()->where("dvups_entity_id")->in($ids)->exec();
         Dvups_entity::delete()->where("id")->in($ids)->exec();
 
         return array('success' => true, // pour le restservice

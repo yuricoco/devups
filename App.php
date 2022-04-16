@@ -58,20 +58,8 @@ class App extends \dclass\devups\Controller\FrontController
 
     public function helloView(){
 
-        $product = Product::last();
-//        $product->description = "La 4eme sortie bd de 3ag pour l'année  2021";
-//        $product->name = ["en"=>'Mysterious eyes VE', 'fr'=>'Mysterious eyes VF'];
-//        $product->__insert();
+        //$product = Product::first();
 
-        dv_dump($product->category->name);
-        //$product = Product::find(2, 1);
-        //var_dump($product);
-
-//        $products = Product::all("id", "asc", 2);
-//        foreach ($products as $product)
-//            var_dump($product->name);
-
-        die;
         Genesis::render("hello", []);
     }
 

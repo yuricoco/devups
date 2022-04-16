@@ -1,6 +1,6 @@
 @php
     $admin = getadmin();
-        $data = Notificationbroadcasted::unreadedadmin($admin);
+        $data = Notification::unreadedadmin($admin);
         $notifications = $data["notifs"];
         $nbnots = $data["notifcount"];
 @endphp
@@ -16,15 +16,15 @@
     <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
          aria-labelledby="alertsDropdown">
         <h6 class="dropdown-header">
-            Notifications ({{Notificationbroadcasted::where("admin.id", $admin->id)->count()}})
+            Notifications ({{Notification::where("admin_id", $admin->id)->count()}})
         </h6>
-        <div id="notification-items">
+        <div id="notification-items" style="max-height: 500px; overflow: auto">
             @foreach($notifications as $notification)
                 @include("default.notification_item")
             @endforeach
         </div>
         <a class="dropdown-item text-center small text-gray-500"
-           href="{{Notificationbroadcasted::classview('notificationbroadcasted/list')}}">Show All Alerts</a>
+           href="{{Notification::classview('notification/list')}}">Show All Alerts</a>
     </div>
 </div>
 

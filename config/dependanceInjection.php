@@ -25,6 +25,7 @@ require __DIR__ . '/../dclass/devups/Tchutte/DB_dumper.php';
 require __DIR__ . '/../dclass/devups/Tchutte/QueryBuilder.php';
 require __DIR__ . '/../dclass/devups/Dfile.php';
 require __DIR__ . '/../dclass/devups/ScanDir.php';
+require __DIR__ . '/../dclass/devups/model/ModelTrait.php';
 require __DIR__ . '/../dclass/devups/model/Model.php';
 require __DIR__ . '/../dclass/devups/DvupsTranslation.php';
 require __DIR__ . '/../dclass/devups/model/EntityCollection.php';

@@ -20,45 +20,6 @@ class CmstextFrontController extends CmstextController
         Genesis::render('documentation', compact("collection", "cms"));
     }
 
-    public function ll($next = 1, $per_page = 10)
-    {
-
-        $ll = new Lazyloading();
-        $ll->lazyloading(new Cmstext());
-        return $ll;
-
-    }
-
-    public function createAction($cmstext_form = null)
-    {
-        $rawdata = \Request::raw();
-        $cmstext = $this->hydrateWithJson(new Cmstext(), $rawdata["cmstext"]);
-
-
-        $cmstext->setCreationdate(new DateTime());
-
-
-        $id = $cmstext->__insert();
-        return array('success' => true,
-            'cmstext' => $cmstext,
-            'detail' => '');
-
-    }
-
-    public function updateAction($id, $cmstext_form = null)
-    {
-        $rawdata = \Request::raw();
-
-        $cmstext = $this->hydrateWithJson(new Cmstext($id), $rawdata["cmstext"]);
-
-
-        $cmstext->__update();
-        return array('success' => true,
-            'cmstext' => $cmstext,
-            'detail' => '');
-
-    }
-
 
     public function detailAction($id)
     {
@@ -68,6 +29,29 @@ class CmstextFrontController extends CmstextController
         return array('success' => true,
             'cmstext' => $cmstext,
             'detail' => '');
+
+    }
+
+    public function faqView()
+    {
+        $collection = [];
+        $list = Tree_item::getmainmenu("faq");
+        foreach ($list as $el){
+            /*$children = $el->getChildren();
+            $colchildren = [];
+            foreach ($children as $child){
+                $content = $child->getContent()->getContent();
+                $colchildren = [
+                    "item"=>$child,
+                    "content"=>$child,
+                ];
+            }*/
+            $collection[] = [
+                "item" => $el,
+                "children" => $el->getChildren(),
+            ];
+        }
+        return compact("collection");
 
     }
 

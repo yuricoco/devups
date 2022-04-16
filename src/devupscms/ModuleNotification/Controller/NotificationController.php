@@ -129,7 +129,7 @@ class NotificationController extends Controller
     {
 
         $ids = Request::post("ids");
-        Notificationbroadcasted::where("this.id")->in($ids)->update([
+        Notification::where("this.id")->in($ids)->update([
             "status" => 1,
             "ping" => 0,
         ]);
@@ -143,31 +143,31 @@ class NotificationController extends Controller
     {
 
         if ($session == "admin") {
-            $notifications = Notificationbroadcasted::where("this.created_at", ">", Request::get("date"))
-                ->where("admin.id", Request::get("adminid"))
+            $notifications = Notification::where("this.created_at", ">", Request::get("date"))
+                ->where("admin_id", Request::get("adminid"))
                 ->where("ping", 1)
                 ->get();
-            $unreaded = Notificationbroadcasted::where("admin.id", Request::get("adminid"))
+            $unreaded = Notification::where("admin_id", Request::get("adminid"))
                 ->where("status", "=", 0)
                 ->count();
 
             if (count($notifications))
-                Notificationbroadcasted::where("admin.id", Request::get("adminid"))
+                Notification::where("admin_id", Request::get("adminid"))
                     //->where("ping", 1)
                     ->update([
                         "ping" => 0
                     ]);
         }else{
-            $notifications = Notificationbroadcasted::where("this.created_at", ">", Request::get("date"))
-                ->where("user.id", Request::get("user_id"))
+            $notifications = Notification::where("this.created_at", ">", Request::get("date"))
+                ->where("user_id", Request::get("user_id"))
                 ->where("ping", 1)
                 ->get();
-            $unreaded = Notificationbroadcasted::where("user.id", Request::get("user_id"))
+            $unreaded = Notification::where("user_id", Request::get("user_id"))
                 ->where("status", "=", 0)
                 ->count();
 
             if (count($notifications))
-                Notificationbroadcasted::where("user.id", Request::get("user_id"))
+                Notification::where("user_id", Request::get("user_id"))
                     //->where("ping", 1)
                     ->update([
                         "ping" => 0

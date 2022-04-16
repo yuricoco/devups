@@ -4,58 +4,169 @@
 class UserFrontController extends UserController
 {
 
+    public static function renderAccount()
+    {
+        $user = new User();
+        if (isset($_SESSION[USERID]))
+            $user = User::find($_SESSION[USERID]);
+
+        Genesis::render('_account', ["user" => $user]);
+
+    }
+
+    public function dashboard()
+    {
+        //$qb = \Favorite::select()->where('user_id', $_SESSION[USERID]);
+        return [
+            "user" => \User::userapp(),
+            "nborder" => 0,
+        ];
+    }
+
+    public function account()
+    {
+        $user = \User::find($_SESSION[USERID]);
+        return [
+            "user" => $user
+        ];
+    }
+
+
+    public function lostpasswordView()
+    {
+        //self::$jsfiles[]= CLASSJS . "model.js";
+        self::$jsfiles[] = CLASSJS . "dform.js";
+        self::$jsfiles[] = d_assets("js/userCtrl.js");
+        return \Response::$data;
+    }
+
+    public function confirmaccountView()
+    {
+        //self::$jsfiles[]= CLASSJS . "model.js";
+        self::$jsfiles[] = CLASSJS . "dform.js";
+        self::$jsfiles[] = d_assets("js/userCtrl.js");
+        return \Response::$data;
+    }
+
+    public function resetpasswordView()
+    {
+        self::$jsfiles[] = CLASSJS . "dform.js";
+        self::$jsfiles[] = d_assets("js/userCtrl.js");
+        return \Response::$data;
+    }
+
+
+    public function createAction($user_form = null)
+    {
+
+        $response = (new RegistrationController())->register();
+
+        if (!$response["success"]) {
+            return $response;
+        }
+        extract($_POST);
+
+        $user = $response["user"];
+
+        return array('success' => true,
+            'user' => $user,
+            'redirect' => route("activate-account"),
+            'detail' => '');
+
+    }
+
     public function registration()
     {
 
-        if (isset($_POST["user_form"]))
-            $userhydrate = $this->form_fillingentity(new User(), $_POST["user_form"]);
-        else {
-            $rawdata = \Request::raw();
-            $userhydrate = $this->hydrateWithJson(new User(), $rawdata["user"]);
-        }
+        $rawdata = \Request::raw();
+
+        $userhydrate = $this->hydrateWithJson(new User(), $rawdata["user"]);
+
         if ( $this->error ) {
-            return 	array(	'success' => false,
+            return  array(  'success' => false,
                 'user' => $userhydrate,
                 'action' => 'create',
                 'error' => $this->error);
         }
 
-        $userhydrate->setPassword(md5($userhydrate->getPassword()));
-
         $activationcode = RegistrationController::generatecode();
         $userhydrate->setActivationcode($activationcode);
 
         // todo: handle it better
-        $userhydrate->setIs_activated(1);
+        $userhydrate->setIs_activated(0);
         $userhydrate->setApiKey(\DClass\lib\Util::randomcode());
-
         $userhydrate->__insert();
+/*
+        $_SESSION['USER'] = serialize($userhydrate);
+        $_SESSION['USERID'] = $userhydrate->getId();*/
 
-        $_SESSION[USER] = serialize($userhydrate);
-        $_SESSION[USERID] = $userhydrate->getId();
 
         // send mail with activation code $codeactivation
         if ($userhydrate->getEmail()) {
             $data = [
-                "activationcode" => $activationcode,
+                "activation_code" => $activationcode,
                 "username" => $userhydrate->getFirstname(),
             ];
-            Reportingmodel::init("register")
+            Reportingmodel::init("register", Dvups_lang::getByIsoCode($userhydrate->lang)->id)
                 ->addReceiver($userhydrate->getEmail(), $userhydrate->getUsername())
                 ->sendMail($data);
         }
 
         // todo: send notification to seller
-        Notification::on($userhydrate, "registered",
-            ["username" => $userhydrate->getFirstname(),
-                "code" => $activationcode])
-            ->send([$userhydrate])
-            //->sendSMS([$userhydrate->getTelephone()])
-        ;
+        Notification::$send_sms = true;
+        Notification::on($userhydrate, "registered")
+            ->send([$userhydrate], ["username" => $userhydrate->getFirstname(), "code" => $activationcode]);
 
         return array('success' => true,
             'user' => $userhydrate,
-            'redirect' => route("activate-account"),
+            'activation_code' => $activationcode,
+            //'redirect' => route("activate-account"),
+            'detail' => '');
+
+    }
+
+    public function updateAction($id, $user_form = null)
+    {
+
+        $rawdata = \Request::raw();
+
+        $user = $this->hydrateWithJson(new User($id), $rawdata["user"]);
+
+        $user->__update();
+        return array('success' => true,
+            'user' => $user,
+            'detail' => '');
+
+    }
+
+    public function updateApiAction($id, $user_form = null)
+    {
+
+        $rawdata = \Request::raw();
+
+        $user = $this->hydrateWithJson(new User($id), $rawdata["user"]);
+
+        if ($this->error) {
+            return array('success' => false,
+                'user' => $user,
+                'error' => $this->error);
+        }
+
+        $user->__update();
+        return array('success' => true,
+            'user' => $user,
+            'detail' => '');
+
+    }
+
+
+    public function detailAction($id)
+    {
+
+        $user = User::find($id);
+
+        return array('success' => true,
+            'user' => $user,
             'detail' => '');
 
     }

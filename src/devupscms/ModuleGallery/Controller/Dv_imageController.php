@@ -30,6 +30,23 @@ class Dv_imageController extends Controller{
         
     }
 
+    public function formView($id = null)
+    {
+        $cmstext = new Dv_image();
+        $action = Dv_image::classpath("services.php?path=dv_image.create&tablemodel=content");
+        if ($id) {
+            $action = Dv_image::classpath("services.php?path=dv_image.update&tablemodel=content&id=" . $id);
+            $cmstext = Dv_image::find($id);
+        }
+
+        return ['success' => true,
+            'form' => Dv_imageForm::init($cmstext, $action)
+                ->buildForm()
+                ->addDformjs()
+                ->renderForm(),
+        ];
+    }
+
     public function createAction($dv_image_form = null ){
         extract($_POST);
 

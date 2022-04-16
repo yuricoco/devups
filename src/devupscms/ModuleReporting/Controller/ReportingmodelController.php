@@ -41,10 +41,12 @@ class ReportingmodelController extends Controller
 
         $action = Reportingmodel::classpath("services.php?path=reportingmodel.update-email&id=" . $id);
         $reportingmodel = Reportingmodel::find($id);
+        $langs = Dvups_lang::all();
         Genesis::renderView("admin.reportingmodel.form", [
             "success" => true,
             "reportingmodel" => $reportingmodel,
             "action" => $action,
+            "langs" => $langs,
         ]);
     }
 
@@ -85,7 +87,7 @@ class ReportingmodelController extends Controller
                     'error' => $this->error);//);
         }
 
-
+        $reportingmodel->dvid_lang = "fr";
         $id = $reportingmodel->__insert();
         //return redirect(Reportingmodel::classpath("reportingmodel/index"));
 
@@ -170,9 +172,13 @@ class ReportingmodelController extends Controller
 
     }
 
+    public function testmail($id, $email)
+    {
+        $this->testmailAction($id, $email);
+    }
     public function testmailAction($id, $email)
     {
-        return Reportingmodel::find($id)
+        return Reportingmodel::find($id, 1)
             ->addReceiver($email, "devups developer")
             ->sendMail([
                 "activationcode" => "ddddd",

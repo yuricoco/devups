@@ -17,7 +17,7 @@ class LoginController
     static function logout()
     {
 
-        unset($_SESSION[USERID]);
+        unset($_SESSION['USERID']);
         unset($_SESSION[USERAPP]);
         unset($_SESSION["setting"]);
         session_destroy();
@@ -49,7 +49,7 @@ class LoginController
             ->where('user.username', $user_form["login"])
             ->orwhere('user.email', $user_form["login"])
             ->orwhere('user.phonenumber', $user_form["login"])
-            ->__getOne();
+            ->first();
 
         if ($user->getId()) {
 
@@ -59,9 +59,11 @@ class LoginController
                         "error" => t('Country has not been specified. important for phonenumber'));
                 }
                 $country = Country::getbyattribut("iso", $user_form['country_iso']);
+
+                if ($country->getId())
+                    $user->country = $country;
+
             }
-            if($country->getId())
-                $user->country = $country;
 
             return LoginController::initialiseUserParam($user) + ["user" => $user];
         } else {
@@ -81,25 +83,26 @@ class LoginController
         $user->setActivationcode($activationcode);
         $user->__update();
 
-        $_SESSION[USERID] = $user->getId();
+        $_SESSION['USERID'] = $user->getId();
         $_SESSION[USERAPP] = serialize($user);
         //$_SESSION[LANG] = $user->getLocale();
 
         //updatesession($user);
 
-        if($user->getEmail()){
+        if ($user->getEmail()) {
             $data = [
-                "activation_link" => route('login').'?vld='.$activationcode.'&u_id='.$user->getId(),
+                "activation_link" => route('login') . '?vld=' . $activationcode . '&u_id=' . $user->getId(),
                 "activation_code" => $activationcode,
                 "username" => $user->getFirstname(),
             ];
-            Reportingmodel::init("reset-password")
+            Reportingmodel::init("reset-password", Dvups_lang::getByIsoCode($user->lang)->id)
                 ->addReceiver($user->getEmail(), $user->getUsername())
                 ->sendMail($data);
         }
 
-        Notification::on($user, "reset-password", ["activationcode"=>$activationcode])
-            ->sendSMS([$user->getTelephone()]);
+        Notification::$send_sms = true;
+        Notification::on($user, "reset-password")
+            ->send([$user], ["activationcode" => $activationcode]);
 
         return array('success' => true, 'user' => $user, 'activationcode' => $activationcode, 'url' => "" . d_url("reset-password"));
 
@@ -107,15 +110,15 @@ class LoginController
 
     public static function resetpassword()
     {
-        extract($_POST);
-        $userapp = User::find(Request::get("userid"));
+        //extract($_POST);
+        $userapp = User::find(Request::get("user_id"));
 
-        $code = sha1($user_form['activationcode']);
-        if ($code == $userapp->getActivationcode()) {
-        //if (substr($code, 0, 5) == $userapp->getActivationcode()) {
+        $code = sha1($_POST['activationcode']);
+        if ($code == $userapp->activationcode) {
+            //if (substr($code, 0, 5) == $userapp->getActivationcode()) {
 
             //$userapp->setSalt(sha1($_POST['password']));
-            $userapp->setPassword(md5(($user_form['password'])));
+            $userapp->setPassword(sha1(($_POST['password'])));
             $userapp->setIs_activated(1);
             $userapp->setResettingpassword(0);
             $userapp->__update();
@@ -124,7 +127,7 @@ class LoginController
             //updatesession($userapp);
 
             return ["user" => $userapp, "success" => true,
-                "url" => route("customer-dashboard") . "", ];
+                "url" => route("customer-dashboard") . "",];
         } else {
             return ["success" => false, "error" => t("Code d'activation incorrect!")];
         }
@@ -133,8 +136,12 @@ class LoginController
     public static function changepwAction()
     {
 
-        $user = User::find(Request::get("id"));
+        $user = User::find(Request::get("user_id"));
+        //$user_password = $user->getPassword();
         extract($_POST);
+
+        //var_dump($user_password);
+        //die();
 
         if (!$_POST['currentpassword'] || !$_POST['newpassword'] || !$_POST['confirmpassword'])
             return array('success' => false,
@@ -144,9 +151,9 @@ class LoginController
             return array('success' => false,
                 'detail' => t("password.notconfirm"));
 
-        if (md5($_POST['currentpassword']) == $user->getPassword()) {
+        if (sha1($_POST['currentpassword']) == $user->getPassword()) {
             $user->__update([
-                "password" => md5($_POST['newpassword'])
+                "password" => sha1($_POST['newpassword'])
             ]);
             return array('success' => true,
                 'detail' => t('Mot de passe mise à jour avec succès'));
@@ -167,10 +174,10 @@ class LoginController
     static function restartsessionAction()
     {
 
-        if (!isset($_COOKIE[USERPASS]) || !isset($_COOKIE[USERPASS]) )
+        if (!isset($_COOKIE[USERPASS]) || !isset($_COOKIE[USERPASS]))
             return 0;
 
-        if(isset($_SESSION[USER]))
+        if (isset($_SESSION[USER]))
             return 0;
 
         //$dbal = new DBAL(new User());
@@ -185,7 +192,8 @@ class LoginController
         }
     }
 
-    public static function initSession(\User $user, $remember_me = null){
+    public static function initSession(\User $user, $remember_me = null)
+    {
 
         $datetime = date("Y-m-d H:i:s");
         User::where("this.id", $user->getId())->update([
@@ -194,7 +202,7 @@ class LoginController
         ]);
 
         $_SESSION[USERAPP] = serialize($user);
-        $_SESSION[USERID] = $user->getId();
+        $_SESSION['USERID'] = $user->getId();
 
         // LoginController::setLastLoginDateAction();
 
@@ -212,42 +220,40 @@ class LoginController
 
     static function connexionAction($extern = false)
     {
-        extract($_POST);
-
-        //$password = md5($user_form["password"]);
-//        $user = User::getbyattribut("phonenumber", 694573490);
-//        Notification::on($user, "registered", ["username"=>$user->getFirstname(), "code"=>"test code"])
-//            ->send([$user])->sendSMS([$user->getTelephone()]);
-
         $user = User::select()
-            ->where('user.password', "=", md5($password))
-            ->andwhere('user.email', "=", $login)
-            ->__getOne();
+            ->where('user.password', "=", sha1($_POST['password']))
+            ->andwhere('user.email', "=", $_POST['login'])
+            ->first();
+
+        if (empty($_POST['login'])) {
+            return array("success" => false,
+                "user" => $user,
+                "error" => ["login" => 'Veuillez remplir tous les champs']);
+        }
 
         if (!$user->getId()) {
             $user = User::select()
-                ->where('user.password', "=", md5($password))
-                ->andwhere('user.phonenumber', "=", $login)
-                ->__getOne();
+                ->where('user.password', "=", sha1($_POST['password']))
+                ->andwhere('user.phonenumber', "=", $_POST['login'])
+                ->first();
 
             if (!$user->getId())
                 return array("success" => false,
                     "user" => $user,
-                    "error" => ["login" => 'erreur de connexion. Login ou mot de passe incorrecte']);
+                    "error" => ["login" => 'Login ou mot de passe incorrecte']);
 
         }
-        //if ($user->getId()) {
 
-        // todo: send notification to seller
+        $_SESSION['USERID'] = $user->getId();
 
-        $url = self::initSession($user);
         return array(
             'success' => true,
-            'detail' => t("Connexion réussi"),
-            "user" => User::find($user->getId()),
-            "redirect" => route($url),
+            'detail' => t("Connexion reussi investisseur"),
+            "user" => $user,
+            "redirect" => route("account"),
             //"userserialize" => $_SESSION[USERAPP]
         );
+
 
     }
 

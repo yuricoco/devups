@@ -34,16 +34,6 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      **/
     protected $style;
     /**
-     * @Column(name="title", type="string" , length=255, nullable=true )
-     * @var string
-     **/
-    protected $title;
-    /**
-     * @Column(name="object", type="string" , length=255, nullable=true )
-     * @var string
-     **/
-    protected $object;
-    /**
      * @Column(name="description", type="text" , nullable=true )
      * @var string
      **/
@@ -58,11 +48,6 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     }
 
     /**
-     * @Column(name="contenttext", type="text"  , nullable=true)
-     * @var text
-     **/
-    protected $contenttext;
-    /**
      * @Column(name="contentheader", type="text"  , nullable=true)
      * @var text
      **/
@@ -72,16 +57,13 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      * @var text
      **/
     protected $contentfooter;
-    /**
-     * @Column(name="content", type="text"  , nullable=true)
-     * @var text
-     **/
-    protected $content;
 
 
     public function __construct($id = null)
     {
 
+        $this->dvtranslate = true;
+        $this->dvtranslated_columns = ["title", "object", "content", "contenttext"];
         if ($id) {
             $this->id = $id;
         }
@@ -147,7 +129,7 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      * @param $model
      * @return Reportingmodel
      */
-    public static function init($model)
+    public static function init($model, $id_lang)
     {
         global $viewdir;
         $viewdir[] = __DIR__ . '/../Resource/views';
@@ -157,13 +139,13 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
         self::$attachments = [];
 
         self::$log_info = " mode - " . $model;
-        $reportingmodel = Reportingmodel::getbyattribut("name", $model);
+        $reportingmodel = Reportingmodel::getbyattribut("name", $model, $id_lang);
         if ($reportingmodel->getId())
             return $reportingmodel;
 
         $id = Reportingmodel::create([
             "name" => $model,
-            "title" => 'email - '.$model,
+            //"title" => 'email - '.$model,
             "type" => 'email',
         ]);
 
@@ -367,9 +349,7 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
     {
         return [
             'id' => $this->id,
-            'object' => $this->object,
-            'contenttext' => $this->contenttext,
-            'content' => $this->content,
+            'name' => $this->name,
         ];
     }
 

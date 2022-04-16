@@ -52,9 +52,10 @@ class NotificationtypeController extends Controller{
                             'notificationtype' => $notificationtype,
                             'action' => 'create', 
                             'error' => $this->error);
-        } 
-        
+        }
 
+
+        $notificationtype->dvid_lang = "fr";
         $id = $notificationtype->__insert();
         return 	array(	'success' => true,
                         'notificationtype' => $notificationtype,
@@ -74,11 +75,11 @@ class NotificationtypeController extends Controller{
                             'action_form' => 'update&id='.$id,
                             'error' => $this->error);
         }
-        
+
         $notificationtype->__update();
         return 	array(	'success' => true,
-                        'notificationtype' => $notificationtype,
-                        'tablerow' => NotificationtypeTable::init()->router()->getSingleRowRest($notificationtype),
+                        //'notificationtype' => $notificationtype,
+                        'tablerow' => NotificationtypeTable::init()->router()->getSingleRowRest(Notificationtype::find($id, 1)),
                         'detail' => '');
                         
     }
@@ -120,11 +121,16 @@ class NotificationtypeController extends Controller{
 
     public function testnotificationAction($id, $number)
     {
-        $nt = Notificationtype::find($id);
-        $notification = Notification::on(new Package(), $nt->get_key(), []);
-            //->send([$customer])
-            //->sendSMS([$number]);
-        Notification::execSMS([$number], $nt->getContent(), $nt->get_key());
+        $nt = Notificationtype::find($id, 1);
+        $user = new User();
+        $user->country = Country::getbyattribut("iso_code", "CM");
+        $user->phonenumber = $number;
+
+        $notification = new Notification();
+        $notification->notificationtype = $nt;
+        $notification->content = $nt->content;
+
+        Notification::sendSMS($notification, $user);
         return $notification;
 
     }

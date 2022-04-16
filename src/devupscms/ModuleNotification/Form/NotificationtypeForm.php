@@ -34,7 +34,8 @@ class NotificationtypeForm extends FormManager
         $this->fields['content'] = [
             "label" => t('Content <br><i>NB: use : to specify a variable i.e: :username</i>'),
             "type" => FORMTYPE_TEXTAREA,
-            "value" => $this->notificationtype->getContent(),
+            "lang" => true,
+            "value" => $this->notificationtype->content,
         ];
 
         $this->fields['session'] = [

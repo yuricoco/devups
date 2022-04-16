@@ -361,7 +361,7 @@ class FormFactory
         $form = "";
         $formrow = "";
         //$_SESSION["dvups_form"][$entitycore->name] = $entitycore->field;
-
+        self::$langs = Dvups_lang::all();
         foreach ($entitycore->field as $key => $field) {
 
             $directive = [];

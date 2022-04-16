@@ -23,11 +23,6 @@ class Notificationtype extends Model implements JsonSerializable
      **/
     protected $session = 'user';
     /**
-     * @Column(name="content", type="string" , length=255 )
-     * @var integer
-     **/
-    protected $content;
-    /**
      * @Column(name="redirect", type="string" , length=255, nullable=true )
      * @var string
      **/
@@ -48,6 +43,8 @@ class Notificationtype extends Model implements JsonSerializable
     public function __construct($id = null)
     {
 
+        $this->dvtranslate = true;
+        $this->dvtranslated_columns = ["content"];
         if ($id) {
             $this->id = $id;
         }

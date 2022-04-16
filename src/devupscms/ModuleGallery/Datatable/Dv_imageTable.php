@@ -21,9 +21,10 @@ class Dv_imageTable extends Datatable
         return $dt;
     }
 
+
     public function buildfrontcustom()
     {
-
+        $this->base_url = __env."admin/";
         global $viewdir, $moduledata;
         $viewdir[] = Dv_image::classroot("") . '/Resource/views';
 
@@ -39,45 +40,46 @@ class Dv_imageTable extends Datatable
     public function buildindextable()
     {
 
+        $this->base_url = __env . "admin/";
         $this->datatablemodel = [
-            ['header' => t('dv_image.id', '#'), 'value' => 'id'],
-            ['header' => t('dv_image.reference', 'Reference'), 'value' => 'reference'],
-            ['header' => t('dv_image.name', 'Name'), 'value' => 'name'],
-            ['header' => t('dv_image.description', 'Description'), 'value' => 'description'],
-            ['header' => t('dv_image.image', 'Image'), 'value' => 'src:image'],
-            ['header' => t('dv_image.image', 'Image'), 'value' => 'image'],
-            ['header' => t('dv_image.size', 'Size'), 'value' => 'size'],
-            ['header' => t('dv_image.width', 'Width'), 'value' => 'width'],
-            ['header' => t('dv_image.height', 'Height'), 'value' => 'height']
+            'id' => ['header' => t('#'),],
+            'reference' => ['header' => t('Reference'),],
+            'name' => ['header' => t('Name'),],
+            'description' => ['header' => t('Description'),],
+            'image' => ['header' => t('Image'), 'value' => 'src:image'],
+            'size' => ['header' => t('Size'),],
+            'width' => ['header' => t('Width'),],
+            'height' => ['header' => t('Height'),]
         ];
 
         return $this;
     }
 
-    public function buildgallerytable($page = "all")
+    public function buildcontenttable()
     {
 
-        $this->qbcustom = Dv_image::folderhas("gallery");
-        $this->per_page = $page;
-        $this->table_class = "";
-        $this->order_by = " this.id DESC ";
-        $this->template = "_partial._gallery_item";
+        $this->base_url = __env . "admin/";
+        $this->datatablemodel = [
+            'image' => ['header' => t('Image'), 'value' => "name", 'get' => function(Dv_image $item){
+                return $item->showImage('150_')."({$item->id})<br><button class='btn btn-outline-info btn-block' onclick='cmstext.copyimage(\"{$item->srcImage()}\")' >copy</button>";
+            }, "search"=>true],
+        ];
+        $this->order_by = "this.id desc";
         return $this;
-
     }
 
     public function builddetailtable()
     {
         $this->datatablemodel = [
-            ['label' => t('dv_image.reference'), 'value' => 'reference'],
-            ['label' => t('dv_image.name'), 'value' => 'name'],
-            ['label' => t('dv_image.description'), 'value' => 'description'],
-            ['label' => t('dv_image.image'), 'value' => 'src:image'],
-            ['label' => t('dv_image.image'), 'value' => 'src:image'],
-            ['label' => t('dv_image.image'), 'value' => 'image'],
-            ['label' => t('dv_image.size'), 'value' => 'size'],
-            ['label' => t('dv_image.width'), 'value' => 'width'],
-            ['label' => t('dv_image.height'), 'value' => 'height']
+            ['label' => t('reference'), 'value' => 'reference'],
+            ['label' => t('name'), 'value' => 'name'],
+            ['label' => t('description'), 'value' => 'description'],
+            ['label' => t('image'), 'value' => 'src:image'],
+            ['label' => t('image'), 'value' => 'src:image'],
+            ['label' => t('image'), 'value' => 'image'],
+            ['label' => t('size'), 'value' => 'size'],
+            ['label' => t('width'), 'value' => 'width'],
+            ['label' => t('height'), 'value' => 'height']
         ];
         // TODO: overwrite datatable attribute for this view
         return $this;
@@ -85,13 +87,12 @@ class Dv_imageTable extends Datatable
 
     public function router()
     {
-        $tablemodel = Request::get("tablemodel");
-        if (method_exists($this, "build" . $tablemodel . "table") && $result = call_user_func(array($this, "build" . $tablemodel . "table"))) {
+        $tablemodel = Request::get("tablemodel", null);
+        if ($tablemodel && method_exists($this, "build" . $tablemodel . "table") && $result = call_user_func(array($this, "build" . $tablemodel . "table"))) {
             return $result;
         } else
             switch ($tablemodel) {
-                case "frontcustom":
-                    return $this->buildfrontcustom();
+                // case "": return this->
                 default:
                     return $this->buildindextable();
             }

@@ -44,12 +44,12 @@ class NotificationtypeTable extends Datatable
 
         $this->enabletopaction = false;
         $this->datatablemodel = [
-            ['header' => t('notificationtype.id', '#'), 'value' => 'id'],
+            ['header' => t('notificationtype.id', '#'), 'value' => 'id', 'search'=>false],
             ['header' => t('Entity'), 'value' => 'dvups_entity.name'],
             ['header' => t('notificationtype._key', '_key'), 'value' => '_key'],
             ['header' => t('notificationtype.content', 'Content'), 'value' => 'content'],
             //['header' => t('Redirect'), 'value' => 'redirection'],
-            ['header' => 'Test', 'value' => 'test']
+            ['header' => 'Test', 'value' => 'test', 'search'=>false]
 
         ];
 

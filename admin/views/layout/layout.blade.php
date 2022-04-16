@@ -94,7 +94,7 @@
 <script src="<?= CLASSJS; ?>devups.js"></script>
 <script src="<?= CLASSJS; ?>dialogbox.js"></script>
 <script >
-    devups.timerNotification(_admin_id, '{{date("Y-m-d H:i:s")}}')
+    // devups.timerNotification(_admin_id, '{{date("Y-m-d H:i:s")}}')
 </script>
 
 <?php

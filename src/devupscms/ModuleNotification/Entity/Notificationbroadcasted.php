@@ -1,6 +1,5 @@
 <?php
 // user \dclass\devups\model\Model;
-use DClass\lib\SendMail;
 
 /**
  * @Entity @Table(name="notificationbroadcasted")
@@ -138,12 +137,6 @@ class Notificationbroadcasted extends Model implements JsonSerializable
 
         // todo: send mail and notification for order
 //        $user = $this->user;
-//        if ($user->getEmail()) {
-//            $order = $this->getEntityInstance();
-//            $title = t("Commande enregitrée avec succes");
-//            $html = SendMail::getmailInvoice($order, $title);
-//            SendMail::sendmail($user->getEmail(), $user->getFirstname(), $html,$title , "message alternatif");
-//        }
 
         $this->__insert();
     }
@@ -241,7 +234,7 @@ class Notificationbroadcasted extends Model implements JsonSerializable
             'viewedat' => $this->viewedat,
             'status' => $this->status,
             'notification' => $this->notification,
-            'user' => $this->user,
+            //'user' => $this->user,
         ];
     }
 

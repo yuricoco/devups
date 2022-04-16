@@ -16,6 +16,7 @@ class DBAL extends Database
     protected $defaultjoin = "";
     public $custom_columns = "";
     protected $collect = [];
+    public $_with = [];
     /**
      *
      * @var type
@@ -558,6 +559,7 @@ class DBAL extends Database
      */
     public function createDbal($object = null)
     {
+        $this->id_lang = self::$id_lang_static;
         if ($object)
             $this->instanciateVariable($object);
 
@@ -576,6 +578,7 @@ class DBAL extends Database
             $objarray = (array)$this->object;
 
             $langs = Dvups_lang::allrows();
+
             foreach ($langs as $lang) {
 
                 $keyvalue = [];
@@ -610,6 +613,12 @@ class DBAL extends Database
             }
         }
 
+        if ($this->object->dvtranslate) {
+            foreach ($this->object->dvtranslated_columns as $column){
+                if (isset($this->object->{$column}[$this->id_lang]))
+                    $this->object->{$column} = $this->object->{$column}[$this->id_lang];
+            }
+        }
         return $this->object->getId();
     }
 
@@ -777,17 +786,39 @@ class DBAL extends Database
      * @param \string $object
      * @return int l'id de l'entité persisté
      */
-    public static function _updateDbal($object, $keyvalue)
+    public static function _updateDbal($object, $keyvalue, $where)
     {
 
-        $values = [];
+        $parameterQuery = [];
         $objectvar = array_keys($keyvalue);
-        $parameterQuery = ':' . implode(", :", $objectvar);
+        foreach ($objectvar as $v)
+            $parameterQuery[] = '`'.$v.'` = :'.$v;
 
-        $sql = " UPDATE `" . strtolower($object) . "` SET (`" . strtolower(implode('` ,`', $objectvar)) . "`) values (" . strtolower($parameterQuery) . ")";
+        $sql = " UPDATE `" . strtolower($object) . "` SET " . strtolower(implode(', ', $parameterQuery)) . " WHERE $where ";
 
         $db = new DBAL();
         return $db->executeDbal($sql, $keyvalue, 1);
+
+    }
+
+    /**
+     * createDbal
+     * persiste les entités en base de données.
+     *
+     * @param \string $object
+     * @return int l'id de l'entité persisté
+     */
+    public static function _deleteDbal($object, $where = "1")
+    {
+
+        $values = [];
+//        $objectvar = array_keys($keyvalue);
+//        $parameterQuery = ':' . implode(", :", $objectvar);
+
+        $sql = " DELETE FROM `" . strtolower($object) . "` WHERE ".$where;
+
+        $db = new DBAL();
+        return $db->executeDbal($sql, [], 1);
 
     }
 
@@ -954,6 +985,11 @@ class DBAL extends Database
         }
 
         $flowBD = Bugmanager::cast((object)$object_array, get_class($this->object));
+
+        foreach ($this->_with as $entity){
+            $flowBD->{"$entity"}->hydrate();
+        }
+
         $flowBD->dvfetched = true;
         $flowBD->dvinrelation = true;
         //var_dump($callables);
@@ -1320,6 +1356,7 @@ class DBAL extends Database
 
     public $hasrelation = false;
     public $objectKeyValue = [];
+    public $identifier = [];
 
     public function setClassname($objectname)
     {
@@ -1353,6 +1390,17 @@ class DBAL extends Database
             $this->table = strtolower($this->objectName);
 
             $metadata = $em->getClassMetadata("\\" . $this->objectName);
+            $this->identifier = $metadata->identifier;
+            if (count($metadata->identifier) > 1){
+                $this->identifier = [];
+                foreach ($metadata->identifier as $id){
+                    $this->identifier[] = $id."_id";
+                }
+            }
+            /*if ($this->table == "product") {
+                $metadata = $em->getClassMetadata("\\Category_lang");
+                dv_dump($metadata);
+            }*/
             $fieldNames = $metadata->fieldNames;
             $assiactions = array_keys($metadata->associationMappings);
 
@@ -1366,7 +1414,8 @@ class DBAL extends Database
             $keys = [];
             $keys = $object->entityKey($fieldNames);
             // dv_dump($keys, array_keys($fieldNames));
-            $this->instanceid = $object->getId();
+            if (isset($keys["id"]))
+                $this->instanceid = $object->getId();
 
             foreach ($object->dv_collection as $key) {
 

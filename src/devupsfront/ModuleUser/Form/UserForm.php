@@ -6,110 +6,88 @@ use Genesis as g;
 class UserForm extends FormManager
 {
 
-    public static function formBuilder($dataform, $button = false)
+    public $user;
+
+    public static function init(\User $user, $action = "")
     {
-        $user = new \User();
-        extract($dataform);
-        $entitycore = new Core($user);
+        $fb = new UserForm($user, $action);
+        $fb->user = $user;
+        return $fb;
+    }
 
-        $entitycore->formaction = $action;
-        $entitycore->formbutton = $button;
-
-        //$entitycore->addcss('csspath');
+    public function buildForm()
+    {
 
 
-        $entitycore->field['firstname'] = [
-            "label" => 'Firstname',
+        $this->fields['country.id'] = [
+            "label" => t('Country'),
             FH_REQUIRE => false,
-            "type" => FORMTYPE_TEXT,
-            "value" => $user->getFirstname(),
+            "type" => FORMTYPE_SELECT,
+            "options" => FormManager::Options_Helper("name", Country::all("name")),
+            "value" => $this->user->country->id,
         ];
 
-        $entitycore->field['lastname'] = [
-            "label" => 'Lastname',
+        $this->fields['firstname'] = [
+            "label" => t('user.firstname'),
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
-            "value" => $user->getLastname(),
+            "value" => $this->user->getFirstname(),
         ];
 
-        $entitycore->field['email'] = [
-            "label" => 'Email',
+        $this->fields['lastname'] = [
+            "label" => t('user.lastname'),
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
-            "value" => $user->getEmail(),
+            "value" => $this->user->getLastname(),
         ];
 
-        $entitycore->field['sexe'] = [
-            "label" => 'Sexe',
+        $this->fields['email'] = [
+            "label" => t('user.email'),
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
-            "value" => $user->getSexe(),
+            "value" => $this->user->getEmail(),
         ];
 
-        $entitycore->field['phonenumber'] = [
-            "label" => 'Phonenumber',
+
+        $this->fields['phonenumber'] = [
+            "label" => t('user.phonenumber'),
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
-            "value" => $user->getPhonenumber(),
+            "value" => $this->user->getPhonenumber(),
         ];
-        $entitycore->field['updatePassword'] = [
-            "label" => 'Password',
+
+        $this->fields['resetpassword'] = [
+            "label" => t('user.password'),
             FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
             "value" => "",
         ];
 
-        $entitycore->field['is_activated'] = [
-            "label" => 'Is_activated',
+        $this->fields['is_activated'] = [
+            "label" => t('user.is_activated'),
             FH_REQUIRE => false,
             "type" => FORMTYPE_RADIO,
-            "options" => ["No", 'Yes'],
-            "value" => $user->getIs_activated(),
+            "options" => ["Desactivate", "Activate"],
+            "value" => $this->user->getIs_activated(),
         ];
 
-        $entitycore->field['username'] = [
-            "label" => 'Username',
+
+        $this->fields['lang'] = [
+            "label" => t('user.lang'),
+            FH_REQUIRE => false,
             "type" => FORMTYPE_TEXT,
-            "value" => $user->getUsername(),
+            "value" => $this->user->getLang(),
         ];
 
-        $entitycore->addDformjs($button);
-        $entitycore->addjs(User::classpath('Resource/js/userForm'));
-
-        return $entitycore;
-    }
-
-    public static function __renderForm($dataform, $button = false)
-    {
-        return FormFactory::__renderForm(UserForm::formBuilder($dataform, $button));
-    }
-
-    public static function getFormData($id = null, $action = "create")
-    {
-        if (!$id):
-            $user = new User();
-
-            return [
-                'success' => true,
-                'user' => $user,
-                'action' => User::classpath("services.php?path=user.create"),
-            ];
-        endif;
-
-        $user = User::find($id);
-        return [
-            'success' => true,
-            'user' => $user,
-            'action' => User::classpath("services.php?path=user.update&id=" . $id),
+        $this->fields['username'] = [
+            "label" => t('user.username'),
+            "type" => FORMTYPE_TEXT,
+            "value" => $this->user->getUsername(),
         ];
 
-    }
 
-    public static function render($id = null, $action = "create")
-    {
-        g::json_encode(['success' => true,
-            'form' => self::__renderForm(self::getFormData($id, $action), true),
-        ]);
+        return $this;
+
     }
 
     public static function renderWidget($id = null, $action = "create")

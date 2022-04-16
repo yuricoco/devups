@@ -10,7 +10,7 @@
         @else
             <div class='form-group'>
                 <label for='content'>Rubrique</label>
-                <?= Form::select('tree_item', FormManager::Options_Helper("name", Tree_item::mainmenu()->__getAll()), $cmstext->tree_item->getId(), ['class' => 'form-control']); ?>
+                <?= Form::select('tree_item', FormManager::Options_Helper("name", Tree_item::mainmenu()->get()), $cmstext->tree_item->getId(), ['class' => 'form-control']); ?>
             </div>
         @endif
 

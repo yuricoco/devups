@@ -581,7 +581,7 @@ EOF;
         $html = '                    
             <div data-notice="' . $this->pagination . '" class="col-lg-3 col-md-12 ">
 
-        <label class=" " >' . t("Line to show") . '</label>';
+        <label class=" " >' . t("Line to show") . '</label><br>';
 
         $html .= '<select id="dt_nbrow" class="form-control" style="width:100px; display: inline-block" onchange="ddatatable.setperpage(this.options[this.selectedIndex].value)" >';
         //$html .= '<option value="&next=' . $current_page . '&per_page=10" >10</option>';

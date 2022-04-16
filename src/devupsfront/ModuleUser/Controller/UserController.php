@@ -1,11 +1,13 @@
-<?php 
+<?php
 
-            
+
 use dclass\devups\Controller\Controller;
 
-class UserController extends Controller{
+class UserController extends Controller
+{
 
-    public function listView($next = 1, $per_page = 10){
+    public function listView($next = 1, $per_page = 10)
+    {
 
         $this->datatable = UserTable::init(new User())->buildindextable();
 
@@ -19,7 +21,8 @@ class UserController extends Controller{
 
     }
 
-    public function datatable($next, $per_page) {
+    public function datatable($next, $per_page)
+    {
         return ['success' => true,
             'datatable' => UserTable::init(new User())->router()->getTableRest(),
         ];
@@ -37,52 +40,53 @@ class UserController extends Controller{
 
         return ['success' => true,
             'form' => UserForm::init($user, $action)
-                ->buildAdminForm()
+                ->buildForm()
                 ->addDformjs()
                 ->renderForm(),
         ];
     }
 
-    public function createAction($user_form = null){
+    public function createAction($user_form = null)
+    {
         extract($_POST);
 
         $user = $this->form_fillingentity(new User(), $user_form);
- 
 
-        if ( $this->error ) {
-            return 	array(	'success' => false,
-                            'user' => $user,
-                            'action' => 'create', 
-                            'error' => $this->error);
+
+        if ($this->error) {
+            return array('success' => false,
+                'user' => $user,
+                'action' => 'create',
+                'error' => $this->error);
         }
-        
+
         $id = $user->__insert();
-        return 	array(	'success' => true,
-                        'user' => $user,
-                        'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
-                        'detail' => '');
+        return array('success' => true,
+            'user' => $user,
+            'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
+            'detail' => '');
 
     }
 
-    public function updateAction($id, $user_form = null){
+    public function updateAction($id, $user_form = null)
+    {
         extract($_POST);
 
         $user = $this->form_fillingentity(new User($id), $user_form);
 
-        if ( $this->error ) {
-            return 	array(	'success' => false,
-                            'user' => $user,
-                            'error' => $this->error);
+        if ($this->error) {
+            return array('success' => false,
+                'user' => $user,
+                'error' => $this->error);
         }
-        
+
         $user->__update();
-        return 	array(	'success' => true,
-                        'user' => $user,
-                        //'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
-                        'detail' => t('Information mis à jour avec succès'));
-                        
+        return array('success' => true,
+            'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
+            'detail' => t('Information mis à jour avec succès'));
+
     }
-    
+
 
     public function detailView($id)
     {
@@ -99,22 +103,52 @@ class UserController extends Controller{
         );
 
     }
-    
-    public function deleteAction($id){
-      
-            User::delete($id);
-        return 	array(	'success' => true, 
-                        'detail' => ''); 
+
+    public function deleteAction($id)
+    {
+
+        User::delete($id);
+        return array('success' => true,
+            'detail' => '');
     }
-    
+
+
+    public function deletegroup($ids)
+    {
+
+        return $this->deletegroupAction($ids);
+
+    }
 
     public function deletegroupAction($ids)
     {
 
-        User::delete()->where("id")->in($ids);
+        User::where("id")->in($ids)->delete();
 
         return array('success' => true,
-                'detail' => ''); 
+            'detail' => '');
+
+    }
+
+    public function changestatus($id)
+    {
+
+        $user = User::find($id, 1);
+        $user->can_sponsoring = Request::get("status");
+        $user->__update([
+            "can_sponsoring" => Request::get("status")
+        ]);
+
+        if ($user->can_sponsoring == 1)
+            Notification::on($user, "investor_account_approved", $user->notificationData())
+                ->send([$user]);
+        else
+            Notification::on($user, "investor_account_reseted", $user->notificationData())
+                ->send([$user]);
+
+        return array('success' => true,
+            'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
+            'detail' => '');
 
     }
 

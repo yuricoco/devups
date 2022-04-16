@@ -48,7 +48,7 @@ class Dv_image extends ImageCore implements JsonSerializable
     public static function infolder(string $foldername)
     {
         $folder = Tree_item::where(["tree.name" => "folder", "this.name" => $foldername])->__getOne();
-        return self::where("folder_id", $folder->getId())->__getAll();
+        return self::where("folder_id", $folder->getId())->get();
     }
     /**
      * get all image in a specific folder
@@ -168,7 +168,7 @@ class Dv_image extends ImageCore implements JsonSerializable
 
             $filedir = 'gallery/';
             $url = $dfile
-                ->sanitize($this->id . "_")
+                ->sanitize(date("YmdHis") . "_")
                 ->addresize([150, 150], "150_", "", true)
                 ->addresize([270, 270], "270_", "", true)
                 ->addresize([50, 50], "50_", "", true)
@@ -183,12 +183,13 @@ class Dv_image extends ImageCore implements JsonSerializable
             $this->image = $url['file']['hashname'];
             $this->name = $url['file']['hashname'];
             $this->reference = $url['file']['hashname'];
+            $this->width = $url['file']['hashname'][0];
+            $this->height = $url['file']['hashname'][1];
 
-            $this->setName(Request::post("name"));
+            //$this->setName(Request::post("name"));
 //            $this->setWidth($url["file"]["width"]);
 //            $this->setHeight($url["file"]["height"]);
-            $this->setSize($url["file"]["imagesize"]);
-            $this->setImage($url["file"]["hashname"]);
+            $this->setSize($url["file"]["size"]);
 
         }
     }
@@ -217,7 +218,7 @@ class Dv_image extends ImageCore implements JsonSerializable
             $this->name = $url['file']['hashname'];
             $this->reference = $url['file']['hashname'];
 
-            $this->setName(Request::post("name"));
+//            $this->setName(Request::post("name"));
 //            $this->setWidth($url["file"]["width"]);
 //            $this->setHeight($url["file"]["height"]);
             $this->setSize($url["file"]["imagesize"]);
@@ -343,9 +344,11 @@ class Dv_image extends ImageCore implements JsonSerializable
             'description' => $this->description,
             //'position' => $this->position,
             'image' => $this->image,
-            'size' => $this->size,
-            'width' => $this->width,
-            'height' => $this->height,
+            'uploaddir' => SRC_FILE.$this->uploaddir,
+            'src' => $this->srcImage(),
+//            'size' => $this->size,
+//            'width' => $this->width,
+//            'height' => $this->height,
         ];
     }
 

@@ -25,16 +25,16 @@ class UserTable extends Datatable
     public function buildindextable()
     {
 
+        $this->base_url = __env."admin/";
         $this->datatablemodel = [
-            ['header' => t('#'), 'value' => 'id'],
-            ['header' => t('user.username', 'Username'), 'value' => 'username'],
-            //['header' => t('user.lastname', 'Lastname'), 'value' => 'lastname'],
-            ['header' => t('Spacekola Ref.'), 'value' => 'spacekolaRef'],
-            ['header' => t('user.email', 'Email'), 'value' => 'email'],
+            ['header' => t('#'), 'value' => 'id', "search"=>false],
+            ['header' => t('Nom'), 'value' => 'username'],
+            ['header' => t('Wallet'), 'value' => 'wallet.amount', "search"=>false],
+            ['header' => t('Country'), 'value' => 'country.name'],
             ['header' => t('user.phonenumber', 'Phonenumber'), 'value' => 'phonenumber'],
-            //['header' => t('user.resettingpassword', 'Resettingpassword'), 'value' => 'resettingpassword'],
+            ['header' => t('email'), 'value' => 'email'],
             ['header' => t('user.is_activated', 'Is_activated'), 'value' => 'is_activated'],
-            //['header' => t('user.activationcode', 'Activationcode'), 'value' => 'activationcode'],
+            ['header' => t('Register at'), 'value' => 'createdAt'],
             //['header' => t('user.birthdate', 'Birthdate'), 'value' => 'birthdate'],
         ];
 

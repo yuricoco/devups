@@ -883,12 +883,12 @@ class " . ucfirst($name) . "Table extends Datatable{
             ]]);
 
             curl_setopt_array($curl, $data);
-            $response = curl_exec($curl);
+            //$response = curl_exec($curl);
             curl_close($curl);
 
             echo " $name > entity well synchronized\n ";
             //if($this->_log)
-            \DClass\lib\Util::log(date("Y-m-d H:i:s") . __LINE__ . $response, "log_sync_toolrad");
+            //\DClass\lib\Util::log(date("Y-m-d H:i:s") . __LINE__ . $response, "log_sync_toolrad");
 
         }
 

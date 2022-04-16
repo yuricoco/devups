@@ -325,8 +325,8 @@ class Tree_item extends Model implements JsonSerializable
         return self::select("*", Dvups_lang::defaultLang()->id)
             //->leftjoin(Tree::class)
             //->leftjoinrecto(Tree_lang::class, Tree::class)
-            ->where("name", $tree)
-            ->where("main", 1);
+            ->where("tree.name", $tree)
+            ->where("this.main", 1);
     }
 
     /**

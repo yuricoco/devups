@@ -47,67 +47,34 @@
                         </span>
                     @else
 
-                        @foreach ($ll->paginationcustom['firsts'] as $key => $page)
-                            @if ($page == $ll->current_page)
-                                <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
-                                        type="button" class="btn btn-outline-secondary active">{{$page}}</button>
+                        @foreach ($ll->paginationcustom['left'] as $key => $page)
+                            @if($page== "...")
+                                <button type="button" class="btn  btn-outline-secondary  btn-sm">{{$page}}</button>
                             @else
                                 <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
-                                        type="button" class="btn btn-outline-secondary">{{$page}}</button>
+                                        type="button"
+                                        class="btn @if ($page == $ll->current_page) btn-primary @else  btn-outline-secondary @endif btn-sm">{{$page}}</button>
+                            @endif
+                        @endforeach
+                        @foreach ($ll->paginationcustom['middle'] as $key => $page)
+                            @if($page== "...")
+                                <button type="button" class="btn  btn-outline-secondary  btn-sm">{{$page}}</button>
+                            @else
+                                <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                        type="button"
+                                        class="btn @if ($page == $ll->current_page) btn-primary @else  btn-outline-secondary @endif btn-sm">{{$page}}</button>
+                            @endif
+                        @endforeach
+                        @foreach ($ll->paginationcustom['right'] as $key => $page)
+                            @if($page== "...")
+                                <button type="button" class="btn  btn-outline-secondary  btn-sm">{{$page}}</button>
+                            @else
+                                <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
+                                        type="button"
+                                        class="btn @if ($page == $ll->current_page) btn-primary @else  btn-outline-secondary @endif btn-sm">{{$page}}</button>
                             @endif
                         @endforeach
 
-                        @if ($ll->current_page < 3 || $ll->current_page >= 7)
-                            <button onclick="ddatatable.pagination(this, {{$ll->paginationcustom['middleleft']}})"
-                                    data-next="{{$ll->paginationcustom['middleleft']}}"
-                                    type="button" class="btn btn-outline-secondary"> ...
-                            </button>
-                            @foreach ($ll->paginationcustom['middles'] as $key => $page)
-                                @if ($page == $ll->current_page)
-                                    <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
-                                            type="button"
-                                            class="btn btn-outline-secondary active">{{$page}}</button>
-                                @else
-                                    <button onclick="ddatatable.pagination(this, {{$page}})" data-next="{{$page}}"
-                                            type="button" class="btn btn-outline-secondary">{{$page}}</button>
-                                @endif
-                            @endforeach
-
-                            @if ($ll->paginationcustom['lasts'])
-                                <button onclick="ddatatable.pagination(this, {{$ll->paginationcustom['middleright']}})"
-                                        data-next="{{$ll->paginationcustom['middleright']}}"
-                                        type="button" class="btn btn-outline-secondary"> ...
-                                </button>
-                                @foreach ($ll->paginationcustom['lasts'] as $key => $page)
-                                    @if ($page == $ll->current_page)
-                                        <button onclick="ddatatable.pagination(this, {{$page}})"
-                                                data-next="{{$page}}"
-                                                type="button"
-                                                class="btn btn-outline-secondary active">{{$page}}</button>
-                                    @else
-                                        <button onclick="ddatatable.pagination(this, {{$page}})"
-                                                data-next="{{$page}}"
-                                                type="button" class="btn btn-outline-secondary">{{$page}}</button>
-                                    @endif
-                                @endforeach
-
-                            @else
-                                @for ($page = 1; $page <= $ll->pagination; $page++)
-                                    @if ($page == $ll->current_page)
-                                        <button onclick="ddatatable.pagination(this, {{$page}})"
-                                                data-next="{{$page}}"
-                                                type="button"
-                                                class="btn btn-outline-secondary active">{{$page}}</button>
-                                    @else
-                                        <button onclick="ddatatable.pagination(this, {{$page}})"
-                                                data-next="{{$page}}"
-                                                type="button" class="btn btn-outline-secondary">{{$page}}</button>
-                                    @endif
-                                @endfor
-
-                            @endif
-
-                        @endif
                     @endif
                 @else
                     @for ($page = 1; $page <= $ll->pagination; $page++)

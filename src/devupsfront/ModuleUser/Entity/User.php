@@ -14,29 +14,18 @@ class User extends UserCore implements JsonSerializable
      * */
     protected $id;
 
-
     /**
-     * @Column(name="spacekola_ref", type="integer" , nullable=true)
+     * @Column(name="address", type="string", length=255 , nullable=true )
      * @var string
      **/
-    protected $spacekola_ref;
+    protected $address;
 
     /**
-     * @Column(name="sexe", type="string" , length=5 , nullable=true)
-     * @var string
-     **/
-    protected $sexe;
-    /**
-     * @Column(name="phonenumber", type="string" , length=25 , nullable=true)
-     * @var string
-     **/
-    protected $phonenumber;
-
-    /**
-     * @Column(name="birthdate", type="date"  , nullable=true)
-     * @var date
-     **/
-    protected $birthdate;
+     * @ManyToOne(targetEntity="\Country")
+     * @JoinColumn(onDelete="set null")
+     * @var \Country
+     */
+    public $country;
 
 
     public function __construct($id = null)
@@ -46,6 +35,8 @@ class User extends UserCore implements JsonSerializable
             $this->id = $id;
         }
 
+        $this->country = new Country();
+
     }
 
     public function getId()
@@ -53,38 +44,10 @@ class User extends UserCore implements JsonSerializable
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getApiKey()
+    public function setConfirm($confirm)
     {
-        return $this->api_key;
-    }
 
-    /**
-     * @param string $api_key
-     */
-    public function setApiKey($api_key)
-    {
-        $this->api_key = $api_key;
-    }
-
-    public function getLastLogin()
-    {
-        return $this->last_login;
-    }
-
-    /**
-     * @param date $last_login
-     */
-    public function setLastLogin($last_login)
-    {
-        $this->last_login = $last_login;
-    }
-
-    public function setConfirm($confirm){
-
-        if($this->getPassword() != md5($confirm))
+        if ($this->getPassword() != md5($confirm))
             return t("Mot de passe incorrect. veuillez reessayer svp!");
 
     }
@@ -122,39 +85,10 @@ class User extends UserCore implements JsonSerializable
     }
 
 
-    public function getFirstname()
-    {
-        return $this->firstname;
-    }
-
-    public function setFirstname($firstname)
-    {
-        $this->firstname = $firstname;
-    }
     public function setUpdatePassword($pwd)
     {
-        if($pwd)
-            $this->password = md5(sha1($pwd));
-    }
-
-    public function getLastname()
-    {
-        return $this->lastname;
-    }
-
-    public function setLastname($lastname)
-    {
-        $this->lastname = $lastname;
-    }
-
-    public function getEmail()
-    {
-        return $this->email;
-    }
-
-    public function setEmail($email)
-    {
-        $this->email = $email;
+        if ($pwd)
+            $this->password = (sha1($pwd));
     }
 
     public function getSexe()
@@ -172,25 +106,6 @@ class User extends UserCore implements JsonSerializable
         return $this->phonenumber;
     }
 
-    public function setPhonenumber($phonenumber)
-    {
-        $this->phonenumber = $phonenumber;
-    }
-
-    public function getPassword()
-    {
-        return $this->password;
-    }
-   /* public function getResettingpassword()
-    {
-        return $this->resettingpassword;
-    }*/
-
-    public function setResettingpassword($resettingpassword)
-    {
-        $this->resettingpassword = $resettingpassword;
-    }
-
     public function getIs_activated()
     {
         return $this->is_activated;
@@ -204,11 +119,6 @@ class User extends UserCore implements JsonSerializable
     public function setCountry_iso($iso_code)
     {
         $this->country = Country::getbyattribut("iso", $iso_code);
-    }
-
-    public function getActivationcode()
-    {
-        return $this->activationcode;
     }
 
     public function setActivationcode($activationcode)
@@ -230,17 +140,6 @@ class User extends UserCore implements JsonSerializable
         $this->birthdate = $birthdate;
     }
 
-    public function getLang()
-    {
-        return $this->lang;
-    }
-
-    public function setLang($lang)
-    {
-        $this->lang = $lang;
-    }
-
-
     /**
      *  manyToOne
      * @return \Country
@@ -256,20 +155,10 @@ class User extends UserCore implements JsonSerializable
         $this->country = $country;
     }
 
-
-    /**
-     *  manyToOne
-     * @return \Town
-     */
-    function getTown()
+    public static function sanitizePhonenumber($phonenumber, $phone_code)
     {
-        $this->town = $this->town->__show();
-        return $this->town;
-    }
-
-    function setTown(\Town $town)
-    {
-        $this->town = $town;
+        $telephone = str_replace("+" . $phone_code, "", "+" . $phonenumber);
+        return str_replace("+", "", $telephone);
     }
 
     function userdata()
@@ -288,27 +177,31 @@ class User extends UserCore implements JsonSerializable
         return [
             'id' => $this->id,
             'firstname' => $this->firstname,
-            'spacekola_ref' => $this->spacekola_ref,
+            //'spacekola_ref' => $this->spacekola_ref,
             'lastname' => $this->lastname,
             'email' => $this->email,
-            'sexe' => $this->sexe,
+            'country' => $this->country,
             'phonenumber' => $this->phonenumber,
             'password' => $this->password,
             'resettingpassword' => $this->resettingpassword,
             'is_activated' => $this->is_activated,
             'activationcode' => $this->activationcode,
-            'birthdate' => $this->birthdate,
+            //'birthdate' => $this->birthdate,
             'lang' => $this->lang,
             'username' => $this->username,
             'api_key' => $this->api_key,
             'session_token' => $this->session_token,
+
         ];
     }
 
     public function __insert()
     {
         $this->is_activated = 0;
-        return parent::__insert(); // TODO: Change the autogenerated stub
+
+        parent::__insert(); // TODO: Change the autogenerated stub
+
+        return $this->id;
     }
 
     /**
@@ -316,53 +209,64 @@ class User extends UserCore implements JsonSerializable
      */
     public static function userapp()
     {
-        if (isset($_SESSION[USER]))
-            return unserialize($_SESSION[USER]);
+        if (isset($_SESSION['USERID']))
+            return User::find($_SESSION['USERID']);
 
         return new \User();
     }
 
     public function updateSession()
     {
-        $_SESSION[USER] = serialize(User::find($this->id));
+        $_SESSION['USER'] = serialize(User::find($this->id));
     }
 
     public function isActivated()
     {
-        return boolval((int) $this->is_activated);
+        return boolval((int)$this->is_activated);
     }
 
-    public function addresses()
+    /**
+     * return the phonenumber with the country phone code.
+     * @return string
+     */
+    public function getTelephone()
     {
-        return $this->__hasmany(Address::class);
+        return $this->country->getPhonecode() . $this->phonenumber;
     }
 
-    public static function currentCountry()
+    public function notificationData()
     {
-        $user = self::userapp();
-        if ($user->getId()) {
-            return $user->country->getIso();
+        return [
+            'firstname' => $this->firstname,
+            //'spacekola_ref' => $this->spacekola_ref,
+            'lastname' => $this->lastname,
+            'email' => $this->email,
+        ];
+    }
+
+    public function activateaccount($activationcode, $url = ""){
+        if ($this->isActivated())
+            return ["success" => true, "url" => route('home')];
+        else {
+            $code = sha1($activationcode);
+            if ($code == $this->getActivationcode()) {
+                //if (substr($code, 0, 5) == $appuser->getActivationcode()) {
+
+                $this->setIs_activated(1);
+                //$appuser->setLocked(false);
+                $this->__update();
+                //updatesession($appuser);
+                $_SESSION[USERAPP] = serialize($this);
+
+                return ["success" => true, "url" => $url];
+            }
         }
 
-        return Country::current();
+        return [
+            "success" => false,
+            'error' => t("Le code d'activation n'est pas valide. Veuillez entrer de nouveau ou alors renvoyer un autre code")
+        ];
 
-    }
-
-    /**
-     * return the phonenumber with the country phone code.
-     * @return string
-     */
-    public function getTelephone(){
-        return $this->country->getPhonecode().$this->phonenumber;
-    }
-
-    /**
-     * return the phonenumber with the country phone code.
-     * @return string
-     */
-    public function getPendingOrder($transporter){
-        return Order::where(Status::get("pending"))
-            ->andwhere($this)->andwhere($transporter)->__getOne();
     }
 
 }

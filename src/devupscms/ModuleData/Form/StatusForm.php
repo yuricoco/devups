@@ -41,7 +41,13 @@ class StatusForm extends FormManager
         $entitycore->field['label'] = [
             "label" => t('status.label'),
             "type" => FORMTYPE_TEXT,
-            "value" => $status->getLabel(),
+            "lang" => true,
+            "value" => $status->label,
+        ];
+        $entitycore->field['description'] = [
+            "label" => t('Description'),
+            "type" => FORMTYPE_TEXTAREA,
+            "value" => $status->description,
         ];
 
 

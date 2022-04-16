@@ -359,7 +359,10 @@ var model = {
             _param[v] = value
         }
         console.log(options, value);
-        Drequest.api("lazyloading." + options.entity)
+        if (!options.base_url)
+            options.base_url = __env+"api/lazyloading." + options.entity
+
+        Drequest.init(options.base_url)
             .param(_param)
             .get((response) => {
                 console.log(response)

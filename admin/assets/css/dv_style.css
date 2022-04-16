@@ -19,11 +19,11 @@
     font-size: 50px;
     background: rgba(51,122,183,0.3);
 }
-.dv_datatable_container .card-header-tab{
+/*.dv_datatable_container .card-header-tab{
     position: sticky;
     top: 60px;
     z-index: 100;
-}
+}*/
 .app-main {
     display: block;
 }
@@ -47,7 +47,7 @@
 }
 .dv_datatable thead{
     position: sticky;
-    top: 98px;
+    /*top: 98px;*/
     background: whitesmoke;
     z-index: 10;
 }

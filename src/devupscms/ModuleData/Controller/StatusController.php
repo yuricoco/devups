@@ -38,9 +38,9 @@ class StatusController extends Controller{
                             'status' => $status,
                             'action' => 'create', 
                             'error' => $this->error);
-        } 
-        
+        }
 
+        $status->dvid_lang = "fr";
         $id = $status->__insert();
         return 	array(	'success' => true,
                         'status' => $status,
@@ -64,7 +64,7 @@ class StatusController extends Controller{
         $status->__update();
         return 	array(	'success' => true,
                         'status' => $status,
-                        'tablerow' => StatusTable::init()->buildindextable()->getSingleRowRest($status),
+                        'tablerow' => StatusTable::init()->buildindextable()->getSingleRowRest(Status::find($id, Dvups_lang::getByIsoCode("fr")->id)),
                         'detail' => '');
                         
     }

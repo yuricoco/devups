@@ -12,7 +12,6 @@ use Request as R;
 header("Access-Control-Allow-Origin: *");
 
 $notificationCtrl = new NotificationController();
-$notificationbroadcastedCtrl = new NotificationbroadcastedController();
 $notificationtypeCtrl = new NotificationtypeController();
 
 (new Request('hello'));
@@ -42,31 +41,6 @@ switch (R::get('path')) {
         break;
     case 'notification.datatable':
         g::json_encode($notificationCtrl->datatable(R::get('next'), R::get('per_page')));
-        break;
-
-    case 'notificationbroadcasted._new':
-        g::json_encode($notificationbroadcastedCtrl->formView());
-        break;
-    case 'notificationbroadcasted.create':
-        g::json_encode($notificationbroadcastedCtrl->createAction());
-        break;
-    case 'notificationbroadcasted.form':
-        g::json_encode($notificationbroadcastedCtrl->formView(R::get("id")));
-        break;
-    case 'notificationbroadcasted.update':
-        g::json_encode($notificationbroadcastedCtrl->updateAction(R::get("id")));
-        break;
-    case 'notificationbroadcasted._show':
-        $notificationbroadcastedCtrl->detailView(R::get("id"));
-        break;
-    case 'notificationbroadcasted._delete':
-        g::json_encode($notificationbroadcastedCtrl->deleteAction(R::get("id")));
-        break;
-    case 'notificationbroadcasted._deletegroup':
-        g::json_encode($notificationbroadcastedCtrl->deletegroupAction(R::get("ids")));
-        break;
-    case 'notificationbroadcasted.datatable':
-        g::json_encode($notificationbroadcastedCtrl->datatable(R::get('next'), R::get('per_page')));
         break;
 
     case 'notificationtype._clonerow':

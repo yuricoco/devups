@@ -1,7 +1,7 @@
 <?php
 
 
-namespace spacekola\ModuleUser;
+namespace devupsfront\ModuleUser;
 
 
 use Dvups_module;
@@ -59,34 +59,14 @@ class ModuleUser
     {
 
         $userCtrl = new UserFrontController();
-        $addressCtrl = new \AddressController();
+        //$addressCtrl = new \AddressController();
 
         (new Request('hello'));
 
         switch (Request::get('path')) {
 
-            case 'address._new':
-                \AddressForm::renderaccount();
-                break;
-            case 'address.create':
-                g::json_encode($addressCtrl->createAction());
-                break;
-            case 'address.form':
-                \AddressForm::renderaccount(Request::get("id"));
-                break;
-            case 'address.update':
-                g::json_encode($addressCtrl->updateAction(Request::get("id")));
-                break;
-            case 'address._delete':
-                g::json_encode($addressCtrl->deleteAction(Request::get("id")));
-                break;
-            case 'address.datatable':
-                g::json_encode($addressCtrl->datatable(Request::get('next'), Request::get('per_page')));
-                break;
             case 'user.create':
             case 'registration':
-                g::json_encode((new UserFrontController())->createAction());
-                break;
             case 'user.register':
                 g::json_encode((new UserFrontController())->registration());
                 break;

@@ -42,12 +42,6 @@ class Country extends \Model implements JsonSerializable
      **/
     protected $status;
 
-    /**
-     * @ManyToOne(targetEntity="\Continent")
-     * , inversedBy="reporter"
-     * @var \Continent
-     */
-    public $continent;
 
     public function __construct($id = null)
     {
@@ -56,7 +50,6 @@ class Country extends \Model implements JsonSerializable
         if ($id) {
             $this->id = $id;
         }
-        $this->continent = new Continent();
     }
 
     public function getId()

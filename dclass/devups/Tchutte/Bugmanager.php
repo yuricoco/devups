@@ -35,8 +35,8 @@ class Bugmanager {
 //        die;
         echo "<pre>";
         $calledfrom = debug_backtrace();
-        print_r($debug);
-        print_r($calledfrom);
+        dump($debug);
+        dump($calledfrom);
         die;
 //        }
 //        else{

@@ -28,8 +28,15 @@ class NotificationTable extends Datatable
         $this->order_by = "this.id desc";
         $this->datatablemodel = [
             ['header' => t('notification.id', '#'), 'value' => 'id'],
-            ['header' => t('notification.entity', 'Entity'), 'value' => 'entity'],
-            ['header' => t('notification.entityid', 'Entityid'), 'value' => 'entityid'],
+            ['header' => "sent to", 'value' => function($item){
+                if ($item->user_id){
+                    return User::find($item->user_id)->firstname;
+                }
+                return Dvups_admin::find($item->admin_id)->name;
+            }],
+            ['header' => t('Entityid'), 'value' =>  function($item){
+                return $item->entity." / ".$item->entityid;
+            }],
             ['header' => t('notification.content', 'Content'), 'value' => 'content']
         ];
 
@@ -41,7 +48,7 @@ class NotificationTable extends Datatable
         $this->order_by = "this.id desc";
         $this->enabletopaction = false;
         $this->datatablemodel = [
-            ['header' => t('notification.id', '#'), 'value' => 'id'],
+            //['header' => t('notification.id', '#'), 'value' => 'id'],
             ['header' => t('notification.entity', 'Entity'), 'value' => 'entity'],
             ['header' => t('notification.entityid', 'Entityid'), 'value' => 'entityid'],
             ['header' => t('notification.content', 'Content'), 'value' => 'content']
