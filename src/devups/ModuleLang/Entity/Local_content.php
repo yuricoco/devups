@@ -13,20 +13,10 @@ class Local_content extends Model implements JsonSerializable
      * */
     protected $id;
     /**
-     * @Column(name="lang", type="string" , length=25 )
-     * @var string
-     **/
-    protected $lang;
-    /**
      * @Column(name="reference", type="string" , length=255 )
      * @var string
      **/
     protected $reference;
-    /**
-     * @Column(name="content", type="text"  )
-     * @var text
-     **/
-    protected $content;
 
     /**
      * @ManyToOne(targetEntity="\Local_content_key")
@@ -39,6 +29,8 @@ class Local_content extends Model implements JsonSerializable
     public function __construct($id = null)
     {
 
+        $this->dvtranslate = true;
+        $this->dvtranslated_columns = ["content"];
         if ($id) {
             $this->id = $id;
         }
@@ -113,7 +105,7 @@ class Local_content extends Model implements JsonSerializable
             'id' => $this->id,
             'reference' => $this->reference,
             'content' => $this->content,
-            'lang' => $this->lang,
+            //'lang' => $this->lang,
             'local_content_key' => $this->local_content_key,
         ];
     }
@@ -135,7 +127,11 @@ class Local_content extends Model implements JsonSerializable
     public static function updateLang()
     {
         $content = Request::post("local_content");
+        $idlang = Request::post("idlang");
         $id = Request::get("id");
+        // $idlang = Dvups_lang::getByIsoCode(Request::get("iso"))->id;
+
+        return DBAL::_updateDbal("local_content_lang",["content"=>$content], " lang_id = $idlang AND local_content_id = $id ");
         return Local_content::where("this.id", $id)->update(["content"=>$content]);
 
     }

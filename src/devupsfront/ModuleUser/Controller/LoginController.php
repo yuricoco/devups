@@ -20,7 +20,7 @@ class LoginController
         unset($_SESSION['USERID']);
         unset($_SESSION[USERAPP]);
         unset($_SESSION["setting"]);
-        session_destroy();
+        // session_destroy();
 
         if (isset($_COOKIE[USERCOOKIE])) {
             setcookie(USERCOOKIE, null, -1, null, null, false, true);
@@ -100,8 +100,7 @@ class LoginController
                 ->sendMail($data);
         }
 
-        Notification::$send_sms = true;
-        Notification::on($user, "reset-password")
+        Notification::on($user, "reset-password", -1)
             ->send([$user], ["activationcode" => $activationcode]);
 
         return array('success' => true, 'user' => $user, 'activationcode' => $activationcode, 'url' => "" . d_url("reset-password"));
@@ -115,9 +114,6 @@ class LoginController
 
         $code = sha1($_POST['activationcode']);
         if ($code == $userapp->activationcode) {
-            //if (substr($code, 0, 5) == $userapp->getActivationcode()) {
-
-            //$userapp->setSalt(sha1($_POST['password']));
             $userapp->setPassword(sha1(($_POST['password'])));
             $userapp->setIs_activated(1);
             $userapp->setResettingpassword(0);
@@ -137,11 +133,7 @@ class LoginController
     {
 
         $user = User::find(Request::get("user_id"));
-        //$user_password = $user->getPassword();
         extract($_POST);
-
-        //var_dump($user_password);
-        //die();
 
         if (!$_POST['currentpassword'] || !$_POST['newpassword'] || !$_POST['confirmpassword'])
             return array('success' => false,

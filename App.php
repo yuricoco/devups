@@ -57,10 +57,33 @@ class App extends \dclass\devups\Controller\FrontController
     }
 
     public function helloView(){
+//        $Storage = Storage::firstOrCreate(
+//            ['name' => 'Tokyo'],
+//            ['open' => 1, 'open_at' => '11:30']
+//        );
+        $storage = Storage::delete();
+        // $storage->__delete();
+        dv_dump($storage);
+// Retrieve Storage by name or create it with the name, delayed, and arrival_time attributes...
+        $Storage = Storage::firstOrCreate(
+            ['name' => 'London to Paris'],
+            ['open' => 1, 'open_at' => '11:30']
+        );
+        dump($Storage);
+// Retrieve Storage by name or instantiate a new Storage instance...
+        $Storage = Storage::firstOrNew([
+            'name' => 'London to Paris'
+        ]);
+        dump($Storage);
 
-        //$product = Product::first();
+// Retrieve Storage by name or instantiate with the name, delayed, and arrival_time attributes...
+        $Storage = Storage::firstOrNew(
+            ['name' => 'Tokyo to Sydney'],
+            ['open' => 1, 'open_at' => '11:30']
+        );
+        dump($Storage);
 
-        Genesis::render("hello", []);
+        //Genesis::render("hello", []);
     }
 
     public function tableView(){

@@ -361,10 +361,10 @@ class Notificationbroadcasted extends Model implements JsonSerializable
             $note = "&read=" . $this->id;
         switch ($this->notification->entity) {
             case "order":
-                return route("order-detail?id=" . $this->notification->entityid) . $note;
-            case "sponsoring":
-                return route("investor-detail?id=" . $this->notification->entityid) . $note;
-            case "cycle":
+                return route("invoice?id=" . $this->notification->entityid) . $note;
+            case "package":
+                return route("package?id=" . $this->notification->entityid) . $note;
+            case "promotion":
                 return route("cycle?id=" . $this->notification->entityid) . $note;
 
         }

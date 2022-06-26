@@ -61,10 +61,10 @@ switch (R::get('path')) {
     case 'notificationtype._show':
         $notificationtypeCtrl->detailView(R::get("id"));
         break;
-    case 'notificationtype._delete':
+    case 'notificationtype.delete':
         g::json_encode($notificationtypeCtrl->deleteAction(R::get("id")));
         break;
-    case 'notificationtype._deletegroup':
+    case 'notificationtype.deletegroup':
         g::json_encode($notificationtypeCtrl->deletegroupAction(R::get("ids")));
         break;
     case 'notificationtype.datatable':

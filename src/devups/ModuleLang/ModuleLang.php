@@ -9,7 +9,6 @@ use Genesis as g;
 use Local_content;
 use Local_content_keyController;
 use Local_content_keyForm;
-use Local_content_keyFrontController;
 use Local_contentController;
 use Local_contentForm;
 use Local_contentFrontController;
@@ -62,11 +61,16 @@ class ModuleLang
 
         switch ($path) {
 
-            case 'local-content.get':
-                g::json_encode(Local_content_keyFrontController::i()->ll());
+            case 'local-content.importlang':
+                $local_contentCtrl->importlang();
                 break;
+//            case 'local-content.get':
+//                g::json_encode(\Local_content_key::lazyloading());
+//                break;
+            case 'local-content.get':
             case 'local-content.getlang':
-                g::json_encode( Local_content::getDataLang(Request::get('id')));
+                g::json_encode(\Local_content::lazyloading());
+                //g::json_encode( Local_content::getDataLang(Request::get('id')));
                 break;
             case 'local-content.update':
                 g::json_encode( Local_content::updateLang());

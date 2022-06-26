@@ -48,6 +48,8 @@ switch (Request::get('path')) {
         break;
     case 'reportingmodel/index':
         $reportingmodelCtrl->listView();
+    case 'reportingmodel/download-content':
+        $reportingmodelCtrl->downloadContent(Request::get("id"));
         break;
     case 'reportingmodel/create':
         $reportingmodelCtrl->createAction();

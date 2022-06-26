@@ -17,12 +17,6 @@ class Tree_item extends Model implements JsonSerializable
      * @var string
      **/
     protected $position;
-
-    /**
-     * @Column(name="content", type="text"  , nullable=true)
-     * @var text
-     **/
-    protected $content;
     /**
      * @Column(name="slug", type="string" , length=55 , nullable=true)
      * @var string
@@ -59,7 +53,7 @@ class Tree_item extends Model implements JsonSerializable
     public function __construct($id = null)
     {
         $this->dvtranslate = true;
-        $this->dvtranslated_columns = ["name"];
+        $this->dvtranslated_columns = ["name", "content"];
         if ($id) {
             $this->id = $id;
         }
@@ -74,7 +68,7 @@ class Tree_item extends Model implements JsonSerializable
         // dv_dump($ti);
         if (!$ti) {
             return new Tree_item();
-            $tree = Tree::where("name", "position")->__getOne();
+            $tree = Tree::where("name", "position")->first();
             if (!Tree::where("name", "position")->count()) {
                 $tree = new Tree();
                 $tree->setName(["en"=>"position", "fr"=>"position"]);
@@ -231,7 +225,7 @@ class Tree_item extends Model implements JsonSerializable
             ->where("this.parent_id", $this->id)
             //->andwhere("this.id", "!=", $category->getId())
             ->orderby("this.position")
-            ->__getAll();
+            ->get();
     }
 
     public static function childrenOf(string $slug)
@@ -240,7 +234,7 @@ class Tree_item extends Model implements JsonSerializable
             ->where("this.parent_id")
             ->in(" select id from tree_item where slug = '$slug' ")
             ->orderby("this.position")
-            ->__getAll();
+            ->get();
     }
 
     /**
@@ -265,7 +259,7 @@ class Tree_item extends Model implements JsonSerializable
         if ($count)
             return self::select()->where("parent_id", $this->id)
                 ->limit($limit)
-                ->__getAll();
+                ->get();
 
         return [];
 

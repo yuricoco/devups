@@ -29,11 +29,10 @@ class UserTable extends Datatable
         $this->datatablemodel = [
             ['header' => t('#'), 'value' => 'id', "search"=>false],
             ['header' => t('Nom'), 'value' => 'username'],
-            ['header' => t('Wallet'), 'value' => 'wallet.amount', "search"=>false],
             ['header' => t('Country'), 'value' => 'country.name'],
-            ['header' => t('user.phonenumber', 'Phonenumber'), 'value' => 'phonenumber'],
+            ['header' => t( 'Phonenumber'), 'value' => 'phonenumber'],
             ['header' => t('email'), 'value' => 'email'],
-            ['header' => t('user.is_activated', 'Is_activated'), 'value' => 'is_activated'],
+            ['header' => t( 'Is activated'), 'value' => 'is_activated'],
             ['header' => t('Register at'), 'value' => 'createdAt'],
             //['header' => t('user.birthdate', 'Birthdate'), 'value' => 'birthdate'],
         ];

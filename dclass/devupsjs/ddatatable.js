@@ -56,8 +56,10 @@ var ddatatable = {
         Drequest.init( __env+"admin/services.php?path=dvups_entity.form-export-view&entity="+classname)
             //.param({path: this.entity + "._new"})
             .toFormdata({filters :  "dfilters=on&next="+this.currentpage + "&per_page=" +
-                    this.per_page + this.searchparam +
-                    this.order + this.urlparam })
+                    this.per_page + (this.searchparam == 'undefined' ? "" : this.searchparam)
+                    + (this.order ?? "")
+                    + (this.urlparam ?? "")
+            })
             .post(function (response) {
                 console.log(response)
                 databinding.checkrenderform(response);

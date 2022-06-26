@@ -187,9 +187,9 @@ class Notification extends Model implements JsonSerializable
         $this->content = $content;
     }
 
-    public static function onadmin($entity, $event, $session = "admin")
+    public static function onadmin($entity, $event, $sendsms = false)
     {
-        return self::on($entity, $event, $session);
+        return self::on($entity, $event, $sendsms, "admin");
     }
 
     /**
@@ -198,9 +198,10 @@ class Notification extends Model implements JsonSerializable
      * @param array $params
      * @return int|Notification
      */
-    public static function on($entity, $event, $session = "user", $sendsms = false)
+    public static function on($entity, $event, $sendsms = false, $session = "user")
     {
 
+        self::$send_sms = $sendsms;
         $classname = strtolower(get_class($entity));
         $type = Notificationtype::where(["dvups_entity.name" => $classname, "_key" => $event])
             ->where("this.session", $session)
@@ -247,7 +248,7 @@ class Notification extends Model implements JsonSerializable
         if (!__prod)
             return 0;
 
-        $response = Request::initCurl("https://spacekolasms.com/api/sendsms?api_key=" . Configuration::get("sms_api_key"))
+        $response = Request::initCurl("https://spacekolasms.com/api/sendsms?api_key=" . Configuration::get("sms_api_key2"))
             ->data([
                 "phonenumber" => $receiver->phonenumber,
                 "message" => $notification->content,
@@ -284,7 +285,7 @@ class Notification extends Model implements JsonSerializable
                     "type"=> Configuration::get("sms_type"),
                     "username"=> Configuration::get("sms_username"),
                     "password"=> Configuration::get("sms_password"),
-                    ]
+                ]
             )
             ->send()
             ->json();
@@ -385,13 +386,13 @@ class Notification extends Model implements JsonSerializable
     public function getRedirect()
     {
         if ($this->read == 0) {
-            if ($this->_notification->_notificationtype->getSession() == "admin") {
-                $entity = ucfirst($this->_notification->entity);
+            if ($this->_notificationtype->getSession() == "admin") {
+                $entity = ucfirst($this->entity);
                 //$entity = Dvups_entity::getbyattribut("name", $this->_notification->entity);
                 //return __env.('admin/' .strtolower($entity->dvups_module->project) . '/' . $entity->dvups_module->name . '/' . $entity->url . "/detail?id=".$this->notification->entityid);
 
                 //return $entity->route();
-                return $entity::classpath("index.php?path=".$this->_notification->entity."/index&dfilters=on&id:eq={$this->notification->entityid}&notified=" . $this->getId());
+                return $entity::classpath("index.php?path=".$this->entity."/index&dfilters=on&id:eq={$this->entityid}&notified=" . $this->getId());
             }
             return route('notification?read=' . $this->getId());
         }
@@ -412,13 +413,13 @@ class Notification extends Model implements JsonSerializable
         $note = "";
         if (!$this->viewedat)
             $note = "&read=" . $this->id;
-        switch ($this->notification->entity) {
+        switch ($this->entity) {
             case "order":
-                return route("order-detail?id=" . $this->notification->entityid) . $note;
-            case "sponsoring":
-                return route("investor-detail?id=" . $this->notification->entityid) . $note;
-            case "cycle":
-                return route("cycle?id=" . $this->notification->entityid) . $note;
+                return route("invoice?id=" . $this->entityid) . $note;
+            case "package":
+                return route("package?id=" . $this->entityid) . $note;
+            case "promotion":
+                return route("cycle?id=" . $this->entityid) . $note;
 
         }
     }
@@ -438,7 +439,13 @@ class Notification extends Model implements JsonSerializable
             $nb->ping = 1;
             $nb->read = 0;
             $local = $receiver->lang;
-            $msg = $type->content[$local];
+
+            // issue on admin notification as the lang attribut is not yet setted by default
+            if (isset($type->content[$local]))
+                $msg = $type->content[$local];
+            else
+                $msg = $type->content["en"];
+
             foreach ($params as $search => $value) {
                 $msg = str_replace(":". $search ."", $value, $msg);
                 //$msg = str_replace("{{". $search ."}}", $value, $msg);
@@ -450,7 +457,8 @@ class Notification extends Model implements JsonSerializable
             else
                 $nb->user_id = $receiver->id;
 
-            $nb->__insert();
+            if(self::$send_sms != -1)
+                $nb->__insert();
 
             if (self::$send_sms)
                 self::sendSMS($nb, $receiver);

@@ -19,6 +19,12 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
     protected $enablenotification = 0;
 
     /**
+     * @Column(name="multi_lang", type="integer", nullable=true)
+     * @var string
+     **/
+    protected $multi_lang = 0;
+
+    /**
      * @ManyToOne(targetEntity="\Dvups_module")
      * @JoinColumn(onDelete="cascade")
      * @var \Dvups_module
@@ -191,6 +197,11 @@ class Dvups_entity extends Dvups_config_item implements JsonSerializable, DvupsT
     {
         if ($this->enablenotification == 1)
             return Notificationbroadcasted::of($this->name);
+    }
+
+    public static function describe($table)
+    {
+        return (new DBAL())->executeDbal("DESCRIBE $table; ", [], DBAL::$FETCHALL);
     }
 
 }

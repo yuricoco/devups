@@ -16,8 +16,8 @@ if(!isset($_SESSION[LANG]))
 //    $_SESSION[PREVIOUSPAGE] = $_SERVER["url"];
 
 function local() {
-    if (Request::get('lang')) {
-        return Request::get('lang');
+    if ($lang = Request::get('lang')) {
+        return $lang;
     }elseif (isset($_SESSION[LANG]))
         return $_SESSION[LANG];
 
@@ -134,6 +134,10 @@ function randomtoken(){
     $randomtoken = base64_encode( openssl_random_pseudo_bytes(32));
 }
 
+/**
+ * @param $value used in the querybuilder to sanitize select where in constraint
+ * @return mixed|string
+ */
 function qb_sanitize($value){
     if(is_string($value))
         return "'$value'";

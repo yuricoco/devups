@@ -24,16 +24,6 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      **/
     protected $type;
     /**
-     * @Column(name="styleressource", type="string" , length=255, nullable=true )
-     * @var string
-     **/
-    protected $styleressource;
-    /**
-     * @Column(name="style", type="text" , nullable=true )
-     * @var string
-     **/
-    protected $style;
-    /**
      * @Column(name="description", type="text" , nullable=true )
      * @var string
      **/
@@ -47,17 +37,6 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
         $this->description = $description;
     }
 
-    /**
-     * @Column(name="contentheader", type="text"  , nullable=true)
-     * @var text
-     **/
-    protected $contentheader;
-    /**
-     * @Column(name="contentfooter", type="text"  , nullable=true)
-     * @var text
-     **/
-    protected $contentfooter;
-
 
     public function __construct($id = null)
     {
@@ -68,38 +47,6 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
             $this->id = $id;
         }
 
-    }
-
-    /**
-     * @return text
-     */
-    public function getContentheader()
-    {
-        return $this->contentheader;
-    }
-
-    /**
-     * @param text $contentheader
-     */
-    public function setContentheader( $contentheader)
-    {
-        $this->contentheader = $contentheader;
-    }
-
-    /**
-     * @return text
-     */
-    public function getContentfooter()
-    {
-        return $this->contentfooter;
-    }
-
-    /**
-     * @param text $contentfooter
-     */
-    public function setContentfooter($contentfooter)
-    {
-        $this->contentfooter = $contentfooter;
     }
 
     public function getId()
@@ -120,7 +67,10 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      */
     public function setType($type)
     {
-        $this->type = $type;
+        if (!$type)
+            return t("this field is important!");
+
+        $this->type = explode(".",$type)[0];
     }
 
     public static $log_info = "";
@@ -129,11 +79,14 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
      * @param $model
      * @return Reportingmodel
      */
-    public static function init($model, $id_lang)
+    public static function init($model, $id_lang = null)
     {
         global $viewdir;
         $viewdir[] = __DIR__ . '/../Resource/views';
         //Reportingmodel::classroot("Resource/views");
+
+        if (!$id_lang)
+            $id_lang = Dvups_lang::getByIsoCode(local())->id;
 
         self::$emailreceiver = [];
         self::$attachments = [];
@@ -505,16 +458,18 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
         $message_html = $this->sanitizeContent($this->content, $data);
         $message_text = $this->sanitizeContent($this->contenttext, $data);
+        $object = $this->sanitizeContent($this->object, $data);
+        $title = $this->sanitizeContent($this->title, $data);
 
         global $viewdir;
         $viewdir[] = Reportingmodel::classroot("Resource/views");
 
-        $message_html = str_replace("{yield}", $message_html, Genesis::getView("email"));
+        $message_html = str_replace("{yield}", $message_html, Genesis::getView("models.".$this->type));
 
-        //if (!__prod || !$this->id) {
+        if (!__prod || !$this->id) {
             \DClass\lib\Util::log($message_html, date("Y_m_d-H_i_s")."_".$this->name.".html", ROOT."cache/", "w");
-        //    return 0;
-        //}
+            return 0;
+        }
 
 // Instantiation and passing `true` enables exceptions
         $mail = new PHPMailer(true);
@@ -533,11 +488,11 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
             $mail->Port = Configuration::get("sm_port");                                    // TCP port to connect to
 
             //Recipients
-            $mail->setFrom(Configuration::get("sm_from"), $this->title);
+            $mail->setFrom(Configuration::get("sm_from"), $title);
             foreach (self::$emailreceiver as $email => $name)
                 $mail->addAddress($email, $name);     // Add a recipient
             //$mail->addAddress('ellen@example.com');               // Name is optional
-            $mail->addReplyTo(Configuration::get("sm_from"), $this->title);
+            $mail->addReplyTo(Configuration::get("sm_from"), $title);
 
             foreach (self::$namecc as $email => $name)
                 $mail->addCC($email, $name);
@@ -552,7 +507,7 @@ class Reportingmodel extends Model implements JsonSerializable, DatatableOverwri
 
             // Content
             $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = $this->object;
+            $mail->Subject = $object;
             $mail->Body = $message_html;
             $mail->AltBody = $message_text;
 

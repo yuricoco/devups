@@ -33,6 +33,12 @@ switch (Request::get('path')) {
     case 'dvups-lang/index':
         (new Dvups_langController())->listView();
         break;
+    case 'exportlang':
+        $local_contentCtrl->exportlang(Request::get("local"));
+        break;
+    case 'local-content/exportlang':
+        $local_contentCtrl->exportlangView();
+        break;
     case 'local-content-key/index':
         $local_content_keyCtrl->listView();
         break;

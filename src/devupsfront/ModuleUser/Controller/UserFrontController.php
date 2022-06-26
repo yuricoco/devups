@@ -112,10 +112,9 @@ class UserFrontController extends UserController
                 ->sendMail($data);
         }
 
-        // todo: send notification to seller
-        Notification::$send_sms = true;
-        Notification::on($userhydrate, "registered")
-            ->send([$userhydrate], ["username" => $userhydrate->getFirstname(), "code" => $activationcode]);
+        //  notification -1 send only sms
+//        Notification::on($userhydrate, "registered", -1)
+//            ->send([$userhydrate], ["username" => $userhydrate->getFirstname(), "code" => $activationcode]);
 
         return array('success' => true,
             'user' => $userhydrate,

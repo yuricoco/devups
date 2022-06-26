@@ -130,26 +130,4 @@ class UserController extends Controller
 
     }
 
-    public function changestatus($id)
-    {
-
-        $user = User::find($id, 1);
-        $user->can_sponsoring = Request::get("status");
-        $user->__update([
-            "can_sponsoring" => Request::get("status")
-        ]);
-
-        if ($user->can_sponsoring == 1)
-            Notification::on($user, "investor_account_approved", $user->notificationData())
-                ->send([$user]);
-        else
-            Notification::on($user, "investor_account_reseted", $user->notificationData())
-                ->send([$user]);
-
-        return array('success' => true,
-            'tablerow' => UserTable::init()->buildindextable()->getSingleRowRest($user),
-            'detail' => '');
-
-    }
-
 }

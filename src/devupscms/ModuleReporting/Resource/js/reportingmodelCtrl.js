@@ -16,13 +16,16 @@ model.sendmail = function (el, id) {
     })
 }
 
-function saveToFile(el, id) {
+function saveToFile(el, id, lang) {
     model.addLoader($(el))
-    Drequest.init(__env+"admin/api/reportingmodel.save-content?id="+id)
+    Drequest.init(__env+"admin/api/reportingmodel.save-content?lang="+lang+"&id="+id)
         .get((response) => {
+            console.log(response)
             model.removeLoader()
-            if (response.success)
-                editor.setValue(response.content)
+            if (!response.success){
+                $.notify(response.detail, "success")
+            }
+                // editor.setValue(response.content)
             else{
                 alert(response.detail)
             }

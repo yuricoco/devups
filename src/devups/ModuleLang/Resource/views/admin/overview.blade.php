@@ -11,8 +11,13 @@
 
                 <h3 class="title">Local content Component</h3>
 
-                <hr>
 
+                <a href="{{Local_content::classpath("local-content/exportlang")}}"
+                        class="btn btn-warning">
+                    <i class="material-icons mi-autorenew">autorenew</i>
+                    Exporter les donnees de lang du site
+                </a>
+                <hr>
                 <!-- Content -->
                 <section id="content" xmlns:v-bind="http://www.w3.org/1999/xhtml"
                          xmlns:v-on="http://www.w3.org/1999/xhtml"

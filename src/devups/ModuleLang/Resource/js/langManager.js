@@ -8,18 +8,25 @@ Vue.component("localcontentForm", {
             local_contenttree: [],
         }
     },
-    props: ["local_content"],
+    props: ["local_content", "lang"],
     mounted() {
         console.log(this.local_content)
         this.baseurl = $("#lang_component").data("baseurl");
-        this.content = this.local_content.content;
+        this.content = this.local_content.content[this.lang.iso_code];
     },
     methods: {
+        exportlang() {
+            Drequest.init(__env + "admin/api/local-content.exportlang")
+                .get((response) => {
+                    console.log(response)
+                })
+        },
         update() {
             this.inprocess = true;
             console.log(this.baseurl);
             var fd = new FormData();
             fd.append("local_content", this.content);
+            fd.append("idlang", this.lang.id);
             Drequest.init(this.baseurl + 'local-content.update&id=' + this.local_content.id).
                 /*toFormdata({
                     "local_content": this.content
@@ -40,7 +47,7 @@ Vue.component("localcontentForm", {
             <div class="card-body">
                 <form id="frmEdit" class="form-horizontal">
                     <div class="form-group">
-                        <label for="text">content {{local_content.lang}}</label>
+                        <label for="text">content {{lang.iso_code}}</label>
                         <textarea  v-model="content"  class="form-control " 
                                placeholder="Text"></textarea>
 
@@ -65,6 +72,8 @@ Vue.component("local_content", {
             local_contentstring: "",
             search: "",
             resultdatas: [],
+            local_content: {},
+            langs: langs,
             ll: {},
             componentkey: 1,
         }
@@ -72,11 +81,12 @@ Vue.component("local_content", {
     props: ["tree"],
     mounted() {
         console.log(this.$parent.baseurl)
-        Drequest.init(this.$parent.baseurl + "local-content.getlang&id=" + this.tree.id)
+        Drequest.api("detail.local-content?id=" + this.tree.id)
+        //Drequest.init(this.$parent.baseurl + "local-content.getlang&id=" + this.tree.id)
             .get((response) => {
                 //model._apiget("local-content.getlang&id=" + this.tree.id, (response) => {
                 console.log(response);
-                this.local_contents = response.data;
+                this.local_content = response.local_content;
             })
 
     },
@@ -87,7 +97,7 @@ Vue.component("local_content", {
             <div class="row">
                 <div class="col-12"> 
                     <div class=" "> 
-                            <h3 class="">{{tree.reference}} | </h3>
+                            <h3 class="">{{local_content.reference}} | </h3>
                     </div>  
                 </div>
                 <div class="col-md-7">
@@ -95,9 +105,11 @@ Vue.component("local_content", {
                         
                         <ul id="sortable" class="sortableLists list-group">
                                     
-                            <li is="localcontentForm" v-for="(local_content, $index) in local_contents"
-                                v-bind:key="local_content.id" :tree="tree" 
+                            <li is="localcontentForm" v-for="(lang, $index) in langs" 
+                                v-bind:key="lang.iso_code"
                                 :local_content="local_content" 
+                                :content="local_content.content[lang.iso_code]" 
+                                :lang="lang" 
                                 :index="$index" 
                                 class="list-group-item"></li>
                             
@@ -129,9 +141,9 @@ var local_contentview = new Vue({
         this.loaddata();
     },
     methods: {
-        regeneratecache (event) {
+        regeneratecache(event) {
             model.addLoader($(event.target));
-            Drequest.init(this.baseurl + "local_content.regeneratecache").get((response)=>{
+            Drequest.init(this.baseurl + "local_content.regeneratecache").get((response) => {
                 console.log(response);
                 model.removeLoader();
                 alert(response.message)

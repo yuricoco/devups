@@ -850,6 +850,97 @@ EOF;
         return $this;
     }
 
+
+    public function renderentitydata($entity, $callback = null)//, $header
+    {
+//        $dt = new Datatable();
+//        $dt->class = get_class($entity);
+
+        if (!$this->datatablemodel) {
+            $tb = [];
+        } else
+            $tb = self::getTableEntityBody($entity, $this->datatablemodel, $callback);
+
+        if ($callback)
+            return "";
+
+        $newrows = "";
+        if (!empty($this->additionnalrow)) {
+            $newrows = $this->rowbuilder();
+        }
+
+        return '<table data-entity="' . $this->class . '"  class="table table-bordered table-hover table-striped" >'
+            //. '<thead><tr>' . implode(" ", $theader['th']) . '</tr><tr>' . implode(" ", $theader['thf']) . '</tr></thead>'
+            . '<tbody>' . implode(" ", $tb) . '</tbody>'
+            . '<tfoot>' . $newrows . '</tfoot>'
+            . '</table>';
+
+    }
+
+    private static function getTableEntityBody($entity, $header, $callback = null)
+    {
+
+        foreach ($header as $valuetd) {
+            // will call the default get[Value] of the attribut
+            $value = $valuetd["value"];
+            // but if dev set get the will call custom get[Get]
+            if (isset($valuetd["get"]))
+                $value = $valuetd["get"];
+
+            $join = explode(".", $value);
+            if (isset($join[1])) {
+
+                $collection = explode("::", $join[0]);
+                $src = explode(":", $join[0]);
+
+                if (isset($src[1]) and $src[0] = 'src') {
+
+                    $entityjoin = call_user_func(array($entity, 'get' . ucfirst($src[1])));
+                    $file = call_user_func(array($entityjoin, 'show' . ucfirst($join[1])));
+
+                    $td = "" . $file . "";
+                } elseif (isset($collection[1])) {
+                    $td = [];
+                    $entitycollection = call_user_func(array($entity, 'get' . ucfirst($collection[1])));
+                    foreach ($entitycollection as $entity) {
+                        $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
+                        $td = '' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '';
+                    }
+                    $td = '' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '';
+                } else {
+                    $entityjoin = call_user_func(array($entity, 'get' . ucfirst($join[0])));
+                    $td = '' . call_user_func(array($entityjoin, 'get' . ucfirst($join[1]))) . '';
+                }
+            } else {
+
+                $src = explode(":", $join[0]);
+
+                if (isset($src[1]) and $src[0] = 'src') {
+
+                    $file = call_user_func(array($entity, 'show' . ucfirst($src[1])));
+                    $td = "" . $file . "";
+                } else {
+                    if (is_object(call_user_func(array($entity, 'get' . ucfirst($value)))) && get_class(call_user_func(array($entity, 'get' . ucfirst($value)))) == "DateTime") {
+                        $td = '' . call_user_func(array($entity, 'get' . ucfirst($value)))->format('d M Y') . '';
+                    } else {
+                        $td = '' . call_user_func(array($entity, 'get' . ucfirst($value))) . '';
+                    }
+                }
+            }
+
+            if ($callback)
+                $callback($valuetd["label"], $td);
+            else
+                $tr[] = '<tr ><td> ' . $valuetd["label"] . ' </td><td>' . $td . '</td></tr>';
+
+        }
+
+        if ($callback)
+            return true;
+
+        return $tr;
+    }
+
     private function tablebodybuilder()
     {
 

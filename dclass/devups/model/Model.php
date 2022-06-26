@@ -78,7 +78,7 @@ class Model extends \stdClass
      * static method gives the path of the module where the entity is/
      * @return string the path of the module where the class is.
      */
-    public static function classview($view, $route = __env."admin/")
+    public static function classview($view, $route = __env."admin")
     {
         //return get_called_class();
         $reflector = new ReflectionClass(get_called_class());
@@ -377,119 +377,6 @@ class Model extends \stdClass
         return $this;
     }
 
-    public function __get($attribut)
-    {
-//        $calledfrom = debug_backtrace();
-//        dv_dump($calledfrom);
-        if (!property_exists($this, $attribut)) {
-
-            if ($this->dvtranslate && in_array($attribut, $this->dvtranslated_columns)) {
-                if (!$this->id)
-                    return null;
-                $classlang = get_class($this) . "_lang";
-                $cnl = strtolower($classlang);
-                if (property_exists($classlang, $attribut)) {
-                    $idlang = DBAL::$id_lang_static;
-
-                    if (!$idlang) {
-
-                        (new DBAL())->setClassname(get_class($this))->getLangValues($this, [$attribut]);
-                        return $this->{$attribut};
-                    }
-                    $sql = " SELECT $attribut FROM `$cnl` WHERE lang_id = $idlang AND " . strtolower(get_class($this)) . "_id = " . $this->id;
-                    $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
-
-                    $this->{$attribut} = $data[0];
-                    return $data[0];
-                }
-            }
-            else {
-                $entityattribut = substr($attribut, 1, strlen($attribut)-1);
-                //var_dump($attribut);
-                if ($attribut != "_".$entityattribut){
-                    $trace = debug_backtrace();
-                    trigger_error(
-                        'Propriété non-définie via __get() : ' . $attribut .
-                        ' dans ' . $trace[0]['file'] .
-                        ' à la ligne ' . $trace[0]['line'],
-                        E_USER_NOTICE);
-                    die;
-                }
-                if (is_object($this->{$entityattribut})) { //  && isset($this->{$entityattribut . "_id"})
-
-                    if ($this->{$entityattribut}->dvfetched)
-                        return $this->{$entityattribut};
-
-                    $this->{$attribut} = $this->{$entityattribut}->hydrate();
-//                    $classname = get_class($this->{$attribut});
-//                    $this->{"_".$attribut} = $classname::findrow($this->{$attribut . "_id"});
-
-                    return $this->{$attribut};
-                }
-
-            }
-        } elseif (property_exists($this, $attribut)) {//$this->id &&
-
-            /*
-             * if id is defined and value of the attribut of this instance is null (problem with default value) and
-             * if devups has never fetch it before then we hydrate the hole instance with it row in database
-             */
-
-            if ($this->id && !$this->dvfetched && $attribut != "id") { //  && !$this->{$attribut}
-
-                /*
-                 * the fact is that by a mechanism I don't understand by now once the method detect an association
-                 * it automatically makes request to the db what I don't want.
-                 * by the way even if we do $entity = $object->imbricate; when the dev will do $entity->attrib it will
-                 * automatically hydrate the entity what solve the problem (at least for the current use case)
-                 */
-                /*if (is_object($this->{$attribut}) && isset($this->{$attribut."_id"})){
-
-                    $classname = get_class($this->{$attribut});
-                    $this->{$attribut} = $classname::findrow($this->{$attribut."_id"});
-
-                    return $this->{$attribut};
-                }*/
-                global $em;
-                $classlang = get_class($this);
-                $metadata = $em->getClassMetadata("\\" . $classlang);
-                $fieldNames = $metadata->fieldNames;
-                $assiactions = array_keys($metadata->associationMappings);
-                $cn = strtolower($classlang);
-                $sql = " SELECT * FROM `$cn` WHERE id = " . $this->id;
-                $data = (new DBAL())->executeDbal($sql, [], DBAL::$FETCH);
-                //var_dump($classlang." - ".$attribut, $data, $fieldNames);
-                foreach ($fieldNames as $k => $val) {
-                    $this->{$k} = $data[$k];
-                }
-                foreach ($assiactions as $k) {
-                    //if(isset($data[$k]))
-                    $this->{$k}->id = $data[$k . "_id"];
-                    $this->{$k . "_id"} = $data[$k . "_id"];
-                }
-
-                $this->dvfetched = true;
-                //return $data[0];
-            }
-            return $this->{$attribut};
-
-        }
-
-        $trace = debug_backtrace();
-        trigger_error(
-            'Propriété non-définie via __get() : ' . $attribut .
-            ' dans ' . $trace[0]['file'] .
-            ' à la ligne ' . $trace[0]['line'],
-            E_USER_NOTICE);
-        return null;
-    }
-
-    public function __set($name, $value)
-    {
-        // TODO: Implement __set() method.
-        $this->{$name} = $value;
-    }
-
     public function getId()
     {
         return (int)$this->id;
@@ -596,136 +483,6 @@ class Model extends \stdClass
     }
 
     const split = ";";
-
-    public function importCsv($classname)
-    {
-        if (!isset($_FILES["fixture"]) || $_FILES["fixture"]['error'] != 0)
-            return [
-                "success" => false,
-                "message" => "no file founded",
-            ];
-
-
-        $handle = file($_FILES["fixture"]["tmp_name"], FILE_IGNORE_NEW_LINES);
-
-        if ($handle) {
-
-            $values = [];
-            $i = 0;
-            //while (($line = fgets($handle)) !== false) {
-            foreach ($handle as $line) {
-                // process the line read.
-                $references = [];
-                if ($line) {
-                    $line = (trim($line));
-                    if ($i >= 1) {
-                        // we verify if the current line is not empty. due to sometime EOF are just \n code
-                        $reference = str_replace(self::split, "", $line);
-                        if (!trim($reference))
-                            continue;
-
-                        // there are some file that has ;;; at the end of a line, programmatically it represent column
-                        // therefore we have to remove those by user array_filter fonction
-                        // we finaly combine value with column key
-                        //try {
-                        $valuetobind = explode(self::split, $line);
-                        if (count($columns) != count($valuetobind))
-                            return [
-                                "content" => $line,
-                                "index" => $i,
-                                "columns" => $columns,
-                                "nbc" => count($columns),
-                                "valuetobind" => $valuetobind,
-                                "nbv" => count($valuetobind),
-                            ];
-
-                        $keyvalue = array_combine($columns, explode(self::split, $line));
-
-                        foreach ($this as $key => $val) {
-                            if (in_array($key, self::$dvkeys))
-                                continue;
-                            if (is_object($val)) {
-                                if (isset($keyvalue[$key . '_id']) && in_array(strtolower($keyvalue[$key . '_id']), ['', 'null']))
-                                    $keyvalue[$key . '_id'] = null;
-                            }
-                        }
-                        // dv_dump($keyvalue);
-
-//                        }catch (Exception $exception){
-//                            die(var_dump($exception));
-//                        }
-
-                        if (!$keyvalue) {
-                            // and if event so we get a false
-                            // we catch error to optimize the exception
-                            $allerrors[] = [
-                                "content" => $line,
-                                "index" => $i,
-                                "combinaison_column" => $columns,
-                                "keyvalue" => $keyvalue,
-                            ];
-                            return $allerrors;
-                        } else
-                            DBAL::_createDbal(strtolower($classname), $keyvalue);
-
-                    } else {
-                        // we collect all headers and with the array_filter fonction we sanitize the array to avoid double value
-                        $columns = array_filter(explode(self::split,
-                            str_replace("\"", "", ($line))
-                        ));
-                    }
-                    $i++;
-                }
-            }
-
-        }
-
-        return ["success" => true, "message" => "all went well"];
-
-    }
-
-    private function exportrows($callable, $column = "*", $sort = 'id', $order = "")
-    {
-
-        $qb = new QueryBuilder($this);
-
-        return $qb->select($column)
-            ->lazyloading("this." . $sort . " " . $order, false, true)
-            ->get($column, $callable);
-
-    }
-
-    public function exportCsv($classname)
-    {
-        $keys = [];
-        foreach ($this as $key => $val) {
-            self::$dvkeys[] = 'id';
-            if (in_array($key, self::$dvkeys) || is_array($val))
-                continue;
-            if (is_object($val)) {
-                $keys[] = $key . '_id';
-            } else
-                $keys[] = $key;
-        }
-
-        $exportat = date("YmdHis");
-        //$classname = get_class($this);
-        $filename = $classname . "-" . $exportat . ".csv";
-        $root = ROOT . "database/fixtures/" . $classname;
-
-        if (!file_exists($root)) {
-            mkdir($root, 0777, true);
-        }
-
-        // todo; optimization open the file once and write once
-        \DClass\lib\Util::log(implode(";", $keys), $filename, $root);
-        $this->exportrows(function ($row, $classname) use ($filename, $exportat, $root) {
-            \DClass\lib\Util::log(implode(";", $row), $filename, $root);
-        }, "this." . implode(", this.", $keys));
-
-        $download = __env . "database/fixtures/" . $classname . "/" . $filename;
-        return compact('keys', "download");
-    }
 
     /**
      * map data to the specify model from the webservice call's
@@ -845,22 +602,25 @@ class Model extends \stdClass
 
 
     /**
-     *
-     * @param string $order
-     * @return \dclass\devups\Datatable\Lazyloading
+     * @param $next
+     * @param $perpage
+     * @param $order
+     * @param $debug
+     * @return \dclass\devups\Datatable\Lazyloading|int|QueryBuilder
+     * @throws ReflectionException
      */
-    public static function lazyloading($order = "", $debug = false)
+    public static function lazyloading($perpage = 10, $next = 1, $order = "", $debug = false)
     {//
         $classname = get_called_class();
         $reflection = new ReflectionClass($classname);
         $entity = $reflection->newInstance();
 
         $ll = new \dclass\devups\Datatable\Lazyloading($entity);
-        $ll->start($entity);
+        $ll->start(new QueryBuilder($entity));
         if ($debug)
             return $ll->renderQuery()->lazyloading($entity, null, $order);
 
-        return $ll->lazyloading($entity, null, $order);
+        return $ll->setNext($next)->setPerPage($perpage)->lazyloading($entity, null, $order);
 
     }
 

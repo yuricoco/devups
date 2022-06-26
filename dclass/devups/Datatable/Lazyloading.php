@@ -30,12 +30,12 @@ class Lazyloading implements \JsonSerializable
     public $remain = 0;
     public $detail = 0;
 
-    public function setPerPage($page)
+    public function setPerPage($page = 10)
     {
         $this->per_page = $page;
         return $this;
     }
-    public function setNext($next)
+    public function setNext($next = 1)
     {
         $this->next = $next;
         return $this;
@@ -95,10 +95,10 @@ class Lazyloading implements \JsonSerializable
                 $this->currentqb->andwhere($attr)->_like($value);
                 break;
             case "isNull":
-                $this->currentqb->andwhere($attr)->isNull();
+                $this->currentqb->whereNull($attr);
                 break;
             case "notNull":
-                $this->currentqb->andwhere($attr)->isNotNull();
+                $this->currentqb->whereNotNull($attr);
                 break;
             case "btw":
                 // todo : add constraint of integrity

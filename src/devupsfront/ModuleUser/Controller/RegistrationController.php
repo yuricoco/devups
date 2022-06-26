@@ -101,8 +101,8 @@ class RegistrationController extends Controller {
         $userhydrate->__update();
 
         $userhydrate->phonenumber = $phonenumber;
-        Notification::$send_sms = true;
-        Notification::on($userhydrate, "change_telephone")
+
+        Notification::on($userhydrate, "change_telephone", -1)
             ->send($userhydrate, ["username"=>$userhydrate->username, "code"=>$activationcode]);
 
         return ["success" => true, "detail" => t("code d'activation vous a été envoyé. Utilisez le pour confirmer le changement de votre numéro.")];
@@ -130,32 +130,6 @@ class RegistrationController extends Controller {
 
     }
 
-    private static function generateusername($param) {
-        $username = remove_accents($param);
-        $username = str_replace(" ", ".", $username);
-
-        $user = User::select()->where("user.username", $username)->__getOne();
-
-        if ($user->getId()) {
-            $list = "1234567890";
-            mt_srand((double) microtime() * 10000);
-            $generate = "";
-            while (strlen($generate) < 3) {
-                $generate .= $list[mt_rand(0, strlen($list) - 1)];
-            }
-
-            if (strlen($username) > 6)
-                $alias = substr($username, 0, -(strlen($username) - 6));
-            else
-                $alias = $username;
-
-            return $alias . $generate;
-        }
-
-
-        return $username;
-    }
-
     public static function generatecode() {
 
         $datetime = new DateTime();
@@ -166,128 +140,6 @@ class RegistrationController extends Controller {
             $generate = '12345';
 
         return substr($generate, 0, 5);
-    }
-
-    protected function updatesetting(\User $userhydrate){
-
-            $nbuser = User::select()
-                ->where('user.email', "=", $userhydrate->getEmail())
-                ->__countEl();
-
-            if($nbuser)
-                return ["success" => false, "detail" => "email address already use"];
-
-            $nbuser = User::select()
-                ->where('phonenumber', "=", $userhydrate->getPhonenumber())
-                ->andwhere('country.phonecode', "=", $userhydrate->country->__get("phonecode"))
-                ->andwhere('user.id', "!=", $userhydrate->getId())
-                ->__countEl();
-
-            if($nbuser)
-                return ["success" => false, "detail" => "phonenumber already use"];
-
-
-        $userhydrate->setUsername($_POST['user_form']['username']);
-        $userhydrate->setEmail($_POST['user_form']['emailorphonenumber']);
-
-        $userhydrate->__update();
-
-        //updatesession($userhydrate);
-        return ["success" => true, "detail" => "success", "user" => $userhydrate];
-
-    }
-
-    public function register($id = null) {
-        extract($_POST);
-
-        // check if username is free
-        //$userhydrate = Controller::form_generat(new User($id), $user_form, null, true);
-        $userhydrate = new User($id);
-        if ( ! is_null($id)){
-            $userhydrate = $this->form_generat(new User($id), $user_form);
-
-            if($userhydrate->getPassword() != md5($confirm))
-                return ["success" => false, "detail" => "le mot de passe est incorrect"];
-
-            $userhydrate->__update();
-            return ["success" => true, "detail" => "success", "user" => $userhydrate];
-
-        }
-
-        $userhydrate = $this->form_generat(new User(), $user_form);
-
-        $qb = new QueryBuilder(new User());
-        $qb->select();
-
-        $qb->where('this.phonenumber', "=", $userhydrate->getPhonenumber());
-
-            $nbuser = $qb
-                //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
-                ->__countEl();
-
-            if($nbuser) {
-                $nbuser = User::select()
-                    ->where('this.phonenumber', "=", $userhydrate->getPhonenumber())
-                    //->andwhere('country.phonecode', "=", $userhydrate->country->__get("phonecode"))
-                    ->__countEl();
-
-                if ($nbuser)
-                    return ["success" => false, "detail" => "phonenumber already use"];
-            }
-
-        if($userhydrate->getEmail()){
-
-            $qb = User::where('this.email', "=", $userhydrate->getEmail());
-
-            $nbuser = $qb
-                //->orwhere('user.username_canonical', "=", $userhydrate->getUsername_canonical())
-                ->__countEl();
-
-            if($nbuser) {
-                $nbuser = User::select()
-                    ->where('user.email', "=", $userhydrate->getEmail())
-                    ->__countEl();
-
-                if($nbuser)
-                    return ["success" => false, "detail" => "email address already use"];
-
-            }
-        }
-
-        $userhydrate->setPassword(md5($user_form['password']));
-        //$userhydrate->setUsername($user_form['username']);
-
-        $activationcode = RegistrationController::generatecode();
-        $userhydrate->setActivationcode($activationcode);
-
-        // todo: handle it better
-        $userhydrate->setIs_activated(1);
-        $userhydrate->setApiKey(\DClass\lib\Util::randomcode());
-
-        $userhydrate->__insert();
-
-        $_SESSION[USER] = serialize($userhydrate);
-        $_SESSION[USERID] = $userhydrate->getId();
-
-        if($userhydrate->getEmail()) {
-            $data = [
-                "activationcode" => $activationcode,
-                "username" => $userhydrate->getFirstname(),
-            ];
-            Reportingmodel::init("registered")
-                ->addReceiver($userhydrate->getEmail(), $userhydrate->getUsername())
-                ->sendMail($data);
-        }
-
-        // todo: send notification to seller
-        Notification::on($userhydrate, "registered", ["username"=>$userhydrate->getFirstname(), "code"=>$activationcode])
-            ->send([$userhydrate])
-            ->sendSMS([$userhydrate->getTelephone()]);
-
-        return ["success" => true,
-            //"activationcode" => $activationcode,
-            "detail" => "success", "user" => $userhydrate];
-
     }
 
     public static function resendactivationcode() {
@@ -316,9 +168,6 @@ class RegistrationController extends Controller {
         Notification::on($user, "reset-password")
             ->send($user, ["username"=>$user->getFirstname(), "code"=>$activationcode]);
 
-        // send sms with activation code $codeactivation
-        //RegistrationController::sendsms($activationcode, null, $user);
-
         return [
             "success" => true,
             //"activationcode" => $activationcode,
@@ -331,45 +180,7 @@ class RegistrationController extends Controller {
 //        global $appuser;
         $appuser = User::find(Request::get("user_id"));
 
-        //return $_POST;
-        if ($appuser->isActivated()) {
-            return ["success" => true, "url" => route("home")];
-        }else {
-            $code = sha1($_POST["activationcode"]);
-            if ($code == $appuser->getActivationcode()) {
-            //if (substr($code, 0, 5) == $appuser->getActivationcode()) {
-
-                $appuser->setIs_activated(1);
-                //$appuser->setLocked(false);
-                $appuser->__update();
-                //updatesession($appuser);
-                $_SESSION[USERAPP] = serialize($appuser);
-
-                // @rfc
-                // todo: we can create a hook system so that we persist specific action
-                // for this position then the code will be executer from where it has been writen
-
-                // we credit the user wallet with the amount of payment
-                $wt = new Wallettransaction();
-                $wt->wallet = $appuser->wallet;
-                $wt->amount = 900;
-                $wt->type = "credit";
-                $wt->comment = t("credit offer for new account.");
-                $wt->__insert();
-
-                Notification::on($appuser, "account_activated")
-                    ->send($appuser, $appuser->notificationData());
-
-
-                return ["success" => true, "url" => route("home")];
-            }
-        }
-
-        return [
-            "success" => false,
-            'error' => t("Le code d'activation n'est pas valide. Veuillez entrer de nouveau ou alors renvoyer un autre code")
-        ];
-
+        return $appuser->activateaccount($_POST["activationcode"], route("home"));
     }
 
 }

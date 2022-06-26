@@ -46,9 +46,9 @@ var reportingmodel = {
     updateEditor() {
         this.editor.setValue($(this.preview.getElementById("yield")).html())
     },
-    loadFromFile(el) {
+    loadFromFile(el, lang) {
         model.addLoader($(el))
-        Drequest.init(__env + "admin/api/reportingmodel.load-content?name=" + report.name)
+        Drequest.init(__env + "admin/api/reportingmodel.load-content?lang="+lang+"&name=" + report.name)
             .get((response) => {
                 model.removeLoader()
                 if (response.success)

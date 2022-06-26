@@ -292,29 +292,43 @@ var model = {
                     value: item[options.value],
                     text: item[options.text][options.lang]
                 }));*/
-                component.find("ul").append(`<li onclick="model.selectvalue(this, '${item[options.value]}', '${item[options.text][options.lang]}')" class="list-group-item" >${item[options.text][options.lang]}</li>`);
+                component.find("ul").append(`<li onclick="model.selectvalue(this, ${i})" class="list-group-item" >${item[options.text][options.lang]}<span id="${options.entity}-${item[options.value]}" hidden >${JSON.stringify(item)}</span></li>`);
             } else {
                 /*component.find("select").append($('<option>', {
                     value: item[options.value],
                     text: item[options.text]
                 }));*/
-                component.find("ul").append(`<li onclick="model.selectvalue(this, '${item[options.value]}', '${item[options.text]}')" class="list-group-item" >${item[options.text]}</li>`);
+                component.find("ul").append(`<li onclick="model.selectvalue(this, ${i})" class="list-group-item" >${item[options.text]}<span id="${options.entity}-${item[options.value]}" hidden >${JSON.stringify(item)}</span></li>`);
             }
         });
     },
     autocompletereset(el, value, text) {
         this.selectvalue(el, value, text)
     },
-    selectvalue(el, value, text) {
+    selectvalue(el, i) {
         var component = $(el).parents(".dv-autocomplete");
-        component.find("input").val(text);
-        component.find("select").html($('<option>', {
-            value: value,
-            text: text
-        }));
+        var tagoption = {
+            value: model.dataset[i][model.options.value],
+            text: model.dataset[i][model.options.text],
+        }
+        component.find("input").val(tagoption.text);
+        if (model.options.lang) {
+            component.find("select").html($('<option>', {
+                value: tagoption.value,
+                text: tagoption.text[model.options.lang],
+            }));
+            component.find("input").val(tagoption.text[model.options.lang]);
+        }else
+            component.find("select").html($('<option>', {
+                value: tagoption.value,
+                text: tagoption.text,
+            }));
 
-        if (options.userselected) {
-            model[options.userselected](value, text);
+        if (model.options.itemselected) {
+            var item = JSON.parse($(el).find("span").text());
+            console.log(item, model.options.itemselected)
+            //model.selectitemcallback(tagoption.value, tagoption.text, item);
+            model[model.options.itemselected](tagoption.value, tagoption.text, item);
         }
 
     },
@@ -324,6 +338,7 @@ var model = {
             value = el.value,
             _param = {"dfilters": "on"};
 
+        model.options = options
         if (value.length < 3) {
             model.dataset = [];
             this.loading = false;

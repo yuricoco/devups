@@ -2,6 +2,7 @@
 
 
 use dclass\devups\Controller\Controller;
+use Shuchkin\SimpleXLSX;
 
 class Local_contentController extends Controller
 {
@@ -9,7 +10,8 @@ class Local_contentController extends Controller
     private static $path = ROOT . "cache/local/";
     const pathmodule = ROOT . "web/app3/frontend1/src/devupsjs/";
 
-    public function listView($next = 1, $per_page = 10){
+    public function listView($next = 1, $per_page = 10)
+    {
 
         $this->datatable = Local_contentTable::init(new Local_content())->buildindextable();
 
@@ -22,10 +24,11 @@ class Local_contentController extends Controller
 
     }
 
-    public function datatable($next, $per_page) {
+    public function datatable($next, $per_page)
+    {
         return ['success' => true,
             'datatable' => Local_contentTable::init(new Local_content())->buildindextable()->getTableRest(),
-           // 'datatable' => Local_contentTable::init(new Local_content())->router()->getTableRest(),
+            // 'datatable' => Local_contentTable::init(new Local_content())->router()->getTableRest(),
         ];
     }
 
@@ -113,7 +116,7 @@ class Local_contentController extends Controller
     public static function buildlocalcachesinglelang($lang)
     {
 
-        $lcs = Local_content::where("lang", $lang)->__getAllRow();
+        $lcs = Local_content::where("lang", $lang)->get();
 
         $info = [];
 
@@ -132,7 +135,8 @@ class Local_contentController extends Controller
 
     }
 
-    public function regeneratecacheAction(){
+    public function regeneratecacheAction()
+    {
         self::buildlocalcache();
 
         Response::success()
@@ -146,24 +150,24 @@ class Local_contentController extends Controller
 
         $lans = Dvups_lang::all();
         foreach ($lans as $lang) {
-            $lang = $lang->getIso_code();
+            $iso_code = $lang->getIso_code();
 
-            $lcs = Local_content::where("lang", $lang)->__getAllRow();
+            $lcs = Local_content::select()->setLang($lang->id)->get();
 
             $info = [];
 
             foreach ($lcs as $lc) {
-                $info[$lc->getReference()] = $lc->getContent();
+                $info[$lc->getReference()] = $lc->content;
             }
 
             if ($info) {
                 // todo - fix issue on php warning during the first call of the function translate t().
-                if(file_exists(self::$path . $lang . ".json"))
-                    unlink(self::$path . $lang . ".json");
+                if (file_exists(self::$path . $iso_code . ".json"))
+                    unlink(self::$path . $iso_code . ".json");
 
                 $contenu = json_encode($info, 1024);
 
-                $entityrooting = fopen(self::$path . $lang . ".json", 'w');
+                $entityrooting = fopen(self::$path . $iso_code . ".json", 'w');
                 fputs($entityrooting, $contenu);
                 fclose($entityrooting);
 
@@ -180,17 +184,18 @@ class Local_contentController extends Controller
         $lck->__insert();
 
         $lans = Dvups_lang::all();
+        $lc = new Local_content();
+        $content = [];
         foreach ($lans as $lang) {
-            $lang = $lang->getIso_code();
-
-            $lc = new Local_content();
-            $lc->setLang($lang);
-            $lc->setReference($ref);
-            $lc->setContent($default);
-            $lc->local_content_key = $lck;
-            $lc->__insert();
-
+            //$lang = $lang->getIso_code();
+            $content[$lang->getIso_code()]=$default;
         }
+
+        //$lc->setLang($lang);
+        $lc->setReference($ref);
+        $lc->content = $content;
+        $lc->local_content_key = $lck;
+        $lc->__insert();
 
         self::buildlocalcache();
 
@@ -224,6 +229,239 @@ class Local_contentController extends Controller
 
         return file_get_contents(self::$path . $lang . ".json");
 
+    }
+
+    public function exportlangView()
+    {
+        $langs = Dvups_lang::all();
+        Genesis::renderView("admin.exportlang", compact("langs"));
+    }
+
+    public static function devups($lang_dest, $lang, &$excelData)
+    {
+        $id_lang_dest = $lang_dest->id;
+        $id_lang = $lang->id;
+        // Database configuration
+        $dbHost = dbhost;
+        $dbUsername = dbuser;
+        $dbPassword = dbpassword;
+        $dbName = dbname;
+
+// Create database connection
+        $db = new mysqli($dbHost, $dbUsername, $dbPassword, $dbName);
+
+// Check connection
+        if ($db->connect_error) {
+            die("Connection failed: " . $db->connect_error);
+        }
+
+        $entities = Dvups_entity::all();
+
+        foreach ($entities as $table) {
+
+            if (!class_exists($table->name)) continue;
+
+            if (in_array($table->name, ["cmstext"]))
+                continue;
+
+            $class = ucfirst($table->name);
+            $entity = new $class;
+            if (!$entity->dvtranslate)
+                continue;
+
+            $attfield = "";
+            $attribs = $entity->dvtranslated_columns;
+
+            $table = $table->name;
+            foreach ($attribs as $attr) {
+                $attfield .= ", dest.$attr AS dest_$attr ";
+            }
+            $sql = " select t.* $attfield from " . $table . "_lang t,
+         (select * from " . $table . "_lang where 1 ) dest
+          where t.lang_id = $id_lang AND dest.lang_id = $id_lang_dest AND dest." . $table . "_id = t.$table" . "_id";
+
+            //dv_dump($sql);
+            $key = $table;
+
+            $query = $db->query($sql);
+            if ($query->num_rows > 0) {
+                // Output each row of the data
+                while ($row = $query->fetch_assoc()) {
+                    foreach ($attribs as $attrib) {
+                        if (!$row[$attrib] && !$row["dest_" . $attrib])
+                            continue;
+
+                        $lineData = array($table,
+                            $row[$key . '_id'], $attrib, $row[$attrib], $row["dest_" . $attrib]);
+                        array_walk($lineData, 'filterData');
+                        $excelData .= implode("\t", array_values($lineData)) . "\n";
+                    }
+                }
+            } else {
+                //$excelData .= 'No records found...' . "\n";
+            }
+
+        }
+
+
+    }
+
+    public function exportlang($iso_code)
+    {
+
+//        if (!file_exists(__DIR__ . "/../import"))
+//            mkdir(__DIR__ . "/../import", 0777, true);
+
+        function filterData(&$str)
+        {
+            $str = preg_replace("/\t/", "\\t", $str);
+            $str = preg_replace("/\r?\n/", "\\n", $str);
+            if (strstr($str, '"')) $str = '"' . str_replace('"', '""', $str) . '"';
+        }
+
+        $dest = Request::get("dest");
+        $lang = Dvups_lang::getbyattribut("iso_code", $iso_code);
+        $lang_dest = Dvups_lang::getbyattribut("iso_code", $dest);
+
+// Excel file name for download
+
+// Column names
+        $excelData = "";
+        //unlink(__DIR__ . "/../import/datalang.csv");
+        $fields = array('table', 'row', 'attribut', 'content ' . (($iso_code)),);
+
+        $fields[] = "content " . $dest;
+        $excelData = implode("\t", array_values($fields)) . "\n";
+
+        self::devups($lang_dest, $lang, $excelData);
+//            $moddepend = fopen(__DIR__ . "/../import/datalang.csv", "w");
+//            fputs($moddepend, $excelData);
+//            fclose($moddepend);
+//            return 1;
+//        echo $excelData;
+//        die;
+// Headers for download
+
+        $fileName = "database-lang_" . date('Y-m-d_H-i') . ".csv";
+//        $excelData = file_get_contents(__DIR__ . "/../import/datalang.csv");
+
+        header('Content-Type: text/html; charset=windows-1252');
+        //header("Content-Type: application/vnd.ms-excel");
+        header("Content-Disposition: attachment; filename=\"$fileName\"");
+
+// Render excel data
+        echo $excelData;
+
+        exit;
+    }
+
+    public static function importlang()
+    {
+        require ROOT . "/dclass/lib/SimpleXLSX.php";
+        $file = null;
+        if (!file_exists(UPLOAD_DIR . "/importlang"))
+            mkdir(UPLOAD_DIR . "/importlang", 0777, true);
+
+        if (isset($_FILES['filelang'])) {
+            if (move_uploaded_file($_FILES['filelang']['tmp_name'], UPLOAD_DIR . "/importlang/translation.xlsx")) {
+
+                return [
+                    "success" => true,
+                    "detail" => "le fichier a bien ete uploade",
+                ];
+
+            } else {
+                return array("success" => false, 'detail' => 'Problème lors de l\'uploadage !');
+            }
+        }
+
+        $file = UPLOAD_DIR . "/importlang/translation.xlsx";
+        if (!file_exists($file))
+            return [
+                "success" => false,
+                "detail" => "le fichier est introuvable",
+            ];
+
+        //$langs = explode(",", $_GET['langs']);
+        $lang = Request::get('lang');
+        $iteration = Request::get("iteration");
+        $next = Request::get("next");
+        $iterator = 0;
+        // $xlsx = new SimpleXLSX(__DIR__ . '/../import/database-lang_2022-02-23.xlsx');
+        $xlsx = new SimpleXLSX($file);
+
+        foreach ($xlsx->rows() as $i => $fields) {
+
+            if ($i == 0) {
+                $head = $fields;
+                continue;
+            }
+
+            if ($i < $next)
+                continue;
+            $iterator++;
+            if ($i > $next + $iteration)
+                break;
+
+            $iso = explode(" ", $head[4])[1];
+            $idlangs = [];
+            // foreach ($langs as $iso) {
+            if ($lang != $iso) {
+                return [
+                    "success" => false,
+                    "created" => $lang,
+                    "updated" => $iso,
+                    "i" => $i,
+                    "remain" => -1,
+                    "detail" => "la langue choisi n'est pas la bonne ",
+                ];
+                //if (!isset($row['content ' . $iso]))
+                continue;
+            }
+
+            $row = array_combine($head, $fields);
+            if (!$row['content ' . $iso])
+                continue;
+
+            if (!isset($idlangs[$iso]))
+                $idlangs[$iso] = Dvups_lang::getbyattribut("iso_code", $iso)->id;
+
+
+            $sql = "  select COUNT(*) from " . $row["table"]
+                . "_lang where {$row["table"]}_id = {$row["row"]} AND lang_id =  " . $idlangs[$iso];
+            $exist = (new DBAL())->executeDbal($sql);
+
+            if ($exist) {
+                DBAL::_updateDbal($row["table"] . "_lang",
+                    [
+                        $row["attribut"] => $row['content ' . $iso],
+                    ],
+                    "{$row["table"]}_id = {$row["row"]} AND lang_id =  " . $idlangs[$iso]);
+            } /*else
+                    Db::getInstance()->insert($row["table"],
+                        [
+                            "id_lang" => $idlangs[$iso],
+                            "id_" . $row["table"] => $row["row"],
+                            "" . $row["attribut"] => $row['content ' . $iso],
+                        ]);*/
+
+
+            //}
+
+        }
+
+        if ($iterator - $iteration < 0) {
+            self::buildlocalcache();
+        }
+
+        return [
+            "success" => true,
+            "created" => true,
+            "updated" => true,
+            "i" => $i,
+            "remain" => $iterator - $iteration,
+            "detail" => "le fichier est ok",
+        ];
     }
 
 }

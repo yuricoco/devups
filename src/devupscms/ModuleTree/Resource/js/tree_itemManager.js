@@ -130,9 +130,9 @@ Vue.component("tree_itemForm", {
                                 
                             </div>
                             <div class="tab-pane fade" id="content-tab" role="tabpanel" aria-labelledby="content-tab">
-                                <div class="form-group">
-                                    <label for="text">Content</label>
-                                    <textarea style="min-height: 300px" class="form-control" v-model="tree_item.content" ></textarea>
+                                <div v-for="lang in langs" class="form-group">
+                                    <label for="text">Content {{lang.iso_code}}</label>
+                                    <textarea style="min-height: 300px" class="form-control" v-model="tree_item.content[lang.iso_code]" ></textarea>
                                 </div>
                             </div>
                             <div class="tab-pane fade" id="image-tab" role="tabpanel" aria-labelledby="profile-tab">

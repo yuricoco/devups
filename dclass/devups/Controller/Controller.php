@@ -610,10 +610,11 @@ class Controller
                     $value2->setId($value_form);
 
                     if (!method_exists($object, $currentfieldsetter)) {
-                        if (in_array($key, $fieldNames))
-                            $object->{$key} = $value2;
-                        else
-                            $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
+//                        dv_dump($fieldNames);
+//                        if (in_array($key_form, $fieldNames))
+                            $object->{$key_form} = $value2;
+//                        else
+//                            $this->error[$key] = " You may create method " . $currentfieldsetter . " in entity ";
                     } elseif ($error = call_user_func(array($object, $currentfieldsetter), $value2)) //$value2->__show(false)
                         $this->error[$key] = $error;
 

@@ -17,13 +17,20 @@ class ReportingmodelForm extends FormManager
 
     public function buildForm()
     {
+        $files = scandir(ROOT."src/devupscms/ModuleReporting/Resource/views/models/");
+
+        unset($files[0]);
+        unset($files[1]);
+        if (!$this->emailmodel->type)
+            $this->emailmodel->type = explode(".", $files[2])[0];
 
         $this->fields['type'] = [
             "label" => t('Type of reporting '),
             "type" => FORMTYPE_RADIO,
-            "options" => FormManager::key_as_value(["PDF", "email"]),
-            "value" => $this->emailmodel->getType(),
+            "options" => FormManager::key_as_value(array_values($files)),
+            "value" => $this->emailmodel->getType().".blade.php",
         ];
+
         $this->fields['name'] = [
             "label" => t('Email model name'),
             "type" => FORMTYPE_TEXT,
@@ -47,6 +54,12 @@ class ReportingmodelForm extends FormManager
             "label" => t('Description of the mail'),
             "type" => FORMTYPE_TEXT,
             "value" => $this->emailmodel->description,
+        ];
+        $this->fields['contenttext'] = [
+            "label" => t('Contenu text'),
+            "type" => FORMTYPE_TEXTAREA,
+            "lang" => true,
+            "value" => $this->emailmodel->contenttext,
         ];
 
 

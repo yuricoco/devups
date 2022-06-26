@@ -33,6 +33,10 @@ class Bugmanager {
 //        if(SYSTEM_DEBUG){
 //        Genesis::json_encode($debug);
 //        die;
+        if (Request::get("debug") == 1){
+            echo json_encode($debug);
+            die;
+        }
         echo "<pre>";
         $calledfrom = debug_backtrace();
         dump($debug);

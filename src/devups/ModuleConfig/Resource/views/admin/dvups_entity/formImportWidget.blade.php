@@ -1,12 +1,21 @@
-{{$entity}}
+<h3>{{$entity}}</h3>
+
 <hr>
+<div class="form-group">
+    <label>Langue source</label>
+    <select class="form-control" name="idlang">
+        @foreach($langs as $lang)
+            <option value="{{$lang->id}}">{{$lang->iso_code}}</option>
+        @endforeach
+    </select>
+</div>
 <div class="form-group">
     <label>Coller un contenu csv</label>
     <textarea id="contentcsv" class="form-control"></textarea>
 </div>
 <div class="form-group">
     <label>Importer un  fichier csv</label>
-    <input id="csvfile" class="form-control" type="file"  />
+    <input id="csvfile" class="form-control" type="file" accept=".csv,.xslx" />
 </div>
 <button onclick="dventity.exportdata(this)" type="button" class="btn btn-info">Importer les données!</button>
 <hr>

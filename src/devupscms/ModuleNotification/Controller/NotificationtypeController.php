@@ -101,8 +101,12 @@ class NotificationtypeController extends Controller{
 
     }
     
+    public function delete($id){
+        return $this->deleteAction($id);
+    }
+
     public function deleteAction($id){
-    
+
         Notificationtype::delete($id);
         
         return 	array(	'success' => true, 

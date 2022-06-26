@@ -26,6 +26,136 @@
           "relation": []
         }
       ]
+    },
+    {
+      "name": "ModuleProduct",
+      "project": " devupstuto",
+      "listentity": [
+        {
+          "name": "category",
+          "attribut": [
+            {
+              "name": "id",
+              "datatype": "integer",
+              "nullable": "not",
+              "formtype": "text"
+            },
+            {
+              "name": "name",
+              "datatype": "string",
+              "size": "255",
+              "nullable": "not",
+              "formtype": "text"
+            }
+          ],
+          "relation": []
+        },
+        {
+          "name": "subcategory",
+          "attribut": [
+            {
+              "name": "id",
+              "datatype": "integer",
+              "nullable": "not",
+              "formtype": "text"
+            },
+            {
+              "name": "name",
+              "datatype": "string",
+              "size": "255",
+              "nullable": "not",
+              "formtype": "text"
+            }
+          ],
+          "relation": [
+            {
+              "entity": "category",
+              "cardinality": "manyToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            }
+          ]
+        },
+        {
+          "name": "image",
+          "attribut": [
+            {
+              "name": "id",
+              "datatype": "integer",
+              "nullable": "not",
+              "formtype": "text"
+            },
+            {
+              "name": "image",
+              "datatype": "string",
+              "size": "255",
+              "nullable": "not",
+              "formtype": "image"
+            }
+          ],
+          "relation": []
+        },
+        {
+          "name": "product",
+          "lang": true,
+          "attribut": [
+            {
+              "name": "id",
+              "datatype": "integer",
+              "nullable": "not",
+              "formtype": "text"
+            },
+            {
+              "name": "name",
+              "lang": true,
+              "visibility": "",
+              "datatype": "string",
+              "size": "22",
+              "nullable": "not",
+              "formtype": "text"
+            },
+            {
+              "name": "description",
+              "visibility": "",
+              "datatype": "text",
+              "size": "",
+              "nullable": "not",
+              "formtype": "textarea"
+            }
+          ],
+          "relation": [
+            {
+              "entity": "image",
+              "cardinality": "oneToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            },
+            {
+              "entity": "category",
+              "cardinality": "manyToOne",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            },
+            {
+              "entity": "subcategory",
+              "cardinality": "manyToOne",
+              "nullable": "default",
+              "ondelete": "set null",
+              "onupdate": "set null"
+            },
+            {
+              "entity": "storage",
+              "cardinality": "manyToMany",
+              "nullable": "not",
+              "ondelete": "cascade",
+              "onupdate": "cascade"
+            }
+          ]
+        }
+      ]
     }
   ]
 }

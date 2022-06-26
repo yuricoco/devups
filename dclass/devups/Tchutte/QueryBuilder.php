@@ -208,7 +208,13 @@ class QueryBuilder extends \DBAL
             $query .= " {$this->_where} ";
 
         if ($this->softdelete) {
-            if ($this->hasrelation)
+            if ($this->dvtrashed) {
+                if ($this->hasrelation)
+                    $query .= ' AND ' . $this->table . '.deleted_at IS NOT NULL ';
+                else
+                    $query .= ' AND deleted_at IS NOT NULL ';
+            }
+            elseif ($this->hasrelation)
                 $query .= ' AND ' . $this->table . '.deleted_at IS NULL ';
             else
                 $query .= ' AND deleted_at IS NULL ';
@@ -230,10 +236,10 @@ class QueryBuilder extends \DBAL
     /**
      * @return boolean | $this
      */
-    public function delete($exec = true)
+    public function delete($force = false)
     {
 
-        if ($this->softdelete) {
+        if ($this->softdelete && $force == false) {
             $this->query = " UPDATE " . $this->table . " SET deleted_at = NOW() ";
         } else
             $this->query = "  DELETE FROM {$this->_from} ";
@@ -241,8 +247,6 @@ class QueryBuilder extends \DBAL
         if (!$this->initwhereclause) {
             $this->_where = " AND id = " . $this->instanceid;
         }
-        if ($exec)
-            return $this->sequensization()->exec();
 
         return $this->sequensization()->exec();
     }
@@ -844,7 +848,7 @@ class QueryBuilder extends \DBAL
         if (property_exists($model, "id")) {
             if ($model->getId())
                 return $model;
-        }else
+        } else
             return $model;
 
         return null;
@@ -879,6 +883,54 @@ class QueryBuilder extends \DBAL
         dv_dump("callback is not callable");
     }
 
+    /**
+     * @param $constraint
+     * @param $data
+     * @param $id_lang
+     * @return array|Object
+     */
+    public function firstOrCreate($constraint, $data = [], $id_lang = null)
+    {
+
+        $model = $this->setLang($id_lang)->where($constraint)->firstOrNull();
+        if ($model)
+            return $model;
+
+        if (!$data)
+            $data = $constraint;
+
+        $data += $constraint;
+
+        $id = DBAL::_createDbal($this->table, $data);
+
+        return $this->setLang($id_lang)->where("this.id", $id)->first();
+
+    }
+
+    /**
+     * @param $constraint
+     * @param $data
+     * @param $id_lang
+     * @return array|Object|type
+     */
+    public function firstOrNew($constraint, $data = [], $id_lang = null)
+    {
+
+        $model = $this->setLang($id_lang)->where($constraint)->firstOrNull();
+        if ($model)
+            return $model;
+
+        if (!$data)
+            $data = $constraint;
+
+        $data += $constraint;
+        foreach ($data as $key => $value)
+            $this->object->{$key} = $value;
+
+        return $this->object;
+
+    }
+
     public function getLast($recursif = true, $collect = [])
     {
         return $this->orderBy($this->table . ".id DESC ")->limit(1)->getInstance($recursif, $collect);
@@ -893,7 +945,16 @@ class QueryBuilder extends \DBAL
             $this->setLang($id_lang);
         // $this->setCollect($collect);
         $i = (int)$index;
+        if ($i < 0) {
+            $nbel = $this->count();
+            if ($nbel == 1)
+                return $this->object;
+
+            $i += $nbel;
+        }
+
         return $this->limit($i - 1, $i)->getInstance();
+
     }
 
     public function __exportAllRow($callback)
@@ -1137,7 +1198,24 @@ class QueryBuilder extends \DBAL
 
     }
 
-    public function getRows($column = "*", $asobject = false)
+    public function trashed($column = "*", $id_lang = null)
+    {
+        $this->dvtrashed = true;
+        $this->select($column);
+        $this->initSelect();
+        $this->sequensization();
+
+        if (!$this->id_lang)
+            $this->setLang($id_lang);
+
+        if (self::$debug)
+            return $this->getSqlQuery();
+
+        return $this->__findAll($this->query, $this->parameters);
+
+    }
+
+    public function getRows($column = "*", $callback = null)
     {
         $this->select($column);
         $this->initSelect($column);
@@ -1146,10 +1224,10 @@ class QueryBuilder extends \DBAL
         if (self::$debug)
             return $this->getSqlQuery();
 
-        if ($asobject)
-            return (object)$this->__findAllRow($this->query, $this->parameters);
+//        if ($asobject)
+//            return (object)$this->__findAllRow($this->query, $this->parameters, $callback);
 
-        return $this->__findAllRow($this->query, $this->parameters);
+        return $this->__findAllRow($this->query, $this->parameters, $callback);
 
     }
 

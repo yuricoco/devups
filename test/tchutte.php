@@ -70,7 +70,7 @@ $storage = new Storage();
 //Product::select()->where(["product.name", "category.id"], ["tew", 1]);
 //Sql: ' select * from product where product.name = ? and category.id = ? '
 
-//Product::select()->where(Category::find(1));
+//Product::select()->where(Category::find(1))->orderBy();
 //Product::select()->where("id")->in([1, 2, 3]);
 //Product::select()->where("id")->in("1, 2, 3");
 //$sql = Product::select()->where("id")->in(
@@ -102,7 +102,7 @@ $products = Category::find(1)->__hasmany('product');
 
 //$nb = Storage::count();
 
-//$storage = Storage::find(3);
+$storage = Storage::find(3);
 //$storage->town = "bamenda centre";
 //$storage->__update(); // __save()
 //$sql  = Storage::update("town", "bamenda", 3)->getSqlQuery();
@@ -112,6 +112,7 @@ $products = Category::find(1)->__hasmany('product');
 //Storage::update()->set(["town" => "buéa"], 1)->exec();
 //Storage::update()->set(["town" => "buéa"])->where('id', 1)->exec();
 
+Storage::lazyloading();
 //$storage = Storage::get(3);
 
 $produits = Product::allrows();

@@ -100,6 +100,7 @@ class BackendGenerator
             if( $" . "id ) { $" . "this->id = $" . "id; }   
             ";
 
+        $methodcollection = "";
         if (!empty($entity->relation)) {
 
             $construteur .= "";
@@ -141,7 +142,7 @@ class BackendGenerator
          */
         public $" . $relation->entity . ";\n";
 
-                    $method .= "
+                    $methodcollection .= "
         /**
          *  " . $relation->cardinality . "
          *	@return " . $antislash . ucfirst($relation->entity) . "
@@ -149,7 +150,7 @@ class BackendGenerator
         function get" . ucfirst($relation->entity) . "() {
             return $" . "this->" . $relation->entity . ";
         }";
-                    $method .= "
+                    $methodcollection .= "
         function set" . ucfirst($relation->entity) . "($" . $relation->entity . "){
             $" . "this->" . $relation->entity . " = $" . $relation->entity . ";
         }
@@ -263,15 +264,15 @@ class BackendGenerator
             $" . "url = Dfile::show($" . "this->" . $attribut->name . ", '" . $name . "');
             return Dfile::fileadapter($" . "url, $" . "this->" . $attribut->name . ");
         }
-        
+        ";
+                    /*
         public function get" . ucfirst($attribut->name) . "() {
             return $" . "this->" . $attribut->name . ";
         }
 
         public function set" . ucfirst($attribut->name) . "($" . $attribut->name . ") {
             $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
-        }
-        ";
+        }*/
                 } elseif ($attribut->formtype == 'liste') {
                     $construt .= "
         public function get" . ucfirst($attribut->name) . "List() {
@@ -287,7 +288,7 @@ class BackendGenerator
         }
         ";
                 } else {
-                    $construt .= "
+                   /* $construt .= "
         public function get" . ucfirst($attribut->name) . "() {
             return $" . "this->" . $attribut->name . ";
         }
@@ -295,12 +296,14 @@ class BackendGenerator
         public function set" . ucfirst($attribut->name) . "($" . $attribut->name . ") {
             $" . "this->" . $attribut->name . " = $" . $attribut->name . ";
         }
-        ";
+        ";*/
                 }
             }
         }
-        $construt .= $method . "
+        $construt .= /*$method .*/ "
         
+        // getter and setter
+        $methodcollection
         public function jsonSerialize() {
                 return [
                     'id' => $" . "this->id,";
@@ -436,7 +439,7 @@ class " . ucfirst($name) . "_lang extends Dv_langCore {\n");
         }";
                     $onoinsert[] = "
         $" . $relation->entity . "->__insert();
-        $" . $name . "->set" . ucfirst($relation->entity) . "($" . $relation->entity . ");";
+        $" . $name . "->" . ($relation->entity) . " = $" . $relation->entity . ";";
                 }
             }
         }
@@ -967,61 +970,61 @@ class " . ucfirst($name) . "Table extends Datatable{
 
             if ($attribut->formtype == 'text' or $attribut->formtype == 'float') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_TEXT, 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             } elseif ($attribut->formtype == 'integer' or $attribut->formtype == 'number') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_NUMBER, 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),  ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ",  ";
             } elseif ($attribut->formtype == 'textarea') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             } elseif ($attribut->formtype == 'date') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             } elseif ($attribut->formtype == 'time') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             } elseif ($attribut->formtype == 'datetime') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             } elseif ($attribut->formtype == 'datepicker') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             } elseif ($attribut->formtype == 'radio') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), 
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", 
                 \"options\" => " . ucfirst($name) . "::$" . $attribut->name . "s, 
                 ";
             } elseif ($attribut->formtype == 'select') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), 
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", 
                 \"options\" => " . ucfirst($name) . "::$" . $attribut->name . "s, 
                 ";
             } elseif ($attribut->formtype == 'email') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             } elseif ($attribut->formtype == 'document') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_FILE,
                 FH_FILETYPE => FILETYPE_" . strtoupper($attribut->formtype) . ",  
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ",
                 \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'video') {
                 $field .= "\t\t\t\"type\" => FORMTYPE_FILE,
                 \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ",
                 \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'music') {
                 $field .= "\"type\" => FORMTYPE_FILE,
                 \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-                \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+                \"value\" => \$this->" . $name . "->" . $attribut->name . ",
                 \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } elseif ($attribut->formtype == 'image') {
                 $field .= "\t\t\"type\" => FORMTYPE_FILE,
             \"filetype\" => FILETYPE_" . strtoupper($attribut->formtype) . ", 
-            \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(),
+            \"value\" => \$this->" . $name . "->" . $attribut->name . ",
             \"src\" => \$this->" . $name . "->show" . ucfirst($attribut->name) . "(), ";
             } else {
                 $field .= "\"type\" => FORMTYPE_TEXT,
-            \"value\" => \$this->" . $name . "->get" . ucfirst($attribut->name) . "(), ";
+            \"value\" => \$this->" . $name . "->" . $attribut->name . ", ";
             }
 
             if (isset($attribut->lang) && $attribut->lang) {
@@ -1053,7 +1056,7 @@ class " . ucfirst($name) . "Table extends Datatable{
                     $field .= "
         \$this->fields['" . $relation->entity . ".id'] = [
             \"type\" => FORMTYPE_SELECT, 
-            \"value\" => \$this->" . $name . "->get" . ucfirst($relation->entity) . "()->getId(),
+            \"value\" => \$this->" . $name . "->" . ($relation->entity) . "->id,
             \"label\" => t('" . $relation->entity . "'),
             \"options\" => FormManager::Options_Helper('" . $enititylinkattrname . "', " . ucfirst($relation->entity) . "::allrows()),
         ];\n";
@@ -1135,52 +1138,52 @@ class " . ucfirst($name) . "Form extends FormManager{
 //            }
 
             if ($attribut->formtype == 'text' or $attribut->formtype == 'float') {
-                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'input' or $attribut->formtype == 'number') {
-                $field .= "\t<?= Form::integer('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::integer('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'textarea') {
-                $field .= "\t<?= Form::textarea('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::textarea('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'date') {
-                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'time') {
-                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'datetime') {
-                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'datepicker') {
-                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'radio') {
-                $field .= "\t<?= Form::radio('" . $attribut->name . "', " . ucfirst($name) . "::$" . $attribut->name . "s, $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::radio('" . $attribut->name . "', " . ucfirst($name) . "::$" . $attribut->name . "s, $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'select') {
-                $field .= "\t<?= Form::select('" . $attribut->name . "', " . ucfirst($name) . "::$" . $attribut->name . "s, $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']); ?>\n";
+                $field .= "\t<?= Form::select('" . $attribut->name . "', " . ucfirst($name) . "::$" . $attribut->name . "s, $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']); ?>\n";
             } elseif ($attribut->formtype == 'email') {
-                $field .= "\t<?= Form::email('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
+                $field .= "\t<?= Form::email('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']) ?>\n";
             } elseif (in_array($attribut->formtype, ['document', 'image', 'musique', 'video'])) {
 
-                $field .= "\t<?= Form::filepreview($" . $name . "->get" . ucfirst($attribut->name) . "(),
+                $field .= "\t<?= Form::filepreview($" . $name . "->" . $attribut->name . ",
                 $" . $name . "->show" . ucfirst($attribut->name) . "(),
                  ['class' => 'form-control'], 'image') ?>\n";
 
                 if ($attribut->formtype == 'document') {
                     $field .= "\t<?= Form::file('" . $attribut->name . "', 
-                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                $" . $name . "->" . $attribut->name . ",
                  ['class' => 'form-control'], 'document') ?>\n";
                 } elseif ($attribut->formtype == 'video') {
                     $field .= "\t<?= Form::file('" . $attribut->name . "', 
-                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                $" . $name . "->" . $attribut->name . ",
                  ['class' => 'form-control'], 'video') ?>\n";
                 } elseif ($attribut->formtype == 'music') {
                     $field .= "\t<?= Form::file('" . $attribut->name . "', 
-                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                $" . $name . "->" . $attribut->name . ",
                  ['class' => 'form-control'], 'audio') ?>\n";
                 } elseif ($attribut->formtype == 'image') {
                     $field .= "\t<?= Form::file('" . $attribut->name . "', 
-                $" . $name . "->get" . ucfirst($attribut->name) . "(),
+                $" . $name . "->" . $attribut->name . ",
                 '',
                  ['class' => 'form-control'], 'image') ?>\n";
 
                 }
             } else {
-                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->get" . ucfirst($attribut->name) . "(), ['class' => 'form-control']) ?>\n";
+                $field .= "\t<?= Form::input('" . $attribut->name . "', $" . $name . "->" . $attribut->name . ", ['class' => 'form-control']) ?>\n";
 
             }
 

@@ -133,7 +133,7 @@ class Tree_item_image extends Model implements JsonSerializable
             //$image->folder = Tree_item::mainmenu("folder")->andwhere("this.name", "slider")->__getOne();
             $image->setImage($url["file"]["hashname"]);
             $image->setUploaddir($filedir);
-            $image->setSize($url["file"]["imagesize"]);
+            $image->setSize($url["file"]["size"]);
             $image->__save();
 
             $this->image = $image;

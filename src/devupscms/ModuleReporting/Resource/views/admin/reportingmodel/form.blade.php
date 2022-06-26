@@ -53,12 +53,18 @@
                             <div id="container-{{$lang->iso_code}}" class="col-lg-6   stretch-card dv-editable">
 
                                 <div class='form-group'>
-                                    <button class="btn btn-primary" onclick="reportingmodel.loadFromFile(this)">
-                                        Charger le contenu depuis le fichier {{$reportingmodel->name}}_{{$lang->iso_code}}.html
+                                    <button class="btn btn-primary"
+                                            onclick="reportingmodel.loadFromFile(this, '{{$lang->iso_code}}')">
+                                        Charger le contenu depuis le fichier html
                                     </button>
-                                    <button class="btn btn-warning" onclick="saveToFile(this)">
-                                        Enregistrer le contenu dans le fichier {{$reportingmodel->name}}_{{$lang->iso_code}}.html
+                                    <button class="btn btn-warning"
+                                            onclick="saveToFile(this, {{$reportingmodel->id}}, '{{$lang->iso_code}}')">
+                                        Enregistrer le contenu dans le fichier html
                                     </button>
+                                    <a class="btn btn-warning"
+                                       href="{{Reportingmodel::classpath("reportingmodel/download-content?lang={$lang->iso_code}&id=".$reportingmodel->id)}}">
+                                        Telecharger le contenu dans un fichier html
+                                    </a>
                                 </div>
                                 <div class='form-group'>
                                     <div class='alert alert-info'>
@@ -105,7 +111,11 @@
                         {!! $reportingmodel->getTest() !!}
                     </div>
                 </div>
-                <iframe hidden id="template">{!! Genesis::getView("email") !!}</iframe>
+                @if(!$reportingmodel->type || in_array($reportingmodel->type, ['email', 'PDF']))
+                    <iframe hidden id="template">{!! Genesis::getView("models.email") !!}</iframe>
+                @else
+                    <iframe hidden id="template">{!! Genesis::getView("models.".$reportingmodel->type) !!}</iframe>
+                @endif
             </div>
         </div>
     </div>
